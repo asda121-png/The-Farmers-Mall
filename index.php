@@ -144,7 +144,7 @@
   -->
   <section 
     class="relative flex items-center justify-center min-h-screen pt-[100px] bg-cover bg-center" 
-    style="background-image: url('images/farmer-hero-banner-img.jpg');"
+    style="background-image: url('images/farmers-hero-banner-img.jpg');"
   >
     <!-- Dark Overlay -->
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
