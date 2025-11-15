@@ -173,7 +173,7 @@
         <p class="text-sm text-gray-500">${escapeHtml(product.unit)}</p>
         <div class="flex justify-between items-center mt-2">
           <p class="font-semibold text-green-700">₱${Number(product.price).toFixed(2)}</p>
-          <button class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700" title="Add to cart">
+          <button class="add-btn bg-white text-green-600 border border-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart">
             <i class="fa-solid fa-plus"></i>
           </button>
         </div>
