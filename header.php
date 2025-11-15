@@ -102,10 +102,10 @@
       <ul class="flex gap-6"> <!-- Removed default text color, script will handle it -->
         <!-- ✅ CHANGED: Updated links to work from any page -->
         <li><a href="index.php" class="hover:text-green-700">Home</a></li>
-        <li><a href="index.php#about" class="hover:text-green-700">About</a></li>
-        <li><a href="index.php#how" class="hover:text-green-700">How It Works</a></li>
-        <li><a href="index.php#shop" class="hover:text-green-700">Shop</a></li>
-        <li><a href="index.php#support" class="hover:text-green-700">Support</a></li>
+        <li><a href="about.php" class="hover:text-green-700">About</a></li>
+        <li><a href="how.php" class="hover:text-green-700">How It Works</a></li>
+        <li><a href="shop.php" class="hover:text-green-700">Shop</a></li>
+        <li><a href="support.php" class="hover:text-green-700">Support</a></li>
       </ul>
     </nav>
 
