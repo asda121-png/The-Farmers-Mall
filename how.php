@@ -43,7 +43,7 @@
         <!-- Page Header -->
         <section 
             class="relative flex items-center justify-center min-h-screen bg-cover bg-center text-white pt-[100px]" 
-            style="background-image: url('images/farm-fresh-box.jpg');"
+            style="background-image: url('images/farmers-mall-cover.jpg');"
             onerror="this.style.backgroundImage='url(\'https://placehold.co/1920x1080/222/white?text=Farm+Fresh+Box\')'"
         >
             <!-- Dark Overlay -->
