@@ -1,3 +1,0 @@
-- [ ] Update products.html: Change images to real ones from images/products/, add data-description to each product card.
-- [ ] Update js/products.js: Add descriptions to sample products in generateBatchProducts, update images to real ones.
-- [ ] Test: Open products.html, click a product, verify details show in productdetails.html.

@@ -129,22 +129,23 @@
 
     // Event delegation for product grid clicks
     productsGrid.addEventListener('click', (e) => {
-      // Find the parent product card that was clicked
       const card = e.target.closest('.product-card');
-      
-      // If a card was clicked (and not something else in the grid)
-      if (card) {
-        // Prevent default behavior if the click was on a button or link inside the card
+      if (card && !e.target.closest('.add-btn')) {
         e.preventDefault();
         
-        // Get product data from the card's data attributes
-        const name = card?.dataset.name || 'Item';
-        const price = card?.dataset.price || '0';
-        const img = card?.querySelector('img')?.src || '';
-        const description = card?.dataset.description || 'No description available.';
-        const selectedProduct = { name, price, img, description };
-        localStorage.setItem('selectedProduct', JSON.stringify(selectedProduct));
-        window.location.href = 'productdetails.html';
+        const name = card.dataset.name || 'Item';
+        const price = card.dataset.price || '0';
+        const img = card.querySelector('img')?.src || '';
+        const description = card.dataset.description || 'No description available.';
+        
+        const params = new URLSearchParams({
+          name: name,
+          price: price,
+          img: img,
+          description: description,
+        });
+        
+        window.location.href = `productdetails.html?${params.toString()}`;
       }
     });
 

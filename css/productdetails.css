@@ -1,0 +1,77 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #F9FAFB;
+}
+
+.breadcrumb a {
+  color: #6b7280;
+}
+
+.breadcrumb-gt {
+  color: #9ca3af;
+  margin: 0 0.5rem;
+}
+
+#main-image {
+  border: 1px solid #E5E7EB;
+}
+
+.thumbnail-gallery img {
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.thumbnail-gallery img:hover,
+.thumbnail-gallery img.border-green-500 {
+  border-color: #22c55e; /* green-500 */
+}
+
+.quantity-input button {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.quantity-input input {
+  border: none;
+  outline: none;
+}
+
+.add-to-cart-btn {
+  background-color: #16A34A; /* green-600 */
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #15803D; /* green-700 */
+}
+
+.wishlist-btn {
+  background-color: #F3F4F6; /* gray-100 */
+  border: 1px solid #E5E7EB; /* gray-200 */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.wishlist-btn:hover {
+  background-color: #E5E7EB; /* gray-200 */
+}
+
+.product-card {
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: #16A34A; /* green-600 */
+  color: white;
+  border-radius: 9999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 2px solid white;
+}
