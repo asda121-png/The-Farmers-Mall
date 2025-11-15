@@ -89,7 +89,7 @@
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden">
+      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="₱45.00" data-img="images/products/Fresh Vegetable Box.png">
         <img src="images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Vegetable Box</h3>
@@ -100,7 +100,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden">
+      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="₱30.00" data-img="images/products/Organic Lettuce.png">
         <img src="images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Organic Lettuce</h3>
@@ -111,7 +111,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden">
+      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="₱50.00" data-img="images/products/Fresh Milk.png">
         <img src="images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
@@ -122,7 +122,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden">
+      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="₱80.00" data-img="images/products/tilapia.jpg">
         <img src="images/products/tilapia.jpg" alt="Aged Cheddar" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Tilapia</h3>
@@ -133,7 +133,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden">
+      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="₱60.00" data-img="images/products/fresh eggs.jpeg">
         <img src="images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Farm Eggs</h3>
@@ -374,12 +374,23 @@
   </footer>
 
   <script>
-    // Add event listener to all '+' buttons
-    document.querySelectorAll('.add-btn').forEach(button => {
-      button.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent the link from redirecting
-        // Add to cart functionality can be added here
-        console.log('Add to cart clicked');
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.product-link').forEach(link => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const name = link.dataset.name;
+          const price = link.dataset.price;
+          const img = link.dataset.img;
+          window.location.href = `productdetails.html?name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}`;
+        });
+      });
+
+      document.querySelectorAll('.add-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          console.log('Add to cart clicked');
+        });
       });
     });
   </script>

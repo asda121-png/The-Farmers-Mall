@@ -13,26 +13,26 @@
 <body class="bg-gray-50 text-gray-800">
 
   <!-- Include Header -->
-    <!-- Navbar -->
-  <header class="bg-white shadow-sm">
+  <header class="bg-white shadow-sm" id="header">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
 
       <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
-          <input 
-            type="text" 
-            name="search"
-            placeholder="Search for fresh product..."
-            class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"/>
-        </form>
+        <input 
+          type="text" 
+          placeholder="Search for fresh product..."
+          class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+        />
       </div>
 
       <div class="flex items-center space-x-6">
+        <a href="homepage.html" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-green-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html"><img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer"></a>
+        <a href="profile.html">
+          <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+        </a>
       </div>
     </div>
   </header>
@@ -64,7 +64,7 @@
   <footer class="text-white py-12 mt-10" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div>
-        <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
+        <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
         <p class="text-gray-300 text-sm">Fresh, organic produce delivered straight to your home from local farmers.</p>
       </div>
       <div>
@@ -95,11 +95,22 @@
       </div>
     </div>
     <div class="border-t border-green-800 text-center text-gray-300 text-sm mt-10 pt-6">
-      © 2025 The Farmer's Mall. All rights reserved.
+      © 2025 Farmers Mall. All rights reserved.
     </div>
   </footer>
 
-  <script src="js/notification.js"></script>
+  <script src="js/customernotification.js"></script>
+  <script>
+    // Highlight the active notification icon in the header
+    document.addEventListener('DOMContentLoaded', function() {
+      const notificationIconLink = document.querySelector('a[href="notification.html"]');
+      if (notificationIconLink) {
+        // The bell icon is inside the link, so we target the link itself
+        notificationIconLink.classList.remove('text-gray-600');
+        notificationIconLink.classList.add('text-green-600');
+      }
+    });
+  </script>
 
 </body>
 </html>
