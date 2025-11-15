@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>All Products – The Farmer's Mall</title>
+  <title>All Products – Farmers Mall</title>
 
   <!-- Tailwind + Font Awesome (CDN as in your project) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="css/productdetails.css">
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
   <!-- Navbar -->
    <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold" style="color: #2E7D32;">The Farmer's Mall</h1>
+      <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
 
       <div class="flex-1 mx-6">
         <input 
@@ -83,7 +84,12 @@
     <!-- Products -->
     <section class="col-span-3">
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-semibold">All Products</h2>
+        <div class="flex items-center space-x-4">
+          <a href="homepage.html" class="flex items-center text-green-600 hover:text-green-700 font-medium text-xl">
+            <i class="fa-solid fa-arrow-left"></i>
+          </a>
+          <h2 class="text-xl font-semibold">All Products</h2>
+        </div>
         <div class="flex items-center space-x-2">
           <label class="text-sm text-gray-600">Sort by:</label>
           <select id="sortSelect" class="border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
@@ -267,7 +273,7 @@
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div>
-        <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
+        <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
         <p class="text-gray-300 text-sm">Fresh, organic produce delivered straight to your home from local farmers.</p>
       </div>
       <div>
@@ -299,7 +305,7 @@
     </div>
 
     <div class="border-t border-green-800 text-center text-gray-300 text-sm mt-10 pt-6">
-      © 2025 The Farmer's Mall. All rights reserved.
+      © 2025 Farmers Mall. All rights reserved.
     </div>
   </footer>
 
