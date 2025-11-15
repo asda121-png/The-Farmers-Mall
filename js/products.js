@@ -135,7 +135,9 @@
         
         const name = card.dataset.name || 'Item';
         const price = card.dataset.price || '0';
-        const img = card.querySelector('img')?.src || '';
+        const imgElement = card.querySelector('img');
+        // Get relative path instead of absolute URL
+        const img = imgElement?.getAttribute('src') || '';
         const description = card.dataset.description || 'No description available.';
         
         const params = new URLSearchParams({

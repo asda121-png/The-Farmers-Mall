@@ -67,4 +67,22 @@ document.addEventListener('DOMContentLoaded', () => {
       heartIcon.classList.add('fa-solid', 'text-red-500');
     }
   });
+
+  // Thumbnail gallery image switcher
+  const mainImage = document.getElementById('main-image');
+  const thumbnails = document.querySelectorAll('.thumbnail-gallery img');
+
+  thumbnails.forEach(thumbnail => {
+    thumbnail.addEventListener('click', () => {
+      // Update main image
+      mainImage.src = thumbnail.src;
+      mainImage.alt = thumbnail.alt;
+      
+      // Remove active border from all thumbnails
+      thumbnails.forEach(t => t.classList.remove('border-green-500'));
+      
+      // Add active border to clicked thumbnail
+      thumbnail.classList.add('border-green-500');
+    });
+  });
 });
