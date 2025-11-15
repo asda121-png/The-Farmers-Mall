@@ -28,7 +28,7 @@
          <a href="homepage.html" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-green-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.html">
           <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
@@ -152,5 +152,15 @@
   </footer>
 
   <script src="js/customermessage.js"></script>
+  <script>
+    // Highlight the active message icon in the header
+    document.addEventListener('DOMContentLoaded', function() {
+      const messageIconLink = document.querySelector('a[href="message.html"]');
+      if (messageIconLink) {
+        messageIconLink.classList.remove('text-gray-600');
+        messageIconLink.classList.add('text-green-600');
+      }
+    });
+  </script>
 </body>
 </html>
