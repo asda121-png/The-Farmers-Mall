@@ -30,18 +30,9 @@
       </div>
 
       <div class="flex items-center space-x-6">
-        <a href="message.html" class="relative text-gray-600">
-          <i class="fa-regular fa-comment text-2xl"></i>
-          <span class="notification-badge">3</span>
-        </a>
-        <a href="notification.html" class="relative text-gray-600">
-          <i class="fa-regular fa-bell text-2xl"></i>
-          <span class="notification-badge">5</span>
-        </a>
-        <a href="cart.html" class="relative text-gray-600">
-          <i class="fa-solid fa-cart-shopping text-2xl"></i>
-          <span class="notification-badge">2</span>
-        </a>
+        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.html">
           <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
@@ -57,26 +48,26 @@
       <span class="breadcrumb-gt">></span>
       <a href="products.html" class="hover:underline">Vegetables</a>
       <span class="breadcrumb-gt">></span>
-      <span class="font-semibold text-gray-700">Fresh Organic Vegetable Bundle</span>
+      <span id="product-name-breadcrumb" class="font-semibold text-gray-700">Product Name</span>
     </div>
 
     <div class="grid md:grid-cols-2 gap-12">
       <!-- Image Gallery -->
       <div>
         <div class="mb-4">
-          <img id="main-image" src="images/vegetable.png" alt="Fresh Vegetable Bundle" class="w-full h-auto rounded-lg shadow-md">
+          <img id="main-image" src="" alt="Product Image" class="w-full h-auto rounded-lg shadow-md object-contain">
         </div>
         <div class="flex space-x-4 thumbnail-gallery">
-          <img src="images/products/Native tomato.jpg" alt="Tomato" class="w-24 h-24 rounded-lg cursor-pointer border-2 border-green-500">
-          <img src="images/products/Organic Lettuce.png" alt="Lettuce" class="w-24 h-24 rounded-lg cursor-pointer">
-          <img src="images/products/carrots.png" alt="Carrots" class="w-24 h-24 rounded-lg cursor-pointer">
-          <img src="images/products/bell pepper mix.png" alt="Mixed Vegetables" class="w-24 h-24 rounded-lg cursor-pointer">
+          <img src="images/products/Native tomato.jpg" alt="Tomato" class="w-24 h-24 rounded-lg cursor-pointer border-2 border-green-500 object-contain">
+          <img src="images/products/Organic Lettuce.png" alt="Lettuce" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
+          <img src="images/products/carrots.png" alt="Carrots" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
+          <img src="images/products/bell pepper mix.png" alt="Mixed Vegetables" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
         </div>
       </div>
 
       <!-- Product Details -->
       <div>
-        <h1 class="text-4xl font-bold mb-3">Fresh Vegetable Bundle</h1>
+        <h1 id="product-name" class="text-4xl font-bold mb-3">Product Name</h1>
         <div class="flex items-center mb-4">
           <div class="text-yellow-400">
             <i class="fas fa-star"></i>
@@ -88,9 +79,7 @@
           <span class="ml-2 text-gray-600">4.9 (1.2k reviews)</span>
         </div>
         <div class="text-3xl font-bold mb-4">
-          <span class="text-green-600">₱24.99</span>
-          <span class="text-gray-400 line-through ml-2">₱29.99</span>
-          <span class="bg-green-100 text-green-700 text-sm font-semibold px-2 py-1 rounded-md ml-2">17% OFF</span>
+          <span id="product-price" class="text-green-600">Price</span>
         </div>
         <div class="flex items-center mb-6">
           <i class="fas fa-check-circle text-green-500 mr-2"></i>
@@ -152,25 +141,25 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <!-- Product Card -->
         <div class="bg-white p-4 rounded-lg shadow-sm text-center">
-          <img src="images/products/strawberry.png" alt="Fresh Strawberries" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="images/products/strawberry.png" alt="Fresh Strawberries" class="w-full h-48 object-contain rounded-md mb-4">
           <h3 class="font-semibold text-lg">Fresh Strawberries</h3>
           <p class="text-green-600 font-bold mt-2">₱12.99</p>
         </div>
         <!-- Product Card -->
         <div class="bg-white p-4 rounded-lg shadow-sm text-center">
-          <img src="images/products/fresh brocoli.png" alt="Organic Broccoli" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="images/products/fresh brocoli.png" alt="Organic Broccoli" class="w-full h-48 object-contain rounded-md mb-4">
           <h3 class="font-semibold text-lg">Organic Broccoli</h3>
           <p class="text-green-600 font-bold mt-2">₱8.50</p>
         </div>
         <!-- Product Card -->
         <div class="bg-white p-4 rounded-lg shadow-sm text-center">
-          <img src="images/products/native chicken.jpg" alt="Free-Range Chicken" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="images/products/native chicken.jpg" alt="Free-Range Chicken" class="w-full h-48 object-contain rounded-md mb-4">
           <h3 class="font-semibold text-lg">Free-Range Chicken</h3>
           <p class="text-green-600 font-bold mt-2">₱25.00</p>
         </div>
         <!-- Product Card -->
         <div class="bg-white p-4 rounded-lg shadow-sm text-center">
-          <img src="images/products/Fresh Milk.png" alt="Farm Fresh Milk" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="images/products/Fresh Milk.png" alt="Farm Fresh Milk" class="w-full h-48 object-contain rounded-md mb-4">
           <h3 class="font-semibold text-lg">Farm Fresh Milk</h3>
           <p class="text-green-600 font-bold mt-2">₱5.99</p>
         </div>
