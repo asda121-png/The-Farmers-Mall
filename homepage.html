@@ -1,378 +1,288 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Farmers Mall - Home</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Farmer's Mall - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        .hero-background {
+            background-image: url('images/img.png');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-  <!-- Navbar -->
-   <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <h1 class="text-xl font-bold" style="color: #2E7D32;">The Farmer's Mall</h1>
 
-      <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
-          <input 
-            type="text" 
-            name="search"
-            placeholder="Search for fresh product..."
-            class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
-        </form>
-      </div>
+            <div class="flex-1 mx-6">
+                <form action="products.php" method="GET">
+                    <input 
+                        type="text" 
+                        name="search"
+                        placeholder="Search for fresh product..."
+                        class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+                    />
+                </form>
+            </div>
 
-      <div class="flex items-center space-x-6">
-        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html">
-          <img src="images/profile.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <section class="relative bg-cover bg-center" style="background-image: url('images/img.png');">
-    <div class="bg-black bg-opacity-40">
-      <div class="max-w-7xl mx-auto px-6 py-32 text-left text-white">
-        <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Fresh Harvest Sale</h2>
-        <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
-        <a href="products.html" class="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
-          Shop Now
-        </a>
-      </div>
-    </div>
-  </section>
-
-<!-- Categories -->
-<section class="max-w-7xl mx-auto px-6 py-10">
-  <h2 class="text-2xl font-bold text-center mb-8">Shop by Category</h2>
-  <div class="flex flex-wrap justify-center gap-6">
-    
-    <a href="products.html?category=vegetables"
-       class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-      <i class="fa-solid fa-carrot text-green-600 text-2xl"></i>
-      <p class="text-gray-700 mt-2 text-sm">Vegetables</p>
-    </a>
-    
-    <a href="products.html?category=fruits" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-      <i class="fa-solid fa-apple-whole text-green-600 text-2xl"></i>
-      <p class="mt-2 text-sm">Fruits</p>
-    </a>
-    
-    <a href="products.html?category=meat" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-      <i class="fa-solid fa-drumstick-bite text-green-600 text-2xl"></i>
-      <p class="mt-2 text-sm">Meat</p>
-    </a>
-    
-    <a href="products.html?category=seafood" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-      <i class="fa-solid fa-fish text-green-600 text-2xl"></i>
-      <p class="mt-2 text-sm">Seafood</p>
-    </a>
-    
-    <a href="products.html?category=dairy" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-      <i class="fa-solid fa-cheese text-green-600 text-2xl"></i>
-      <p class="mt-2 text-sm">Dairy</p>
-    </a>
-    
-    <a href="products.html?category=bakery" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-      <i class="fa-solid fa-bread-slice text-green-600 text-2xl"></i>
-      <p class="mt-2 text-sm">Bakery</p>
-    </a>
-    
-  </div>
-</section>
-
-
-  <!-- Top Products -->
-  <section class="max-w-7xl mx-auto px-6 pt-10 pb-10">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold">Top Products</h2>
-      <a href="products.html" class="text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
-    </div>
-
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <!-- 1 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative block">
-        <img src="images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Fresh Vegetable Box</h3>
-        <p class="text-green-600 font-bold text-sm">₱45.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <!-- 2 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative block">
-        <img src="images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Organic Lettuce</h3>
-        <p class="text-green-600 font-bold text-sm">₱30.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <!-- 3 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative block">
-        <img src="images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
-        <p class="text-green-600 font-bold text-sm">₱50.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <!-- 4 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative block">
-        <img src="images/products/tilapia.jpg" alt="Aged Cheddar" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Tilapia</h3>
-        <p class="text-green-600 font-bold text-sm">₱80.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <!-- 5 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative block">
-        <img src="images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Farm Eggs</h3>
-        <p class="text-green-600 font-bold text-sm">₱60.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-    </div>
-  </section>
-
-  <!-- Other Products (12 items) -->
-  <section class="max-w-7xl mx-auto px-6 pt-10 pb-20">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold">Other Products</h2>
-      <a href="products.html" class="text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <!-- Row 1 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/Emsaymada.jpg" alt="Baby Carrots" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Emsaymada</h3>
-        <p class="text-green-600 font-bold text-sm">₱25.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/Butter Spread.jpg" alt="Artisan Bread" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Butter Spread</h3>
-        <p class="text-green-600 font-bold text-sm">₱70.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/Bangus.jpg" alt="Banana" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
-        <p class="text-green-600 font-bold text-sm">₱140.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/fresh pork liempo.jpg" alt="Cheddar" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Fresh Pork Liempo</h3>
-        <p class="text-green-600 font-bold text-sm">₱180.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <!-- Row 2 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/fresh avocado.jpg" alt="Fresh Milk" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Fresh Avocado</h3>
-        <p class="text-green-600 font-bold text-sm">₱50.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/Native tomato.jpg" alt="Organic Lettuce" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Native Tomatoes per kg</h3>
-        <p class="text-green-600 font-bold text-sm">₱30.00</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/fresh okra.jpg" alt="Baby Carrots" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Fresh Okra</h3>
-        <p class="text-green-600 font-bold text-sm">₱25.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/native chicken.jpg" alt="Artisan Bread" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Native Chicken (Manok)</h3>
-        <p class="text-green-600 font-bold text-sm">₱260.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <!-- Row 3 -->
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/pork ribs.jpg" alt="Banana" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Pork Ribs</h3>
-        <p class="text-green-600 font-bold text-sm">₱310.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/shrimp.jpg" alt="Farm Eggs" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Shrimp (Hipon)</h3>
-        <p class="text-green-600 font-bold text-sm">₱400.00 per kg</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/chocolate milk.jpg" alt="Fresh Vegetable Box" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Chocolate Milk</h3>
-        <p class="text-green-600 font-bold text-sm">₱55.00 per 250ml</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="productdetails.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative block">
-        <img src="images/products/ube cheese pandesal.jpg" alt="Tomato" class="w-full h-32 object-cover rounded">
-        <h3 class="mt-2 font-semibold text-sm">Ube Cheese Pandesal</h3>
-        <p class="text-green-600 font-bold text-sm">₱50.00 per 5 pcs</p>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-    </div>
-  </section>
-
-  <!-- Explore Other Shops -->
-  <section class="max-w-7xl mx-auto px-6 py-20">
-    <h2 class="text-2xl font-bold mb-6">Explore Other Shops</h2>
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Mesa Farm</h3>
-          <p class="text-sm text-gray-600">Organic vegetables & herbs</p>
-          <p class="text-green-600 mt-2">★ 4.8</p>
+            <!-- Icons and Profile -->
+            <div class="flex items-center space-x-6">
+                <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+                <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+                <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+                <?php if ($isLoggedIn): ?>
+                    <!-- Logged In User Profile Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
+                            <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full" onerror="this.onerror=null; this.src='https://placehold.co/32x32/333333/ffffff?text=U'">
+                            <span class="text-sm font-medium text-gray-700"><?= $username ?></span>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a href="profile.html" class="block px-4 py-2 text-gray-700 hover:bg-green-50 rounded-t-lg"><i class="fas fa-user mr-2"></i>My Profile</a>
+                            <a href="orders.php" class="block px-4 py-2 text-gray-700 hover:bg-green-50"><i class="fas fa-shopping-bag mr-2"></i>My Orders</a>
+                            <a href="account.html" class="block px-4 py-2 text-gray-700 hover:bg-green-50"><i class="fas fa-cog mr-2"></i>Account Settings</a>
+                            <hr class="my-2">
+                            <a href="logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!-- Not Logged In - Show Login Link -->
+                    <a href="profile.html">
+                        <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition-opacity" onerror="this.onerror=null; this.src='https://placehold.co/32x32/333333/ffffff?text=U'">
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
-      </div>
+    </header>
 
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="images/img2.png" alt="Taco Bell" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Taco Bell</h3>
-          <p class="text-sm text-gray-600">Fresh Mexican ingredients</p>
-          <p class="text-green-600 mt-2">★ 4.5</p>
+    <main>
+        <!-- Personalized Welcome Section for Logged-In Users -->
+        <?php if ($isLoggedIn): ?>
+        <section class="bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200">
+            <div class="max-w-7xl mx-auto px-6 py-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome back, <span style="color: #2E7D32;"><?= $username ?></span>! 👋</h2>
+                        <p class="text-gray-600">Continue shopping fresh produce from your favorite farmers</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600 mb-2">Account Status:</p>
+                        <span class="inline-block bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i>Active Member
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <!-- Hero -->
+        <section class="relative hero-background">
+            <div class="bg-black bg-opacity-40">
+                <div class="max-w-7xl mx-auto px-6 py-32 text-left text-white">
+                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Fresh Harvest Sale</h2>
+                    <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
+                <a href="products.php" class="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+                        Shop Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section class="max-w-7xl mx-auto px-6 py-10">
+            <h2 class="text-xl font-bold text-center mb-6">Shop by Category</h2>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                
+                <a href="products.php?category=vegetables"
+                    class="flex flex-col items-center bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer">
+                    <i class="fa-solid fa-carrot text-green-600 text-3xl mb-2"></i>
+                    <p class="text-gray-700 font-medium">Vegetables</p>
+                </a>
+                
+                <a href="products.php?category=fruits" class="flex flex-col items-center bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer">
+                    <i class="fa-solid fa-apple-whole text-green-600 text-2xl"></i>
+                    <p class="mt-2">Fruits</p>
+                </a>
+                
+                <a href="products.php?category=meat" class="flex flex-col items-center bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer">
+                    <i class="fa-solid fa-drumstick-bite text-green-600 text-2xl"></i>
+                    <p class="mt-2">Meat</p>
+                </a>
+                
+                <a href="products.php?category=seafood" class="flex flex-col items-center bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer">
+                    <i class="fa-solid fa-fish text-green-600 text-2xl"></i>
+                    <p class="mt-2">Seafood</p>
+                </a>
+                
+                <a href="products.php?category=dairy" class="flex flex-col items-center bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer">
+                    <i class="fa-solid fa-cheese text-green-600 text-2xl"></i>
+                    <p class="mt-2">Dairy</p>
+                </a>
+                
+                <a href="products.php?category=bakery" class="flex flex-col items-center bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer">
+                    <i class="fa-solid fa-bread-slice text-green-600 text-2xl"></i>
+                    <p class="mt-2">Bakery</p>
+                </a>
+                
+            </div>
+        </section>
+
+
+        <!-- Top Products (Dynamically rendered by PHP) -->
+        <section class="max-w-7xl mx-auto px-6 pb-10">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Top Products</h2>
+                <a href="products.php" class="text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i> View All</a>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                <?php
+                // Loop through the data fetched from the database
+                if (count($top_products) > 0) {
+                    foreach ($top_products as $product) {
+                        renderProductCard($product);
+                    }
+                } else {
+                    echo '<p class="col-span-full text-center text-gray-500">No top products found in the database.</p>';
+                }
+                ?>
+            </div>
+        </section>
+
+        <!-- Other Products (Dynamically rendered by PHP) -->
+        <section class="max-w-7xl mx-auto px-6 pb-20">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Other Products</h2>
+                <a href="products.php" class="text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i> View All</a>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <?php
+                // Loop through the data fetched from the database
+                if (count($other_products) > 0) {
+                    foreach ($other_products as $product) {
+                        renderProductCard($product);
+                    }
+                } else {
+                    echo '<p class="col-span-full text-center text-gray-500">No other products found in the database.</p>';
+                }
+                ?>
+            </div>
+        </section>
+
+        <!-- Explore Other Shops (Static HTML) -->
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <h2 class="text-xl font-bold mb-6">Explore Other Shops</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                    <img src="images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/200x160/d1e7dd/1e7145?text=Mesa+Farm'">
+                    <div class="p-4">
+                        <h3 class="font-bold">Mesa Farm</h3>
+                        <p class="text-sm text-gray-600">Organic vegetables & herbs</p>
+                        <p class="text-green-600 mt-2">★ 4.8</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                    <img src="images/img2.png" alt="Taco Bell" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/200x160/d1e7dd/1e7145?text=Taco+Bell'">
+                    <div class="p-4">
+                        <h3 class="font-bold">Taco Bell</h3>
+                        <p class="text-sm text-gray-600">Fresh Mexican ingredients</p>
+                        <p class="text-green-600 mt-2">★ 4.5</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                    <img src="images/img3.png" alt="Jay's Artisan" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/200x160/d1e7dd/1e7145?text=Jay\'s+Artisan'">
+                    <div class="p-4">
+                        <h3 class="font-bold">Jay’s Artisan</h3>
+                        <p class="text-sm text-gray-600">Coffees and bread</p>
+                        <p class="text-green-600 mt-2">★ 4.9</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                    <img src="images/img4.png" alt="Ocean Fresh" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/200x160/d1e7dd/1e7145?text=Ocean+Fresh'">
+                    <div class="p-4">
+                        <h3 class="font-bold">Ocean Fresh</h3>
+                        <p class="text-sm text-gray-600">Daily catch seafood</p>
+                        <p class="text-green-600 mt-2">★ 4.7</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-white py-12" style="background-color: #1B5E20;">
+        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+            
+            <!-- Logo/About -->
+            <div>
+                <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
+                <p class="text-gray-300 text-sm">
+                    Fresh, organic produce delivered straight to your home from local farmers.
+                </p>
+            </div>
+            
+            <!-- Quick Links -->
+            <div>
+                <h3 class="font-bold text-lg mb-3">Quick Links</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="#" class="hover:underline">About Us</a></li>
+                    <li><a href="#" class="hover:underline">Contact</a></li>
+                    <li><a href="#" class="hover:underline">FAQ</a></li>
+                    <li><a href="#" class="hover:underline">Support</a></li>
+                </ul>
+            </div>
+
+            <!-- Categories -->
+            <div>
+                <h3 class="font-bold text-lg mb-3">Categories</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="#" class="hover:underline">Vegetables</a></li>
+                    <li><a href="#" class="hover:underline">Fruits</a></li>
+                    <li><a href="#" class="hover:underline">Dairy</a></li>
+                    <li><a href="#" class="hover:underline">Meat</a></li>
+                </ul>
+            </div>
+
+            <!-- Social -->
+            <div>
+                <h3 class="font-bold text-lg mb-3">Follow Us</h3>
+                <div class="flex space-x-4 text-xl">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="images/img3.png" alt="Jay's Artisan" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Jay’s Artisan</h3>
-          <p class="text-sm text-gray-600">Coffees and bread</p>
-          <p class="text-green-600 mt-2">★ 4.9</p>
+        <!-- Divider -->
+        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
+            © 2025 The Farmer's Mall. All rights reserved.
         </div>
-      </div>
+    </footer>
 
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="images/img4.png" alt="Ocean Fresh" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Ocean Fresh</h3>
-          <p class="text-sm text-gray-600">Daily catch seafood</p>
-          <p class="text-green-600 mt-2">★ 4.7</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="text-white py-12" style="background-color: #1B5E20;">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-      
-      <!-- Logo/About -->
-      <div>
-        <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
-        <p class="text-gray-300 text-sm">
-          Fresh, organic produce delivered straight to your home from local farmers.
-        </p>
-      </div>
-      
-      <!-- Quick Links -->
-      <div>
-        <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="#" class="hover:underline">About Us</a></li>
-          <li><a href="#" class="hover:underline">Contact</a></li>
-          <li><a href="#" class="hover:underline">FAQ</a></li>
-          <li><a href="#" class="hover:underline">Support</a></li>
-        </ul>
-      </div>
-
-      <!-- Categories -->
-      <div>
-        <h3 class="font-bold text-lg mb-3">Categories</h3>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="#" class="hover:underline">Vegetables</a></li>
-          <li><a href="#" class="hover:underline">Fruits</a></li>
-          <li><a href="#" class="hover:underline">Dairy</a></li>
-          <li><a href="#" class="hover:underline">Meat</a></li>
-        </ul>
-      </div>
-
-      <!-- Social -->
-      <div>
-        <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-        <div class="flex space-x-4 text-xl">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Divider -->
-    <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-      © 2025 Farmers Mall. All rights reserved.
-    </div>
-  </footer>
-
-  <script>
-    // Add event listener to all '+' buttons
-    document.querySelectorAll('.add-btn').forEach(button => {
-      button.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent the link from redirecting
-        // Add to cart functionality can be added here
-        console.log('Add to cart clicked');
-      });
-    });
-  </script>
+    <script>
+        // Add event listener to all '+' buttons to redirect to the products page
+        document.querySelectorAll('.add-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Since this is a sample, we redirect. In a real app, this would be an AJAX call.
+                window.location.href = 'products.php';
+            });
+        });
+    </script>
 </body>
 </html>
 =======
@@ -753,5 +663,4 @@
   </script>
 </body>
 </html>
->>>>>>> 0252b44f71959aeb2e4ad57d3032a54c4fa83805
->>>>>>> 5cc0e36ca70cc496c77441eaea394b3b6357dbc6
+>>>>>>> 03faa30c903acc92ce2294ff9297bf0c16346c2a

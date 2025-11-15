@@ -1,16 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Footer – The Farmer's Mall</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="m-0 p-0">
-
-  <!-- Footer -->
-  <footer class="text-white py-12" style="background-color: #1B5E20;">
+<!-- Footer -->
+  <footer id="support" class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       
       <!-- Logo/About -->
@@ -47,9 +36,10 @@
       <div>
         <h3 class="font-bold text-lg mb-3">Follow Us</h3>
         <div class="flex space-x-4 text-xl">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
+          <!-- Updated from footer.html -->
+          <a href="#" class="hover:text-green-300"><i class="fab fa-facebook"></i></a>
+          <a href="#" class="hover:text-green-300"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="hover:text-green-300"><i class="fab fa-instagram"></i></a>
         </div>
       </div>
     </div>
