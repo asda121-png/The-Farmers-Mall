@@ -345,7 +345,6 @@
                         }
                     });
 
-                    // Toggle the clicked item
                     if (isActive) {
                         item.classList.remove('active');
                     } else {
