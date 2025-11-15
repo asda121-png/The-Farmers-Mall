@@ -17,7 +17,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 $users = [];
 $totalUsers = 0;
 $activeCustomers = 0;
-$retailers = 0;
+$retailers = 0; // This variable now counts 'admin' and 'employee' roles
 $newUsersThisMonth = 0;
 $db_error = null;
 
@@ -25,13 +25,16 @@ if ($conn->connect_error) {
     // Store error message to display in the HTML
     $db_error = "Connection failed: " . $conn->connect_error;
 } else {
-    // Assuming the 'users' table has columns: id, name, email, role, status, joined_date
-    $sql = "SELECT id, name, email, role, status, joined_date FROM users ORDER BY joined_date DESC";
+    // --- SQL QUERY: Updated to use 'joined_at' from the new schema ---
+    // Assuming 'email' is still present in the table as it's required for display.
+    $sql = "SELECT id, first_name, last_name, email, role, status, joined_at FROM users ORDER BY joined_at DESC";
     $result = $conn->query($sql);
 
     if ($result) {
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                // Combine first_name and last_name into one 'full_name' for display
+                $row['full_name'] = $row['first_name'] . ' ' . $row['last_name'];
                 $users[] = $row;
             }
         }
@@ -41,17 +44,21 @@ if ($conn->connect_error) {
         $currentYear = date('Y');
 
         foreach ($users as $user) {
-            // Calculate statistics
-            if ($user['role'] === 'Customer' && $user['status'] === 'Active') {
+            $userRole = strtolower($user['role']);
+            $userStatus = strtolower($user['status']);
+
+            // Calculate statistics using new ENUM values ('customer', 'active', 'employee', 'admin')
+            if ($userRole === 'customer' && $userStatus === 'active') {
                 $activeCustomers++;
             }
-            if ($user['role'] === 'Retailer') {
+            // Count all non-customer roles (admin or employee) as "Retailers" for the stats box
+            if ($userRole === 'employee' || $userRole === 'admin') {
                 $retailers++;
             }
 
-            // Check for new users this month (assuming joined_date is in YYYY-MM-DD format)
-            $joinedMonth = date('m', strtotime($user['joined_date']));
-            $joinedYear = date('Y', strtotime($user['joined_date']));
+            // Check for new users this month using 'joined_at'
+            $joinedMonth = date('m', strtotime($user['joined_at']));
+            $joinedYear = date('Y', strtotime($user['joined_at']));
 
             if ($joinedMonth == $currentMonth && $joinedYear == $currentYear) {
                 $newUsersThisMonth++;
@@ -112,7 +119,7 @@ if ($conn->connect_error) {
         <p class="text-sm text-green-200">Admin Panel</p>
       </div>
       <nav class="space-y-2">
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        <a href="admin-dashboard.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
           <i class="fa-solid fa-tachometer-alt w-5"></i>
           <span>Dashboard</span>
         </a>
@@ -124,7 +131,7 @@ if ($conn->connect_error) {
           <i class="fa-solid fa-store w-5"></i>
           <span>Retailers</span>
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        <a href="admin-products.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
           <i class="fa-solid fa-box w-5"></i>
           <span>Products</span>
         </a>
@@ -185,7 +192,7 @@ if ($conn->connect_error) {
         </div>
         <div class="bg-white p-5 rounded-xl shadow-lg flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-500">Retailers</p>
+            <p class="text-sm text-gray-500">Employees/Admins</p>
             <p id="statRetailers" class="text-3xl font-bold text-yellow-600"><?php echo $retailers; ?></p>
           </div>
           <i class="fa-solid fa-store text-4xl text-green-200"></i>
@@ -229,33 +236,67 @@ if ($conn->connect_error) {
             </thead>
             <tbody id="usersTableBody" class="divide-y divide-gray-100">
                 <?php foreach ($users as $user): 
-                    $statusClass = $user['status'] === 'Active' ? 'badge-active' : 'badge-inactive';
-                    $roleColor = $user['role'] === 'Retailer' ? 'text-yellow-600' : ($user['role'] === 'Admin' ? 'text-red-600' : 'text-green-600');
-                    $initial = strtoupper(substr($user['name'], 0, 1));
-                    $placeholderColor = dechex(mt_rand(0, 0xFFFFFF)); // Generate a random color for the placeholder
+                    $userStatus = strtolower($user['status']);
+                    $userRole = strtolower($user['role']);
+                    
+                    // Style based on new lowercase ENUM 'status'
+                    $statusClass = '';
+                    switch ($userStatus) {
+                        case 'active':
+                            $statusClass = 'badge-active';
+                            break;
+                        case 'inactive':
+                            $statusClass = 'badge-inactive';
+                            break;
+                        case 'banned':
+                            $statusClass = 'bg-red-700 text-white';
+                            break;
+                        default:
+                            $statusClass = 'bg-gray-200 text-gray-700';
+                    }
+
+                    // Color based on new lowercase ENUM 'role'
+                    $roleColor = '';
+                    switch ($userRole) {
+                        case 'admin':
+                            $roleColor = 'text-red-600';
+                            break;
+                        case 'employee':
+                            $roleColor = 'text-yellow-600';
+                            break;
+                        case 'customer':
+                        default:
+                            $roleColor = 'text-green-600';
+                    }
+                    
+                    // Display uses the combined name and the first_name for the initial
+                    $fullName = htmlspecialchars($user['full_name']);
+                    $initial = strtoupper(substr($user['first_name'], 0, 1));
+                    $placeholderColor = dechex(mt_rand(0, 0xFFFFFF));
                 ?>
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="p-4 flex items-center gap-3">
-                        <img src="https://placehold.co/32x32/<?php echo $placeholderColor; ?>/ffffff?text=<?php echo $initial; ?>" class="w-8 h-8 rounded-full" alt="<?php echo htmlspecialchars($user['name']); ?>">
-                        <span class="font-medium"><?php echo htmlspecialchars($user['name']); ?></span>
+                        <img src="https://placehold.co/32x32/<?php echo $placeholderColor; ?>/ffffff?text=<?php echo $initial; ?>" class="w-8 h-8 rounded-full" alt="<?php echo $fullName; ?>">
+                        <span class="font-medium"><?php echo $fullName; ?></span>
                     </td>
                     <td class="p-4 text-gray-600"><?php echo htmlspecialchars($user['email']); ?></td>
                     <td class="p-4">
-                        <span class="font-semibold <?php echo $roleColor; ?>"><?php echo htmlspecialchars($user['role']); ?></span>
+                        <span class="font-semibold <?php echo $roleColor; ?>"><?php echo htmlspecialchars(ucfirst($userRole)); ?></span>
                     </td>
                     <td class="p-4">
-                        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full <?php echo $statusClass; ?>"><?php echo htmlspecialchars($user['status']); ?></span>
+                        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full <?php echo $statusClass; ?>"><?php echo htmlspecialchars(ucfirst($userStatus)); ?></span>
                     </td>
-                    <td class="p-4 text-gray-500"><?php echo htmlspecialchars($user['joined_date']); ?></td>
+                    <!-- Displaying the 'joined_at' column as Joined Date -->
+                    <td class="p-4 text-gray-500"><?php echo htmlspecialchars($user['joined_at']); ?></td>
                     <td class="p-4">
                         <div class="flex gap-2">
-                            <button data-action="view" data-id="<?php echo $user['id']; ?>" data-name="<?php echo htmlspecialchars($user['name']); ?>" class="action-btn text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-100 transition-colors" title="View Details">
+                            <button data-action="view" data-id="<?php echo $user['id']; ?>" data-name="<?php echo $fullName; ?>" class="action-btn text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-100 transition-colors" title="View Details">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button data-action="edit" data-id="<?php echo $user['id']; ?>" data-name="<?php echo htmlspecialchars($user['name']); ?>" class="action-btn text-yellow-600 hover:text-yellow-800 p-1 rounded-full hover:bg-yellow-100 transition-colors" title="Edit User">
+                            <button data-action="edit" data-id="<?php echo $user['id']; ?>" data-name="<?php echo $fullName; ?>" class="action-btn text-yellow-600 hover:text-yellow-800 p-1 rounded-full hover:bg-yellow-100 transition-colors" title="Edit User">
                                 <i class="fa-solid fa-edit"></i>
                             </button>
-                            <button data-action="delete" data-id="<?php echo $user['id']; ?>" data-name="<?php echo htmlspecialchars($user['name']); ?>" class="action-btn text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-100 transition-colors" title="Delete User">
+                            <button data-action="delete" data-id="<?php echo $user['id']; ?>" data-name="<?php echo $fullName; ?>" class="action-btn text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-100 transition-colors" title="Delete User">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -268,7 +309,7 @@ if ($conn->connect_error) {
       </div>
 
       <!-- User Action Modal -->
-      <div id="actionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300 opacity-0">
+      <div id="actionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 transition-opacity duration-300 opacity-0">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300">
           <h3 id="modalTitle" class="font-bold text-xl mb-4 text-green-800">User Action</h3>
           <p id="modalMessage" class="text-gray-600 mb-6"></p>
@@ -398,7 +439,7 @@ if ($conn->connect_error) {
           confirmButton.classList.remove('bg-red-600', 'hover:bg-red-700');
           confirmButton.classList.add('bg-green-600', 'hover:bg-green-700');
           confirmButton.onclick = () => {
-             // In a real PHP app, this would be a redirect: window.location.href = `edit-user.php?id=${userId}`;
+             // In a real PHP app, this would be a redirect: window.location.href = \`edit-user.php?id=\${userId}\`;
              console.log(`Redirecting to edit page for user ${userId}`);
              hideActionModal();
           };
@@ -417,7 +458,7 @@ if ($conn->connect_error) {
              fetch('delete_user.php', {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                 body: `user_id=${userId}`
+                 body: \`user_id=\${userId}\`
              }).then(() => location.reload()); // Reload page to see changes
              */
              hideActionModal();
