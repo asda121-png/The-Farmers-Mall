@@ -166,7 +166,7 @@
     </div>
   </section>
 
-  <!-- Featured Farmers -->
+  
   <section class="px-6 py-16 text-center">
     <h2 class="text-2xl font-bold text-gray-900">Meet Our Featured Farmers</h2>
     <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10">
@@ -207,7 +207,7 @@
     </div>
   </section>
 
-  <!-- Delivery Coverage -->
+  
   <section class="px-6 py-16 text-center">
     <h2 class="text-2xl font-bold text-gray-900">Delivery Coverage</h2>
     <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow mt-6">
@@ -223,7 +223,7 @@
     </div>
   </section>
 
-  <!-- CTA -->
+
   <section class="px-6 py-16">
     <div class="bg-green-600 text-white rounded-xl p-10 text-center max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-4">Ready for a Taste of Freshness?</h2>
@@ -233,8 +233,6 @@
   </section>
 
   <?php
-    // Include the footer
-    // We are including 'footer.php' as it's the correct PHP file we created.
     include 'footer.html';
   ?>
 
