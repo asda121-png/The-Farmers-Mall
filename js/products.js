@@ -189,18 +189,18 @@
   function generateBatchProducts() {
     // simple rotating sample products to append — images reused from your set
     const sample = [
-      { name: 'Kangkong Bunch', category: 'vegetables', price: 22.50, organic: false, img: 'images/products/img11.png', unit: 'Per bunch' },
-      { name: 'Cucumber', category: 'vegetables', price: 30.00, organic: false, img: 'images/products/img12.png', unit: 'Per kg' },
-      { name: 'Green Pepper', category: 'vegetables', price: 55.00, organic: false, img: 'images/products/img13.png', unit: 'Per kg' },
-      { name: 'Mango (Carabao)', category: 'fruits', price: 120.00, organic: false, img: 'images/products/img14.png', unit: 'Per kg' },
-      { name: 'Pineapple', category: 'fruits', price: 80.00, organic: false, img: 'images/products/img15.png', unit: 'Each' },
-      { name: 'Goat Milk', category: 'dairy', price: 150.00, organic: false, img: 'images/products/img16.png', unit: 'Per liter' },
-      { name: 'Sourdough Loaf', category: 'bakery', price: 65.00, organic: false, img: 'images/products/img5.png', unit: 'Per loaf' },
-      { name: 'Pork Belly', category: 'meat', price: 320.00, organic: false, img: 'images/products/img17.png', unit: 'Per kg' },
-      { name: 'Tilapia (Fresh)', category: 'seafood', price: 140.00, organic: false, img: 'images/products/img18.png', unit: 'Per kg' },
-      { name: 'Local Cheese', category: 'dairy', price: 95.00, organic: false, img: 'images/products/img19.png', unit: 'Per 200g' },
-      { name: 'Eggs (Free Range)', category: 'dairy', price: 70.00, organic: true, img: 'images/products/img5.png', unit: 'Dozen' },
-      { name: 'Sweet Potato', category: 'vegetables', price: 40.00, organic: false, img: 'images/products/img20.png', unit: 'Per kg' }
+      { name: 'Kangkong Bunch', category: 'vegetables', price: 22.50, organic: false, img: 'images/products/fresh spinach.png', unit: 'Per bunch' },
+      { name: 'Cucumber', category: 'vegetables', price: 30.00, organic: false, img: 'images/products/organic cucumber.png', unit: 'Per kg' },
+      { name: 'Green Pepper', category: 'vegetables', price: 55.00, organic: false, img: 'images/products/bell pepper mix.png', unit: 'Per kg' },
+      { name: 'Strawberry Basket', category: 'fruits', price: 120.00, organic: false, img: 'images/products/strawberry.png', unit: 'Per kg' },
+      { name: 'Banana Bunch', category: 'fruits', price: 80.00, organic: false, img: 'images/products/banana.png', unit: 'Each' },
+      { name: 'Chocolate Milk', category: 'dairy', price: 150.00, organic: false, img: 'images/products/chocolate milk.jpg', unit: 'Per liter' },
+      { name: 'Ube Cheese Pandesal', category: 'bakery', price: 65.00, organic: false, img: 'images/products/ube cheese pandesal.jpg', unit: 'Per loaf' },
+      { name: 'Pork Liempo', category: 'meat', price: 320.00, organic: false, img: 'images/products/fresh pork liempo.jpg', unit: 'Per kg' },
+      { name: 'Tilapia (Fresh)', category: 'seafood', price: 140.00, organic: false, img: 'images/products/tilapia.jpg', unit: 'Per kg' },
+      { name: 'Butter Spread', category: 'dairy', price: 95.00, organic: false, img: 'images/products/Butter Spread.jpg', unit: 'Per 200g' },
+      { name: 'Fresh Eggs', category: 'dairy', price: 70.00, organic: true, img: 'images/products/fresh eggs.jpeg', unit: 'Dozen' },
+      { name: 'Fresh Okra', category: 'vegetables', price: 40.00, organic: false, img: 'images/products/fresh okra.jpg', unit: 'Per kg' }
     ];
 
     // shift starting index based on batch count to vary names if user clicks many times
