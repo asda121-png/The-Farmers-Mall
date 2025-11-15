@@ -10,10 +10,10 @@
 <body class="bg-gray-50 font-sans">
 
   <!-- Navbar -->
-  <header class="bg-white shadow-sm">
+  <header class="bg-white shadow-sm" id="header">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <!-- Logo -->
-      <h1 class="text-xl font-bold" style="color: #2E7D32;">The Farmer's Mall</h1>
+      <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
 
       <!-- Search -->
       <div class="flex-1 mx-6">
@@ -23,32 +23,20 @@
 
       <!-- Icons -->
       <div class="flex items-center space-x-6">
-        <!-- Message -->
-        <a href="messages.html">
-          <i class="fa-regular fa-comment text-gray-600 cursor-pointer"></i>
-        </a>
-
-        <!-- Notifications -->
-        <a href="notifications.html">
-          <i class="fa-regular fa-bell text-gray-600 cursor-pointer"></i>
-        </a>
-
-        <!-- Cart -->
-        <a href="cart.html">
-          <i class="fa-solid fa-cart-shopping text-gray-600 cursor-pointer"></i>
-        </a>
-
-        <!-- Profile -->
+         <a href="homepage.html" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.html">
-          <img src="images/karl.png" alt="User"
-               class="w-8 h-8 rounded-full cursor-pointer">
+          <!-- Active state shown with a ring -->
+          <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600">
         </a>
       </div>
     </div>
   </header>
 
   <!-- Main Layout -->
-  <main class="max-w-7xl mx-auto px-6 py-10 flex gap-8">
+  <main class="max-w-7xl mx-auto px-6 py-10 flex gap-8 mb-96">
 
     <!-- Sidebar -->
     <aside class="w-72 bg-white rounded-lg shadow p-6">
@@ -57,42 +45,37 @@
         <img src="images/karl.png" class="w-20 h-20 rounded-full mb-3" alt="Profile">
         <h2 class="font-semibold">Piodos De Blanco</h2>
         <p class="text-gray-500 text-sm">PiodosDe.Blanco@email.com</p>
-        <span class="text-green-600 text-sm mt-1 flex items-center gap-1">
-          <i class="fas fa-star text-yellow-400"></i> Premium Member
-        </span>
       </div>
 
       <!-- Navigation -->
       <nav class="space-y-2">
-        <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 text-green-700 font-medium">
+        <a href="#order-history" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 text-green-700 font-medium">
           <i class="fas fa-box"></i> Order History
         </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-          <i class="fas fa-map-marker-alt"></i> Saved Addresses
+        <a href="#my-address" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-map-marker-alt"></i> My Address
         </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+        <a href="#payment-methods" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
           <i class="fas fa-credit-card"></i> Payment Methods
         </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+        <a href="#settings" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
           <i class="fas fa-cog"></i> Settings
         </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+        <a href="#help-support" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
           <i class="fas fa-question-circle"></i> Help & Support
         </a>
+        <!-- Logout Button -->
+        <div class="border-t pt-2 mt-2">
+          <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
       </nav>
-
-      <!-- Account Summary -->
-      <div class="mt-6 p-4 border rounded-lg bg-gray-50">
-        <h3 class="font-semibold mb-2">Account Summary</h3>
-        <p class="text-sm flex justify-between"><span>Total Orders</span> <span>47</span></p>
-        <p class="text-sm flex justify-between"><span>Total Spent</span> <span>₱2,847</span></p>
-        <p class="text-sm flex justify-between"><span>Rewards Points</span> <span class="text-green-600">1,250</span></p>
-      </div>
     </aside>
 
     <!-- Order History Section -->
-    <section class="flex-1">
-      <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex-1">
+      <section id="order-history" class="content-section bg-white rounded-lg shadow p-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
           <h2 class="font-semibold text-lg">Order History</h2>
@@ -108,48 +91,117 @@
           </div>
         </div>
 
-        <!-- Order Item 1 -->
-        <div class="flex items-center justify-between border-b pb-4 mb-4">
-          <div class="flex items-center gap-4">
-            <img src="images/veg.png" alt="order1" class="rounded-lg w-16 h-16 object-cover">
-            <div>
-              <h3 class="font-medium">Order #FM-2025-001</h3>
-              <p class="text-sm text-gray-500">Placed on October 4, 2025</p>
-              <p class="text-sm">Organic Vegetables Bundle + 2 more items</p>
-            </div>
+        <!-- Order List Container -->
+        <div id="orderList" class="space-y-4">
+          <!-- Orders will be dynamically inserted here -->
+          <div id="noOrdersPlaceholder" class="text-center text-gray-500 py-10 border-2 border-dashed rounded-lg">
+            <i class="fas fa-receipt text-3xl mb-3"></i>
+            <p>You haven't placed any orders yet.</p>
+            <a href="products.php" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+              Start Shopping
+            </a>
           </div>
-          <div class="text-right">
-            <p class="font-semibold">₱89.50</p>
-            <span class="text-green-600 text-xs font-medium">Delivered</span>
-            <div class="text-sm mt-1">
-              <a href="#" class="text-green-600 hover:underline">View Details</a> · 
-              <a href="#" class="text-green-600 hover:underline">Reorder</a>
+        </div>
+      </section>
+
+      <!-- Saved Addresses Section (Hidden by default) -->
+      <section id="my-address" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-semibold text-lg">My Delivery Address</h2>
+            <button id="editAddressBtn" class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
+              <i class="fas fa-pen mr-1"></i> Edit
+            </button>
+        </div>
+        <div id="addressDisplay" class="text-gray-600 leading-relaxed">
+          <!-- Address will be dynamically inserted here -->
+          <div id="noAddressPlaceholder" class="text-center text-gray-500 py-10 border-2 border-dashed rounded-lg">
+            <i class="fas fa-map-marker-alt text-3xl mb-3"></i>
+            <p>No saved addresses yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment Methods Section (Hidden by default) -->
+      <section id="payment-methods" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-semibold text-lg">Payment Methods</h2>
+          <button id="addPaymentBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+            <i class="fas fa-plus mr-1"></i> Add New Card
+          </button>
+        </div>
+        <div id="paymentList" class="space-y-4">
+          <!-- Payment methods will be dynamically inserted here -->
+          <div id="noPaymentPlaceholder" class="text-center text-gray-500 py-10">
+            <i class="fas fa-credit-card text-3xl mb-3"></i>
+            <p>No payment methods saved.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section (Hidden by default) -->
+      <section id="settings" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg mb-6">Settings</h2>
+        <div class="space-y-6">
+          <div>
+            <h3 class="font-medium text-md mb-3">Email Notifications</h3>
+            <div class="space-y-3">
+              <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p class="font-medium text-sm">Order Updates</p>
+                  <p class="text-xs text-gray-500">Receive updates on your order status.</p>
+                </div>
+                <input type="checkbox" class="toggle-switch" data-setting="orderUpdates" checked>
+              </label>
+              <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p class="font-medium text-sm">Promotions & News</p>
+                  <p class="text-xs text-gray-500">Get notified about sales and new products.</p>
+                </div>
+                <input type="checkbox" class="toggle-switch" data-setting="promotions" checked>
+              </label>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- Order Item 2 -->
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <img src="images/fruits.png" alt="order2" class="rounded-lg w-16 h-16 object-cover">
-            <div>
-              <h3 class="font-medium">Order #FM-2025-002</h3>
-              <p class="text-sm text-gray-500">Placed on October 5, 2025</p>
-              <p class="text-sm">Fresh Fruits & Herbs Package + 3 more items</p>
+      <!-- Help & Support Section (Hidden by default) -->
+      <section id="help-support" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg mb-6">Help & Support</h2>
+        <div class="space-y-3" id="faqAccordion">
+          <!-- FAQ Item 1 -->
+          <div class="border rounded-lg">
+            <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
+              <span>How do I track my order?</span>
+              <i class="fas fa-chevron-down transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
+              You can track your order from the "Order History" section. Click on "Track Order" for any item that is in transit.
             </div>
           </div>
-          <div class="text-right">
-            <p class="font-semibold">₱156.75</p>
-            <span class="text-blue-600 text-xs font-medium">In Transit</span>
-            <div class="text-sm mt-1">
-              <a href="#" class="text-green-600 hover:underline">Track Order</a> · 
-              <a href="#" class="text-green-600 hover:underline">View Details</a>
+          <!-- FAQ Item 2 -->
+          <div class="border rounded-lg">
+            <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
+              <span>What is your return policy?</span>
+              <i class="fas fa-chevron-down transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
+              Due to the nature of fresh produce, we only accept returns for damaged or incorrect items reported within 24 hours of delivery. Please contact our support team with a photo of the issue.
+            </div>
+          </div>
+          <!-- FAQ Item 3 -->
+          <div class="border rounded-lg">
+            <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
+              <span>How do I change my delivery address?</span>
+              <i class="fas fa-chevron-down transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
+              You can manage your delivery locations in the "Saved Addresses" section. You can add, edit, or delete addresses there.
             </div>
           </div>
         </div>
+      </section>
 
-      </div>
-    </section>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -158,7 +210,7 @@
       
       <!-- Logo/About -->
       <div>
-        <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
+        <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
         <p class="text-gray-300 text-sm">
           Fresh, organic produce delivered straight to your home from local farmers.
         </p>
@@ -199,9 +251,350 @@
 
     <!-- Divider -->
     <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-      © 2025 The Farmer's Mall. All rights reserved.
+      © 2025 Farmers Mall. All rights reserved.
     </div>
   </footer>
 
+  <!-- Add Address Modal -->
+  <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <h3 class="font-semibold text-lg mb-4">Add New Address</h3>
+      <form id="addressForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Full Name</label>
+          <input type="text" id="address-name" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Street Address</label>
+          <input type="text" id="address-street" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-700">City</label><input type="text" id="address-city" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+          <div><label class="block text-sm font-medium text-gray-700">Province</label><input type="text" id="address-province" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+        </div>
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" class="modal-close px-4 py-2 border rounded-md text-sm">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Payment Modal -->
+  <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <h3 class="font-semibold text-lg mb-4">Add New Card</h3>
+      <form id="paymentForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Card Number</label>
+          <input type="text" id="card-number" placeholder="•••• •••• •••• ••••" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Cardholder Name</label>
+          <input type="text" id="card-name" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-700">Expiry (MM/YY)</label><input type="text" id="card-expiry" placeholder="MM/YY" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+          <div><label class="block text-sm font-medium text-gray-700">CVV</label><input type="text" id="card-cvv" placeholder="•••" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+        </div>
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" class="modal-close px-4 py-2 border rounded-md text-sm">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+      <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+      <div class="flex justify-center gap-4">
+        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+        <a href="logout.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      function updateContent(hash) {
+        // Default to order history if hash is empty or invalid
+        const targetHash = hash || '#order-history';
+        
+        // Hide all sections
+        contentSections.forEach(section => {
+          section.classList.add('hidden');
+        });
+
+        // Show the target section
+        const targetSection = document.querySelector(targetHash);
+        if (targetSection) {
+          targetSection.classList.remove('hidden');
+        }
+
+        // Update active link style
+        sidebarLinks.forEach(link => {
+          if (link.getAttribute('href') === targetHash) {
+            link.classList.add('bg-green-50', 'text-green-700', 'font-medium');
+            link.classList.remove('hover:bg-gray-100');
+          } else {
+            link.classList.remove('bg-green-50', 'text-green-700', 'font-medium');
+            link.classList.add('hover:bg-gray-100');
+          }
+        });
+      }
+
+      // Handle clicks on sidebar links
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault(); // Prevent the page from jumping
+          updateContent(link.hash);
+        });
+      });
+
+      // Show content based on initial URL hash, or default to the first one
+      updateContent(window.location.hash);
+
+      // --- Modal Management ---
+      const addressModal = document.getElementById('addressModal');
+      const paymentModal = document.getElementById('paymentModal');
+      const editAddressBtn = document.getElementById('editAddressBtn');
+      const addPaymentBtn = document.getElementById('addPaymentBtn');
+      const closeModalBtns = document.querySelectorAll('.modal-close');
+
+      const openModal = (modal) => modal.classList.remove('hidden');
+      const closeModal = (modal) => modal.classList.add('hidden');
+
+      editAddressBtn.addEventListener('click', () => openModal(addressModal));
+      addPaymentBtn.addEventListener('click', () => openModal(paymentModal));
+      closeModalBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          closeModal(addressModal);
+          closeModal(paymentModal);
+        });
+      });
+
+      // --- Saved Addresses Logic ---
+      const addressForm = document.getElementById('addressForm');
+      const addressDisplay = document.getElementById('addressDisplay');
+      const noAddressPlaceholder = document.getElementById('noAddressPlaceholder');
+      let userAddress = JSON.parse(localStorage.getItem('userAddress')) || null;
+
+      function renderAddress() {
+        addressDisplay.innerHTML = ''; // Clear current content
+        if (!userAddress || !userAddress.name) {
+          addressDisplay.appendChild(noAddressPlaceholder);
+          noAddressPlaceholder.style.display = 'block';
+        } else {
+          noAddressPlaceholder.style.display = 'none';
+          addressDisplay.innerHTML = `
+            <p class="font-medium">${userAddress.name}</p>
+            <p>${userAddress.street}</p>
+            <p>${userAddress.city}, ${userAddress.province}</p>
+          `;
+        }
+        // Pre-fill the modal form when it's opened
+        document.getElementById('address-name').value = userAddress?.name || '';
+        document.getElementById('address-street').value = userAddress?.street || '';
+        document.getElementById('address-city').value = userAddress?.city || '';
+        document.getElementById('address-province').value = userAddress?.province || '';
+      }
+
+      addressForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        userAddress = {
+          name: document.getElementById('address-name').value,
+          street: document.getElementById('address-street').value,
+          city: document.getElementById('address-city').value,
+          province: document.getElementById('address-province').value,
+        };
+        localStorage.setItem('userAddress', JSON.stringify(userAddress));
+        renderAddress();
+        addressForm.reset();
+        closeModal(addressModal);
+      });
+
+      // --- Payment Methods Logic ---
+      const paymentForm = document.getElementById('paymentForm');
+      const paymentList = document.getElementById('paymentList');
+      const noPaymentPlaceholder = document.getElementById('noPaymentPlaceholder');
+      let payments = JSON.parse(localStorage.getItem('userPayments')) || [];
+
+      function getCardType(number) {
+        if (/^4/.test(number)) return { type: 'Visa', icon: 'fa-cc-visa', color: 'text-blue-700' };
+        if (/^5[1-5]/.test(number)) return { type: 'Mastercard', icon: 'fa-cc-mastercard', color: 'text-red-600' };
+        return { type: 'Card', icon: 'fa-credit-card', color: 'text-gray-500' };
+      }
+
+      function renderPayments() {
+        paymentList.innerHTML = '';
+        if (payments.length === 0) {
+          paymentList.appendChild(noPaymentPlaceholder);
+          noPaymentPlaceholder.style.display = 'block';
+        } else {
+          noPaymentPlaceholder.style.display = 'none';
+          payments.forEach((pay, index) => {
+            const cardInfo = getCardType(pay.number);
+            const div = document.createElement('div');
+            div.className = 'p-4 border rounded-lg flex justify-between items-center';
+            div.innerHTML = `
+              <div class="flex items-center gap-3">
+                <i class="fab ${cardInfo.icon} ${cardInfo.color} text-2xl"></i>
+                <div>
+                  <p class="font-medium">${cardInfo.type} ending in ${pay.number.slice(-4)}</p>
+                  <p class="text-sm text-gray-500">Expires ${pay.expiry}</p>
+                </div>
+              </div>
+              <button class="delete-payment-btn text-red-500 hover:text-red-700 text-sm" data-index="${index}"><i class="fas fa-trash"></i></button>
+            `;
+            paymentList.appendChild(div);
+          });
+        }
+      }
+
+      paymentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newPayment = {
+          number: document.getElementById('card-number').value,
+          name: document.getElementById('card-name').value,
+          expiry: document.getElementById('card-expiry').value,
+        };
+        payments.push(newPayment);
+        localStorage.setItem('userPayments', JSON.stringify(payments));
+        renderPayments();
+        paymentForm.reset();
+        closeModal(paymentModal);
+      });
+
+      paymentList.addEventListener('click', (e) => {
+        if (e.target.closest('.delete-payment-btn')) {
+          const index = e.target.closest('.delete-payment-btn').dataset.index;
+          payments.splice(index, 1);
+          localStorage.setItem('userPayments', JSON.stringify(payments));
+          renderPayments();
+        }
+      });
+
+      // --- Settings Logic ---
+      const toggleSwitches = document.querySelectorAll('.toggle-switch');
+      let userSettings = JSON.parse(localStorage.getItem('userSettings')) || { orderUpdates: true, promotions: true };
+
+      function applySettings() {
+        toggleSwitches.forEach(toggle => {
+          const settingName = toggle.dataset.setting;
+          toggle.checked = userSettings[settingName] !== false; // Default to true if not set
+        });
+      }
+
+      toggleSwitches.forEach(toggle => {
+        toggle.addEventListener('change', () => {
+          const settingName = toggle.dataset.setting;
+          userSettings[settingName] = toggle.checked;
+          localStorage.setItem('userSettings', JSON.stringify(userSettings));
+        });
+      });
+
+      // --- FAQ Accordion Logic ---
+      const faqQuestions = document.querySelectorAll('.faq-question');
+      faqQuestions.forEach(question => {
+        question.addEventListener('click', () => {
+          const answer = question.nextElementSibling;
+          const icon = question.querySelector('i');
+          
+          answer.classList.toggle('hidden');
+          icon.classList.toggle('rotate-180');
+        });
+      });
+
+      // --- Order History Logic ---
+      const orderList = document.getElementById('orderList');
+      const noOrdersPlaceholder = document.getElementById('noOrdersPlaceholder');
+      let userOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+
+      function getStatusInfo(status) {
+        switch (status) {
+          case 'Delivered': return { text: 'Delivered', class: 'text-green-600' };
+          case 'Shipped': return { text: 'In Transit', class: 'text-blue-600' };
+          case 'Cancelled': return { text: 'Cancelled', class: 'text-red-600' };
+          default: return { text: 'Pending', class: 'text-orange-500' };
+        }
+      }
+
+      function renderOrders() {
+        orderList.innerHTML = '';
+        if (userOrders.length === 0) {
+          orderList.appendChild(noOrdersPlaceholder);
+          noOrdersPlaceholder.style.display = 'block';
+        } else {
+          noOrdersPlaceholder.style.display = 'none';
+          // Sort by most recent first
+          userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          
+          userOrders.forEach(order => {
+            const statusInfo = getStatusInfo(order.status);
+            const firstItem = order.items[0];
+            const additionalItems = order.items.length - 1;
+            const itemSummary = `${firstItem.name}${additionalItems > 0 ? ` + ${additionalItems} more item(s)` : ''}`;
+
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between border-b pb-4';
+            div.innerHTML = `
+              <div class="flex items-center gap-4">
+                <img src="${firstItem.image}" alt="${firstItem.name}" class="rounded-lg w-16 h-16 object-cover">
+                <div>
+                  <h3 class="font-medium">Order ${order.id}</h3>
+                  <p class="text-sm text-gray-500">Placed on ${new Date(order.timestamp).toLocaleDateString()}</p>
+                  <p class="text-sm">${itemSummary}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold">₱${order.total.toFixed(2)}</p>
+                <span class="${statusInfo.class} text-xs font-medium">${statusInfo.text}</span>
+                <div class="text-sm mt-1">
+                  <a href="#" class="text-green-600 hover:underline">View Details</a>
+                  ${order.status === 'Delivered' ? `· <a href="#" class="text-green-600 hover:underline">Reorder</a>` : ''}
+                  ${order.status === 'Shipped' ? `· <a href="#" class="text-green-600 hover:underline">Track</a>` : ''}
+                </div>
+              </div>
+            `;
+            orderList.appendChild(div);
+          });
+        }
+      }
+
+      // --- Initial Render on Load ---
+      renderOrders();
+      renderAddress();
+      renderPayments();
+      applySettings();
+
+      // --- Logout Modal Logic ---
+      const logoutButton = document.getElementById('logoutButton');
+      const logoutModal = document.getElementById('logoutModal');
+      const cancelLogoutBtn = document.getElementById('cancelLogout');
+  
+      if (logoutButton && logoutModal && cancelLogoutBtn) {
+        logoutButton.addEventListener('click', (e) => {
+          e.preventDefault(); // Prevent the link from navigating immediately
+          logoutModal.classList.remove('hidden');
+        });
+  
+        cancelLogoutBtn.addEventListener('click', () => {
+          logoutModal.classList.add('hidden');
+        });
+  
+        // Also close modal if user clicks on the background overlay
+        logoutModal.addEventListener('click', (e) => {
+          if (e.target === logoutModal) logoutModal.classList.add('hidden');
+        });
+      }
+    });
+  </script>
 </body>
 </html>

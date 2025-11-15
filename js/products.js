@@ -129,22 +129,25 @@
 
     // Event delegation for product grid clicks
     productsGrid.addEventListener('click', (e) => {
-      // Find the parent product card that was clicked
       const card = e.target.closest('.product-card');
-      
-      // If a card was clicked (and not something else in the grid)
-      if (card) {
-        // Prevent default behavior if the click was on a button or link inside the card
+      if (card && !e.target.closest('.add-btn')) {
         e.preventDefault();
         
-        // Get product data from the card's data attributes
-        const name = card?.dataset.name || 'Item';
-        const price = card?.dataset.price || '0';
-        const img = card?.querySelector('img')?.src || '';
-        const description = card?.dataset.description || 'No description available.';
-        const selectedProduct = { name, price, img, description };
-        localStorage.setItem('selectedProduct', JSON.stringify(selectedProduct));
-        window.location.href = 'productdetails.html';
+        const name = card.dataset.name || 'Item';
+        const price = card.dataset.price || '0';
+        const imgElement = card.querySelector('img');
+        // Get relative path instead of absolute URL
+        const img = imgElement?.getAttribute('src') || '';
+        const description = card.dataset.description || 'No description available.';
+        
+        const params = new URLSearchParams({
+          name: name,
+          price: price,
+          img: img,
+          description: description,
+        });
+        
+        window.location.href = `productdetails.html?${params.toString()}`;
       }
     });
 
@@ -170,7 +173,7 @@
         <p class="text-sm text-gray-500">${escapeHtml(product.unit)}</p>
         <div class="flex justify-between items-center mt-2">
           <p class="font-semibold text-green-700">₱${Number(product.price).toFixed(2)}</p>
-          <button class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700" title="Add to cart">
+          <button class="add-btn bg-white text-green-600 border border-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart">
             <i class="fa-solid fa-plus"></i>
           </button>
         </div>
@@ -189,18 +192,18 @@
   function generateBatchProducts() {
     // simple rotating sample products to append — images reused from your set
     const sample = [
-      { name: 'Kangkong Bunch', category: 'vegetables', price: 22.50, organic: false, img: 'images/products/img11.png', unit: 'Per bunch' },
-      { name: 'Cucumber', category: 'vegetables', price: 30.00, organic: false, img: 'images/products/img12.png', unit: 'Per kg' },
-      { name: 'Green Pepper', category: 'vegetables', price: 55.00, organic: false, img: 'images/products/img13.png', unit: 'Per kg' },
-      { name: 'Mango (Carabao)', category: 'fruits', price: 120.00, organic: false, img: 'images/products/img14.png', unit: 'Per kg' },
-      { name: 'Pineapple', category: 'fruits', price: 80.00, organic: false, img: 'images/products/img15.png', unit: 'Each' },
-      { name: 'Goat Milk', category: 'dairy', price: 150.00, organic: false, img: 'images/products/img16.png', unit: 'Per liter' },
-      { name: 'Sourdough Loaf', category: 'bakery', price: 65.00, organic: false, img: 'images/products/img5.png', unit: 'Per loaf' },
-      { name: 'Pork Belly', category: 'meat', price: 320.00, organic: false, img: 'images/products/img17.png', unit: 'Per kg' },
-      { name: 'Tilapia (Fresh)', category: 'seafood', price: 140.00, organic: false, img: 'images/products/img18.png', unit: 'Per kg' },
-      { name: 'Local Cheese', category: 'dairy', price: 95.00, organic: false, img: 'images/products/img19.png', unit: 'Per 200g' },
-      { name: 'Eggs (Free Range)', category: 'dairy', price: 70.00, organic: true, img: 'images/products/img5.png', unit: 'Dozen' },
-      { name: 'Sweet Potato', category: 'vegetables', price: 40.00, organic: false, img: 'images/products/img20.png', unit: 'Per kg' }
+      { name: 'Kangkong Bunch', category: 'vegetables', price: 22.50, organic: false, img: 'images/products/fresh spinach.png', unit: 'Per bunch' },
+      { name: 'Cucumber', category: 'vegetables', price: 30.00, organic: false, img: 'images/products/organic cucumber.png', unit: 'Per kg' },
+      { name: 'Green Pepper', category: 'vegetables', price: 55.00, organic: false, img: 'images/products/bell pepper mix.png', unit: 'Per kg' },
+      { name: 'Strawberry Basket', category: 'fruits', price: 120.00, organic: false, img: 'images/products/strawberry.png', unit: 'Per kg' },
+      { name: 'Banana Bunch', category: 'fruits', price: 80.00, organic: false, img: 'images/products/banana.png', unit: 'Each' },
+      { name: 'Chocolate Milk', category: 'dairy', price: 150.00, organic: false, img: 'images/products/chocolate milk.jpg', unit: 'Per liter' },
+      { name: 'Ube Cheese Pandesal', category: 'bakery', price: 65.00, organic: false, img: 'images/products/ube cheese pandesal.jpg', unit: 'Per loaf' },
+      { name: 'Pork Liempo', category: 'meat', price: 320.00, organic: false, img: 'images/products/fresh pork liempo.jpg', unit: 'Per kg' },
+      { name: 'Tilapia (Fresh)', category: 'seafood', price: 140.00, organic: false, img: 'images/products/tilapia.jpg', unit: 'Per kg' },
+      { name: 'Butter Spread', category: 'dairy', price: 95.00, organic: false, img: 'images/products/Butter Spread.jpg', unit: 'Per 200g' },
+      { name: 'Fresh Eggs', category: 'dairy', price: 70.00, organic: true, img: 'images/products/fresh eggs.jpeg', unit: 'Dozen' },
+      { name: 'Fresh Okra', category: 'vegetables', price: 40.00, organic: false, img: 'images/products/fresh okra.jpg', unit: 'Per kg' }
     ];
 
     // shift starting index based on batch count to vary names if user clicks many times

@@ -1,0 +1,153 @@
+<?php
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – Farmers Mall</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-100 text-gray-800 flex">
+
+  <!-- Sidebar -->
+  <aside class="bg-green-800 text-white w-64 min-h-screen p-4 flex flex-col justify-between">
+    <div>
+      <div class="text-center mb-10">
+        <h1 class="text-2xl font-bold">Farmers Mall</h1>
+        <p class="text-sm text-green-200">Admin Panel</p>
+      </div>
+      <nav class="space-y-2">
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-green-700">
+          <i class="fa-solid fa-tachometer-alt w-5"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="admin-users.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+          <i class="fa-solid fa-users w-5"></i>
+          <span>Users</span>
+        </a>
+        <a href="admin-retailers.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+          <i class="fa-solid fa-store w-5"></i>
+          <span>Retailers</span>
+        </a>
+        <a href="admin-products.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+          <i class="fa-solid fa-box w-5"></i>
+          <span>Products</span>
+        </a>
+        <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+          <i class="fa-solid fa-receipt w-5"></i>
+          <span>Orders</span>
+        </a>
+        <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+          <i class="fa-solid fa-cog w-5"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div>
+      <a href="#" id="logoutButton" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <i class="fa-solid fa-sign-out-alt w-5"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1">
+    <!-- Header -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+      <h2 class="text-xl font-semibold">Dashboard Overview</h2>
+      <div class="flex items-center gap-4">
+        <a href="admin-notification.html">
+          <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer"></i>
+        </a>
+        <div class="flex items-center gap-2 cursor-pointer">
+          <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-8 h-8 rounded-full" alt="Admin">
+          <div>
+            <p class="text-sm font-medium">Admin User</p>
+            <p class="text-xs text-gray-500">admin@farmersmall.com</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="p-6 space-y-6">
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow p-5 flex items-center gap-4">
+          <div class="bg-green-100 text-green-600 p-3 rounded-full"><i class="fa-solid fa-peso-sign"></i></div>
+          <div>
+            <p class="text-gray-500 text-sm">Total Revenue</p>
+            <h3 id="totalRevenueStat" class="text-2xl font-bold">₱0.00</h3>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 flex items-center gap-4">
+          <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i class="fa-solid fa-users"></i></div>
+          <div>
+            <p class="text-gray-500 text-sm">Total Users</p>
+            <h3 id="totalUsersStat" class="text-2xl font-bold">0</h3>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 flex items-center gap-4">
+          <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full"><i class="fa-solid fa-store"></i></div>
+          <div>
+            <p class="text-gray-500 text-sm">Active Retailers</p>
+            <h3 id="activeRetailersStat" class="text-2xl font-bold">0</h3>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 flex items-center gap-4">
+          <div class="bg-red-100 text-red-600 p-3 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div>
+            <p class="text-gray-500 text-sm">Issues Reported</p>
+            <h3 id="issuesReportedStat" class="text-2xl font-bold">12</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Revenue Chart -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+          <h3 class="font-semibold mb-4">Monthly Revenue</h3>
+          <canvas id="adminChart"></canvas>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="font-semibold mb-4">Recent Activity</h3>
+          <div id="recentActivityContainer" class="space-y-4 text-sm">
+            <!-- Activity will be loaded here dynamically -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+      <div class="text-red-500 text-4xl mb-4">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+      <div class="flex justify-center gap-4">
+        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+          Cancel
+        </button>
+        <a href="login.html" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">
+          Logout
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin-dashboard.js"></script>
+</body>
+
+</html>
