@@ -1,206 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart – The Farmer's Mall</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart – The Farmer's Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    .wishlist.active i { color: red; }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
 
-  <!-- HEADER (loaded dynamically) -->
+  <!-- Header will be loaded here -->
   <div id="header"></div>
 
-  <!-- CART CONTENT -->
-  <main class="max-w-7xl mx-auto p-6 flex flex-col lg:flex-row gap-8 mt-6 mb-80">
-
-    <!-- Left: Cart Items -->
-    <section class="flex-1">
-      <h2 class="text-2xl font-semibold mb-6">Shopping Cart</h2>
-      <div id="cartItems" class="space-y-4">
-        <!-- Cart items will be dynamically inserted here -->
-      </div>
-      <a href="products.html" class="text-green-700 hover:underline flex items-center mt-4">
-        <i class="fa-solid fa-arrow-left mr-2"></i> Continue Shopping
-      </a>
-    </section>
-
-    <!-- Right: Order Summary -->
-    <aside class="bg-white shadow-sm p-6 rounded-xl w-full lg:w-80 h-fit">
-      <h3 class="font-semibold text-lg mb-4">Order Summary</h3>
-      <div class="mb-4">
-        <label for="promo" class="text-sm text-gray-600">Promo Code</label>
-        <div class="flex mt-2">
-          <input id="promo" type="text" placeholder="Enter code"
-                 class="flex-1 border px-3 py-2 rounded-l-md focus:ring-green-500 focus:ring-1 outline-none">
-          <button class="bg-green-600 text-white px-4 rounded-r-md hover:bg-green-700">Apply</button>
-        </div>
-      </div>
-
-      <div class="text-sm text-gray-700 space-y-2">
-        <div class="flex justify-between"><span>Subtotal</span><span id="subtotal">₱0.00</span></div>
-        <div class="flex justify-between"><span>Shipping</span><span>Free</span></div>
-      </div>
-
-      <div class="border-t mt-3 pt-3 flex justify-between text-lg font-semibold text-gray-800">
-        <span>Total</span><span id="total">₱0.00</span>
-      </div>
-
-      <button onclick="window.location.href='paymentmethod.html'"
-              class="bg-green-600 w-full text-white py-3 rounded-md mt-6 font-medium hover:bg-green-700 transition">
-        Proceed to Checkout
+  <!-- Main Cart Section -->
+  <main class="max-w-7xl mx-auto p-6 mt-6 flex-grow w-full mb-96">
+    <div class="flex items-center space-x-4 mb-6">
+      <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800">
+        <i class="fa-solid fa-arrow-left text-xl"></i>
       </button>
-    </aside>
+      <h2 class="text-2xl font-semibold">Your Shopping Cart</h2>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- LEFT: Cart Items -->
+      <section id="cartItems" class="lg:col-span-2 space-y-4">
+        <!-- Cart items will be dynamically inserted here by cart.js -->
+      </section>
+
+      <!-- RIGHT: Order Summary -->
+      <aside class="bg-white shadow-sm p-6 rounded-xl h-fit">
+        <h3 class="font-semibold text-lg mb-4">Order Summary</h3>
+        
+        <div class="text-sm text-gray-700 space-y-2">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span id="subtotal">₱0.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Shipping</span>
+            <span>Free</span>
+          </div>
+        </div>
+
+        <div class="border-t mt-4 pt-4 flex justify-between text-lg font-semibold text-gray-800">
+          <span>Total</span>
+          <span id="total">₱0.00</span>
+        </div>
+
+        <a href="paymentmethod.html"
+           class="block text-center bg-green-600 w-full text-white py-3 rounded-md mt-6 font-medium hover:bg-green-700 transition">
+          Proceed to Checkout
+        </a>
+      </aside>
+    </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="text-white py-12 mt-10" style="background-color: #1B5E20;">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-      <div>
-        <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
-        <p class="text-gray-300 text-sm">
-          Fresh, organic produce delivered straight to your home from local farmers.
-        </p>
-      </div>
-      <div>
-        <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="#" class="hover:underline">About Us</a></li>
-          <li><a href="#" class="hover:underline">Contact</a></li>
-          <li><a href="#" class="hover:underline">FAQ</a></li>
-          <li><a href="#" class="hover:underline">Support</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="font-bold text-lg mb-3">Categories</h3>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="#" class="hover:underline">Vegetables</a></li>
-          <li><a href="#" class="hover:underline">Fruits</a></li>
-          <li><a href="#" class="hover:underline">Dairy</a></li>
-          <li><a href="#" class="hover:underline">Meat</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-        <div class="flex space-x-4 text-xl">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-      © 2025 The Farmer's Mall. All rights reserved.
-    </div>
-  </footer>
+  <!-- Footer -->
+  <div id="footer"></div>
 
   <!-- JavaScript -->
+  <script src="js/cart.js"></script>
   <script>
-    // Dynamically load header.html
-    fetch('header.html')
+    // Dynamically load footer.html
+    fetch('footer.html')
       .then(res => res.text())
-      .then(data => {
-        document.getElementById('header').innerHTML = data;
-
-        // Highlight the cart icon
-        const cartIcon = document.querySelector('a[href="cart.html"] i');
-        if (cartIcon) {
-          cartIcon.parentElement.classList.remove('text-gray-600');
-          cartIcon.parentElement.classList.add('text-green-600');
-        }
-
-        // Add search functionality to the loaded header
-        const headerSearchInput = document.querySelector('#header input[type="text"]');
-        if (headerSearchInput) {
-          const form = document.createElement('form');
-          form.action = 'products.html';
-          form.method = 'GET';
-          headerSearchInput.name = 'search';
-          headerSearchInput.parentElement.insertBefore(form, headerSearchInput);
-          form.appendChild(headerSearchInput);
-        }
-
-
-      });
-
-    // CART FUNCTIONALITY
-    const cartContainer = document.getElementById('cartItems');
-    const subtotalEl = document.getElementById('subtotal');
-    const totalEl = document.getElementById('total');
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    function renderCart() {
-      cartContainer.innerHTML = '';
-      if(cart.length === 0){
-        cartContainer.innerHTML = '<p class="text-gray-500 text-center">Your cart is empty</p>';
-        subtotalEl.textContent = '₱0.00';
-        totalEl.textContent = '₱0.00';
-        return;
-      }
-
-      cart.forEach((item, index) => {
-        const itemTotal = (item.price * (item.quantity || 1)).toFixed(2);
-        const div = document.createElement('div');
-        div.className = 'bg-white p-4 rounded-xl shadow-sm flex items-center justify-between';
-        div.innerHTML = `
-          <div class="flex items-center gap-4">
-            <img src="${item.image || 'images/products/img.png'}" class="w-16 h-16 rounded-lg object-cover">
-            <div>
-              <h3 class="font-semibold text-gray-800">${item.name}</h3>
-              <p class="text-green-700 font-medium">₱${item.price.toFixed(2)}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-4">
-            <button class="quantity-btn text-gray-600 px-2 py-1 border rounded-full" data-action="decrease">–</button>
-            <span class="quantity text-lg font-medium">${item.quantity || 1}</span>
-            <button class="quantity-btn text-gray-600 px-2 py-1 border rounded-full" data-action="increase">+</button>
-            <p class="text-green-700 font-semibold w-20 text-right item-total">₱${itemTotal}</p>
-            <button class="wishlist text-gray-400 hover:text-red-500 transition"><i class="fa-regular fa-heart"></i></button>
-            <button class="remove-item text-red-500 hover:text-red-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-        `;
-        cartContainer.appendChild(div);
-
-        // Quantity buttons
-        div.querySelectorAll('.quantity-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            if(!item.quantity) item.quantity = 1;
-            if(btn.dataset.action === 'increase') item.quantity++;
-            else if(btn.dataset.action === 'decrease' && item.quantity > 1) item.quantity--;
-            localStorage.setItem('cart', JSON.stringify(cart));
-            renderCart();
-          });
-        });
-
-        // Remove item
-        div.querySelector('.remove-item').addEventListener('click', () => {
-          cart.splice(index,1);
-          localStorage.setItem('cart', JSON.stringify(cart));
-          renderCart();
-        });
-
-        // Wishlist toggle
-        div.querySelector('.wishlist').addEventListener('click', () => {
-          div.querySelector('.wishlist').classList.toggle('active');
-        });
-      });
-
-      updateTotals();
-    }
-
-    function updateTotals(){
-      let subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-      subtotalEl.textContent = `₱${subtotal.toFixed(2)}`;
-      totalEl.textContent = `₱${subtotal.toFixed(2)}`;
-    }
-
-    renderCart();
+      .then(data => document.getElementById('footer').innerHTML = data);
   </script>
 
 </body>
+
 </html>

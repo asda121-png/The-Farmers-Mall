@@ -1,3 +1,121 @@
+<?php
+// PHP SCRIPT START - SERVER-SIDE REGISTRATION WITH MYSQL INTEGRATION
+
+// --- MySQL Connection Details (Based on user input) ---
+// WARNING: In a production environment, these should never be hardcoded 
+// and should be loaded from a secure configuration file outside the web root.
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', ''); // No password as specified by the user
+define('DB_NAME', 'farmers');
+
+$registration_status = '';
+$registration_message = '';
+
+/**
+ * Establishes a connection to the MySQL database.
+ * @return mysqli|null The database connection object or null on failure.
+ */
+function connectToDatabase() {
+    // The @ suppresses warnings/errors, we handle the error via $conn->connect_error below
+    $conn = @new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+    // Check connection
+    if ($conn->connect_error) {
+        // In a real app, this would log to a file, not output directly.
+        error_log("Connection failed: " . $conn->connect_error);
+        return null;
+    }
+    return $conn;
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])) {
+    // 1. Connect to Database
+    $conn = connectToDatabase();
+    
+    if (!$conn) {
+        $registration_status = 'error';
+        $registration_message = "Registration failed: Database connection failed. Please ensure MySQL is running and database '" . DB_NAME . "' exists.";
+    } else {
+        // 2. Collect and Sanitize Data
+        // Use real_escape_string for safety, although prepared statements below are the primary defense.
+        $firstName = $conn->real_escape_string(trim($_POST['firstname'] ?? ''));
+        $lastName = $conn->real_escape_string(trim($_POST['lastname'] ?? ''));
+        $email = $conn->real_escape_string(filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL));
+        $username = $conn->real_escape_string(trim($_POST['username'] ?? ''));
+        $address = $conn->real_escape_string(trim($_POST['address'] ?? ''));
+        $phone = $conn->real_escape_string(trim($_POST['phone'] ?? ''));
+        $password = $_POST['password'] ?? '';
+        $confirm = $_POST['confirm'] ?? '';
+        $terms = isset($_POST['terms']);
+        
+        $errors = [];
+
+        // 3. Server-Side Validation
+        if ($password !== $confirm) {
+            $errors[] = "Passwords do not match.";
+        }
+        if (!preg_match('/^09\d{9}$/', $phone)) {
+            $errors[] = "Invalid phone number format.";
+        }
+        if (!$terms) {
+            $errors[] = "You must agree to the Terms and Privacy Policy.";
+        }
+        
+        // IMPORTANT: Add checks here to see if the username/email already exists in the database!
+        
+        if (empty($errors)) {
+            // 4. Hash the password securely
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            
+            // --- MYSQL INSERTION USING PREPARED STATEMENTS (Assumes 'users' table exists) ---
+            $sql = "INSERT INTO users (first_name, last_name, email, username, address, phone, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            
+            // Prepare statement
+            if ($stmt = $conn->prepare($sql)) {
+                // Bind parameters (s = string)
+                $stmt->bind_param("sssssss", 
+                    $firstName, 
+                    $lastName, 
+                    $email, 
+                    $username, 
+                    $address, 
+                    $phone, 
+                    $hashedPassword
+                );
+
+                // Execute statement
+                if ($stmt->execute()) {
+                    $registration_status = 'success';
+                    $registration_message = 'Registration successful for ' . htmlspecialchars($username) . '! Redirecting to login...';
+                } else {
+                    // Log detailed database error
+                    error_log("MySQL Insertion Error: " . $stmt->error);
+                    $registration_status = 'error';
+                    $registration_message = "Registration failed due to a database error. Please contact support. (Code: 500)";
+                }
+
+                // Close statement
+                $stmt->close();
+            } else {
+                error_log("MySQL Prepare Error: " . $conn->error);
+                $registration_status = 'error';
+                $registration_message = "Registration failed: Could not prepare SQL statement. (Code: 501)";
+            }
+            
+        } else {
+            // Errors from validation
+            $registration_status = 'error';
+            $registration_message = "Registration failed: " . implode(" | ", $errors);
+        }
+
+        // 5. Close Connection
+        $conn->close();
+    }
+}
+// PHP SCRIPT END
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,9 +202,9 @@
   </div>
 
   <!-- Register Card -->
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden relative z-10 my-12">
-    <div class="bg-green-600 py-6 px-8 text-center relative ">
-      <a href="login.html" class="absolute left-6 top-6 text-white hover:text-green-200 transition-colors">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden relative z-10">
+    <div class="bg-green-600 py-6 px-8 text-center relative">
+      <a href="login.php" class="absolute left-6 top-6 text-white hover:text-green-200 transition-colors">
         <i class="fas fa-arrow-left"></i>
       </a>
       <div class="floating-icon w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -98,7 +216,9 @@
 
     <div class="p-8">
       <!-- Form is set to POST to the same PHP file for processing -->
-      <form id="registerForm" method="POST" action="php/register.php">
+      <form method="POST" onsubmit="return validateForm(event)">
+        <input type="hidden" name="register_submitted" value="1">
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label for="firstname" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
@@ -205,7 +325,7 @@
 
         <p class="text-center text-sm text-gray-600 mt-6">
           Already have an account? 
-          <a href="login.html" class="text-green-600 font-medium hover:underline">Log In</a>
+          <a href="login.php" class="text-green-600 font-medium hover:underline">Log In</a>
         </p>
       </form>
     </div>
@@ -221,7 +341,12 @@
       msg.textContent = message;
       toast.classList.remove("hidden");
       toast.classList.add("show");
+      // Set background color based on status
       toast.style.backgroundColor = type === "success" ? "#16a34a" : "#dc2626";
+      // Update icon based on status
+      const icon = toast.querySelector('.fa-solid');
+      icon.className = type === "success" ? "fa-solid fa-check-circle" : "fa-solid fa-circle-exclamation";
+
 
       setTimeout(() => {
         toast.classList.remove("show");
@@ -229,37 +354,38 @@
       }, 3500); // Give user time to read the message
     }
 
-    function validateForm() {
+    function validateForm(e) {
       // Client-side validation to improve UX, PHP handles final server-side validation.
+      
       const pass = document.getElementById('password').value.trim();
       const confirm = document.getElementById('confirm').value.trim();
       const phone = document.getElementById('phone').value.trim();
+      
       const phoneError = document.getElementById("phoneError");
       const passError = document.getElementById("passwordError");
 
       phoneError.classList.add("hidden");
       passError.classList.add("hidden");
-      let errorMessages = [];
+
+      let isValid = true;
 
       // Phone check
       const phonePattern = /^09\d{9}$/;
       if (!phonePattern.test(phone)) {
         phoneError.classList.remove("hidden");
-        errorMessages.push("Phone number is invalid.");
+        isValid = false;
       }
 
       // Password check
       if (pass !== confirm) {
         passError.classList.remove("hidden");
-        errorMessages.push("Passwords do not match.");
+        isValid = false;
       }
-
-      const isValid = errorMessages.length === 0;
 
       // If client-side validation fails, prevent submission.
       if (!isValid) {
-        // Show a more specific toast message
-        showToast(errorMessages.join(" "), "error");
+        e.preventDefault();
+        showToast("Please correct the errors in the form.", "error");
         return false;
       }
       
@@ -269,35 +395,20 @@
     
     // Inject PHP status check after page load
     window.onload = function() {
+        const status = '<?= $registration_status ?>';
+        // The addslashes is crucial here to prevent PHP data from breaking the JS string
+        const message = '<?= addslashes($registration_message) ?>'; 
+        
+        if (status === 'success') {
+            showToast(message, 'success');
+            // Simulate redirection after successful database interaction
+            // NOTE: In a live environment, PHP would handle this redirection via header("Location: ...")
+            setTimeout(() => window.location.href = "login.php", 2500);
+        } else if (status === 'error') {
+            showToast(message, 'error');
+        }
         feather.replace();
     };
-
-    // Handle form submission with AJAX to the PHP script
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent the default form submission
-
-      if (validateForm()) { // If client-side validation passes
-        const formData = new FormData(this);
-
-        fetch('php/register.php', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            showToast(data.message, 'success');
-            setTimeout(() => window.location.href = "login.html", 2500);
-          } else {
-            showToast(data.message || "An unknown error occurred.", 'error');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          showToast("A network error occurred. Please try again.", 'error');
-        });
-      }
-    });
   </script>
 </body>
 </html>

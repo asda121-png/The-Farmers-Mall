@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<bo class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
   <!-- Header -->
   <header class="bg-white border-b shadow-sm sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -100,7 +100,7 @@
       rights reserved.</div>
   </footer>
 
-  <script>
+  <script src="js/retailersearchresults.js"></script>
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('searchInput');
       const resultsTitle = document.getElementById('resultsTitle');
@@ -157,7 +157,7 @@
                 <p class="text-sm text-gray-500">Customer: ${o.customerName}</p>
               </div>
             </div>
-            <a href="retailerorderdetails.html?orderId=${o.id}" onclick="localStorage.setItem('selectedSellerOrder', JSON.stringify(${JSON.stringify(o)}))" class="text-green-600 text-sm font-medium">View Order</a>
+            <a href="retailerorderdetails.html?orderId=${o.id}" onclick="localStorage.setItem('selectedSellerOrder', JSON.stringify(o));" class="text-green-600 text-sm font-medium">View Order</a>
           </div>
         `;
       });
@@ -171,7 +171,7 @@
         resultsContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Try searching for something else.</p>';
       }
     });
-  </script>
+  
 
 </body>
 

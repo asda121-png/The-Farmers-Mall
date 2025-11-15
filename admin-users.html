@@ -103,64 +103,9 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const usersTableBody = document.getElementById('usersTableBody');
-      const sellerOrders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
-      const adminRetailers = JSON.parse(localStorage.getItem('adminRetailers')) || [];
+  <script src="js/admin-users.js"></script>
 
-      const allUsers = [];
 
-      // Get customers from orders
-      const customerNames = new Set(sellerOrders.map(order => order.customerName));
-      customerNames.forEach(name => {
-        allUsers.push({
-          name: name,
-          email: `${name.replace(/\s/g, '.').toLowerCase()}@example.com`,
-          role: 'Customer',
-          status: 'Active',
-          joinedDate: '2025-10-25', // Placeholder
-          avatar: `https://randomuser.me/api/portraits/women/${allUsers.length + 1}.jpg`
-        });
-      });
-
-      // Get retailers
-      adminRetailers.forEach(retailer => {
-        allUsers.push({
-          name: retailer.storeName,
-          email: retailer.email,
-          role: 'Retailer',
-          status: retailer.status,
-          joinedDate: retailer.joinedDate,
-          avatar: `https://randomuser.me/api/portraits/${retailer.avatar}`
-        });
-      });
-
-      usersTableBody.innerHTML = '';
-      allUsers.forEach(user => {
-        const statusClass = user.status === 'Verified' || user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50';
-        tr.innerHTML = `
-          <td class="p-4 flex items-center gap-3"><img src="${user.avatar}" class="w-8 h-8 rounded-full">${user.name}</td>
-          <td class="p-4">${user.email}</td>
-          <td class="p-4">${user.role}</td>
-          <td class="p-4"><span class="${statusClass} px-2 py-1 rounded-full text-xs font-medium">${user.status}</span></td>
-          <td class="p-4">${new Date(user.joinedDate).toLocaleDateString()}</td>
-          <td class="p-4"><button class="text-red-600 hover:underline">Suspend</button></td>
-        `;
-        usersTableBody.appendChild(tr);
-      });
-
-      // Logout Modal Logic
-      const logoutButton = document.getElementById('logoutButton');
-      const logoutModal = document.getElementById('logoutModal');
-      const cancelLogoutBtn = document.getElementById('cancelLogout');
-      logoutButton.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
-      cancelLogoutBtn.addEventListener('click', () => logoutModal.classList.add('hidden'));
-      logoutModal.addEventListener('click', (e) => { if (e.target === logoutModal) logoutModal.classList.add('hidden'); });
-    });
-  </script>
 
 </body>
 </html>

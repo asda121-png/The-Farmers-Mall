@@ -1,27 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fresh Vegetable Bundle – The Farmer's Mall</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details – The Farmer's Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
+  <!-- Header -->
    <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold" style="color: #2E7D32;">The Farmer's Mall</h1>
+      <a href="homepage.html" class="text-xl font-bold" style="color: #2E7D32;">The Farmer's Mall</a>
 
       <div class="flex-1 mx-6">
         <form action="products.html" method="GET">
           <input 
             type="text" 
             name="search"
-            placeholder="Search for fresh product..."
+            placeholder="Search for fresh produce..."
             class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
           />
         </form>
@@ -38,142 +36,54 @@
     </div>
   </header>
 
-  <!-- Push content down for fixed header -->
-  <div class="h-20"></div>
-
-  <!-- Breadcrumb -->
-  <div class="max-w-7xl mx-auto px-6 py-4 text-sm text-gray-600">
-    <a href="homepage.html" class="hover:text-green-700">Home</a> ›
-    <a href="products.html" class="hover:text-green-700">Vegetables</a> ›
-    <span class="text-gray-800 font-medium">Fresh Vegetable Bundle</span>
-  </div>
-
-  <!-- Product Section -->
-  <main class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-10">
-
-    <!-- Left: Product Image -->
-    <div>
-      <img src="images/products/imgg.png" alt="Fresh Vegetable Bundle"
-           class="w-full rounded-lg shadow-sm">
-      <div class="flex gap-3 mt-4">
-        <img src="images/products/img1.png" class="w-20 h-20 object-cover rounded-lg border cursor-pointer hover:ring-2 hover:ring-green-500 transition">
-        <img src="images/products/img2.png" class="w-20 h-20 object-cover rounded-lg border cursor-pointer hover:ring-2 hover:ring-green-500 transition">
-        <img src="images/products/img3.png" class="w-20 h-20 object-cover rounded-lg border cursor-pointer hover:ring-2 hover:ring-green-500 transition">
-      </div>
-    </div>
-
-    <!-- Right: Product Details -->
-    <div>
-      <h2 class="text-2xl font-semibold text-gray-900 mb-2">Fresh Vegetable Bundle</h2>
-      <div class="flex items-center gap-2 mb-2">
-        <div class="flex text-yellow-500 text-sm">
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star-half-stroke"></i>
-        </div>
-        <span class="text-gray-700 text-sm">4.9</span>
-        <span class="text-gray-500 text-sm">(1.2k reviews)</span>
-      </div>
-
-      <!-- Price -->
-      <div class="flex items-center space-x-3 mb-3">
-        <p class="text-2xl font-bold text-green-700">₱24.99</p>
-        <p class="text-gray-400 line-through">₱29.99</p>
-        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-sm font-medium">17% OFF</span>
-      </div>
-
-      <!-- Stock -->
-      <p class="text-green-700 font-medium mb-4 flex items-center">
-        <i class="fa-solid fa-circle-check mr-2"></i> In Stock
-      </p>
-
-      <!-- Quantity -->
-      <div class="flex items-center mb-6">
-        <span class="mr-3 font-medium text-gray-800">Quantity:</span>
-        <div class="flex border rounded-md">
-          <button id="decreaseQty" class="px-3 py-1 border-r hover:bg-gray-100">−</button>
-          <input id="quantityInput" type="text" value="1" class="w-12 text-center outline-none">
-          <button id="increaseQty" class="px-3 py-1 border-l hover:bg-gray-100">+</button>
-        </div>
-      </div>
-
-      <!-- Add to Cart -->
-      <div class="flex items-center gap-3 mb-6">
-        <button id="addToCartBtn" class="flex-1 bg-green-700 text-white py-3 rounded-md font-medium hover:bg-green-800 transition">
-          <i class="fa-solid fa-cart-plus mr-2"></i>Add to Cart
-        </button>
-        <button id="heartBtn" class="border px-4 py-3 rounded-md hover:bg-gray-100 text-gray-600">
-          <i id="heartIcon" class="fa-regular fa-heart"></i>
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full mb-[40rem]">
+      <div class="flex items-center space-x-4 mb-6">
+        <button onclick="window.history.back()" class="text-gray-600 hover:text-black">
+          <i class="fa-solid fa-arrow-left text-lg"></i>
         </button>
       </div>
+      
+      <!-- Product Details Grid -->
+      <div id="product-content" class="grid md:grid-cols-2 gap-8 bg-white p-8 rounded-lg shadow-sm">
+        <!-- Product Image -->
+        <div>
+          <img id="productImage" src="" alt="Product Image" class="w-full h-auto rounded-lg object-cover">
+        </div>
 
-      <!-- Delivery Info -->
-      <div class="bg-green-50 border border-green-100 p-4 rounded-lg mb-5">
-        <h3 class="font-semibold text-gray-800 mb-2">Delivery Information</h3>
-        <ul class="text-sm text-gray-700 space-y-1">
-          <li><i class="fa-solid fa-truck text-green-600 mr-2"></i>Delivery within 2–4 business days</li>
-          <li><i class="fa-solid fa-box text-green-600 mr-2"></i>Free shipping on orders over ₱20</li>
-        </ul>
-      </div>
+        <!-- Product Info -->
+        <div class="flex flex-col justify-center">
+          <h2 id="productName" class="text-3xl font-bold text-gray-800 mb-2">Product Name</h2>
+          <p class="text-sm text-gray-500 mb-4">From Mesa Farm</p>
+          
+          <p id="productPrice" class="text-2xl font-bold text-green-700 mb-4">₱0.00</p>          
+          <p id="productDescription" class="text-gray-600 text-sm mb-6">
+            Loading description...
+          </p>
 
-      <!-- Key Features -->
-      <div>
-        <h3 class="font-semibold text-gray-800 mb-2">Key Features</h3>
-        <ul class="text-sm text-gray-700 space-y-1">
-          <li><i class="fa-solid fa-check text-green-600 mr-2"></i>100% Organic and pesticide-free</li>
-          <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Locally sourced from certified farms</li>
-          <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Harvested within 24 hours</li>
-        </ul>
+          <!-- Quantity & Add to Cart -->
+          <div class="flex items-center gap-4 mb-6">
+            <div class="flex items-center border rounded-lg">
+              <button id="decreaseQty" class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg">-</button>
+              <input id="quantityInput" type="text" value="1" class="w-12 text-center border-l border-r focus:outline-none">
+              <button id="increaseQty" class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg">+</button>
+            </div>
+            <button id="addToCartBtn" class="flex-1 bg-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 transition">
+              Add to Cart
+            </button>
+          </div>
+
+          <!-- Wishlist -->
+          <button id="heartBtn" class="flex items-center gap-2 text-gray-600 hover:text-red-500 transition">
+            <i id="heartIcon" class="fa-regular fa-heart"></i>
+            <span>Add to Wishlist</span>
+          </button>
+        </div>
       </div>
-    </div>
   </main>
 
-  <!-- Product Description -->
-  <section class="max-w-7xl mx-auto px-6 mt-12 bg-white p-6 rounded-lg shadow-sm">
-    <h3 class="font-semibold text-lg mb-3">Product Description</h3>
-    <p class="text-gray-600 text-sm leading-relaxed">
-      Our Fresh Organic Vegetable Bundle brings you the finest selection of farm-fresh vegetables,
-      carefully curated for maximum nutrition and flavor. This premium bundle includes crisp lettuce,
-      juicy tomatoes, vibrant carrots, and seasonal greens — all grown using sustainable organic
-      farming practices. Each vegetable is hand-picked at peak ripeness to ensure you receive the
-      highest quality produce. Perfect for creating healthy salads, nutritious smoothies, or adding
-      fresh ingredients to your favorite recipes.
-    </p>
-  </section>
-
-  <!-- Recommendations -->
-  <section class="max-w-7xl mx-auto px-6 mt-10 mb-16">
-    <h3 class="font-semibold text-lg mb-4">You might also like</h3>
-    <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
-        <img src="images/products/fresh spinach.png" class="rounded-lg mb-3" alt="Fresh Spinach">
-        <h4 class="font-medium text-gray-800">Fresh Spinach</h4>
-        <p class="text-green-700 font-semibold">₱12.99</p>
-      </div>
-
-      <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
-        <img src="images/products/bell pepper mix.png" class="rounded-lg mb-3" alt="Bell Pepper Mix">
-        <h4 class="font-medium text-gray-800">Bell Pepper Mix</h4>
-        <p class="text-green-700 font-semibold">₱18.99</p>
-      </div>
-
-      <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
-        <img src="images/products/fresh brocoli.png" class="rounded-lg mb-3" alt="Fresh Broccoli">
-        <h4 class="font-medium text-gray-800">Fresh Broccoli</h4>
-        <p class="text-green-700 font-semibold">₱15.99</p>
-      </div>
-
-      <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
-        <img src="images/products/organic cucumber.png" class="rounded-lg mb-3" alt="Organic Cucumber">
-        <h4 class="font-medium text-gray-800">Organic Cucumber</h4>
-        <p class="text-green-700 font-semibold">₱8.99</p>
-      </div>
-    </div>
-  </section>
- <!-- Footer -->
-  <footer class="text-white py-12" style="background-color: #1B5E20;">
+  <!-- Footer -->
+  <footer class="text-white py-12 mt-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div>
         <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
@@ -199,79 +109,16 @@
       </div>
       <div>
         <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-        <div class="flex space-x-4 text-xl">
-          <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook"></i></a>
-          <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram"></i></a>
-        </div>
+        <div class="flex space-x-4 text-xl"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i
+              class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-instagram"></i></a></div>
       </div>
     </div>
-
-    <div class="border-t border-green-800 text-center text-gray-300 text-sm mt-10 pt-6">
-      © 2025 The Farmer's Mall. All rights reserved.
-    </div>
+    <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">© 2025 The Farmer's Mall. All
+      rights reserved.</div>
   </footer>
-  <!-- JavaScript Section -->
-  <script>
-    // Quantity buttons
-    const quantityInput = document.getElementById('quantityInput');
-    const increaseBtn = document.getElementById('increaseQty');
-    const decreaseBtn = document.getElementById('decreaseQty');
 
-    increaseBtn.addEventListener('click', () => {
-      let value = parseInt(quantityInput.value);
-      quantityInput.value = value + 1;
-    });
+  <script src="js/productdetails.js"></script>
 
-    decreaseBtn.addEventListener('click', () => {
-      let value = parseInt(quantityInput.value);
-      if (value > 1) quantityInput.value = value - 1;
-    });
-
-    // Add to cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    addToCartBtn.addEventListener('click', () => {
-      // 1. Get product details from the page
-      const name = document.querySelector('h2').textContent.trim();
-      const priceString = document.querySelector('.text-2xl.font-bold.text-green-700').textContent;
-      const price = parseFloat(priceString.replace('₱', ''));
-      const image = document.querySelector('main > div:first-child img').src;
-      const quantity = parseInt(quantityInput.value);
-
-      // 2. Get existing cart from localStorage or create a new one
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-      // 3. Check if item already exists in cart
-      const existingItem = cart.find(item => item.name === name);
-
-      if (existingItem) {
-        // If it exists, just update the quantity
-        existingItem.quantity += quantity;
-      } else {
-        // If not, add the new item to the cart
-        cart.push({ name, price, image, quantity });
-      }
-
-      // 4. Save the updated cart back to localStorage
-      localStorage.setItem('cart', JSON.stringify(cart));
-
-      // 5. Redirect to the cart page
-      window.location.href = 'cart.html';
-    });
-
-    // Heart (favorite) button
-    const heartBtn = document.getElementById('heartBtn');
-    const heartIcon = document.getElementById('heartIcon');
-
-    heartBtn.addEventListener('click', () => {
-      if (heartIcon.classList.contains('fa-regular')) {
-        heartIcon.classList.remove('fa-regular');
-        heartIcon.classList.add('fa-solid', 'text-red-500');
-      } else {
-        heartIcon.classList.remove('fa-solid', 'text-red-500');
-        heartIcon.classList.add('fa-regular');
-      }
-    });
-  </script>
 </body>
+
 </html>
