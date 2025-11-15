@@ -83,12 +83,12 @@
         bestMatch.classList.remove(...inactiveClasses.split(' '));
         bestMatch.classList.add(...activeClasses.split(' '));
       } else if (homeLink) {
-         // Default to highlighting Home if no other match (e.g. on page load with no hash)
-         // but only if there's no hash
-         if (!currentHash) {
-            homeLink.classList.remove(...inactiveClasses.split(' '));
-            homeLink.classList.add(...activeClasses.split(' '));
-         }
+        // Default to highlighting Home if no other match (e.g. on page load with no hash)
+        // but only if there's no hash
+        if (!currentHash) {
+           homeLink.classList.remove(...inactiveClasses.split(' '));
+           homeLink.classList.add(...activeClasses.split(' '));
+        }
       }
     }
 
@@ -192,72 +192,123 @@
     </div>
   </section>
 
-  <!-- Categories -->
+  <!-- 
+    Categories
+    ---
+    MODIFIED:
+    - Wrapped each item in an <a> tag to make it clickable.
+    - Added 'group' to the <a> tag.
+    - Added hover effects to the <a> tag (shadow, lift).
+    - Added hover effect to the <img> tag (scale) using 'group-hover'.
+    - Made images uniform with h-48 object-cover.
+  -->
   <section id="shop" class="px-6 py-16 text-center">
     <h2 class="text-2xl font-bold text-gray-900">Shop Our Categories</h2>
-    <div class="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto mt-10">
-      <div><img src="images/vegetable.png" class="rounded-xl" alt="Vegetables"><p class="mt-2 font-semibold">Vegetable</p></div>
-      <div><img src="images/fruits.png" class="rounded-xl" alt="Fruits"><p class="mt-2 font-semibold">Fruits</p></div>
-      <div><img src="images/meat.png" class="rounded-xl" alt="Meat"><p class="mt-2 font-semibold">Meat</p></div>
-      <div><img src="images/pantry.png" class="rounded-xl" alt="Pantry"><p class="mt-2 font-semibold">Pantry</p></div>
-      <div><img src="images/equipment.png" class="rounded-xl" alt="Equipment"><p class="mt-2 font-semibold">Equipment</p></div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-6xl mx-auto mt-10">
+      
+      <!-- Category Item 1 -->
+      <a href="shop.php?category=vegetable" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <img src="images/vegetable.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Vegetables">
+        <p class="py-4 font-semibold">Vegetable</p>
+      </a>
+      
+      <!-- Category Item 2 -->
+      <a href="shop.php?category=fruits" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <img src="images/fruits.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Fruits">
+        <p class="py-4 font-semibold">Fruits</p>
+      </a>
+
+      <!-- Category Item 3 -->
+      <a href="shop.php?category=meat" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <img src="images/meat.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Meat">
+        <p class="py-4 font-semibold">Meat</p>
+      </a>
+
+      <!-- Category Item 4 -->
+      <a href="shop.php?category=pantry" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <img src="images/pantry.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Pantry">
+        <p class="py-4 font-semibold">Pantry</p>
+      </a>
+
+      <!-- Category Item 5 -->
+      <a href="shop.php?category=equipment" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <img src="images/equipment.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Equipment">
+        <p class="py-4 font-semibold">Equipment</p>
+      </a>
+
     </div>
   </section>
 
-  
-  <section class="px-6 py-16 text-center">
+<section class="px-6 py-16 text-center">
     <h2 class="text-2xl font-bold text-gray-900">Meet Our Featured Farmers</h2>
     <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10">
       <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-green-600 font-bold mb-2">Farmer A</h3>
+        <h3 class="text-green-600 font-bold mb-2">James Blanco</h3>
         <p>Green Valley Farm – Specializing in organic leafy greens and fresh herbs.</p>
       </div>
       <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-green-600 font-bold mb-2">Farmer B</h3>
+        <h3 class="text-green-600 font-bold mb-2">Dirk Dimpas</h3>
         <p>Sunrise Dairy – Providing creamy, pasture-raised milk and cheese.</p>
       </div>
       <div class="bg-white p-6 rounded-xl shadow">
-        <h3 class="text-green-600 font-bold mb-2">Farmer C</h3>
+        <h3 class="text-green-600 font-bold mb-2">Jayson Bustamante</h3>
         <p>Orchard Heights – Home to the sweetest apples and stone fruits.</p>
       </div>
     </div>
-  </section>
 
-  <!-- Why Choose Us -->
-  <section class="px-6 py-16 text-center bg-[#f1fbf4]">
-    <h2 class="text-2xl font-bold text-gray-900">Why Choose Us?</h2>
-    <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10">
-      <div class="bg-white p-6 rounded-xl shadow">
-        <img src="https://img.icons8.com/ios-filled/50/1fa02d/organic-food.png" class="mx-auto mb-4" alt="Organic Icon">
-        <h3 class="font-bold mb-2">Organic & Natural</h3>
-        <p class="text-gray-600">Our products are grown with care, without harmful pesticides or chemicals.</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow">
-        <img src="images/vegetables-box.png" class="mx-auto mb-4" alt="Freshness Icon">
-        <h3 class="font-bold mb-2">Unmatched Freshness</h3>
-        <p class="text-gray-600">From the farm to your table in record time, guaranteeing peak flavor and nutrition.</p>
-      </div>
-      <div class="bg-white p-6 rounded-xl shadow">
-        <img src="https://img.icons8.com/ios-filled/50/1fa02d/handshake.png" class="mx-auto mb-4" alt="Support Local Icon">
-        <h3 class="font-bold mb-2">Supporting Local</h3>
-        <p class="text-gray-600">Every purchase directly supports small, independent farmers in your community.</p>
-      </div>
+    <!-- NEW "Start Selling" Button -->
+    <div class="mt-12">
+      <a href="startselling.html" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        Start Selling
+      </a>
     </div>
+    <!-- END NEW Button -->
+
   </section>
 
   
-  <section class="px-6 py-16 text-center">
-    <h2 class="text-2xl font-bold text-gray-900">Delivery Coverage</h2>
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow mt-6">
-      <p class="text-gray-600">We currently serve the following areas:</p>
-      <div class="flex flex-wrap justify-center gap-3 mt-4">
-        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">Cityville</span>
-        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">Greendale</span>
-        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">Northwood</span>
-        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">Riverside</span>
-        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">Oakland</span>
+  <section class="px-6 py-16"> <!-- Removed text-center -->
+    <div class="max-w-6xl mx-auto"> <!-- Use a wider container -->
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-10">Delivery Coverage</h2> <!-- Center the main title -->
+      
+      <!-- Two-column grid -->
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        
+        <!-- Left Column: Text Content -->
+        <div class="bg-white p-8 rounded-xl shadow text-center h-full flex flex-col justify-center"> <!-- Re-apply the card style here, added flex -->
+          
+          <!-- New Icon -->
+          <div>
+            <i class="fas fa-truck-fast text-green-600 text-5xl mb-4"></i>
+          </div>
+          <!-- End New Icon -->
+          
+          <p class="text-gray-600 text-lg">We currently serve areas in and around the <strong>City of Mati</strong></p>
+          <div class="flex flex-wrap justify-center gap-3 mt-6">
+            <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Central</span>
+            <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Dahican</span>
+            <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Badas</span>
+            <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Matiao</span>
+            <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Madang</span>
+          </div>
+          <p class="mt-8 text-sm text-gray-500">Don’t see your area? <a href="support.html" class="text-green-600 hover:underline font-medium">Contact us</a> to let us know where you are!</p>
+        </div>
+
+        <!-- Right Column: Google Map -->
+        <div>
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63183.65961011504!2d126.2132717513672!3d6.945417999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x325603b55c366f0b%3A0x6d11a5113959544c!2sMati%2C%20Davao%20Oriental!5e0!3m2!1sen!2sph!4v1678888888888!5m2!1sen!2sph" 
+            width="100%" 
+            height="400" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            class="rounded-xl shadow-lg w-full"
+          ></iframe>
+        </div>
+
       </div>
-      <p class="mt-4 text-sm text-gray-500">Don’t see your area? <a href="#" class="text-green-600 hover:underline">Contact us</a> to let us know where you are!</p>
     </div>
   </section>
 
@@ -266,7 +317,7 @@
     <div class="bg-green-600 text-white rounded-xl p-10 text-center max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-4">Ready for a Taste of Freshness?</h2>
       <p class="mb-6">Join the farm-to-table movement today and get the best local produce delivered to you.</p>
-      <a href="login.html" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
+      <a href="login.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
     </div>
   </section>
 
@@ -276,3 +327,9 @@
 
 </body>
 </html>
+
+
+
+
+
+
