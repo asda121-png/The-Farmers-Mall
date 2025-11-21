@@ -2,84 +2,11 @@
 // Start session to check if user is logged in
 session_start();
 
-// --- Configuration ---
-$servername = "localhost";
-$db_username = "root";
-$db_password = ""; // As requested: no password
-$dbname = "farmers";
-
-// Function to establish database connection
-function getDbConnection() {
-    global $servername, $db_username, $db_password, $dbname;
-    
-    // Create connection
-    $conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-        // Use a user-friendly message, but also log the detailed error
-        error_log("Database Connection Failed: " . $conn->connect_error);
-        die('<div style="font-family: sans-serif; padding: 20px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; margin: 20px;">
-                <h1>Database Connection Error</h1>
-                <p>Could not connect to the database. Please ensure MySQL is running, the \'farmers\' database exists, and the credentials are correct.</p>
-                <p>Error Detail: ' . htmlspecialchars($conn->connect_error) . '</p>
-            </div>');
-    }
-    return $conn;
-}
-
 // Check if user is logged in
 $isLoggedIn = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 $username = $isLoggedIn ? htmlspecialchars($_SESSION['username'] ?? 'User') : null;
 $userRole = $isLoggedIn ? htmlspecialchars($_SESSION['role'] ?? 'user') : null;
 
-// Function to render a single product card
-function renderProductCard($product) {
-    // Sanitize and format data
-    $name = htmlspecialchars($product['name']);
-    $price = number_format($product['price'], 2);
-    // Use the stored image path or a placeholder if the path is missing/empty
-    $image = htmlspecialchars($product['image_path'] ?? ''); 
-    $id = htmlspecialchars($product['product_id']);
-    $category = htmlspecialchars($product['category']);
-    
-    // Determine the price suffix based on the category (meat/seafood are usually per kg)
-    $suffix = ($category === 'meat' || $category === 'seafood') ? ' per kg' : '';
-
-    // Use placeholder image if the defined image path fails
-    $placeholder_image = 'https://placehold.co/128x128/eeeeee/333333?text=No+Image';
-
-    echo '<div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card" data-id="' . $id . '">';
-    echo '  <img src="' . $image . '" alt="' . $name . '" class="w-full h-32 object-cover rounded" onerror="this.onerror=null; this.src=\'' . $placeholder_image . '\'">';
-    echo '  <h3 class="mt-2 font-semibold text-sm">' . $name . '</h3>';
-    echo '  <p class="text-green-600 font-bold text-sm">₱' . $price . $suffix . '</p>';
-    // The button remains static for now, redirecting to products.html
-    echo '  <button aria-label="add" data-id="' . $id . '" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart">';
-    echo '      <i class="fa-solid fa-plus"></i>';
-    echo '  </button>';
-    echo '</div>';
-}
-
-// --- DATA FETCHING LOGIC (Runs unconditionally) ---
-$conn = getDbConnection();
-$top_products = [];
-$other_products = [];
-
-// Query to get all products, sorting by the flag
-$sql = "SELECT product_id, name, price, image_path, category, is_top_product FROM Products ORDER BY is_top_product DESC, product_id ASC";
-$result = $conn->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        if ($row['is_top_product']) {
-            $top_products[] = $row;
-        } else {
-            $other_products[] = $row;
-        }
-    }
-}
-$conn->close();
-// --- END DATA FETCHING LOGIC ---
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -228,16 +155,41 @@ $conn->close();
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                <?php
-                // Loop through the data fetched from the database
-                if (count($top_products) > 0) {
-                    foreach ($top_products as $product) {
-                        renderProductCard($product);
-                    }
-                } else {
-                    echo '<p class="col-span-full text-center text-gray-500">No top products found in the database.</p>';
-                }
-                ?>
+                <!-- Static Product Card 1 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img1.png" alt="Fresh Lettuce" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Fresh Lettuce</h3>
+                  <p class="text-green-600 font-bold text-sm">₱50.00</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 2 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img2.png" alt="Organic Carrots" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Organic Carrots</h3>
+                  <p class="text-green-600 font-bold text-sm">₱80.00 per kg</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 3 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img3.png" alt="Tomatoes" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Tomatoes</h3>
+                  <p class="text-green-600 font-bold text-sm">₱60.00 per kg</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 4 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img4.png" alt="Broccoli" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Broccoli</h3>
+                  <p class="text-green-600 font-bold text-sm">₱120.00</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 5 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img5.png" alt="Fresh Eggs" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Fresh Eggs</h3>
+                  <p class="text-green-600 font-bold text-sm">₱90.00 per dozen</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
             </div>
         </section>
 
@@ -249,16 +201,34 @@ $conn->close();
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <?php
-                // Loop through the data fetched from the database
-                if (count($other_products) > 0) {
-                    foreach ($other_products as $product) {
-                        renderProductCard($product);
-                    }
-                } else {
-                    echo '<p class="col-span-full text-center text-gray-500">No other products found in the database.</p>';
-                }
-                ?>
+                <!-- Static Product Card 1 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img6.png" alt="Pork Chop" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Pork Chop</h3>
+                  <p class="text-green-600 font-bold text-sm">₱350.00 per kg</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 2 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img7.png" alt="Fresh Milk" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
+                  <p class="text-green-600 font-bold text-sm">₱85.00</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 3 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img8.png" alt="Apples" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Apples</h3>
+                  <p class="text-green-600 font-bold text-sm">₱25.00 each</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <!-- Static Product Card 4 -->
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition relative product-card">
+                  <img src="images/products/img9.png" alt="Bananas" class="w-full h-32 object-cover rounded">
+                  <h3 class="mt-2 font-semibold text-sm">Bananas</h3>
+                  <p class="text-green-600 font-bold text-sm">₱40.00 per kg</p>
+                  <button aria-label="add" class="add-btn bg-green-600 text-white rounded-full p-2 hover:bg-green-700 absolute bottom-3 right-3 shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+                </div>
             </div>
         </section>
 
