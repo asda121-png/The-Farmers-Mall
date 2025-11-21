@@ -117,7 +117,7 @@
                 <i class="fas fa-map-marker-alt text-green-600 text-5xl mb-6"></i>
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Commitment to Mati</h2>
                 <p class="text-lg text-gray-700 mb-6">
-                    Our roots are right here in the City of Mati. We're not just a service *in* the community; we are *of* the community. We are passionate about making fresh, healthy food accessible to every family in the areas we serve, from Central to Dahican and beyond.
+                    Our roots are right here in the City of Mati. We're not just a service in the community; we are *of the community. We are passionate about making fresh, healthy food accessible to every family in the areas we serve, from Central to Dahican and beyond.
                 </p>
                 <a href="register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300">
                     Browse Local Products

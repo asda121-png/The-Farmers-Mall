@@ -207,34 +207,34 @@
     <div class="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-6xl mx-auto mt-10">
       
       <!-- Category Item 1 -->
-      <a href="shop.php?category=vegetable" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <img src="images/vegetable.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Vegetables">
         <p class="py-4 font-semibold">Vegetable</p>
-      </a>
+      </div>
       
       <!-- Category Item 2 -->
-      <a href="shop.php?category=fruits" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <img src="images/fruits.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Fruits">
         <p class="py-4 font-semibold">Fruits</p>
-      </a>
+      </div>
 
       <!-- Category Item 3 -->
-      <a href="shop.php?category=meat" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <img src="images/meat.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Meat">
         <p class="py-4 font-semibold">Meat</p>
-      </a>
+      </div>
 
       <!-- Category Item 4 -->
-      <a href="shop.php?category=pantry" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <img src="images/pantry.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Pantry">
         <p class="py-4 font-semibold">Pantry</p>
-      </a>
+      </div>
 
       <!-- Category Item 5 -->
-      <a href="shop.php?category=equipment" class="group block bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <img src="images/equipment.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Equipment">
         <p class="py-4 font-semibold">Equipment</p>
-      </a>
+      </div>
 
     </div>
   </section>

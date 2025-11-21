@@ -94,9 +94,12 @@
 
   <!-- Header -->
   <header class="flex justify-between items-center py-4 bg-white shadow sticky top-0 z-50">
-    <div class="flex items-center gap-2 font-bold text-green-700 text-xl ml-[96px]">
-      The Farmers Mall
-    </div>
+    <div class="flex items-center gap-2 ml-[96px]">
+        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+          <i class="fas fa-leaf text-white text-lg"></i>
+        </div>
+        <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
+      </div>
 
     <nav>
       <ul class="flex gap-6"> <!-- Removed default text color, script will handle it -->
