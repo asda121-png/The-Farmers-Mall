@@ -247,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       <div class="mb-8">
         <div class="flex justify-between text-xs text-gray-500 mb-1">
           <span id="step-name">Personal Info</span>
-          <span>Step <span id="step-current">1</span> of 4</span>
+          <span>Step <span id="step-current">1</span> of 5</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2">
           <div id="progress-bar" class="bg-green-600 h-2 rounded-full progress-bar-fill" style="width: 25%;"></div>
@@ -255,8 +255,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       </div>
 
       <div class="flex-grow flex flex-col">
+        <!-- The form action is currently pointing to a sample script, adjust as needed -->
         <form id="registerForm" method="POST" action="php/register.php" class="flex-grow flex flex-col">
-          <div class="flex-grow" style="min-height: 320px;"> <!-- Static height container -->
+          <div class="flex-grow" style="height: 320px; overflow-y: auto;"> <!-- Static height container with scroll -->
             <!-- Step 1: Personal Info -->
             <div class="form-step active space-y-4">
               <div>
@@ -286,63 +287,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             </div>
     
             <!-- Step 2: Account Details -->
-            <div class="form-step hidden space-y-4">
+            <div class="form-step hidden space-y-4"> <!-- This is now the Address step -->
               <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label for="street" class="block text-sm font-medium text-gray-700 mb-1">Street</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="email" id="email" name="email" required placeholder="Enter your email" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <input type="text" id="street" name="street" required placeholder="Enter your street address" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
               </div>
+              <div>
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="city" name="city" required placeholder="Enter your city" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+              </div>
+              <div>
+                <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
+                  <select id="country" name="country" required class="w-full outline-none text-gray-700 text-sm bg-transparent py-2">
+                    <option value="">Select Country</option>
+                    <option value="PH">Philippines</option>
+                    <option value="US">United States</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
+                  <select id="province" name="province" required class="w-full outline-none text-gray-700 text-sm bg-transparent py-2">
+                    <option value="">Select Province</option>
+                    <!-- Options will be populated by JavaScript -->
+                  </select>
+                </div>
+              </div>
+            </div>
+     
+             <!-- Step 3: Contact Info -->
+            <div class="form-step hidden space-y-4"> <!-- This is now the Account Details step -->
               <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="username" name="username" required placeholder="Choose a username" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
               </div>
-              <div class="space-y-4">
-                <div>
-                   <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                   <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                     <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
-                   </div>
-                 </div>
-                 <div>
-                   <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                   <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                     <input type="password" id="confirm" name="confirm" required placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
-                   </div>
-                   <p id="passwordError" class="text-red-500 text-sm mt-1 hidden">Passwords do not match!</p>
-                 </div>
-               </div>
-             </div>
-     
-             <!-- Step 3: Contact Info -->
-             <div class="form-step hidden space-y-4">
-               <div>
-                 <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                   <input type="text" id="address" name="address" required placeholder="Enter your address" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
-                 </div>
-               </div>
-               <div>
-                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                   <input type="text" id="phone" name="phone" required placeholder="09XXXXXXXXX" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                 </div>
-                 <p id="phoneError" class="text-red-500 text-sm mt-1 hidden">Phone number must start with 09 and be 11 digits long.</p>
-               </div>
-             </div>
+              <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+              </div>
+              <div>
+                <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="password" id="confirm" name="confirm" required placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <p id="passwordError" class="text-red-500 text-sm mt-1 hidden">Passwords do not match!</p>
+              </div>
+            </div>
      
              <!-- Step 4: Finalize -->
-             <div class="form-step hidden">
-               <div class="flex items-start mb-6 bg-gray-50 p-4 rounded-lg">
-                 <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1">
-                 <label for="terms" class="ml-3 block text-sm text-gray-700">
-                   I agree to the <a href="#" class="text-green-600 font-medium hover:underline">Terms of Service</a> and 
-                   <a href="#" class="text-green-600 font-medium hover:underline">Privacy Policy</a>.
-                 </label>
-               </div>
+            <div class="form-step hidden space-y-4"> <!-- This is now the Verification step -->
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email or Phone Number for Verification</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="email" name="email" required placeholder="Enter your email or phone" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
               </div>
+              <button type="button" class="w-full text-center text-sm text-green-600 hover:underline">Send Verification Code</button>
+              <div>
+                <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="otp" name="otp" required placeholder="Enter the code you received" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 5: Finalize (Terms & Conditions) -->
+            <div class="form-step hidden space-y-4">
+              <h3 class="text-lg font-semibold text-gray-800">Final Agreement</h3>
+              <p class="text-sm text-gray-600">Please review and agree to the following terms before creating your account. By proceeding, you acknowledge and accept:</p>
+              
+              <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside bg-gray-50 p-4 rounded-lg">
+                <li>You agree to our <a href="#" class="text-green-600 font-medium hover:underline">Terms of Service</a>, which govern your use of our platform.</li>
+                <li>You have read and understood our <a href="#" class="text-green-600 font-medium hover:underline">Privacy Policy</a>, which details how we handle your data.</li>
+                <li>You consent to receive communications from us regarding your account and our services.</li>
+                <li>You confirm that all information provided is accurate and that you are at least 18 years of age.</li>
+              </ul>
+
+              <div class="flex items-start mt-4">
+                <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1">
+                <label for="terms" class="ml-3 block text-sm text-gray-700">
+                  I have read and agree to all the terms and conditions listed above.
+                </label>
+              </div>
+            </div>
           </div>
   
           <!-- Navigation Buttons (now inside the form) -->
@@ -374,11 +411,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const submitBtn = document.getElementById('submitBtn');
+    const countrySelect = document.getElementById('country');
+    const provinceSelect = document.getElementById('province');
 
     let currentStep = 0;
-    const stepNames = ["Personal Info", "Account Details", "Contact Info", "Finalize"];
+    const stepNames = ["Personal Info", "Address", "Account Details", "Verification", "Finalize"];
+
+    const provinces = {
+      "PH": ["Davao Oriental", "Davao de Oro", "Davao del Norte", "Metro Manila"],
+      "US": ["California", "Texas", "Florida", "New York"]
+    };
+
+    function populateProvinces() {
+      const selectedCountry = countrySelect.value;
+      provinceSelect.innerHTML = '<option value="">Select Province</option>'; // Clear existing options
+
+      if (selectedCountry && provinces[selectedCountry]) {
+        provinces[selectedCountry].forEach(province => {
+          const option = document.createElement('option');
+          option.value = province;
+          option.textContent = province;
+          provinceSelect.appendChild(option);
+        });
+      }
+    }
 
     function updateProgress() {
+      // Hide all steps first to handle logic cleanly
+      steps.forEach(step => step.classList.add('hidden'));
+      // Then show the current one
+      steps[currentStep].classList.remove('hidden');
       progressBar.style.width = `${((currentStep + 1) / steps.length) * 100}%`;
       stepNameEl.textContent = stepNames[currentStep];
       stepCurrentEl.textContent = currentStep + 1;
@@ -386,7 +448,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
 
     function goToStep(stepIndex) {
       steps[currentStep].classList.add('hidden');
-      steps[stepIndex].classList.remove('hidden');
       currentStep = stepIndex;
       updateProgress();
       updateButtons();
@@ -417,7 +478,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       }
 
       // Step-specific validation
-      if (stepIndex === 1) { // Account Details
+      if (stepIndex === 1) { // Address
+        if (!document.getElementById('country').value || !document.getElementById('province').value) {
+          showToast("Please select a country and province.", "error");
+          return false;
+        }
+      }
+
+      if (stepIndex === 2) { // Account Details
         const pass = document.getElementById('password').value.trim();
         const confirm = document.getElementById('confirm').value.trim();
         const passError = document.getElementById("passwordError");
@@ -429,19 +497,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         passError.classList.add("hidden");
       }
 
-      if (stepIndex === 2) { // Contact Info
-        const phone = document.getElementById('phone').value.trim();
-        const phoneError = document.getElementById("phoneError");
-        const phonePattern = /^09\d{9}$/;
-        if (!phonePattern.test(phone)) {
-          phoneError.classList.remove("hidden");
-          showToast("Phone number must start with 09 and be 11 digits.", "error");
+      if (stepIndex === 3) { // Verification
+        if (!document.getElementById('otp').value.trim()) {
+          showToast("Please enter the verification code.", "error");
           return false;
         }
-        phoneError.classList.add("hidden");
       }
 
-      if (stepIndex === 3) { // Finalize
+      if (stepIndex === 4) { // Finalize
         if (!document.getElementById('terms').checked) {
           showToast("You must agree to the terms and conditions.", "error");
           return false;
@@ -464,6 +527,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         goToStep(currentStep - 1);
       }
     });
+
+    countrySelect.addEventListener('change', populateProvinces);
 
 
     function showToast(message, type = "error") {
@@ -512,6 +577,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         });
       }
     });
+
+    // Initial setup
+    updateProgress();
   </script>
 </body>
 
