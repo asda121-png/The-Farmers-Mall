@@ -7,6 +7,38 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="css/productdetails.css">
+  <style>
+    /* Modal Animation */
+    #deleteModal.show, #clearCartModal.show {
+      display: flex !important;
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    #deleteModal.show .modal-content, #clearCartModal.show .modal-content {
+      animation: slideUp 0.3s ease-out;
+      transform: scale(1);
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px) scale(0.95);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
 
@@ -109,6 +141,76 @@
 
   <!-- Footer -->
   <div id="footer"></div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 modal-content">
+      <div class="p-6">
+        <!-- Icon -->
+        <div class="flex justify-center mb-4">
+          <div class="bg-red-100 rounded-full p-4">
+            <i class="fa-solid fa-trash text-red-600 text-3xl"></i>
+          </div>
+        </div>
+        
+        <!-- Title -->
+        <h3 class="text-xl font-bold text-gray-800 text-center mb-2">Remove Item?</h3>
+        
+        <!-- Product Info -->
+        <div id="modalProductInfo" class="bg-gray-50 rounded-lg p-3 mb-4 flex items-center gap-3">
+          <img id="modalProductImage" src="" alt="Product" class="w-16 h-16 rounded-lg object-cover border border-gray-200">
+          <div class="flex-1">
+            <p id="modalProductName" class="font-semibold text-gray-800"></p>
+            <p id="modalProductPrice" class="text-green-600 text-sm"></p>
+          </div>
+        </div>
+        
+        <!-- Message -->
+        <p class="text-gray-600 text-center mb-6">Are you sure you want to remove this item from your cart?</p>
+        
+        <!-- Buttons -->
+        <div class="flex gap-3">
+          <button id="cancelDeleteBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+            <i class="fa-solid fa-times mr-2"></i>Cancel
+          </button>
+          <button id="confirmDeleteBtn" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">
+            <i class="fa-solid fa-trash mr-2"></i>Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear Cart Confirmation Modal -->
+  <div id="clearCartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 modal-content">
+      <div class="p-6">
+        <!-- Icon -->
+        <div class="flex justify-center mb-4">
+          <div class="bg-orange-100 rounded-full p-4">
+            <i class="fa-solid fa-exclamation-triangle text-orange-600 text-3xl"></i>
+          </div>
+        </div>
+        
+        <!-- Title -->
+        <h3 class="text-xl font-bold text-gray-800 text-center mb-2">Clear Entire Cart?</h3>
+        
+        <!-- Message -->
+        <p class="text-gray-600 text-center mb-2">This will remove all <span id="clearCartItemCount" class="font-semibold text-gray-800">0</span> items from your cart.</p>
+        <p class="text-gray-500 text-sm text-center mb-6">This action cannot be undone.</p>
+        
+        <!-- Buttons -->
+        <div class="flex gap-3">
+          <button id="cancelClearBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+            <i class="fa-solid fa-times mr-2"></i>Cancel
+          </button>
+          <button id="confirmClearBtn" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">
+            <i class="fa-solid fa-trash mr-2"></i>Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- JavaScript -->
   <script src="js/cart.js"></script>
