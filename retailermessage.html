@@ -19,16 +19,31 @@
         <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
       </div>
 
+      <!-- Center: Search -->
+      <div class="flex-1 mx-8 max-w-xl">
+        <form action="retailersearchresults.html" method="GET" class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input type="search" name="q" placeholder="Search orders, products, customers..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
+        </form>
+      </div>
+
       <!-- Right: Icons & Profile -->
       <div class="flex items-center space-x-6">
         <a href="retailermessage.html" class="relative cursor-pointer">
           <i class="fa-regular fa-comment text-xl text-green-600"></i>
+          <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
         </a>
         <a href="retailernotifications.html" class="relative cursor-pointer">
           <i class="fa-regular fa-bell text-xl text-gray-600"></i>
+          <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
         </a>
         <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
+          <div class="profile-info">
+            <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
+            <p class="text-xs text-gray-500">Seller</p>
+          </div>
         </a>
       </div>
     </div>
@@ -111,6 +126,22 @@
     </div>
     <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">© 2025 Farmers Mall. All rights reserved.</div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- Real-time Badge Update ---
+      const count = localStorage.getItem('unreadNotifications');
+      const badge = document.querySelector('a[href="retailernotifications.html"] .absolute');
+      if (badge) {
+        if (count && parseInt(count) > 0) {
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    });
+  </script>
 
 </body>
 </html>
