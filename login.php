@@ -220,51 +220,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
   </div>
 
   <!-- Login Card -->
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden relative z-10">
-    <div class="bg-green-600 py-6 px-8 text-center relative">
-      <a href="landing.php" class="absolute left-6 top-6 text-white hover:text-green-200 transition-colors">
-        <i class="fas fa-arrow-left"></i>
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden relative z-10 lg:flex" style="min-height: 680px;">
+    <!-- Left Side - Branding with Image -->
+    <div class="hidden lg:flex lg:w-1/2 p-16 flex-col justify-center items-center text-white text-center relative bg-cover bg-center" style="background-image: url('images/img.png');">
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-green-800 opacity-60"></div>
+      
+      <a href="landing.html" class="absolute top-6 left-6 h-12 w-12 flex items-center justify-center bg-black bg-opacity-30 rounded-full text-white hover:bg-opacity-50 transition-all z-20">
+        <i class="fas fa-arrow-left text-xl"></i>
       </a>
-      <div class="floating-icon w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-        <i class="fas fa-leaf text-green-600 text-3xl"></i>
+
+      <!-- Content -->
+      <div class="relative z-10">
+        <div class="floating-icon w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <i class="fas fa-leaf text-green-600 text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold">Farmer's Mall</h2>
+        <p class="mt-2 text-green-100">Connecting farmers and consumers directly, offering fresh, local, and organic produce.</p>
       </div>
-      <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
-      <p class="text-green-100 mt-1">Sign in to your account</p>
     </div>
 
-    <div class="p-8">
-      <!-- Form points to this file (login.php) for processing -->
-      <form id="loginForm" method="POST">
+    <!-- Right Side - Form -->
+    <div class="w-full lg:w-1/2 p-16 flex flex-col justify-center">
+      <div class="text-center mb-6 lg:hidden">
+        <div class="floating-icon w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <i class="fas fa-leaf text-3xl"></i>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 text-center">Welcome Back</h2>
+      <p class="text-gray-600 mt-1 text-center mb-8">Sign in to your account</p>
+      <form id="loginForm" method="POST" class="space-y-6">
         <input type="hidden" name="login_submitted" value="1">
-        
-        <!-- Email/Username Input -->
-        <div class="mb-4">
+        <!-- Email Input -->
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Email or Username</label>
           <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 transition-all">
             <i class="far fa-envelope text-gray-400 mr-2"></i>
-            <input id="email" name="email" type="text" placeholder="Enter your email or username" class="w-full outline-none text-gray-700" required>
+            <input id="email" name="email" type="text" placeholder="Enter your email or username" class="w-full outline-none text-gray-700 py-1" required>
           </div>
           <p id="emailError" class="error-message">Invalid email/username or password.</p>
         </div>
 
         <!-- Password Input -->
-        <div class="mb-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
           <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 transition-all">
             <i class="fas fa-lock text-gray-400 mr-2"></i>
-            <input id="password" name="password" type="password" placeholder="Enter your password" class="w-full outline-none text-gray-700" required>
+            <input id="password" name="password" type="password" placeholder="Enter your password" class="w-full outline-none text-gray-700 py-1" required>
           </div>
           <p id="passwordError" class="error-message">Invalid email/username or password.</p>
         </div>
 
-        <div class="flex items-center justify-between text-sm text-gray-600 mt-4 mb-6">
+        <div class="flex items-center justify-between text-sm text-gray-600">
           <label class="flex items-center">
             <input type="checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2">
             Remember me
           </label>
           <a href="#" class="text-green-600 hover:underline">Forgot Password?</a>
         </div>
-
+        
         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">
           Login <i class="fas fa-sign-in-alt ml-2"></i>
         </button>
@@ -287,8 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
 
         <p class="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?
-          <!-- LINK TO REGISTRATION -->
-          <a href="account.php" class="text-green-600 font-medium hover:underline">Create an Account</a>
+          <a href="register.html" class="text-green-600 font-medium hover:underline">Create an Account</a>
         </p>
 
         <small class="block text-center text-xs text-gray-500 mt-4">
