@@ -232,7 +232,7 @@
           // Redirect to homepage.php after a short delay
           setTimeout(() => {
             window.location.href = 'homepage.html';
-          });
+          }, 2000);
         });
       }
 
