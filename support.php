@@ -220,7 +220,7 @@
                 <div class="space-y-4">
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none ">
                             <h3 class="text-lg font-semibold text-gray-900">What are your delivery hours?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -234,7 +234,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">What if an item is missing or damaged?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -248,7 +248,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">Do you deliver outside the City of Mati?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -262,7 +262,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">How do I return a product?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -276,7 +276,7 @@
                     </div>
                     
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none ">
                             <h3 class="text-lg font-semibold text-gray-900">Do I need an account to place an order?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -290,7 +290,7 @@
                     </div>
                     
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">What payment methods do you accept?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -304,7 +304,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">Can I change my order after it's placed?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
