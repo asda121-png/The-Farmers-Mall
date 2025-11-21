@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
   </div>
 
   <!-- Login Card -->
-  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden relative z-10 lg:flex" style="min-height: 680px;">
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden relative z-10 lg:flex" style="min-height: 680px;"> <!-- Static height container -->
     <!-- Left Side - Branding with Image -->
     <div class="hidden lg:flex lg:w-1/2 p-16 flex-col justify-center items-center text-white text-center relative bg-cover bg-center" style="background-image: url('images/img.png');">
       <!-- Overlay -->
@@ -301,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
 
         <p class="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?
-          <a href="register.html" class="text-green-600 font-medium hover:underline">Create an Account</a>
+          <a href="register.php" class="text-green-600 font-medium hover:underline">Create an Account</a>
         </p>
 
         <small class="block text-center text-xs text-gray-500 mt-4">

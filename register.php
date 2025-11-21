@@ -154,7 +154,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
             position: relative;
-            overflow: auto;
+            overflow: hidden;
+        }
+        /* Background Circles */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .circle1 { width: 150px; height: 150px; top: 10%; left: 5%; }
+        .circle2 { width: 100px; height: 100px; bottom: 20%; left: 15%; }
+        .circle3 { width: 120px; height: 120px; top: 30%; right: 10%; }
+        .circle4 { width: 80px; height: 80px; bottom: 15%; right: 20%; }
+        .circle5 { width: 200px; height: 200px; bottom: 5%; left: 50%; transform: translateX(-50%); }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
         /* Toast Notification */
         .toast {
@@ -181,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body class="flex items-center justify-center p-4" style="background: #228B22;">
 
     <!-- Background Circles -->
     <div class="bg-circle circle1"></div>
@@ -338,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
   
         <p class="text-center text-sm text-gray-600 mt-8">
           Already have an account? 
-          <a href="login.html" class="text-green-600 font-medium hover:underline">Log In</a>
+          <a href="login.php" class="text-green-600 font-medium hover:underline">Log In</a>
         </p>
       </div>
     </div>
@@ -495,4 +514,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     });
   </script>
 </body>
+
 </html>
