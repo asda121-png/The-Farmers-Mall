@@ -104,7 +104,6 @@
         <li><a href="index.php" class="hover:text-green-700">Home</a></li>
         <li><a href="about.php" class="hover:text-green-700">About</a></li>
         <li><a href="how.php" class="hover:text-green-700">How It Works</a></li>
-        <li><a href="shop.php" class="hover:text-green-700">Shop</a></li>
         <li><a href="support.php" class="hover:text-green-700">Support</a></li>
       </ul>
     </nav>

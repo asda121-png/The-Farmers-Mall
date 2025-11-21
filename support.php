@@ -220,7 +220,7 @@
                 <div class="space-y-4">
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none ">
                             <h3 class="text-lg font-semibold text-gray-900">What are your delivery hours?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -234,7 +234,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">What if an item is missing or damaged?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -248,7 +248,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">Do you deliver outside the City of Mati?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -262,7 +262,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">How do I return a product?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -276,7 +276,7 @@
                     </div>
                     
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none ">
                             <h3 class="text-lg font-semibold text-gray-900">Do I need an account to place an order?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -290,7 +290,7 @@
                     </div>
                     
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">What payment methods do you accept?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -304,7 +304,7 @@
                     </div>
 
                     <div class="faq-item bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset">
+                        <button class="faq-toggle w-full flex justify-between items-center text-left p-6 hover:bg-gray-50 transition-colors duration-200 focus:outline-none">
                             <h3 class="text-lg font-semibold text-gray-900">Can I change my order after it's placed?</h3>
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
@@ -356,4 +356,59 @@
     </script>
 
 </body>
-</html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support – Farmers Mall</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+
+        /* * =================================================================
+         * PRO-LEVEL FAQ ACCORDION
+         * Uses CSS Grid to animate height instead of 'max-height'.
+         * This animates to the *exact* content height every time.
+         * =================================================================
+        */
+        .faq-answer {
+            display: grid;
+            grid-template-rows: 0fr; /* Start collapsed */
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        
+        /* This class is toggled by JS */
+        .faq-item.active .faq-answer {
+            grid-template-rows: 1fr; /* Animate to 1 fraction (full content) */
+        }
+        
+        /* The direct child of .faq-answer must have overflow: hidden */
+        .faq-answer > div {
+            overflow: hidden;
+        }
+        
+        /* Rotate the arrow icon (JS toggles .active on .faq-item) */
+        .faq-item.active .faq-toggle i {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
