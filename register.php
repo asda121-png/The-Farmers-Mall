@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       <!-- Overlay -->
       <div class="absolute inset-0 bg-green-800 opacity-60"></div>
       
-      <a href="landing.html" class="absolute top-6 left-6 h-12 w-12 flex items-center justify-center bg-black bg-opacity-30 rounded-full text-white hover:bg-opacity-50 transition-all z-20">
+      <a href="index.php" class="absolute top-6 left-6 h-12 w-12 flex items-center justify-center bg-black bg-opacity-30 rounded-full text-white hover:bg-opacity-50 transition-all z-20">
         <i class="fas fa-arrow-left text-xl"></i>
       </a>
 

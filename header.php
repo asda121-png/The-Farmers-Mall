@@ -109,10 +109,10 @@
     </nav>
 
     <div class="flex gap-3 mr-[96px]">
-      <a href="register.html" class="px-4 py-2 border-2 border-green-600 text-green-600 font-semibold rounded-full hover:bg-green-600 hover:text-white transition">
+      <a href="register.php" class="px-4 py-2 border-2 border-green-600 text-green-600 font-semibold rounded-full hover:bg-green-600 hover:text-white transition">
         Sign Up
       </a>
-      <a href="login.html" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition">
+      <a href="login.php" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition">
         Shop Now
       </a>
     </div>
