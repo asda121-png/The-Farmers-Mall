@@ -10,6 +10,323 @@
     .category-text {
         margin-top: 0.5rem; /* Adjusts spacing to the upper */
     }
+
+    /* Smooth transitions for all elements */
+    * {
+        transition: all 0.3s ease;
+    }
+
+    /* Header icon hover effects */
+    header a:hover i {
+        transform: scale(1.2);
+        color: #2E7D32;
+    }
+
+    /* Search input hover and focus effects */
+    input[type="text"] {
+        transition: all 0.3s ease;
+    }
+
+    input[type="text"]:hover {
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+        border-color: #2E7D32;
+    }
+
+    /* Profile image hover effect */
+    header img:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+    }
+
+    /* Hero button hover effect */
+    .hero-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .hero-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    /* Category hover effects restored */
+    .category-item {
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .category-item:hover {
+      transform: translateY(-10px) scale(1.1);
+      box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9f0 100%);
+    }
+
+    .category-item:hover i {
+      transform: scale(1.3) rotate(10deg);
+      color: #1B5E20;
+    }
+
+    .category-item:hover p {
+      color: #1B5E20;
+      font-weight: 600;
+    }
+
+    /* Product card hover effects */
+    .product-card {
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .product-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(27, 94, 32, 0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        border-radius: 0.5rem;
+        z-index: 0;
+    }
+
+    .product-card:hover::before {
+        opacity: 1;
+    }
+
+    .product-card:hover {
+        transform: translateY(-12px) scale(1.03);
+        box-shadow: 0 15px 35px rgba(46, 125, 50, 0.25);
+    }
+
+    .product-card img {
+        transition: all 0.5s ease;
+    }
+
+    .product-card:hover img {
+        transform: scale(1.15);
+    }
+
+    .product-card h3,
+    .product-card p {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Add to cart button enhanced effects */
+    .add-btn {
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 2;
+    }
+
+    .add-btn:hover {
+        transform: rotate(90deg) scale(1.2);
+        box-shadow: 0 4px 15px rgba(46, 125, 50, 0.5);
+    }
+
+    .add-btn:active {
+        transform: rotate(90deg) scale(0.9);
+    }
+
+    /* Shop card hover effects */
+    .shop-card {
+        transition: all 0.4s ease;
+        overflow: hidden;
+    }
+
+    .shop-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(46, 125, 50, 0.2);
+    }
+
+    .shop-card img {
+        transition: all 0.5s ease;
+    }
+
+    .shop-card:hover img {
+        transform: scale(1.2) rotate(2deg);
+    }
+
+    .shop-card:hover h3 {
+        color: #2E7D32;
+    }
+
+    /* Footer links hover effect */
+    footer a {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    footer a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #4CAF50;
+        transition: width 0.3s ease;
+    }
+
+    footer a:hover::after {
+        width: 100%;
+    }
+
+    footer a:hover {
+        color: #4CAF50;
+        transform: translateX(5px);
+    }
+
+    /* Social media icons hover effect */
+    footer .fab {
+        transition: all 0.3s ease;
+    }
+
+    footer .fab:hover {
+        transform: translateY(-5px) scale(1.3);
+        color: #4CAF50;
+    }
+
+    /* Arrow link hover effect */
+    .arrow-link {
+        transition: all 0.3s ease;
+    }
+
+    .arrow-link:hover {
+        transform: translateX(5px);
+    }
+
+    /* Pulse animation for new badges */
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+    }
+
+    /* Shimmer effect on hover */
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    .shimmer-effect:hover::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        pointer-events: none;
+    }
+
+    /* Section heading underline effect */
+    .section-heading {
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #2E7D32, #4CAF50);
+        transition: width 0.4s ease;
+    }
+
+    .section-heading:hover::after {
+        width: 100%;
+    }
+
+    /* Hero slider styles */
+    .hero-slider {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1.5s ease-in-out;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .hero-slide.active {
+        opacity: 1;
+        position: relative;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Slider navigation dots */
+    .slider-dots {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 20;
+    }
+
+    .slider-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .slider-dot.active {
+        background: #fff;
+        transform: scale(1.2);
+    }
+
+    .slider-dot:hover {
+        background: rgba(255, 255, 255, 0.8);
+    }
   </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -40,42 +357,80 @@
     </div>
   </header>
 
-  <section class="relative bg-cover bg-center" style="background-image: url('images/img.png');">
-    <div class="bg-black bg-opacity-40">
-      <div class="max-w-7xl mx-auto px-6 py-32 text-left text-white">
-        <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Fresh Harvest Sale</h2>
-        <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
-        <a href="products.html" class="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
-          Shop Now
-        </a>
+  <section class="hero-slider relative">
+    <!-- Slide 1 -->
+    <div class="hero-slide active" style="background-image: url('images/img.png');">
+      <div class="bg-black bg-opacity-40">
+        <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Fresh Harvest Sale</h2>
+          <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
+          <a href="products.html" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+            Shop Now
+          </a>
+        </div>
       </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="hero-slide" style="background-image: url('images/img1.png');">
+      <div class="bg-black bg-opacity-40">
+        <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Farm Fresh Daily</h2>
+          <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
+          <a href="products.html" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+            Shop Now
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="hero-slide" style="background-image: url('images/img2.png');">
+      <div class="bg-black bg-opacity-40">
+        <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Premium Quality</h2>
+          <p class="text-lg md:text-xl mb-6">Fresh ingredients delivered to your door</p>
+          <a href="products.html" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+            Shop Now
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <div class="slider-dots">
+      <span class="slider-dot active" data-slide="0"></span>
+      <span class="slider-dot" data-slide="1"></span>
+      <span class="slider-dot" data-slide="2"></span>
     </div>
   </section>
 
-  <section class="max-w-full mx-auto px-0 py-10 bg-[#FFFFFF] mb-10">
-    <h2 class="text-2xl font-bold text-center mb-8">Shop by Category</h2>
-    <div class="flex flex-wrap justify-center gap-6">
-      <a href="products.html?category=vegetables" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+  <section class="w-full mx-auto px-0 py-10 bg-[#FFFFFF] mb-10">
+    <div class="flex justify-center mb-8">
+      <h2 class="section-heading text-2xl font-bold">Shop by Category</h2>
+    </div>
+    <div class="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto px-6">
+      <a href="products.html?category=vegetables" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-carrot text-green-600 text-2xl"></i>
         <p class="text-gray-700 mt-2 text-xs category-text">Vegetables</p>
       </a>
-      <a href="products.html?category=fruits" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.html?category=fruits" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-apple-whole text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Fruits</p>
       </a>
-      <a href="products.html?category=meat" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.html?category=meat" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-drumstick-bite text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Meat</p>
       </a>
-      <a href="products.html?category=seafood" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.html?category=seafood" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-fish text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Seafood</p>
       </a>
-      <a href="products.html?category=dairy" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.html?category=dairy" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-cheese text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Dairy</p>
       </a>
-      <a href="products.html?category=bakery" class="flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.html?category=bakery" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-bread-slice text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Bakery</p>
       </a>
@@ -84,12 +439,12 @@
 
   <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold">Top Products</h2>
-      <a href="products.html" class="text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
+      <h2 class="section-heading text-2xl font-bold">Top Products</h2>
+      <a href="products.html" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="₱45.00" data-img="images/products/Fresh Vegetable Box.png">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="₱45.00" data-img="images/products/Fresh Vegetable Box.png">
         <img src="images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Vegetable Box</h3>
@@ -100,7 +455,7 @@
         </button>
       </a>
 
-      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="₱30.00" data-img="images/products/Organic Lettuce.png">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="₱30.00" data-img="images/products/Organic Lettuce.png">
         <img src="images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Organic Lettuce</h3>
@@ -111,7 +466,7 @@
         </button>
       </a>
 
-      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="₱50.00" data-img="images/products/Fresh Milk.png">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="₱50.00" data-img="images/products/Fresh Milk.png">
         <img src="images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
@@ -122,7 +477,7 @@
         </button>
       </a>
 
-      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="₱80.00" data-img="images/products/tilapia.jpg">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="₱80.00" data-img="images/products/tilapia.jpg">
         <img src="images/products/tilapia.jpg" alt="Aged Cheddar" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Tilapia</h3>
@@ -133,7 +488,7 @@
         </button>
       </a>
 
-      <a href="#" class="product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="₱60.00" data-img="images/products/fresh eggs.jpeg">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="₱60.00" data-img="images/products/fresh eggs.jpeg">
         <img src="images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Farm Eggs</h3>
@@ -148,12 +503,12 @@
 
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold">Other Products</h2>
-      <a href="products.html" class="text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
+      <h2 class="section-heading text-2xl font-bold">Other Products</h2>
+      <a href="products.html" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/Emsaymada.jpg" alt="Baby Carrots" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Emsaymada</h3>
@@ -164,7 +519,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/Butter Spread.jpg" alt="Artisan Bread" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Butter Spread</h3>
@@ -175,7 +530,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/Bangus.jpg" alt="Banana" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
@@ -186,7 +541,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/fresh pork liempo.jpg" alt="Cheddar" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Pork Liempo</h3>
@@ -197,7 +552,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/fresh avocado.jpg" alt="Fresh Milk" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Avocado</h3>
@@ -208,7 +563,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/Native tomato.jpg" alt="Organic Lettuce" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Native Tomatoes per kg</h3>
@@ -219,7 +574,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/fresh okra.jpg" alt="Baby Carrots" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Okra</h3>
@@ -230,7 +585,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/native chicken.jpg" alt="Artisan Bread" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Native Chicken (Manok)</h3>
@@ -241,7 +596,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/pork ribs.jpg" alt="Banana" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Pork Ribs</h3>
@@ -252,7 +607,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/shrimp.jpg" alt="Farm Eggs" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Shrimp (Hipon)</h3>
@@ -263,7 +618,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/chocolate milk.jpg" alt="Fresh Vegetable Box" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Chocolate Milk</h3>
@@ -274,7 +629,7 @@
         </button>
       </a>
 
-      <a href="productdetails.html" class="bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
+      <a href="productdetails.html" class="product-card bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden">
         <img src="images/products/ube cheese pandesal.jpg" alt="Tomato" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Ube Cheese Pandesal</h3>
@@ -288,9 +643,9 @@
   </section>
 
   <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
-    <h2 class="text-2xl font-bold mb-6">Explore Other Shops</h2>
+    <h2 class="section-heading text-2xl font-bold mb-6">Explore Other Shops</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Mesa Farm</h3>
@@ -299,7 +654,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="images/img2.png" alt="Taco Bell" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Taco Bell</h3>
@@ -308,7 +663,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="images/img3.png" alt="Jay's Artisan" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Jay’s Artisan</h3>
@@ -317,7 +672,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="images/img4.png" alt="Ocean Fresh" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Ocean Fresh</h3>
@@ -375,6 +730,50 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Hero Slider
+      const slides = document.querySelectorAll('.hero-slide');
+      const dots = document.querySelectorAll('.slider-dot');
+      let currentSlide = 0;
+      const slideInterval = 5000; // 5 seconds
+
+      function showSlide(index) {
+        slides.forEach((slide, i) => {
+          slide.classList.remove('active');
+          dots[i].classList.remove('active');
+        });
+        
+        currentSlide = (index + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+      }
+
+      function nextSlide() {
+        showSlide(currentSlide + 1);
+      }
+
+      // Auto advance slides
+      let sliderTimer = setInterval(nextSlide, slideInterval);
+
+      // Dot click handlers
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          showSlide(index);
+          clearInterval(sliderTimer);
+          sliderTimer = setInterval(nextSlide, slideInterval);
+        });
+      });
+
+      // Pause on hover
+      const heroSlider = document.querySelector('.hero-slider');
+      heroSlider.addEventListener('mouseenter', () => {
+        clearInterval(sliderTimer);
+      });
+
+      heroSlider.addEventListener('mouseleave', () => {
+        sliderTimer = setInterval(nextSlide, slideInterval);
+      });
+
+      // Product links
       document.querySelectorAll('.product-link').forEach(link => {
         link.addEventListener('click', (event) => {
           event.preventDefault();
