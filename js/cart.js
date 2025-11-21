@@ -110,13 +110,7 @@
 
         // Remove item with confirmation
         div.querySelector('.remove-item').addEventListener('click', () => {
-          if (confirm(`Remove ${item.name} from cart?`)) {
-            cart.splice(index, 1);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            renderCart();
-            updateCartIcon();
-            showNotification(`${item.name} removed from cart`, 'info');
-          }
+          showDeleteModal(item, index);
         });
 
         // Wishlist toggle
@@ -212,13 +206,7 @@
           return;
         }
         
-        if (confirm('Are you sure you want to clear your entire cart?')) {
-          cart = [];
-          localStorage.setItem('cart', JSON.stringify(cart));
-          renderCart();
-          updateCartIcon();
-          showNotification('Cart cleared successfully', 'success');
-        }
+        showClearCartModal();
       });
     }
 
@@ -242,8 +230,117 @@
       }
       // Escape to go back
       if (e.key === 'Escape') {
-        window.history.back();
+        const deleteModal = document.getElementById('deleteModal');
+        const clearModal = document.getElementById('clearCartModal');
+        if (deleteModal && deleteModal.classList.contains('show')) {
+          hideDeleteModal();
+        } else if (clearModal && clearModal.classList.contains('show')) {
+          hideClearCartModal();
+        } else {
+          window.history.back();
+        }
       }
     });
+
+    // Delete Modal Functions
+    function showDeleteModal(item, index) {
+      const modal = document.getElementById('deleteModal');
+      const productImage = document.getElementById('modalProductImage');
+      const productName = document.getElementById('modalProductName');
+      const productPrice = document.getElementById('modalProductPrice');
+      const confirmBtn = document.getElementById('confirmDeleteBtn');
+      const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+      // Set product info
+      productImage.src = item.image || 'images/products/Fresh Vegetable Box.png';
+      productName.textContent = item.name;
+      productPrice.textContent = `₱${item.price.toFixed(2)} × ${item.quantity || 1}`;
+
+      // Show modal
+      modal.classList.remove('hidden');
+      modal.classList.add('show');
+
+      // Remove existing event listeners by cloning buttons
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      const newCancelBtn = cancelBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+      // Add event listeners
+      newConfirmBtn.addEventListener('click', () => {
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+        updateCartIcon();
+        hideDeleteModal();
+        showNotification(`${item.name} removed from cart`, 'info');
+      });
+
+      newCancelBtn.addEventListener('click', hideDeleteModal);
+      
+      // Click outside to close
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          hideDeleteModal();
+        }
+      });
+    }
+
+    function hideDeleteModal() {
+      const modal = document.getElementById('deleteModal');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
+
+    // Clear Cart Modal Functions
+    function showClearCartModal() {
+      const modal = document.getElementById('clearCartModal');
+      const itemCount = document.getElementById('clearCartItemCount');
+      const confirmBtn = document.getElementById('confirmClearBtn');
+      const cancelBtn = document.getElementById('cancelClearBtn');
+
+      // Set item count
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      itemCount.textContent = totalItems;
+
+      // Show modal
+      modal.classList.remove('hidden');
+      modal.classList.add('show');
+
+      // Remove existing event listeners by cloning buttons
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      const newCancelBtn = cancelBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+      // Add event listeners
+      newConfirmBtn.addEventListener('click', () => {
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+        updateCartIcon();
+        hideClearCartModal();
+        showNotification('Cart cleared successfully', 'success');
+      });
+
+      newCancelBtn.addEventListener('click', hideClearCartModal);
+      
+      // Click outside to close
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          hideClearCartModal();
+        }
+      });
+    }
+
+    function hideClearCartModal() {
+      const modal = document.getElementById('clearCartModal');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
 
     renderCart();
