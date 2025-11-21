@@ -257,7 +257,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       <div class="flex-grow flex flex-col">
         <!-- The form action is currently pointing to a sample script, adjust as needed -->
         <form id="registerForm" method="POST" action="php/register.php" class="flex-grow flex flex-col">
-          <div class="flex-grow" style="height: 320px; overflow-y: auto;"> <!-- Static height container with scroll -->
+          <div class="flex-grow" style="min-height: 360px;"> <!-- Parent container for static height -->
+            <div class="flex-grow" style="height: 320px; overflow-y: auto;"> <!-- Scrollable content area -->
             <!-- Step 1: Personal Info -->
             <div class="form-step active space-y-4">
               <div>
@@ -295,33 +296,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 </div>
               </div>
               <div>
-                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="text" id="city" name="city" required placeholder="Enter your city" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
-                </div>
-              </div>
-              <div>
-                <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                <label for="barangay" class="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
-                  <select id="country" name="country" required class="w-full outline-none text-gray-700 text-sm bg-transparent py-2">
-                    <option value="">Select Country</option>
-                    <option value="PH">Philippines</option>
-                    <option value="US">United States</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
-                  <select id="province" name="province" required class="w-full outline-none text-gray-700 text-sm bg-transparent py-2">
-                    <option value="">Select Province</option>
+                  <select id="barangay" name="barangay" required class="w-full outline-none text-gray-700 text-sm bg-transparent py-2">
+                    <option value="">Select Barangay</option>
                     <!-- Options will be populated by JavaScript -->
                   </select>
                 </div>
               </div>
+              <div>
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
+                  <input type="text" id="city" name="city" value="Mati City" readonly class="w-full outline-none text-gray-700 text-sm placeholder:text-sm bg-gray-100 cursor-not-allowed">
+                </div>
+              </div>
+              <div>
+                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
+                  <input type="text" id="province" name="province" value="Davao Oriental" readonly class="w-full outline-none text-gray-700 text-sm placeholder:text-sm bg-gray-100 cursor-not-allowed">
+                </div>
+              </div>
             </div>
      
-             <!-- Step 3: Contact Info -->
+            <!-- Hidden inputs for fixed City and Province values -->
+            <input type="hidden" name="city" value="Mati City">
+            <input type="hidden" name="province" value="Davao Oriental">
+
+            <!-- Step 3: Contact Info -->
             <div class="form-step hidden space-y-4"> <!-- This is now the Account Details step -->
               <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -373,15 +374,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <li>You confirm that all information provided is accurate and that you are at least 18 years of age.</li>
               </ul>
 
-              <div class="flex items-start mt-4">
-                <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1">
-                <label for="terms" class="ml-3 block text-sm text-gray-700">
-                  I have read and agree to all the terms and conditions listed above.
-                </label>
-              </div>
+            </div>
+            </div>
+  
+            <!-- Terms Checkbox (outside scrollable area, shown on last step) -->
+            <div id="terms-container" class="flex items-start mt-4 hidden">
+              <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1">
+              <label for="terms" class="ml-3 block text-sm text-gray-700">
+                I have read and agree to all the terms and conditions listed above.
+              </label>
             </div>
           </div>
-  
+
           <!-- Navigation Buttons (now inside the form) -->
           <div id="navigation-buttons" class="mt-auto pt-6 flex gap-4">
             <button type="button" id="prevBtn" class="prev-btn w-32 justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg transition-colors text-sm hidden">Previous</button>
@@ -412,8 +416,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     const nextBtn = document.getElementById('nextBtn');
     const submitBtn = document.getElementById('submitBtn');
     const countrySelect = document.getElementById('country');
-    const provinceSelect = document.getElementById('province');
-
+    const termsContainer = document.getElementById('terms-container');
+    const barangaySelect = document.getElementById('barangay');
     let currentStep = 0;
     const stepNames = ["Personal Info", "Address", "Account Details", "Verification", "Finalize"];
 
@@ -422,19 +426,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       "US": ["California", "Texas", "Florida", "New York"]
     };
 
-    function populateProvinces() {
-      const selectedCountry = countrySelect.value;
-      provinceSelect.innerHTML = '<option value="">Select Province</option>'; // Clear existing options
+    // Mati City Barangays
+    const matiBarangays = [
+      "Badas", "Bobon", "Buso", "Cawayanan", "Central", "Dahican", "Danao", "Dawan", "Don Enrique Lopez",
+      "Don Martin Marundan", "Don Salvador Lopez Sr.", "Langka", "Lantawan", "Lawigan", "Libudon", "Luban",
+      "Macambol", "Magsaysay", "Manay", "Matiao", "New Bataan", "New Libudon", "Old Macambol", "Poblacion",
+      "Sainz", "San Isidro", "San Roque", "Tagabakid", "Tagbinonga", "Taguibo", "Tamisan"
+    ];
 
-      if (selectedCountry && provinces[selectedCountry]) {
-        provinces[selectedCountry].forEach(province => {
-          const option = document.createElement('option');
-          option.value = province;
-          option.textContent = province;
-          provinceSelect.appendChild(option);
-        });
-      }
+    function populateBarangays() {
+      barangaySelect.innerHTML = '<option value="">Select Barangay</option>'; // Clear existing options
+      matiBarangays.sort().forEach(barangay => { // Sort alphabetically
+        const option = document.createElement('option');
+        option.value = barangay;
+        option.textContent = barangay;
+        barangaySelect.appendChild(option);
+      });
     }
+
 
     function updateProgress() {
       // Hide all steps first to handle logic cleanly
@@ -458,6 +467,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       const isFirstStep = currentStep === 0;
       const isLastStep = currentStep === steps.length - 1;
 
+      // Show/hide the terms checkbox container based on the step
+      termsContainer.classList.toggle('hidden', !isLastStep);
+
       prevBtn.classList.toggle('hidden', currentStep === 0);
       nextBtn.classList.toggle('hidden', isLastStep);
       submitBtn.classList.toggle('hidden', !isLastStep);
@@ -479,8 +491,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
 
       // Step-specific validation
       if (stepIndex === 1) { // Address
-        if (!document.getElementById('country').value || !document.getElementById('province').value) {
-          showToast("Please select a country and province.", "error");
+        if (!document.getElementById('barangay').value) {
+          showToast("Please select a barangay.", "error");
           return false;
         }
       }
@@ -528,7 +540,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       }
     });
 
-    countrySelect.addEventListener('change', populateProvinces);
+    populateBarangays(); // Populate barangays on load
 
 
     function showToast(message, type = "error") {
