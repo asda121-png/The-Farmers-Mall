@@ -171,7 +171,22 @@
         resultsContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Try searching for something else.</p>';
       }
     });
-  
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- Real-time Badge Update ---
+      const count = localStorage.getItem('unreadNotifications');
+      const badge = document.querySelector('a[href="retailernotifications.html"] .absolute');
+      if (badge) {
+        if (count && parseInt(count) > 0) {
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    });
+  </script>
 
 </body>
 

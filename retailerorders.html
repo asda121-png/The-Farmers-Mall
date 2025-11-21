@@ -11,7 +11,7 @@
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
     <!-- Left: Logo -->
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='sellerdashboard.html'">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
       <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
     </div>
 
@@ -28,13 +28,13 @@
     <div class="flex items-center space-x-6">
       
       <!-- Messages -->
-      <a href="seller-message.html" class="relative cursor-pointer">
+      <a href="retailermessage.html" class="relative cursor-pointer">
         <i class="fa-regular fa-comment text-xl text-gray-600"></i>
         <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
       </a>
 
       <!-- Notifications -->
-      <a href="seller-notifications.html" class="relative cursor-pointer">
+      <a href="retailernotifications.html" class="relative cursor-pointer">
         <i class="fa-regular fa-bell text-xl text-gray-600"></i>
         <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
       </a>
@@ -397,6 +397,21 @@
 
       // Initial render
       renderOrders();
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- Real-time Badge Update ---
+      const count = localStorage.getItem('unreadNotifications');
+      const badge = document.querySelector('a[href="retailernotifications.html"] .absolute');
+      if (badge) {
+        if (count && parseInt(count) > 0) {
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
     });
   </script>
 </body>

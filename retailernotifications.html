@@ -19,16 +19,31 @@
         <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
       </div>
 
+      <!-- Center: Search -->
+      <div class="flex-1 mx-8 max-w-xl">
+        <form action="retailersearchresults.html" method="GET" class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input type="search" name="q" placeholder="Search orders, products, customers..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
+        </form>
+      </div>
+
       <!-- Right: Icons & Profile -->
       <div class="flex items-center space-x-6">
         <a href="retailermessage.html" class="relative cursor-pointer">
           <i class="fa-regular fa-comment text-xl text-gray-600"></i>
+          <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
         </a>
         <a href="retailernotifications.html" class="relative cursor-pointer">
           <i class="fa-regular fa-bell text-xl text-green-600"></i>
+          <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
         </a>
         <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
+          <div class="profile-info">
+            <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
+            <p class="text-xs text-gray-500">Seller</p>
+          </div>
         </a>
       </div>
     </div>
@@ -36,7 +51,7 @@
 
   <!-- Main Content -->
   <main class="flex-grow">
-    <div class="max-w-4xl mx-auto px-6 py-8 mb-80">
+    <div class="max-w-4xl mx-auto px-6 py-8 min-h-[92vh]">
       <!-- Title & Actions -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-3">
@@ -58,7 +73,7 @@
             <p class="text-sm text-gray-600">You have a new order (#FM-1025) from Piodos De Blanco.</p>
             <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
           </div>
-          <button class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
+          <button class="delete-notification text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <!-- Unread Notification -->
@@ -69,7 +84,7 @@
             <p class="text-sm text-gray-600">Your product "Red Onions" is running low on stock (5 left).</p>
             <p class="text-xs text-gray-400 mt-1">1 day ago</p>
           </div>
-          <button class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
+          <button class="delete-notification text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <!-- Read Notification -->
@@ -80,14 +95,14 @@
             <p class="text-sm text-gray-600">Jane Smith left a 5-star review for your product "Iceberg Lettuce".</p>
             <p class="text-xs text-gray-400 mt-1">3 days ago</p>
           </div>
-          <button class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
+          <button class="delete-notification text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="text-white py-12 mt-12" style="background-color: #1B5E20;">
+  <footer class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div><h3 class="font-bold text-lg mb-3">Farmers Mall</h3><p class="text-gray-300 text-sm">Fresh, organic produce delivered straight to your home from local farmers.</p></div>
       <div><h3 class="font-bold text-lg mb-3">Quick Links</h3><ul class="space-y-2 text-sm text-gray-300"><li><a href="#" class="hover:underline">About Us</a></li><li><a href="#" class="hover:underline">Contact</a></li><li><a href="#" class="hover:underline">FAQ</a></li><li><a href="#" class="hover:underline">Support</a></li></ul></div>
@@ -97,12 +112,61 @@
     <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">© 2025 Farmers Mall. All rights reserved.</div>
   </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const markAllReadBtn = document.getElementById('markAllRead');
+      const notificationList = document.getElementById('notificationList');
+
+      // --- Centralized Notification Count Management ---
+      const getUnreadCount = () => {
+        const unreadItems = document.querySelectorAll('#notificationList .bg-green-50');
+        return unreadItems.length;
+      };
+
+      const updateNotificationBadge = () => {
+        const count = getUnreadCount();
+        localStorage.setItem('unreadNotifications', count);
+
+        // Update badge on all pages that might be open
+        const badges = document.querySelectorAll('a[href="retailernotifications.html"] .absolute');
+        badges.forEach(badge => {
+          if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        });
+      };
+
+      markAllReadBtn.addEventListener('click', () => {
+        const unreadNotifications = notificationList.querySelectorAll('.bg-green-50');
+        unreadNotifications.forEach(notification => {
+          notification.classList.remove('bg-green-50', 'border-l-4', 'border-green-500');
+        });
+        updateNotificationBadge();
+      });
+
+      notificationList.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-notification');
+        if (deleteBtn) {
+          const notificationItem = deleteBtn.closest('.p-5');
+          if (notificationItem) {
+            notificationItem.remove();
+            updateNotificationBadge();
+
+            const notificationItems = notificationList.querySelectorAll('.p-5');
+            if (notificationItems.length === 0) {
+              notificationList.innerHTML = '<p class="text-center text-gray-500 py-10">🎉 All caught up! No notifications left.</p>';
+            }
+          }
+        }
+      });
+
+      // Initial count update on page load
+      updateNotificationBadge();
+    });
+  </script>
+
 </body>
 </html>
-```
-
-### 3. New File: `sellerprofile.html`
-
-This page serves as the seller's account page, allowing them to view and edit their profile information, manage their shop settings, and log out.
-
-```diff
