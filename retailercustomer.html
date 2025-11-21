@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,6 +18,15 @@
       <!-- Left: Logo -->
       <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
         <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
+      </div>
+
+      <!-- Center: Search -->
+      <div class="flex-1 mx-8 max-w-xl">
+        <form action="retailersearchresults.html" method="GET" class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input type="search" name="q" placeholder="Search orders, products, customers..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
+        </form>
       </div>
 
       <!-- Right: Icons & Profile -->
