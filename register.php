@@ -371,7 +371,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <li>You agree to our <a href="#" class="text-green-600 font-medium hover:underline">Terms of Service</a>, which govern your use of our platform.</li>
                 <li>You have read and understood our <a href="#" class="text-green-600 font-medium hover:underline">Privacy Policy</a>, which details how we handle your data.</li>
                 <li>You consent to receive communications from us regarding your account and our services.</li>
-                <li>You confirm that all information provided is accurate and that you are at least 18 years of age.</li>
+                <li>You confirm that all information provided is accurate and that you are at least 18 years of age..</li>
               </ul>
 
             </div>

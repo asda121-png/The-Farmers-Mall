@@ -218,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         <small class="block text-center text-xs text-gray-500 mt-4">
           By continuing, you agree to our
           <a href="#" class="text-green-600 font-medium hover:underline">Terms of Service</a> and
-          <a href="#" class="text-green-600 font-medium hover:underline">Privacy Policy</a>.
+          <a href="#" class="text-green-600 font-medium hover:underline">Privacy Policy.</a>.
         </small>
       </form>
     </div>
