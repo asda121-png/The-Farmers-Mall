@@ -1,3 +1,126 @@
+<?php
+// PHP SCRIPT START - SERVER-SIDE LOGIN WITH MYSQL INTEGRATION
+session_start();
+
+// --- MySQL Connection Details ---
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', ''); 
+define('DB_NAME', 'farmers');
+
+$login_status = '';
+$login_message = '';
+$redirect_url = ''; // New variable to store the destination URL
+
+/**
+ * Establishes a connection to the MySQL database.
+ * @return mysqli|null The database connection object or null on failure.
+ */
+function connectToDatabase() {
+    $conn = @new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if ($conn->connect_error) {
+        error_log("Login Connection failed: " . $conn->connect_error);
+        return null;
+    }
+    return $conn;
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
+    $input_identifier = trim($_POST['email'] ?? ''); // Can be email or username
+    $password = $_POST['password'] ?? '';
+    $login_success = false;
+
+    // =========================================================
+    // 1. ADMIN CREDENTIAL CHECK (Development/Testing ONLY)
+    // 
+    // WARNING: Hardcoding credentials and password checks like this is 
+    // highly insecure for a real application. This is done to satisfy 
+    // the prompt's request for a simple admin check.
+    // =========================================================
+    
+    // Define the specific admin credentials (in a real app, this would be a hashed password)
+    $ADMIN_EMAIL = 'Admin1234@gmail.com';
+    $ADMIN_PASS = 'Admin123'; 
+    
+    // Check for hardcoded admin credentials
+    if ($input_identifier === $ADMIN_EMAIL && $password === $ADMIN_PASS) {
+        // SUCCESS: Admin Login
+        $_SESSION['loggedin'] = true;
+        $_SESSION['role'] = 'admin'; // Set session role
+        $_SESSION['username'] = 'Administrator';
+        
+        $login_status = 'success';
+        $login_message = 'Admin login successful! Redirecting to dashboard...';
+        $redirect_url = 'admin-dashboard.php'; // Set admin redirect
+        $login_success = true;
+    } 
+    
+    // =========================================================
+    // 2. GENERIC USER DATABASE CHECK
+    // =========================================================
+    if (!$login_success) {
+        $conn = connectToDatabase();
+        
+        if (!$conn) {
+            $login_status = 'error';
+            $login_message = "Login failed: Database connection failed. Please ensure MySQL is running.";
+        } else {
+            // Check database for user by email OR username
+            $sql = "SELECT id, username, password_hash FROM users WHERE email = ? OR username = ?";
+            
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("ss", $input_identifier, $input_identifier);
+                
+                if ($stmt->execute()) {
+                    $result = $stmt->get_result();
+                    
+                    if ($result->num_rows === 1) {
+                        $user = $result->fetch_assoc();
+                        $hashed_password = $user['password_hash'];
+                        
+                        // Verify Password using secure hashing function
+                        if (password_verify($password, $hashed_password)) {
+                            // SUCCESS: Regular User Login
+                            $_SESSION['loggedin'] = true;
+                            $_SESSION['id'] = $user['id'];
+                            $_SESSION['username'] = $user['username'];
+                            // Assume default 'user' role if not explicitly set in the database
+                            $_SESSION['role'] = $user['role'] ?? 'user'; 
+                            
+                            $login_status = 'success';
+                            $login_message = 'Login successful! Redirecting to homepage...';
+                            $redirect_url = 'homepage.html'; // Set user redirect
+                            $login_success = true;
+                            
+                        } else {
+                            // Incorrect password
+                            $login_status = 'error';
+                            $login_message = 'Invalid email/username or password.';
+                        }
+                    } else {
+                        // User not found
+                        $login_status = 'error';
+                        $login_message = 'Invalid email/username or password.';
+                    }
+                } else {
+                    error_log("MySQL Execution Error: " . $stmt->error);
+                    $login_status = 'error';
+                    $login_message = "Login failed due to a server error. (Code: 500)";
+                }
+                $stmt->close();
+            } else {
+                error_log("MySQL Prepare Error: " . $conn->error);
+                $login_status = 'error';
+                $login_message = "Login failed due to a server error. (Code: 501)";
+            }
+            
+            $conn->close();
+        }
+    }
+}
+// PHP SCRIPT END
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
