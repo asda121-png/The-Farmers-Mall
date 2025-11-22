@@ -100,7 +100,7 @@
           </div>
         </div>
         <div class="flex items-center gap-4">
-          <button class="flex-1 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition flex items-center justify-center add-to-cart-btn">
+          <button class="flex-1 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition flex items-center justify-center add-to-cart-btn" id="addToCartBtn">
             <i class="fas fa-shopping-cart mr-2"></i>
             Add to Cart
           </button>

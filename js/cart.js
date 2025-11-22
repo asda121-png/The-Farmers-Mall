@@ -1,30 +1,5 @@
- // Dynamically load header.html
-    fetch('header.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('header').innerHTML = data;
-
-        // Highlight the cart icon
-        const cartIcon = document.querySelector('a[href="cart.html"] i');
-        if (cartIcon) {
-          cartIcon.parentElement.classList.remove('text-gray-600');
-          cartIcon.parentElement.classList.add('text-green-600');
-        }
-
-        // Add search functionality to the loaded header
-        const headerSearchInput = document.querySelector('#header input[type="text"]');
-        if (headerSearchInput) {
-          const form = document.createElement('form');
-          form.action = 'products.php';
-          form.method = 'GET';
-          headerSearchInput.name = 'search';
-          headerSearchInput.parentElement.insertBefore(form, headerSearchInput);
-          form.appendChild(headerSearchInput);
-        }
-
-        // Update cart icon badge
-        updateCartIcon();
-      });
+    // Update cart icon badge on load
+    updateCartIcon();
 
     // CART FUNCTIONALITY
     const cartContainer = document.getElementById('cartItems');
@@ -69,7 +44,7 @@
         div.className = 'bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-md transition-shadow gap-4';
         div.innerHTML = `
           <div class="flex items-center gap-4 flex-1">
-            <img src="${item.image || 'images/products/Fresh Vegetable Box.png'}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+        <img src="${item.image || '../images/products/Fresh Vegetable Box.png'}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
             <div class="flex-1">
               <h3 class="font-semibold text-gray-800 text-lg">${escapeHtml(item.name)}</h3>
               <p class="text-green-700 font-medium text-sm">₱${item.price.toFixed(2)} each</p>
@@ -158,7 +133,7 @@
     }
 
     function updateCartIcon() {
-      const cartIcon = document.querySelector('a[href="cart.html"]');
+      const cartIcon = document.querySelector('a[href="cart.php"]');
       if (!cartIcon) return;
 
       let badge = cartIcon.querySelector('.cart-badge');

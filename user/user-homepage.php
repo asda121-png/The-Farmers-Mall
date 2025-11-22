@@ -754,11 +754,87 @@
         });
       });
 
+      // Add to cart functionality
+      function addToCart(product) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        // Check if product already exists in cart
+        const existingIndex = cart.findIndex(item => item.name === product.name);
+        
+        if (existingIndex > -1) {
+          // Increment quantity if product exists
+          cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
+        } else {
+          // Add new product to cart
+          cart.push({
+            name: product.name,
+            price: parseFloat(product.price),
+            image: product.image,
+            quantity: 1,
+            description: product.description
+          });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartIcon();
+        showNotification(`${product.name} added to cart!`);
+      }
+
+      // Show toast notification
+      function showNotification(message, type = 'success') {
+        // Remove existing notification if any
+        const existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+        toast.innerHTML = `
+          <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle text-xl"></i>
+            <span class="font-medium">${message}</span>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        // Animate in
+        setTimeout(() => toast.classList.remove('translate-x-full'), 10);
+        // Animate out and remove
+        setTimeout(() => {
+          toast.classList.add('translate-x-full');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      // Update cart icon with item count
+      function updateCartIcon() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartIcon = document.querySelector('a[href="cart.php"]');
+        if (!cartIcon) return;
+        // Create or update a badge for the count
+        let badge = cartIcon.querySelector('.cart-badge');
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5';
+          cartIcon.classList.add('relative');
+          cartIcon.appendChild(badge);
+        }
+        const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        badge.textContent = totalItems;
+        badge.style.display = totalItems > 0 ? 'block' : 'none';
+      }
+
       document.querySelectorAll('.add-btn').forEach(button => {
         button.addEventListener('click', (event) => {
           event.preventDefault();
           event.stopPropagation();
-          console.log('Add to cart clicked');
+          const link = button.closest('.product-link');
+          if (link) {
+            const product = {
+              name: link.dataset.name,
+              price: parseFloat(link.dataset.price.replace('₱', '')),
+              image: link.dataset.img,
+              description: link.dataset.description || ''
+            };
+            addToCart(product);
+          }
         });
       });
 

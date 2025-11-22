@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateCartIcon() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartIcon = document.querySelector('a[href="cart.html"]');
+    const cartIcon = document.querySelector('a[href="cart.php"]');
     if (!cartIcon) return;
 
     let badge = cartIcon.querySelector('.cart-badge');
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         description: description
       });
       
-      window.location.href = `productdetails.html?${params.toString()}`;
+      window.location.href = `productdetails.php?${params.toString()}`;
     });
   });
 });
