@@ -93,9 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
     /* Toast Notification */
     .toast {
       position: fixed;
-      top: 20px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%) translateY(-50px);
+      transform: translate(-50%, -50%) scale(0.9);
       color: white;
       padding: 14px 22px;
       border-radius: 10px;
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
       gap: 10px;
     }
     .toast.show {
-      transform: translateX(-50%) translateY(0);
+      transform: translate(-50%, -50%) scale(1);
       opacity: 1;
     }
   </style>
@@ -267,12 +267,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
 
         if (status === 'success') {
             showToast(message, 'success');
-            
-            // Redirect based on the determined URL (admin or user)
+
+            // Redirect to the loading page with the final destination as a parameter
             if (redirectUrl) {
                 setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 1500);
+                    window.location.href = `../public/loading.html?redirect_to=${encodeURIComponent(redirectUrl)}`;
+                }, 1000); // Reduced delay for a quicker transition
             }
         } else if (status === 'error') {
             showToast(message, 'error');
