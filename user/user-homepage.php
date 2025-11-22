@@ -319,7 +319,7 @@
       <div class="flex items-center space-x-6">
         <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="cart.php" class="text-gray-600 relative"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.php">
           <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
@@ -851,6 +851,9 @@
 
       // Load profile on page load
       loadUserProfile();
+
+      // Update cart icon on page load
+      updateCartIcon();
 
       // Listen for profile updates from other tabs
       window.addEventListener('storage', (e) => {

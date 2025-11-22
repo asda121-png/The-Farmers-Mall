@@ -147,7 +147,7 @@
           description: description,
         });
         
-        window.location.href = `productdetails.html?${params.toString()}`;
+        window.location.href = `productdetails.php?${params.toString()}`;
       }
     });
 
@@ -251,14 +251,14 @@
   // Update cart icon with item count
   function updateCartIcon() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartIcon = document.querySelector('a[href="cart.html"]');
+    const cartIcon = document.querySelector('a[href*="cart"]');
     if (!cartIcon) return;
 
     // Create or update a badge for the count
     let badge = cartIcon.querySelector('.cart-badge');
     if (!badge) {
       badge = document.createElement('span');
-      badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5';
+      badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1 min-w-[0.75rem] text-center z-10';
       cartIcon.classList.add('relative');
       cartIcon.appendChild(badge);
     }
@@ -350,6 +350,13 @@
     bindAddToCartButtons();
     initFromURL();
     updateCartIcon(); // Update on page load
+
+    // Listen for cart updates from other tabs
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'cart') {
+        updateCartIcon();
+      }
+    });
   }
 
   init();
