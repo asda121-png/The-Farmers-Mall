@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,9 +37,9 @@
 
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-  <!-- Header -->
   <header class="bg-white border-b shadow-sm sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+
       <!-- Left: Logo -->
       <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
@@ -49,24 +50,29 @@
 
       <!-- Center: Search -->
       <div class="flex-1 mx-8 max-w-xl">
-        <form action="retailersearchresults.html" method="GET" class="relative">
+        <form action="products.html" method="GET" class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          <input type="search" name="q" placeholder="Search orders, products, customers..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
+          <input type="text" name="search" placeholder="Search products..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm" />
         </form>
       </div>
 
       <!-- Right: Icons & Profile -->
       <div class="flex items-center space-x-6">
-        <a href="retailermessage.html" class="relative cursor-pointer" aria-label="Messages">
-          <i class="fa-regular fa-comment text-xl text-green-600"></i>
+        <!-- Messages -->
+        <a href="retailermessage.php" class="relative cursor-pointer">
+          <i class="fa-regular fa-comment text-xl text-gray-600"></i>
           <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
         </a>
-        <a href="retailernotifications.html" class="relative cursor-pointer" aria-label="Notifications">
+
+        <!-- Notifications -->
+        <a href="retailernotifications.html" class="relative cursor-pointer">
           <i class="fa-regular fa-bell text-xl text-gray-600"></i>
           <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
         </a>
-        <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer" aria-label="Profile">
+
+        <!-- Profile -->
+        <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
           <div class="profile-info">
             <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
@@ -88,7 +94,7 @@
           <div class="p-4 border-b">
             <div class="relative">
               <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input id="searchInput" type="text" placeholder="Search users..."
+              <input id="searchInput" type="text" placeholder="Search customer..."
                 class="w-full pl-9 pr-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500">
             </div>
           </div>
@@ -130,13 +136,18 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
+  <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+      
+      <!-- Logo/About -->
       <div>
         <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
-        <p class="text-gray-300 text-sm">Fresh, organic produce delivered straight to your home from local farmers.</p>
+        <p class="text-gray-300 text-sm">
+          Fresh, organic produce delivered straight to your home from local farmers.
+        </p>
       </div>
+      
+      <!-- Quick Links -->
       <div>
         <h3 class="font-bold text-lg mb-3">Quick Links</h3>
         <ul class="space-y-2 text-sm text-gray-300">
@@ -146,6 +157,8 @@
           <li><a href="#" class="hover:underline">Support</a></li>
         </ul>
       </div>
+
+      <!-- Categories -->
       <div>
         <h3 class="font-bold text-lg mb-3">Categories</h3>
         <ul class="space-y-2 text-sm text-gray-300">
@@ -155,6 +168,8 @@
           <li><a href="#" class="hover:underline">Meat</a></li>
         </ul>
       </div>
+
+      <!-- Social -->
       <div>
         <h3 class="font-bold text-lg mb-3">Follow Us</h3>
         <div class="flex space-x-4 text-xl">
@@ -164,6 +179,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Divider -->
     <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
       © 2025 Farmers Mall. All rights reserved.
     </div>
@@ -224,6 +241,26 @@
 
       let activeUser = Object.keys(conversations)[0];
 
+      function formatTimestampForList(isoString) {
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) return 'Just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+
+        if (date >= startOfToday) {
+          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (date >= startOfYesterday) {
+          return 'Yesterday';
+        }
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+
       function saveConversations() {
         localStorage.setItem('conversations', JSON.stringify(conversations));
       }
@@ -238,7 +275,7 @@
         );
 
         // Sort the filtered users alphabetically
-        filteredUsers.sort();
+        filteredUsers.sort((a, b) => new Date(conversations[b].messages.slice(-1)[0].timestamp) - new Date(conversations[a].messages.slice(-1)[0].timestamp));
 
         for (const user of filteredUsers) {
           const conv = conversations[user];
@@ -246,14 +283,18 @@
           const li = document.createElement('li');
           li.className = `p-4 flex items-center space-x-3 hover:bg-gray-50 cursor-pointer ${user === activeUser ? 'bg-green-50 border-l-4 border-green-600' : ''}`;
           li.dataset.user = user;
+          const timeString = formatTimestampForList(lastMessage.timestamp);
           const onlineIndicatorClass = conv.online ? 'bg-green-500' : 'bg-gray-400';
           li.innerHTML = `
             <div class="relative">
               <img src="${conv.avatar}" alt="Customer" class="w-10 h-10 rounded-full">
               <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ${onlineIndicatorClass} ring-2 ring-white"></span>
             </div>
-            <div class="flex-1 overflow-hidden">
-              <p class="font-medium text-gray-800">${user}</p>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-center">
+                <p class="font-medium text-gray-800">${user}</p>
+                <p class="text-xs text-gray-400 flex-shrink-0 ml-2">${timeString}</p>
+              </div>
               <p class="text-sm text-gray-500 truncate">${lastMessage.text}</p>
             </div>
             ${conv.unread > 0 ? `<span class="bg-green-600 text-white text-xs rounded-full px-2 py-1">${conv.unread}</span>` : ''}`;
@@ -286,6 +327,7 @@
 
           const timeString = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+          // Define the reaction toolbar that appears on hover
           const reactionToolbar = `
             <div class="absolute top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white border rounded-full shadow-sm p-1 opacity-0 group-hover:opacity-100 transition-opacity ${isMine ? 'left-0 -translate-x-full' : 'right-0 translate-x-full'}">
               <button data-timestamp="${msg.timestamp}" class="reaction-btn p-1.5 rounded-full hover:bg-gray-100 text-gray-500" aria-label="Like message">
@@ -296,22 +338,24 @@
               </button>
             </div>`;
           
+          // Define the like indicator (thumbs-up icon) that shows if a message is liked
+          const likeIndicator = msg.liked ? `<i class="fa-solid fa-thumbs-up text-blue-500 text-xs absolute -bottom-2 right-1"></i>` : '';
+
+          let messageContent = '';
           if (msg.imageUrl) {
             messageContent = `
               <div class="relative group" data-timestamp="${msg.timestamp}">
                 <img src="${msg.imageUrl}" alt="Sent image" class="rounded-lg shadow-sm max-w-[70%] sm:max-w-xs max-h-60 object-cover cursor-pointer" onclick="window.open('${msg.imageUrl}', '_blank')">
-                <span class="block text-xs text-gray-400 mt-1 ${isMine ? 'text-right pr-5' : 'text-left pl-5'}">${timeString}</span>
-                ${reactionToolbar}
-                ${msg.liked ? `<i class="fa-solid fa-thumbs-up text-blue-500 text-xs absolute -bottom-2 right-1"></i>` : ''}
+                <span class="block text-xs text-gray-400 mt-1 ${isMine ? 'text-right pr-5' : 'text-left'}">${timeString}</span>
+                ${reactionToolbar} ${likeIndicator}
               </div>`;
           } else {
             const bgColor = isMine ? 'bg-green-600 text-white' : 'bg-white text-gray-700';
             messageContent = `
               <div class="relative group" data-timestamp="${msg.timestamp}">
                 <div class="${bgColor} p-3 rounded-lg shadow-sm max-w-[70%] sm:max-w-xs"><p class="text-sm break-words">${msg.text}</p></div>
-                <span class="block text-xs text-gray-400 mt-1 ${isMine ? 'text-right pr-5' : 'text-left pl-5'}">${timeString}</span>
-                ${reactionToolbar}
-                ${msg.liked ? `<i class="fa-solid fa-thumbs-up text-blue-500 text-xs absolute -bottom-2 right-1"></i>` : ''}
+                <span class="block text-xs text-gray-400 mt-1 ${isMine ? 'text-right pr-5' : 'text-left'}">${timeString}</span>
+                ${reactionToolbar} ${likeIndicator}
               </div>`;
           }
 
@@ -357,6 +401,24 @@
         }, 1500);
       }
 
+      // --- Attach File Logic ---
+      attachFileBtn.addEventListener('click', () => fileUpload.click());
+      fileUpload.addEventListener('change', () => {
+        const file = fileUpload.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            conversations[activeUser].messages.push({
+              sender: MY_NAME,
+              imageUrl: e.target.result,
+              timestamp: new Date().toISOString()
+            });
+            renderAll(true);
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+
       function renderAll(scrollToBottom = false) {
         saveConversations();
         renderConversationList();
@@ -378,21 +440,21 @@
 
       // --- Like & Delete Logic ---
       chatMessagesEl.addEventListener('click', (e) => {
-        const reactionBtn = e.target.closest('.reaction-btn');
-        if (reactionBtn) {
-          const timestamp = reactionBtn.dataset.timestamp;
-          const message = conversations[activeUser].messages.find(m => m.timestamp === timestamp);
-          if (message) {
-            message.liked = !message.liked;
-            renderAll(false); // Pass false to prevent scrolling
-          }
-        }
+        const targetButton = e.target.closest('button');
+        if (targetButton) {
+          const timestamp = targetButton.dataset.timestamp;
+          const message = conversations[activeUser]?.messages.find(m => m.timestamp === timestamp);
 
-        const deleteBtn = e.target.closest('.delete-message-btn');
-        if (deleteBtn && activeUser) {
-          const messageTimestampToDelete = deleteBtn.dataset.timestamp;
-          deleteMessageModal.classList.remove('hidden');
-          deleteMessageModal.dataset.messageTimestamp = messageTimestampToDelete; // Store timestamp for confirmation
+          if (message) {
+            if (targetButton.classList.contains('reaction-btn')) {
+              message.liked = !message.liked; // Toggle the liked state
+              renderAll(false); // Re-render without scrolling
+            } else if (targetButton.classList.contains('delete-message-btn')) {
+              // Store timestamp for confirmation
+              deleteMessageModal.dataset.messageTimestamp = timestamp;
+              deleteMessageModal.classList.remove('hidden');
+            }
+          }
         }
       });
 
@@ -426,27 +488,33 @@
       // --- Search Logic ---
       searchInput.addEventListener('input', renderConversationList);
 
-      attachFileBtn.addEventListener('click', () => fileUpload.click());
-      fileUpload.addEventListener('change', () => {
-        const file = fileUpload.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            conversations[activeUser].messages.push({
-              sender: MY_NAME,
-              imageUrl: e.target.result,
-              timestamp: new Date().toISOString()
-            });
-            renderAll(true); // Scroll to bottom for new image messages
+      // When tab becomes visible, clear unread for the active chat
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          if (conversations[activeUser]) {
+            conversations[activeUser].unread = 0;
+            renderAll();
           }
-          reader.readAsDataURL(file);
         }
       });
 
+      // Initial Render
       renderAll();
+
+      // Also update notification badge on load (from previous context)
+      const notifCount = localStorage.getItem('unreadNotifications');
+      const notifBadge = document.querySelector('a[href="retailernotifications.html"] .absolute');
+      if (notifBadge) {
+        if (notifCount && parseInt(notifCount) > 0) {
+          notifBadge.textContent = notifCount;
+          notifBadge.style.display = 'inline-flex';
+        } else {
+          notifBadge.style.display = 'none';
+        }
+      }
     });
   </script>
 
 </body>
 
-</html>
+</html> 
