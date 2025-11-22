@@ -42,7 +42,7 @@
         <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.html">
-          <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
     </div>
@@ -201,6 +201,33 @@
   </footer>
 
   <script src="../js/paymentmethod.js"></script>
+  <script>
+    // Load User Profile Data
+    function loadUserProfile() {
+      const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+      if (userProfile && userProfile.profilePic) {
+        const headerProfilePic = document.getElementById('headerProfilePic');
+        if (headerProfilePic) {
+          headerProfilePic.src = userProfile.profilePic;
+        }
+      }
+    }
+
+    // Load profile on page load
+    loadUserProfile();
+
+    // Listen for profile updates
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'userProfile') {
+        loadUserProfile();
+      }
+    });
+
+    // Listen for profile updates in same tab
+    window.addEventListener('profileUpdated', () => {
+      loadUserProfile();
+    });
+  </script>
 
 </body>
 </html>

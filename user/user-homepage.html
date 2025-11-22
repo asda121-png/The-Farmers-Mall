@@ -321,7 +321,7 @@
         <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.html">
-          <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
     </div>
@@ -347,7 +347,7 @@
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
           <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Farm Fresh Daily</h2>
           <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
-          <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+          <a href="../user/products.html" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
           </a>
         </div>
@@ -410,7 +410,7 @@
   <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold">Top Products</h2>
-      <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
+      <a href="products.html" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -474,7 +474,7 @@
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold">Other Products</h2>
-      <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
+      <a href="products.html" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -760,6 +760,32 @@
           event.stopPropagation();
           console.log('Add to cart clicked');
         });
+      });
+
+      // --- Load User Profile Data ---
+      function loadUserProfile() {
+        const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+        if (userProfile && userProfile.profilePic) {
+          const headerProfilePic = document.getElementById('headerProfilePic');
+          if (headerProfilePic) {
+            headerProfilePic.src = userProfile.profilePic;
+          }
+        }
+      }
+
+      // Load profile on page load
+      loadUserProfile();
+
+      // Listen for profile updates from other tabs
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'userProfile') {
+          loadUserProfile();
+        }
+      });
+
+      // Listen for profile updates in same tab
+      window.addEventListener('profileUpdated', () => {
+        loadUserProfile();
       });
     });
   </script>
