@@ -6,9 +6,7 @@ $login_status = '';
 $login_message = '';
 $redirect_url = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
-    $input_identifier = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
+
 
     // Check for admin credentials
     if ($input_identifier === 'Admin1234@gmail.com' && $password === 'Admin123') {
@@ -29,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         $login_message = 'Login successful! Redirecting to homepage...';
         $redirect_url = '../user/user-homepage.html';
     }
-}
+
 // PHP SCRIPT END
 ?>
 <!DOCTYPE html>
