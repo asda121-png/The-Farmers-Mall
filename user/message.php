@@ -33,7 +33,7 @@
          <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="cart.php" class="text-gray-600 relative"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.php">
           <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
@@ -158,6 +158,23 @@
 
   <script src="../js/customermessage.js"></script>
   <script>
+    // Update cart icon with item count
+    function updateCartIcon() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartIcon = document.querySelector('a[href="cart.php"]');
+      if (!cartIcon) return;
+      // Create or update a badge for the count
+      let badge = cartIcon.querySelector('.cart-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[0.75rem] text-center z-10';
+        cartIcon.appendChild(badge);
+      }
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      badge.textContent = totalItems;
+      badge.style.display = totalItems > 0 ? 'block' : 'none';
+    }
+
     // Highlight the active message icon in the header
     document.addEventListener('DOMContentLoaded', function() {
       const messageIconLink = document.querySelector('a[href="message.php"]');
@@ -177,11 +194,15 @@
         }
       }
       loadUserProfile();
+      updateCartIcon(); // Update cart icon on page load
 
       // Listen for profile updates from other tabs
       window.addEventListener('storage', (e) => {
         if (e.key === 'userProfile') {
           loadUserProfile();
+        }
+        if (e.key === 'cart') {
+          updateCartIcon();
         }
       });
 

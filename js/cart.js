@@ -78,6 +78,7 @@
               item.quantity--;
             }
             localStorage.setItem('cart', JSON.stringify(cart));
+            window.dispatchEvent(new Event('cartUpdated'));
             renderCart();
             updateCartIcon();
           });
@@ -223,13 +224,16 @@
       const productImage = document.getElementById('modalProductImage');
       const productName = document.getElementById('modalProductName');
       const productPrice = document.getElementById('modalProductPrice');
+      const productQuantity = document.getElementById('modalProductQuantity');
       const confirmBtn = document.getElementById('confirmDeleteBtn');
       const cancelBtn = document.getElementById('cancelDeleteBtn');
+      const closeBtn = document.getElementById('closeDeleteModal');
 
       // Set product info
       productImage.src = item.image || 'images/products/Fresh Vegetable Box.png';
       productName.textContent = item.name;
-      productPrice.textContent = `₱${item.price.toFixed(2)} × ${item.quantity || 1}`;
+      productPrice.textContent = `₱${item.price.toFixed(2)}`;
+      productQuantity.textContent = `Quantity: ${item.quantity || 1}`;
 
       // Show modal
       modal.classList.remove('hidden');
@@ -238,8 +242,10 @@
       // Remove existing event listeners by cloning buttons
       const newConfirmBtn = confirmBtn.cloneNode(true);
       const newCancelBtn = cancelBtn.cloneNode(true);
+      const newCloseBtn = closeBtn.cloneNode(true);
       confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
       cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+      closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
 
       // Add event listeners
       newConfirmBtn.addEventListener('click', () => {
@@ -252,7 +258,8 @@
       });
 
       newCancelBtn.addEventListener('click', hideDeleteModal);
-      
+      newCloseBtn.addEventListener('click', hideDeleteModal);
+
       // Click outside to close
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {

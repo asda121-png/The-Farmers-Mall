@@ -194,37 +194,50 @@
   <!-- Delete Confirmation Modal -->
   <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 modal-content">
-      <div class="p-6">
-        <!-- Icon -->
-        <div class="flex justify-center mb-4">
-          <div class="bg-red-100 rounded-full p-4">
-            <i class="fa-solid fa-trash text-red-600 text-3xl"></i>
+      <div class="relative">
+        <!-- Close button -->
+        <button id="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10">
+          <i class="fa-solid fa-times text-xl"></i>
+        </button>
+
+        <div class="p-6">
+
+
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-800 text-center mb-2">Remove Item?</h3>
+
+          <!-- Enhanced Product Info -->
+          <div id="modalProductInfo" class="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+            <div class="flex items-center gap-3">
+              <img id="modalProductImage" src="" alt="Product" class="w-20 h-20 rounded-lg object-cover border border-gray-200">
+              <div class="flex-1">
+                <p id="modalProductName" class="font-semibold text-gray-800 text-lg"></p>
+                <p id="modalProductPrice" class="text-green-600 font-medium text-base"></p>
+                <p id="modalProductQuantity" class="text-gray-500 text-sm"></p>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <!-- Title -->
-        <h3 class="text-xl font-bold text-gray-800 text-center mb-2">Remove Item?</h3>
-        
-        <!-- Product Info -->
-        <div id="modalProductInfo" class="bg-gray-50 rounded-lg p-3 mb-4 flex items-center gap-3">
-          <img id="modalProductImage" src="" alt="Product" class="w-16 h-16 rounded-lg object-cover border border-gray-200">
-          <div class="flex-1">
-            <p id="modalProductName" class="font-semibold text-gray-800"></p>
-            <p id="modalProductPrice" class="text-green-600 text-sm"></p>
+
+          <!-- Impact message -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-info-circle text-blue-600 mt-0.5"></i>
+              <div>
+                <p class="text-gray-700 text-sm font-medium">Impact on your order:</p>
+                <p class="text-gray-600 text-sm mt-1">Removing this item will update your cart total and may affect any applied discounts.</p>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <!-- Message -->
-        <p class="text-gray-600 text-center mb-6">Are you sure you want to remove this item from your cart?</p>
-        
-        <!-- Buttons -->
-        <div class="flex gap-3">
-          <button id="cancelDeleteBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-            <i class="fa-solid fa-times mr-2"></i>Cancel
-          </button>
-          <button id="confirmDeleteBtn" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">
-            <i class="fa-solid fa-trash mr-2"></i>Remove
-          </button>
+
+          <!-- Enhanced buttons -->
+          <div class="flex gap-3">
+            <button id="cancelDeleteBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md">
+              <i class="fa-solid fa-arrow-left mr-2"></i>Keep Item
+            </button>
+            <button id="confirmDeleteBtn" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md">
+              <i class="fa-solid fa-trash mr-2"></i>Remove Item
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -233,29 +246,51 @@
   <!-- Clear Cart Confirmation Modal -->
   <div id="clearCartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 modal-content">
-      <div class="p-6">
-        <!-- Icon -->
-        <div class="flex justify-center mb-4">
-          <div class="bg-orange-100 rounded-full p-4">
-            <i class="fa-solid fa-exclamation-triangle text-orange-600 text-3xl"></i>
+      <div class="relative">
+        <!-- Close button -->
+        <button id="closeClearCartModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10">
+          <i class="fa-solid fa-times text-xl"></i>
+        </button>
+
+        <div class="p-6">
+          <!-- Icon with animation -->
+          <div class="flex justify-center mb-4">
+            <div class="bg-orange-100 rounded-full p-4 animate-bounce">
+              <i class="fa-solid fa-exclamation-triangle text-orange-600 text-3xl"></i>
+            </div>
           </div>
-        </div>
-        
-        <!-- Title -->
-        <h3 class="text-xl font-bold text-gray-800 text-center mb-2">Clear Entire Cart?</h3>
-        
-        <!-- Message -->
-        <p class="text-gray-600 text-center mb-2">This will remove all <span id="clearCartItemCount" class="font-semibold text-gray-800">0</span> items from your cart.</p>
-        <p class="text-gray-500 text-sm text-center mb-6">This action cannot be undone.</p>
-        
-        <!-- Buttons -->
-        <div class="flex gap-3">
-          <button id="cancelClearBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-            <i class="fa-solid fa-times mr-2"></i>Cancel
-          </button>
-          <button id="confirmClearBtn" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">
-            <i class="fa-solid fa-trash mr-2"></i>Clear All
-          </button>
+
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-800 text-center mb-2">Clear Entire Cart?</h3>
+
+          <!-- Enhanced message with cart summary -->
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <i class="fa-solid fa-shopping-cart text-red-600"></i>
+              <span class="font-semibold text-gray-800">Cart Summary</span>
+            </div>
+            <p class="text-gray-700 text-center mb-1">This will remove all <span id="clearCartItemCount" class="font-bold text-red-600">0</span> items from your cart.</p>
+            <p class="text-gray-600 text-sm text-center">Total value: <span id="clearCartTotalValue" class="font-semibold text-red-600">₱0.00</span></p>
+          </div>
+
+          <!-- Warning message -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-6">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-exclamation-triangle text-yellow-600"></i>
+              <p class="text-gray-700 text-sm font-medium">This action cannot be undone</p>
+            </div>
+            <p class="text-gray-600 text-sm mt-1">All items will be permanently removed from your cart.</p>
+          </div>
+
+          <!-- Enhanced buttons -->
+          <div class="flex gap-3">
+            <button id="cancelClearBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md">
+              <i class="fa-solid fa-arrow-left mr-2"></i>Keep Items
+            </button>
+            <button id="confirmClearBtn" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md">
+              <i class="fa-solid fa-trash mr-2"></i>Clear All
+            </button>
+          </div>
         </div>
       </div>
     </div>
