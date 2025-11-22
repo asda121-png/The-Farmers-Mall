@@ -1,6 +1,6 @@
 <?php
         // Include the header
-        include 'header.php';
+    include '../includes/header.php';
     ?>
 
     <!-- Main Content Area -->
@@ -9,7 +9,7 @@
         <!-- Page Header -->
         <section 
             class="relative flex items-center justify-center min-h-screen bg-cover bg-center text-white pt-[100px]" 
-            style="background-image: url('images/farmers-mall-cover.jpg');"
+            style="background-image: url('../images/farmers-mall-cover.jpg');"
             onerror="this.style.backgroundImage='url(\'https://placehold.co/1920x1080/222/white?text=Farm+Fresh+Box\')'"
         >
             <!-- Dark Overlay -->
@@ -29,7 +29,7 @@
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                 <!-- Image Column -->
                 <div>
-                    <img src="images/browse-shop.jpg" alt="Browse and shop online" class="rounded-xl shadow-lg w-full" onerror="this.src='https://placehold.co/600x400/16a34a/white?text=1.+Browse+%26+Shop'">
+                    <img src="../images/browse-shop.jpg" alt="Browse and shop online" class="rounded-xl shadow-lg w-full" onerror="this.src='https://placehold.co/600x400/16a34a/white?text=1.+Browse+%26+Shop'">
                 </div>
                 <!-- Text Column -->
                 <div class="text-gray-700">
@@ -64,7 +64,7 @@
                 <!-- Image Column (Order changed) -->
                 <!-- REMOVED md:order-first -->
                 <div>
-                    <img src="images/pick-pack.jpg" alt="We pick and pack your order" class="rounded-xl shadow-lg w-full">
+                    <img src="../images/pick-pack.jpg" alt="We pick and pack your order" class="rounded-xl shadow-lg w-full">
                 </div>
             </div>
         </section>
@@ -74,7 +74,7 @@
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                 <!-- Image Column -->
                 <div>
-                    <img src="images/deliver-fresh.jpg" alt="Fresh produce delivered to your door" class="rounded-xl shadow-lg w-full">
+                    <img src="../images/deliver-fresh.jpg" alt="Fresh produce delivered to your door" class="rounded-xl shadow-lg w-full">
                 </div>
                 <!-- Text Column -->
                 <div class="text-gray-700">
@@ -135,7 +135,7 @@
                 <p class="text-lg text-gray-700 mb-6">
                     Experience the difference of truly fresh, local food. Browse our categories and see what's in season today.
                 </p>
-                <a href="register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300">
+                <a href="../auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300">
                     Browse All Categories
                 </a>
             </div>
@@ -144,6 +144,6 @@
     </main>
 
     <?php
-        include 'footer.html';
+        include '../includes/footer.html';
     ?>
 

@@ -58,7 +58,7 @@
 
     <?php
         // Include the header
-        include 'header.php';
+        include '../includes/header.php';
     ?>
 
     <main class="pt-[100px]"> 
@@ -324,7 +324,7 @@
     </main>
 
     <?php
-        include 'footer.html';
+        include '../includes/footer.html';
     ?>
 
     <script>

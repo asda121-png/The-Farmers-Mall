@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         
         $login_status = 'success';
         $login_message = 'Admin login successful! Redirecting to dashboard...';
-        $redirect_url = 'admin-dashboard.php';
+        $redirect_url = '../admin/admin-dashboard.php';
     } else {
         // Any other credentials - redirect to homepage
         $_SESSION['loggedin'] = true;
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         
         $login_status = 'success';
         $login_message = 'Login successful! Redirecting to homepage...';
-        $redirect_url = 'homepage.html';
+        $redirect_url = '../public/homepage.php';
     }
 }
 // PHP SCRIPT END
@@ -133,11 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
   <!-- Login Card -->
   <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden relative z-10 lg:flex" style="min-height: 680px;"> <!-- Static height container -->
     <!-- Left Side - Branding with Image -->
-    <div class="hidden lg:flex lg:w-1/2 p-16 flex-col justify-center items-center text-white text-center relative bg-cover bg-center" style="background-image: url('images/img.png');">
+    <div class="hidden lg:flex lg:w-1/2 p-16 flex-col justify-center items-center text-white text-center relative bg-cover bg-center" style="background-image: url('../images/img.png');">
       <!-- Overlay -->
       <div class="absolute inset-0 bg-green-800 opacity-60"></div>
       
-      <a href="index.php" class="absolute top-6 left-6 h-12 w-12 flex items-center justify-center bg-black bg-opacity-30 rounded-full text-white hover:bg-opacity-50 transition-all z-20">
+      <a href="../index.php" class="absolute top-6 left-6 h-12 w-12 flex items-center justify-center bg-black bg-opacity-30 rounded-full text-white hover:bg-opacity-50 transition-all z-20">
         <i class="fas fa-arrow-left text-xl"></i>
       </a>
 

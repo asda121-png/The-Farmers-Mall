@@ -130,7 +130,7 @@
 
   <?php
     // Include the header
-    include 'header.php';
+    include 'includes/header.php';
   ?>
 
   <!-- 
@@ -155,7 +155,7 @@
       <div class="max-w-lg">
         <h1 id="hero-h1" class="text-6xl font-bold text-white mb-4 opacity-0 translate-y-5 transition-all ease-out duration-700">Your Local Farm,<br>On Your Device</h1>
         <p id="hero-p" class="text-gray-200 text-xl mb-6 opacity-0 translate-y-5 transition-all ease-out duration-700" style="animation-delay: 200ms;">Fresh, local, and organic produce delivered right to your door.</p>
-        <a id="hero-a" href="register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg opacity-0 translate-y-5 ease-out duration-700" style="animation-delay: 400ms;">Sign Up</a>
+        <a id="hero-a" href="auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg opacity-0 translate-y-5 ease-out duration-700" style="animation-delay: 400ms;">Sign Up</a>
       </div>
     </div>
   </section>
@@ -258,7 +258,7 @@
 
     <!-- NEW "Start Selling" Button -->
     <div class="mt-12">
-      <a href="startselling.html" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <a href="retailer/startselling.php" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         Start Selling
       </a>
     </div>
@@ -291,7 +291,7 @@
             <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Matiao</span>
             <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Madang</span>
           </div>
-          <p class="mt-8 text-sm text-gray-500">Don’t see your area? <a href="support.html" class="text-green-600 hover:underline font-medium">Contact us</a> to let us know where you are!</p>
+          <p class="mt-8 text-sm text-gray-500">Don't see your area? <a href="public/support.php" class="text-green-600 hover:underline font-medium">Contact us</a> to let us know where you are!</p>
         </div>
 
         <!-- Right Column: Google Map -->
@@ -317,12 +317,12 @@
     <div class="bg-green-600 text-white rounded-xl p-10 text-center max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-4">Ready for a Taste of Freshness?</h2>
       <p class="mb-6">Join the farm-to-table movement today and get the best local produce delivered to you.</p>
-      <a href="login.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
+      <a href="auth/login.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
     </div>
   </section>
 
   <?php
-    include 'footer.html';
+    include 'includes/footer.html';
   ?>
 
 </body>

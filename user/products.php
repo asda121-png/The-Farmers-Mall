@@ -57,7 +57,7 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username'] ?? 'User') : nu
   <!-- Navbar -->
    <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold" style="color: #2E7D32;"><a href="homepage.php" > The Farmer's Mall</a></h1>
+      <h1 class="text-xl font-bold" style="color: #2E7D32;"><a href="../public/homepage.php" > The Farmer's Mall</a></h1>
 
       <div class="flex-1 mx-6">
         <input 
@@ -76,7 +76,7 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username'] ?? 'User') : nu
             <!-- Logged In User Profile Dropdown -->
             <div class="relative group">
                 <button class="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
-                    <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full" onerror="this.onerror=null; this.src='https://placehold.co/32x32/333333/ffffff?text=U'">
+                    <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full" onerror="this.onerror=null; this.src='https://placehold.co/32x32/333333/ffffff?text=U'">
                     <span class="text-sm font-medium text-gray-700"><?= $username ?></span>
                 </button>
                 <!-- Dropdown Menu -->
@@ -85,13 +85,13 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username'] ?? 'User') : nu
                     <a href="orders.php" class="block px-4 py-2 text-gray-700 hover:bg-green-50"><i class="fas fa-shopping-bag mr-2"></i>My Orders</a>
                     <a href="account.html" class="block px-4 py-2 text-gray-700 hover:bg-green-50"><i class="fas fa-cog mr-2"></i>Account Settings</a>
                     <hr class="my-2">
-                    <a href="logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <a href="../auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
                 </div>
             </div>
         <?php else: ?>
-            <!-- Not Logged In - Show Profile Icon -->
-            <a href="login.php">
-                <img src="images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition-opacity" onerror="this.onerror=null; this.src='https://placehold.co/32x32/333333/ffffff?text=U'">
+            <!-- Not Logged In - Show Login Link -->
+            <a href="../auth/login.php">
+                <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition-opacity" onerror="this.onerror=null; this.src='https://placehold.co/32x32/333333/ffffff?text=U'">
             </a>
         <?php endif; ?>
       </div>

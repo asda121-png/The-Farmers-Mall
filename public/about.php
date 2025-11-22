@@ -34,13 +34,13 @@
 
     <?php
         // Include the header
-        include 'header.php';
+        include '../includes/header.php';
     ?>
 
     <!-- Main Content Area -->
     <main>
         <!-- Page Header -->
-        <section class="relative flex items-center justify-center min-h-screen bg-cover bg-center text-white pt-[100px]" style="background-image: url('images/farmer-image.jpg');">
+        <section class="relative flex items-center justify-center min-h-screen bg-cover bg-center text-white pt-[100px]" style="background-image: url('../images/our-story.jpg');">
             <!-- Dark Overlay --><!-- Adjusted tint back to bg-black/60 for better contrast --><div class="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
 
             <!-- Content --><div class="relative z-10 w-full max-w-6xl mx-auto px-6 text-center">
@@ -55,7 +55,7 @@
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                 <!-- Image Column -->
                 <div>
-                    <img src="images/our-farm-partners.jpg" alt="Local farm partner" class="rounded-xl shadow-lg w-full">
+                    <img src="../images/our-farm-partners.jpg" alt="Local farm partner" class="rounded-xl shadow-lg w-full">
                     <!-- Placeholder image. Replace with a real photo of a local farm! -->
                 </div>
                 <!-- Text Column -->
@@ -119,7 +119,7 @@
                 <p class="text-lg text-gray-700 mb-6">
                     Our roots are right here in the City of Mati. We're not just a service in the community; we are *of the community. We are passionate about making fresh, healthy food accessible to every family in the areas we serve, from Central to Dahican and beyond.
                 </p>
-                <a href="register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300">
+                <a href="../auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300">
                     Browse Local Products
                 </a>
             </div>
@@ -128,7 +128,7 @@
     </main>
 
     <?php
-        include 'footer.html';
+        include '../includes/footer.html';
     ?>
 
 </body>
