@@ -128,11 +128,10 @@
 
 <body class="bg-[#f6fff8] text-gray-800">
 
-  <?php
-    // Include the header
-    include 'includes/header.php';
-  ?>
-
+<?php
+// Include the header
+include '../includes/header.php';
+?>
   <!-- 
     Hero 
     ---
