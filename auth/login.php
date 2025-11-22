@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         
         $login_status = 'success';
         $login_message = 'Login successful! Redirecting to homepage...';
-        $redirect_url = '../public/homepage.php';
+        $redirect_url = '../public/user-homepage.php';
     }
 }
 // PHP SCRIPT END
