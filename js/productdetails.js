@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const productName = params.get('name') || 'Fresh Organic Vegetable Bundle';
   const productPrice = params.get('price') || '24.99';
-  const productImg = params.get('img') || 'images/products/Fresh Vegetable Box.png';
+  const productImg = params.get('img') || '../images/products/Fresh Vegetable Box.png';
   const productDescription = params.get('description') || 'A fresh assortment of seasonal vegetables including carrots, spinach, and broccoli, perfect for healthy meals.';
 
   // Update page elements
