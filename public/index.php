@@ -143,7 +143,7 @@ include '../includes/header.php';
   -->
   <section 
     class="relative flex items-center justify-center min-h-screen pt-[100px] bg-cover bg-center" 
-    style="background-image: url('images/farmer-hero-banner-img.jpg');"
+    style="background-image: url('../images/farmer-hero-banner-img.jpg');"
   >
     <!-- Dark Overlay -->
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
@@ -154,7 +154,7 @@ include '../includes/header.php';
       <div class="max-w-lg">
         <h1 id="hero-h1" class="text-6xl font-bold text-white mb-4 opacity-0 translate-y-5 transition-all ease-out duration-700">Your Local Farm,<br>On Your Device</h1>
         <p id="hero-p" class="text-gray-200 text-xl mb-6 opacity-0 translate-y-5 transition-all ease-out duration-700" style="animation-delay: 200ms;">Fresh, local, and organic produce delivered right to your door.</p>
-        <a id="hero-a" href="auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg opacity-0 translate-y-5 ease-out duration-700" style="animation-delay: 400ms;">Sign Up</a>
+        <a id="hero-a" href="../auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg opacity-0 translate-y-5 ease-out duration-700" style="animation-delay: 400ms;">Sign Up</a>
       </div>
     </div>
   </section>
@@ -207,31 +207,31 @@ include '../includes/header.php';
       
       <!-- Category Item 1 -->
       <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        <img src="images/vegetable.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Vegetables">
+        <img src="../images/vegetable.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Vegetables">
         <p class="py-4 font-semibold">Vegetable</p>
       </div>
       
       <!-- Category Item 2 -->
       <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        <img src="images/fruits.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Fruits">
+        <img src="../images/fruits.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Fruits">
         <p class="py-4 font-semibold">Fruits</p>
       </div>
 
       <!-- Category Item 3 -->
       <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        <img src="images/meat.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Meat">
+        <img src="../images/meat.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Meat">
         <p class="py-4 font-semibold">Meat</p>
       </div>
 
       <!-- Category Item 4 -->
       <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        <img src="images/pantry.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Pantry">
+        <img src="../images/pantry.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Pantry">
         <p class="py-4 font-semibold">Pantry</p>
       </div>
 
       <!-- Category Item 5 -->
       <div class="group bg-white rounded-xl shadow overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        <img src="images/equipment.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Equipment">
+        <img src="../images/equipment.png" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" alt="Equipment">
         <p class="py-4 font-semibold">Equipment</p>
       </div>
 
@@ -257,11 +257,11 @@ include '../includes/header.php';
 
     <!-- NEW "Start Selling" Button -->
     <div class="mt-12">
-      <a href="retailer/startselling.php" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <a href="../retailer/startselling.html" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         Start Selling
       </a>
     </div>
-    <!-- END NEW Button -->
+    <!-- END NEW Button --> 
 
   </section>
 
@@ -316,7 +316,7 @@ include '../includes/header.php';
     <div class="bg-green-600 text-white rounded-xl p-10 text-center max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-4">Ready for a Taste of Freshness?</h2>
       <p class="mb-6">Join the farm-to-table movement today and get the best local produce delivered to you.</p>
-      <a href="auth/login.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
+      <a href="../auth/register.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
     </div>
   </section>
 
