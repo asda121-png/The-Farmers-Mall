@@ -76,7 +76,7 @@ $admin_email = "admin@farmersmall.com";
           <i class="fa-solid fa-tachometer-alt w-5 text-green-200"></i>
           <span>Dashboard</span>
         </a>
-        <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-product.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-box w-5"></i>
           <span>Products</span>
         </a>
