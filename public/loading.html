@@ -35,14 +35,14 @@
     }
 
     .logo {
-      width:60px;height:60px;margin-bottom:10px;
-      background-color:rgba(255,255,255,0.15);
-      border-radius:50%;
+      width:80px;height:80px;margin-bottom:10px;
+      background-color:#16a34a; /* Tailwind's green-600 */
+      border-radius: 50%;
       display:flex;justify-content:center;align-items:center;
-      font-size:32px;
     }
+    .logo i {color:white;font-size:40px;}
 
-    .icons {
+    .icons { 
       display:flex;justify-content:center;gap:40px;margin:20px 0;
     }
     .icons div {
@@ -65,7 +65,8 @@
     }
     .bottom-text span {margin:0 5px;}
   </style>
-  <script src="https://kit.fontawesome.com/3f56f6f2fd.js" crossorigin="anonymous"></script>
+  <!-- Using CSS link for Font Awesome for better reliability (matches index.php) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <!-- floating circles -->
@@ -74,7 +75,9 @@
   <div class="circle"></div>
   <div class="circle"></div>
 
-  <div class="logo">🌱</div>
+  <div class="logo">
+    <i class="fas fa-leaf"></i>
+  </div>
   <h1>Farmers Mall</h1>
   <p>Your Local Farm, On Your Phone</p>
 
@@ -87,7 +90,7 @@
   <div class="loading-bar">
     <div class="loading-fill" id="loading-fill"></div>
   </div>
-  <p>Loading fresh produce...</p>
+  <p id="loading-text">Loading fresh produce...</p>
 
   <div class="bottom-text">
     Connecting farmers to your table <br>
@@ -97,15 +100,18 @@
   <script>
     let progress = 0;
     const fill = document.getElementById('loading-fill');
+    const loadingText = document.getElementById('loading-text');
     let loadingInterval = setInterval(() => {
-      progress += 2;
+      progress += 1;
+      if (progress > 100) progress = 100;
       fill.style.width = progress + '%';
-      if(progress >= 100) {
+      loadingText.textContent = `Loading fresh produce... ${progress}%`;
+      if (progress >= 100) {
         clearInterval(loadingInterval);
         // Redirect to your landing page after loading:
         window.location.href = "index.php"; 
       }
-    }, 60);
+    }, 30);
   </script>
 </body>
 </html>
