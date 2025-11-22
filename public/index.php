@@ -154,7 +154,7 @@ include '../includes/header.php';
       <div class="max-w-lg">
         <h1 id="hero-h1" class="text-6xl font-bold text-white mb-4 opacity-0 translate-y-5 transition-all ease-out duration-700">Your Local Farm,<br>On Your Device</h1>
         <p id="hero-p" class="text-gray-200 text-xl mb-6 opacity-0 translate-y-5 transition-all ease-out duration-700" style="animation-delay: 200ms;">Fresh, local, and organic produce delivered right to your door.</p>
-        <a id="hero-a" href="../auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg opacity-0 translate-y-5 ease-out duration-700" style="animation-delay: 400ms;">Sign Up</a>
+        <a id="hero-a" href="../auth/register.php" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg opacity-0 translate-y-5 ease-out duration-700" style="animation-delay: 400ms;">Shop Now</a>
       </div>
     </div>
   </section>
@@ -314,9 +314,9 @@ include '../includes/header.php';
 
   <section class="px-6 py-16">
     <div class="bg-green-600 text-white rounded-xl p-10 text-center max-w-4xl mx-auto">
-      <h2 class="text-2xl font-bold mb-4">Ready for a Taste of Freshness?</h2>
-      <p class="mb-6">Join the farm-to-table movement today and get the best local produce delivered to you.</p>
-      <a href="../auth/register.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Shop Now</a>
+      <h2 class="text-2xl font-bold mb-4">Got a Question or Issue? Don’t Wait — Get Instant Support Now!</h2>
+      <p class="mb-6">Let us know what you need, and we’ll guide you every step of the way.</p>
+      <a href="../public/support.php" class="px-6 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-gray-200 transition">Get Help</a>
     </div>
   </section>
 
