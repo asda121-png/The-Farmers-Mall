@@ -29,14 +29,19 @@
 
   <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+          <i class="fas fa-leaf text-white text-lg"></i>
+        </div>
+        <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
+      </div>
 
       <div class="flex-1 mx-6">
         <form action="products.php" method="GET">
           <input 
             type="text" 
             name="search"
-            placeholder="Search for fresh produce..."
+            placeholder="Search for fresh product..."
             class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
           />
         </form>
@@ -47,11 +52,12 @@
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.php">
-          <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
     </div>
   </header>
+
 
   <!-- Success Section -->
   <main class="flex flex-col items-center px-6 py-16">
@@ -114,7 +120,7 @@
         <button class="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition flex items-center justify-center">
           <i class="fa-solid fa-box mr-2"></i>Track Order
         </button>
-        <button onclick="window.location.href='../public/homepage.php'"
+        <button onclick="window.location.href='../user/user-homepage.php'"
                 class="border border-green-700 text-green-700 px-6 py-2 rounded-lg hover:bg-green-50 transition flex items-center justify-center">
           <i class="fa-solid fa-store mr-2"></i>Continue Shopping
         </button>
@@ -132,8 +138,50 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <div id="footer"></div>
+  <footer class="text-white py-12" style="background-color: #1B5E20;">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+      
+      <div>
+        <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
+        <p class="text-gray-300 text-sm">
+          Fresh, organic produce delivered straight to your home from local farmers.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="font-bold text-lg mb-3">Quick Links</h3>
+        <ul class="space-y-2 text-sm text-gray-300">
+          <li><a href="#" class="hover:underline">About Us</a></li>
+          <li><a href="#" class="hover:underline">Contact</a></li>
+          <li><a href="#" class="hover:underline">FAQ</a></li>
+          <li><a href="#" class="hover:underline">Support</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-bold text-lg mb-3">Categories</h3>
+        <ul class="space-y-2 text-sm text-gray-300">
+          <li><a href="#" class="hover:underline">Vegetables</a></li>
+          <li><a href="#" class="hover:underline">Fruits</a></li>
+          <li><a href="#" class="hover:underline">Dairy</a></li>
+          <li><a href="#" class="hover:underline">Meat</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-bold text-lg mb-3">Follow Us</h3>
+        <div class="flex space-x-4 text-xl">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
+      © 2025 Farmers Mall. All rights reserved.
+    </div>
+  </footer>
 
   <!-- Script to load footer -->
   <script>

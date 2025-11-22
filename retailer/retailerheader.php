@@ -37,55 +37,34 @@
 
 <body>
   <!-- SELLER HEADER -->
-  <header class="bg-white border-b shadow-sm">
-    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-
-      <!-- Left: Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
+ <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'"></div>
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
           <i class="fas fa-leaf text-white text-lg"></i>
         </div>
-        <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
+        <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
       </div>
 
-      <!-- Center: Search -->
-      <div class="flex-1 mx-8 max-w-xl">
-        <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
-          <input type="text" placeholder="Search..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
-        </div>
-        <form action="products.php" method="GET" class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          <input type="text" name="search" placeholder="Search products..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm" />
+      <div class="flex-1 mx-6">
+        <form action="products.php" method="GET">
+          <input 
+            type="text" 
+            name="search"
+            placeholder="Search for fresh product..."
+            class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+          />
         </form>
       </div>
 
-      <!-- Right: Icons & Profile -->
       <div class="flex items-center space-x-6">
-        <!-- Messages -->
-        <div class="relative cursor-pointer">
-          <i class="fa-regular fa-comment text-xl text-gray-600"></i>
-          <span
-            class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
-        </div>
-
-        <!-- Notifications -->
-        <div class="relative cursor-pointer">
-          <i class="fa-regular fa-bell text-xl text-gray-600"></i>
-          <span
-            class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
-        </div>
-
-        <!-- Profile -->
-        <div class="flex items-center space-x-2 cursor-pointer">
-          <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
-          <div class="profile-info">
-            <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
-            <p class="text-xs text-gray-500">Seller</p>
-          </div>
-        </div>
+        <a href="retailerdashboard.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+        <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="retailernotifications.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="retailerprofile.php">
+          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+        </a>
       </div>
     </div>
   </header>

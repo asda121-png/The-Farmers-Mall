@@ -13,39 +13,10 @@
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
   <!-- Header -->
-  <header class="bg-white border-b shadow-sm sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-      <!-- Left: Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
-        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-leaf text-white text-lg"></i>
-        </div>
-        <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
-      </div>
-
-      <!-- Center: Search -->
-      <div class="flex-1 mx-8 max-w-xl">
-        <form action="retailersearchresults.php" method="GET" class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          <input type="search" name="q" placeholder="Search orders, products, customers..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
-        </form>
-      </div>
-
-      <!-- Right: Icons & Profile -->
-      <div class="flex items-center space-x-6">
-        <a href="retailermessage.php" class="relative cursor-pointer">
-          <i class="fa-regular fa-comment text-xl text-gray-600"></i>
-        </a>
-        <a href="retailernotifications.php" class="relative cursor-pointer">
-          <i class="fa-regular fa-bell text-xl text-gray-600"></i>
-        </a>
-        <a href="retailerprofile.php" class="flex items-center space-x-2 cursor-pointer">
-          <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
-        </a>
-      </div>
-    </div>
-  </header>
+     <?php
+// Include the header
+include '../retailer/retailerheader.php';
+?>
 
   <!-- MAIN CONTENT -->
   <main class="flex-grow">

@@ -13,53 +13,11 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
-  <header class="bg-white border-b shadow-sm sticky top-0 z-50">
-  <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
-    <!-- Left: Logo -->
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
-      <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-        <i class="fas fa-leaf text-white text-lg"></i>
-      </div>
-      <h1 class="text-xl font-bold text-green-700">Farmers Mall</h1>
-    </div>
-
-    <!-- Center: Search -->
-    <div class="flex-1 mx-8 max-w-xl">
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
-        <input type="text" placeholder="Search..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
-      </div>
-    </div>
-
-    <!-- Right: Icons & Profile -->
-    <div class="flex items-center space-x-6">
-      
-      <!-- Messages -->
-      <a href="retailermessage.php" class="relative cursor-pointer">
-        <i class="fa-regular fa-comment text-xl text-gray-600"></i>
-        <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
-      </a>
-
-      <!-- Notifications -->
-      <a href="retailernotifications.php" class="relative cursor-pointer">
-        <i class="fa-regular fa-bell text-xl text-gray-600"></i>
-        <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
-      </a>
-
-      <!-- Profile -->
-      <a href="retailerprofile.php" class="flex items-center space-x-2 cursor-pointer">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
-        <div class="profile-info">
-          <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
-          <p class="text-xs text-gray-500">Seller</p>
-        </div>
-      </a>
-
-    </div>
-  </div>
-</header>
+<?php
+// Include the header
+include '../retailer/retailerheader.php';
+?>
 
   <!-- Dashboard Content -->
   <main class="max-w-6xl mx-auto px-6 py-6 space-y-6 flex-grow w-full mb-20">
