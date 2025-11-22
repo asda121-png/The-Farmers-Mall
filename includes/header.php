@@ -111,10 +111,11 @@
               $base = '../';
           }
         ?>
-        <li><a href="<?php echo $base; ?>public/index.php" class="hover:text-green-700">Home</a></li>
-        <li><a href="<?php echo $base; ?>public/about.php" class="hover:text-green-700">About</a></li>
-        <li><a href="<?php echo $base; ?>public/how.php" class="hover:text-green-700">How It Works</a></li>
-        <li><a href="<?php echo $base; ?>public/support.php" class="hover:text-green-700">Support</a></li>
+         <li><a href="<?php echo $base;?>public/index.php" class="hover:text-green-700">Home</a></li>
+      <li><a href="<?php echo $base;?>public/about.php" class="hover:text-green-700">About</a></li>
+      <li><a href="<?php echo $base;?>public/how.php" class="hover:text-green-700">How It Works</a></li>
+      <li><a href="<?php echo $base;?>public/support.php" class="hover:text-green-700">Support</a></li>
+
       </ul>
     </nav>
 
