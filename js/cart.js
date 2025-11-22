@@ -48,7 +48,7 @@
             <i class="fas fa-shopping-cart text-gray-300 text-6xl mb-4"></i>
             <p class="text-gray-500 text-xl mb-2">Your cart is empty</p>
             <p class="text-gray-400 mb-6">Add some products to get started!</p>
-            <a href="products.html" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-md">
+            <a href="products.php" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-md">
               <i class="fa-solid fa-shopping-bag mr-2"></i>
               Browse Products
             </a>
