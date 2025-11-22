@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="css/productdetails.css">
+  <link rel="stylesheet" href="../css/productdetails.css">
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -24,7 +24,7 @@
       </a>
 
       <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
+        <form action="products.php" method="GET">
           <input 
             type="text" 
             name="search"
@@ -52,7 +52,7 @@
     <div class="text-sm text-gray-500 mb-6 breadcrumb">
       <a href="user-homepage.html" class="hover:underline">Home</a>
       <span class="breadcrumb-gt">></span>
-      <a href="products.html" class="hover:underline">Vegetables</a>
+      <a href="products.php" class="hover:underline">Vegetables</a>
       <span class="breadcrumb-gt">></span>
       <span id="product-name-breadcrumb" class="font-semibold text-gray-700">Product Name</span>
     </div>
@@ -64,10 +64,10 @@
           <img id="main-image" src="" alt="Product Image" class="w-full h-auto rounded-lg shadow-md object-contain">
         </div>
         <div class="flex space-x-4 thumbnail-gallery">
-          <img src="images/products/Native tomato.jpg" alt="Tomato" class="w-24 h-24 rounded-lg cursor-pointer border-2 border-green-500 object-contain">
-          <img src="images/products/Organic Lettuce.png" alt="Lettuce" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
-          <img src="images/products/carrots.png" alt="Carrots" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
-          <img src="images/products/bell pepper mix.png" alt="Mixed Vegetables" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
+          <img src="../images/products/Native tomato.jpg" alt="Tomato" class="w-24 h-24 rounded-lg cursor-pointer border-2 border-green-500 object-contain">
+          <img src="../images/products/Organic Lettuce.png" alt="Lettuce" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
+          <img src="../images/products/carrots.png" alt="Carrots" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
+          <img src="../images/products/bell pepper mix.png" alt="Mixed Vegetables" class="w-24 h-24 rounded-lg cursor-pointer object-contain">
         </div>
       </div>
 
@@ -149,7 +149,7 @@
         <div class="product-card bg-white p-4 rounded-lg shadow-sm text-center cursor-pointer hover:shadow-xl transition-all" 
              data-name="Fresh Strawberries" data-price="89.99" data-img="images/products/strawberry.png" 
              data-description="Juicy and sweet fresh strawberries, hand-picked for maximum flavor and freshness.">
-          <img src="images/products/strawberry.png" alt="Fresh Strawberries" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="../images/products/strawberry.png" alt="Fresh Strawberries" class="w-full h-48 object-cover rounded-md mb-4">
           <h3 class="font-semibold text-lg">Fresh Strawberries</h3>
           <p class="text-green-600 font-bold mt-2">₱89.99</p>
         </div>
@@ -157,7 +157,7 @@
         <div class="product-card bg-white p-4 rounded-lg shadow-sm text-center cursor-pointer hover:shadow-xl transition-all" 
              data-name="Organic Broccoli" data-price="45.50" data-img="images/products/fresh brocoli.png" 
              data-description="Fresh organic broccoli, rich in vitamins and minerals, perfect for healthy meals.">
-          <img src="images/products/fresh brocoli.png" alt="Organic Broccoli" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="../images/products/fresh brocoli.png" alt="Organic Broccoli" class="w-full h-48 object-cover rounded-md mb-4">
           <h3 class="font-semibold text-lg">Organic Broccoli</h3>
           <p class="text-green-600 font-bold mt-2">₱45.50</p>
         </div>
@@ -165,7 +165,7 @@
         <div class="product-card bg-white p-4 rounded-lg shadow-sm text-center cursor-pointer hover:shadow-xl transition-all" 
              data-name="Free-Range Chicken" data-price="280.00" data-img="images/products/native chicken.jpg" 
              data-description="Premium free-range chicken, tender and flavorful, raised naturally without hormones.">
-          <img src="images/products/native chicken.jpg" alt="Free-Range Chicken" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="../images/products/native chicken.jpg" alt="Free-Range Chicken" class="w-full h-48 object-cover rounded-md mb-4">
           <h3 class="font-semibold text-lg">Free-Range Chicken</h3>
           <p class="text-green-600 font-bold mt-2">₱280.00</p>
         </div>
@@ -173,7 +173,7 @@
         <div class="product-card bg-white p-4 rounded-lg shadow-sm text-center cursor-pointer hover:shadow-xl transition-all" 
              data-name="Farm Fresh Milk" data-price="95.00" data-img="images/products/Fresh Milk.png" 
              data-description="Pure and fresh milk straight from local farms, rich in nutrients and perfect for daily consumption.">
-          <img src="images/products/Fresh Milk.png" alt="Farm Fresh Milk" class="w-full h-48 object-cover rounded-md mb-4">
+          <img src="../images/products/Fresh Milk.png" alt="Farm Fresh Milk" class="w-full h-48 object-cover rounded-md mb-4">
           <h3 class="font-semibold text-lg">Farm Fresh Milk</h3>
           <p class="text-green-600 font-bold mt-2">₱95.00</p>
         </div>
@@ -216,7 +216,7 @@
       rights reserved.</div>
   </footer>
 
-  <script src="js/productdetails.js"></script>
+  <script src="../js/productdetails.js"></script>
 
 </body>
 

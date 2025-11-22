@@ -290,7 +290,7 @@ include '../includes/header.php';
             <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Matiao</span>
             <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">Madang</span>
           </div>
-          <p class="mt-8 text-sm text-gray-500">Don't see your area? <a href="public/support.php" class="text-green-600 hover:underline font-medium">Contact us</a> to let us know where you are!</p>
+          <p class="mt-8 text-sm text-gray-500">Don't see your area? <a href="support.php" class="text-green-600 hover:underline font-medium">Contact us</a> to let us know where you are!</p>
         </div>
 
         <!-- Right Column: Google Map -->
