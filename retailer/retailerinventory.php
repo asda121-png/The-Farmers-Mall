@@ -12,7 +12,7 @@
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
     <!-- Left: Logo -->
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
       <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
         <i class="fas fa-leaf text-white text-lg"></i>
       </div>
@@ -38,13 +38,13 @@
       </a>
 
       <!-- Notifications -->
-      <a href="retailernotifications.html" class="relative cursor-pointer">
+      <a href="retailernotifications.php" class="relative cursor-pointer">
         <i class="fa-regular fa-bell text-xl text-gray-600"></i>
         <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
       </a>
 
       <!-- Profile -->
-      <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer">
+      <a href="retailerprofile.php" class="flex items-center space-x-2 cursor-pointer">
         <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
         <div class="profile-info">
           <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
@@ -62,7 +62,7 @@
     <div class="max-w-6xl mx-auto px-6 py-8 space-y-6 w-full">
       <!-- Back & Title -->
       <div class="flex items-center space-x-3">
-        <button onclick="window.location.href='retailerdashboard.html'" class="text-gray-600 hover:text-black">
+        <button onclick="window.location.href='retailerdashboard.php'" class="text-gray-600 hover:text-black">
           <i class="fa-solid fa-arrow-left text-lg"></i>
         </button>
         <h2 class="text-lg font-semibold">Inventory Status</h2>

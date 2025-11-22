@@ -32,7 +32,7 @@
       <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
 
       <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
+        <form action="products.php" method="GET">
           <input 
             type="text" 
             name="search"
@@ -43,10 +43,10 @@
       </div>
 
       <div class="flex items-center space-x-6">
-        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html">
+        <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="profile.php">
           <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
@@ -114,7 +114,7 @@
         <button class="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition flex items-center justify-center">
           <i class="fa-solid fa-box mr-2"></i>Track Order
         </button>
-        <button onclick="window.location.href='../public/homepage.html'"
+        <button onclick="window.location.href='../public/homepage.php'"
                 class="border border-green-700 text-green-700 px-6 py-2 rounded-lg hover:bg-green-50 transition flex items-center justify-center">
           <i class="fa-solid fa-store mr-2"></i>Continue Shopping
         </button>
@@ -137,7 +137,7 @@
 
   <!-- Script to load footer -->
   <script>
-    fetch('footer.html')
+    fetch('footer.php')
       .then(res => res.text())
       .then(data => document.getElementById('footer').innerHTML = data);
   </script>

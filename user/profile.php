@@ -13,7 +13,7 @@
   <header class="bg-white shadow-sm" id="header">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <!-- Logo -->
-      <a href="user-homepage.html" class="flex items-center gap-2 hover:opacity-80 transition">
+      <a href="user-homepage.php" class="flex items-center gap-2 hover:opacity-80 transition">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
           <i class="fas fa-leaf text-white text-lg"></i>
         </div>
@@ -22,7 +22,7 @@
 
       <!-- Search -->
       <div class="flex-1 mx-6">
-        <form id="searchForm" action="products.html" method="get">
+        <form id="searchForm" action="products.php" method="get">
           <input type="text" name="search" id="searchInput" placeholder="Search for fresh produce..."
                  class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none">
         </form>
@@ -30,11 +30,11 @@
 
       <!-- Icons -->
       <div class="flex items-center space-x-6">
-         <a href="user-homepage.html" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house"></i></a>
-        <a href="message.html" class="text-gray-600 hover:text-green-600 transition" title="Messages"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-gray-600 hover:text-green-600 transition" title="Notifications"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-gray-600 hover:text-green-600 transition" title="Cart"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html">
+         <a href="user-homepage.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house"></i></a>
+        <a href="message.php" class="text-gray-600 hover:text-green-600 transition" title="Messages"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.php" class="text-gray-600 hover:text-green-600 transition" title="Notifications"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.php" class="text-gray-600 hover:text-green-600 transition" title="Cart"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="profile.php">
           <!-- Active state shown with a ring -->
           <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600">
         </a>
@@ -868,7 +868,7 @@
           const searchTerm = searchInput.value.trim();
           if (searchTerm) {
             // Redirect to products page with search query
-            window.location.href = `products.html?search=${encodeURIComponent(searchTerm)}`;
+            window.location.href = `products.php?search=${encodeURIComponent(searchTerm)}`;
           }
           e.preventDefault();
         });

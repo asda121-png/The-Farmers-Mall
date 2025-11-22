@@ -16,7 +16,7 @@
   <!-- Header -->
    <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="user-homepage.html" class="flex items-center gap-2">
+      <a href="user-homepage.php" class="flex items-center gap-2">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
           <i class="fas fa-leaf text-white text-lg"></i>
         </div>
@@ -36,10 +36,10 @@
 
       <div class="flex items-center space-x-6">
         <a href="../public/homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html">
+        <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="profile.php">
           <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
@@ -50,7 +50,7 @@
   <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full">
     <!-- Breadcrumbs -->
     <div class="text-sm text-gray-500 mb-6 breadcrumb">
-      <a href="user-homepage.html" class="hover:underline">Home</a>
+      <a href="user-homepage.php" class="hover:underline">Home</a>
       <span class="breadcrumb-gt">></span>
       <a href="products.php" class="hover:underline">Vegetables</a>
       <span class="breadcrumb-gt">></span>

@@ -41,7 +41,7 @@
     <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
       <!-- Left: Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
           <i class="fas fa-leaf text-white text-lg"></i>
         </div>
@@ -55,7 +55,7 @@
           <input type="text" placeholder="Search..."
             class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
         </div>
-        <form action="products.html" method="GET" class="relative">
+        <form action="products.php" method="GET" class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           <input type="text" name="search" placeholder="Search products..."
             class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm" />

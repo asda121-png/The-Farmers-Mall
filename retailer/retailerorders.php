@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pending Orders – Farmers Mall</title>
+  <title>Seller Orders – The Farmer’s Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <header class="bg-white border-b shadow-sm sticky top-0 z-50">
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
     <!-- Left: Logo -->
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
       <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
         <i class="fas fa-leaf text-white text-lg"></i>
       </div>
@@ -37,13 +37,13 @@
       </a>
 
       <!-- Notifications -->
-      <a href="retailernotifications.html" class="relative cursor-pointer">
+      <a href="retailernotifications.php" class="relative cursor-pointer">
         <i class="fa-regular fa-bell text-xl text-gray-600"></i>
         <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
       </a>
 
       <!-- Profile -->
-      <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer">
+      <a href="retailerprofile.php" class="flex items-center space-x-2 cursor-pointer">
         <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Seller Profile">
         <div class="profile-info">
           <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
@@ -60,10 +60,10 @@
     <div class="max-w-6xl mx-auto px-6 py-8 mb-96">
       <!-- Back & Title -->
       <div class="flex items-center space-x-3 mb-6">
-        <button onclick="window.location.href='retailerdashboard.html'" class="text-gray-600 hover:text-black">
+        <button onclick="window.location.href='retailerdashboard.php'" class="text-gray-600 hover:text-black">
           <i class="fa-solid fa-arrow-left text-lg"></i>
         </button>
-        <h2 class="text-lg font-semibold">Pending Orders</h2>
+        <h2 class="text-lg font-semibold">All Orders</h2>
       </div>
 
       <!-- Controls -->
@@ -249,7 +249,7 @@
           tr.onclick = () => {
             // Save the selected order to localStorage and navigate
             localStorage.setItem('selectedSellerOrder', JSON.stringify(order));
-            window.location.href = `retailerorderdetails.html?orderId=${order.id}`;
+            window.location.href = `retailerorderdetails.php?orderId=${order.id}`;
           };
 
           let statusClass = 'bg-gray-100 text-gray-700';
@@ -405,7 +405,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       // --- Real-time Badge Update ---
       const count = localStorage.getItem('unreadNotifications');
-      const badge = document.querySelector('a[href="retailernotifications.html"] .absolute');
+      const badge = document.querySelector('a[href="retailernotifications.php"] .absolute');
       if (badge) {
         if (count && parseInt(count) > 0) {
           badge.textContent = count;

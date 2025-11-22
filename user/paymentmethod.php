@@ -26,7 +26,7 @@
       <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
 
       <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
+        <form action="products.php" method="GET">
           <input 
             type="text" 
             name="search"
@@ -38,10 +38,10 @@
 
       <div class="flex items-center space-x-6">
         <a href="../public/homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html">
+        <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="profile.php">
           <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>

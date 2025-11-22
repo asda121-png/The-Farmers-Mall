@@ -171,10 +171,10 @@
     <div class="logo">Farmers Mall</div>
     <nav>
       <a href="../public/homepage.php">Home</a>
-      <a href="message.html">Messages</a>
+      <a href="message.php">Messages</a>
       <a href="products.php">Products</a>
-      <a href="notification.html">Notifications</a>
-      <a href="account.html" class="active">Account</a>
+      <a href="notification.php">Notifications</a>
+      <a href="account.php" class="active">Account</a>
     </nav>
   </header>
 

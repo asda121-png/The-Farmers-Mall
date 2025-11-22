@@ -15,7 +15,7 @@
   <header class="bg-white border-b shadow-sm sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
       <!-- Left: Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
           <i class="fas fa-leaf text-white text-lg"></i>
         </div>
@@ -24,7 +24,7 @@
 
       <!-- Center: Search -->
       <div class="flex-1 mx-8 max-w-xl">
-        <form action="retailersearchresults.html" method="GET" class="relative">
+        <form action="retailersearchresults.php" method="GET" class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           <input type="search" name="q" placeholder="Search orders, products, customers..."
             class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
@@ -58,7 +58,7 @@
       <!-- Title & Actions -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-3">
-          <button onclick="window.location.href='retailerdashboard.html'" class="text-gray-600 hover:text-black">
+          <button onclick="window.location.href='retailerdashboard.php'" class="text-gray-600 hover:text-black">
             <i class="fa-solid fa-arrow-left text-lg"></i>
           </button>
           <h2 class="text-lg font-semibold">Notifications</h2>
@@ -69,7 +69,7 @@
       <!-- Notifications List -->
       <div id="notificationList" class="bg-white rounded-lg shadow-sm divide-y">
         <!-- Unread Notification - New Order -->
-        <a href="retailerorderdetails.html?orderId=FM-1025" class="block p-5 flex items-start gap-4 hover:bg-green-200 bg-green-100 border-l-4 border-green-500">
+        <a href="retailerorderdetails.php?orderId=FM-1025" class="block p-5 flex items-start gap-4 hover:bg-green-200 bg-green-100 border-l-4 border-green-500">
             <div class="bg-green-100 text-green-600 p-3 rounded-full"><i class="fa-solid fa-box"></i></div>
             <div class="flex-1">
                 <p class="font-medium">New Order Received</p>
@@ -80,7 +80,7 @@
         </a>
 
         <!-- Unread Notification - Low Stock -->
-        <a href="retailerinventory.html" class="block p-5 flex items-start gap-4 hover:bg-green-200 bg-green-50 border-l-4 border-green-500">
+        <a href="retailerinventory.php" class="block p-5 flex items-start gap-4 hover:bg-green-200 bg-green-50 border-l-4 border-green-500">
             <div class="bg-orange-100 text-orange-600 p-3 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="flex-1">
                 <p class="font-medium">Low Stock Warning</p>
@@ -91,7 +91,7 @@
         </a>
 
         <!-- Read Notification - New Review -->
-        <a href="retailerproducts.html" class="block p-5 flex items-start gap-4 hover:bg-green-200">
+        <a href="retailerproducts.php" class="block p-5 flex items-start gap-4 hover:bg-green-200">
             <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i class="fa-solid fa-star"></i></div>
             <div class="flex-1">
                 <p class="font-medium">New 5-Star Review</p>
@@ -145,7 +145,7 @@
         localStorage.setItem('unreadNotifications', count);
 
         // Update badge on all pages that might be open
-        const badges = document.querySelectorAll('a[href="retailernotifications.html"] .absolute');
+        const badges = document.querySelectorAll('a[href="retailernotifications.php"] .absolute');
         badges.forEach(badge => {
           if (count > 0) {
             badge.textContent = count;

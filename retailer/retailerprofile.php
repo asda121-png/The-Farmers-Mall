@@ -15,7 +15,7 @@
   <header class="bg-white border-b shadow-sm sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
       <!-- Left: Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
           <i class="fas fa-leaf text-white text-lg"></i>
         </div>
@@ -24,7 +24,7 @@
 
       <!-- Center: Search -->
       <div class="flex-1 mx-8 max-w-xl">
-        <form action="retailersearchresults.html" method="GET" class="relative">
+        <form action="retailersearchresults.php" method="GET" class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           <input type="search" name="q" placeholder="Search orders, products, customers..."
             class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 text-sm">
@@ -33,15 +33,15 @@
 
       <!-- Right: Icons & Profile -->
       <div class="flex items-center space-x-6">
-        <a href="retailermessage.html" class="relative cursor-pointer">
+        <a href="retailermessage.php" class="relative cursor-pointer">
           <i class="fa-regular fa-comment text-xl text-gray-600"></i>
           <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">3</span>
         </a>
-        <a href="retailernotifications.html" class="relative cursor-pointer">
+        <a href="retailernotifications.php" class="relative cursor-pointer">
           <i class="fa-regular fa-bell text-xl text-gray-600"></i>
           <span class="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-semibold rounded-full px-1.5">5</span>
         </a>
-        <a href="retailerprofile.html" class="flex items-center space-x-2 cursor-pointer">
+        <a href="retailerprofile.php" class="flex items-center space-x-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full ring-2 ring-green-600" alt="Seller Profile">
           <div class="profile-info">
             <p class="text-sm font-medium text-gray-800">Mesa Farm</p>
@@ -58,7 +58,7 @@
       <!-- Title -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-3">
-        <button onclick="window.location.href='retailerdashboard.html'" class="text-gray-600 hover:text-black">
+        <button onclick="window.location.href='retailerdashboard.php'" class="text-gray-600 hover:text-black">
           <i class="fa-solid fa-arrow-left text-lg"></i>
         </button>
         <h2 class="text-lg font-semibold">My Account</h2>

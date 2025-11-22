@@ -84,7 +84,7 @@ $admin_email = "admin@farmersmall.com";
           <i class="fa-solid fa-truck-ramp-box w-5"></i>
           <span>Inventory</span>
         </a>
-        <a href="admin-retailers.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-retailers.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-store w-5"></i>
           <span>Retailers</span>
         </a>
@@ -93,7 +93,7 @@ $admin_email = "admin@farmersmall.com";
           <span>Review</span>
           <span class="ml-auto text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium">02</span>
         </a>
-        <a href="admin-orders.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
@@ -102,15 +102,15 @@ $admin_email = "admin@farmersmall.com";
       <!-- Navigation: ACCOUNT -->
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
       <nav class="space-y-1">
-        <a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-cog w-5"></i>
           <span>Settings</span>
         </a>
-        <a href="admin-help.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-help.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-circle-info w-5"></i>
           <span>Help</span>
         </a>
-        <a href="admin-manage-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
         </a>

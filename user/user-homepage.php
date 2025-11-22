@@ -306,7 +306,7 @@
       </div>
 
       <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
+        <form action="products.php" method="GET">
           <input 
             type="text" 
             name="search"
@@ -317,10 +317,10 @@
       </div>
 
       <div class="flex items-center space-x-6">
-        <a href="message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="profile.html">
+        <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="profile.php">
           <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
@@ -347,7 +347,7 @@
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
           <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Farm Fresh Daily</h2>
           <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
-          <a href="../user/products.html" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+          <a href="../user/products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
           </a>
         </div>
@@ -380,27 +380,27 @@
       <h2 class="section-heading text-2xl font-bold">Shop by Category</h2>
     </div>
     <div class="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto px-6">
-      <a href="products.html?category=vegetables" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.php?category=vegetables" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-carrot text-green-600 text-2xl"></i>
         <p class="text-gray-700 mt-2 text-xs category-text">Vegetables</p>
       </a>
-      <a href="products.html?category=fruits" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.php?category=fruits" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-apple-whole text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Fruits</p>
       </a>
-      <a href="products.html?category=meat" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.php?category=meat" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-drumstick-bite text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Meat</p>
       </a>
-      <a href="products.html?category=seafood" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.php?category=seafood" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-fish text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Seafood</p>
       </a>
-      <a href="products.html?category=dairy" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.php?category=dairy" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-cheese text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Dairy</p>
       </a>
-      <a href="products.html?category=bakery" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+      <a href="products.php?category=bakery" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
         <i class="fa-solid fa-bread-slice text-green-600 text-2xl"></i>
         <p class="mt-2 text-xs category-text">Bakery</p>
       </a>
@@ -410,7 +410,7 @@
   <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold">Top Products</h2>
-      <a href="products.html" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
+      <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -474,7 +474,7 @@
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold">Other Products</h2>
-      <a href="products.html" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
+      <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -750,7 +750,7 @@
           const name = link.dataset.name;
           const price = link.dataset.price;
           const img = link.dataset.img;
-          window.location.href = `productdetails.html?name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}`;
+          window.location.href = `productdetails.php?name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}`;
         });
       });
 

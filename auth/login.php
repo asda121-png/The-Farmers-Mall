@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         
         $login_status = 'success';
         $login_message = 'Login successful! Redirecting to homepage...';
-        $redirect_url = '../user/user-homepage.html';
+        $redirect_url = '../user/user-homepage.php';
     }
 }
 // PHP SCRIPT END
@@ -268,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         if (status === 'success') {
             // Immediately redirect to the loading page upon successful login
             if (redirectUrl) {
-                window.location.href = `../public/loading.html?redirect_to=${encodeURIComponent(redirectUrl)}`;
+                window.location.href = `../public/loading.php?redirect_to=${encodeURIComponent(redirectUrl)}`;
             }
         } else if (status === 'error') {
             showToast(message, 'error');

@@ -257,7 +257,7 @@ include '../includes/header.php';
 
     <!-- NEW "Start Selling" Button -->
     <div class="mt-12">
-      <a href="../retailer/startselling.html" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <a href="../retailer/startselling.php" class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         Start Selling
       </a>
     </div>
@@ -321,7 +321,7 @@ include '../includes/header.php';
   </section>
 
   <?php
-    include '../includes/footer.html';
+    include '../includes/footer.php';
   ?>
 
 </body>

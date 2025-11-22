@@ -12,7 +12,7 @@
   <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <h1 class="text-xl font-bold text-green-700">Admin Profile</h1>
-      <a href="admin-dashboard.html" class="text-sm text-green-600 hover:underline">← Back</a>
+      <a href="admin-dashboard.php" class="text-sm text-green-600 hover:underline">← Back</a>
     </div>
   </header>
 

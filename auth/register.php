@@ -578,7 +578,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         .then(data => {
           if (data.status === 'success') {
             showToast(data.message, 'success');
-            setTimeout(() => window.location.href = "login.html", 2500);
+            setTimeout(() => window.location.href = "login.php", 2500);
           } else {
             showToast(data.message || "An unknown error occurred.", 'error');
           }

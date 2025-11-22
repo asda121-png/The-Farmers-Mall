@@ -22,27 +22,27 @@
         <p class="text-sm text-green-200">Admin Panel</p>
       </div>
       <nav class="space-y-2">
-        <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-dashboard.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
           <i class="fa-solid fa-tachometer-alt w-5"></i>
           <span>Dashboard</span>
         </a>
-        <a href="admin-users.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-users.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
           <i class="fa-solid fa-users w-5"></i>
           <span>Users</span>
         </a>
-        <a href="admin-retailers.html" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-green-700">
+        <a href="admin-retailers.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-green-700">
           <i class="fa-solid fa-store w-5"></i>
           <span>Retailers</span>
         </a>
-        <a href="admin-products.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-products.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
           <i class="fa-solid fa-box w-5"></i>
           <span>Products</span>
         </a>
-        <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-orders.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
-        <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
           <i class="fa-solid fa-cog w-5"></i>
           <span>Settings</span>
         </a>
@@ -62,7 +62,7 @@
     <header class="bg-white shadow-sm p-4 flex justify-between items-center">
       <h2 class="text-xl font-semibold">Manage Retailers</h2>
       <div class="flex items-center gap-4">
-        <a href="admin-notification.html">
+        <a href="admin-notification.php">
           <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer"></i>
         </a>
         <div class="flex items-center gap-2 cursor-pointer">
@@ -136,7 +136,7 @@
       <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
       <div class="flex justify-center gap-4">
         <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
-        <a href="login.html" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+        <a href="login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
       </div>
     </div>
   </div>

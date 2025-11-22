@@ -52,7 +52,7 @@
       </div>
 
       <div class="flex-1 mx-6">
-        <form action="products.html" method="GET">
+        <form action="products.php" method="GET">
           <input 
             type="text" 
             name="search"
@@ -63,11 +63,11 @@
       </div>
 
       <div class="flex items-center space-x-6">
-         <a href="../user/user-homepage.html" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-        <a href="../user/message.html" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="../user/notification.html" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="../user/cart.html" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="../user/profile.html">
+         <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+        <a href="../user/message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+        <a href="../user/notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+        <a href="../user/cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="../user/profile.php">
           <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
       </div>
@@ -83,7 +83,7 @@
         <h2 class="text-xl md:text-2xl font-semibold">Your Shopping Cart (<span id="cartCount">0</span>)</h2>
       </div>
       <div class="flex items-center gap-2 md:gap-4 flex-wrap">
-        <a href="products.html" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2">
+        <a href="products.php" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2">
           <i class="fa-solid fa-plus"></i>
           <span class="hidden sm:inline">Continue Shopping</span>
         </a>
@@ -125,7 +125,7 @@
           <span id="total" class="text-green-600">₱0.00</span>
         </div>
 
-        <a href="paymentmethod.html" id="checkoutBtn"
+        <a href="paymentmethod.php" id="checkoutBtn"
            class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg">
           <i class="fa-solid fa-lock mr-2"></i>
           Proceed to Checkout
@@ -264,8 +264,8 @@
   <!-- JavaScript -->
   <script src="../js/cart.js"></script>
   <script>
-    // Dynamically load footer.html
-    fetch('footer.html')
+    // Dynamically load footer.php
+    fetch('footer.php')
       .then(res => res.text())
       .then(data => document.getElementById('footer').innerHTML = data);
 

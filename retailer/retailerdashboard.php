@@ -17,7 +17,7 @@
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
     <!-- Left: Logo -->
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.html'">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'">
       <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
         <i class="fas fa-leaf text-white text-lg"></i>
       </div>
@@ -71,7 +71,7 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-  <a href="retailerrevenue.html" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
+  <a href="retailerrevenue.php" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
     <div class="text-green-600 text-2xl"><i class="fa-solid fa-peso-sign"></i></div>
     <div>
       <p class="text-gray-500 text-sm">Revenue</p>
@@ -79,7 +79,7 @@
     </div>
   </a>
 
-  <a href="retailerorders.html" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
+  <a href="retailerorders.php" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
     <div class="text-green-600 text-2xl"><i class="fa-solid fa-cart-shopping"></i></div>
     <div>
       <p class="text-gray-500 text-sm">Orders</p>
@@ -87,7 +87,7 @@
     </div>
   </a>
 
-  <a href="retailercustomer.html" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
+  <a href="retailercustomer.php" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
     <div class="text-green-600 text-2xl"><i class="fa-solid fa-users"></i></div>
     <div>
       <p class="text-gray-500 text-sm">Customers</p>
@@ -95,7 +95,7 @@
     </div>
   </a>
 
-  <a href="retailerpending.html" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
+  <a href="retailerpending.php" class="block bg-white shadow-sm rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition-shadow">
     <div class="text-orange-500 text-2xl"><i class="fa-solid fa-clock"></i></div>
     <div>
       <p class="text-gray-500 text-sm">Pending</p>
@@ -112,7 +112,7 @@
         <div class="bg-white shadow-sm rounded-lg p-5">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-lg">Recent Orders</h3>
-            <a href="retailerorders.html" class="text-green-600 text-sm font-medium">View All</a>
+            <a href="retailerorders.php" class="text-green-600 text-sm font-medium">View All</a>
           </div>
 
           <div id="recentOrdersContainer" class="space-y-3"></div>
@@ -131,7 +131,7 @@
         <div class="bg-white shadow-sm rounded-lg p-5">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-lg">Inventory Status</h3>
-            <a href="retailerinventory.html" class="text-green-600 text-sm font-medium">Manage</a>
+            <a href="retailerinventory.php" class="text-green-600 text-sm font-medium">Manage</a>
           </div>
 
           <div class="space-y-4">
@@ -177,7 +177,7 @@
         <div class="bg-white shadow-sm rounded-lg p-5">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-lg">Top Products</h3>
-            <a href="retailerproducts.html" class="text-green-600 text-sm font-medium">View All</a>
+            <a href="retailerproducts.php" class="text-green-600 text-sm font-medium">View All</a>
           </div>
 
           <div class="space-y-4">
@@ -408,7 +408,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       // --- Real-time Badge Update ---
       const count = localStorage.getItem('unreadNotifications');
-      const badge = document.querySelector('a[href="retailernotifications.html"] .absolute');
+      const badge = document.querySelector('a[href="retailernotifications.php"] .absolute');
       if (badge) {
         if (count && parseInt(count) > 0) {
           badge.textContent = count;

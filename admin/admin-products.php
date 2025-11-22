@@ -102,7 +102,7 @@ if ($conn->connect_error) {
           <i class="fa-solid fa-users w-5"></i>
           <span>Users</span>
         </a>
-        <a href="admin-retailers.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        <a href="admin-retailers.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
           <i class="fa-solid fa-store w-5"></i>
           <span>Retailers</span>
         </a>
@@ -110,11 +110,11 @@ if ($conn->connect_error) {
           <i class="fa-solid fa-box w-5"></i>
           <span>Products</span>
         </a>
-        <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        <a href="admin-orders.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
-        <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        <a href="admin-settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
           <i class="fa-solid fa-cog w-5"></i>
           <span>Settings</span>
         </a>
@@ -134,7 +134,7 @@ if ($conn->connect_error) {
     <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-10">
       <h2 class="text-2xl font-bold text-green-800">Manage Products</h2>
       <div class="flex items-center gap-4">
-        <a href="admin-notification.html" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <a href="admin-notification.php" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
           <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer"></i>
         </a>
         <div class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
