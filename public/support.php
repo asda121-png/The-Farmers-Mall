@@ -356,7 +356,6 @@
     </script>
 
 </body>
-=======
 <!DOCTYPE html>
 <html lang="en">
 <head>

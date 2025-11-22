@@ -321,7 +321,7 @@ include '../includes/header.php';
   </section>
 
   <?php
-    include 'includes/footer.html';
+    include '../includes/footer.html';
   ?>
 
 </body>
