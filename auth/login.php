@@ -266,13 +266,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         resetErrors(); // Hide any initial errors
 
         if (status === 'success') {
-            showToast(message, 'success');
-
-            // Redirect to the loading page with the final destination as a parameter
+            // Immediately redirect to the loading page upon successful login
             if (redirectUrl) {
-                setTimeout(() => {
-                    window.location.href = `../public/loading.html?redirect_to=${encodeURIComponent(redirectUrl)}`;
-                }, 1000); // Reduced delay for a quicker transition
+                window.location.href = `../public/loading.html?redirect_to=${encodeURIComponent(redirectUrl)}`;
             }
         } else if (status === 'error') {
             showToast(message, 'error');
