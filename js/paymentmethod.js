@@ -87,6 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('cart');
 
     // Redirect to success page
-    window.location.href = 'ordersuccessfull.html';
+    window.location.href = 'ordersuccessfull.php';
   });
 });

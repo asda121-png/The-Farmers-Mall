@@ -37,7 +37,7 @@
       </div>
 
       <div class="flex items-center space-x-6">
-        <a href="../public/homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+        <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
