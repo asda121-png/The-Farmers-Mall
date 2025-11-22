@@ -14,37 +14,59 @@
   <!-- Sidebar -->
   <aside class="bg-green-800 text-white w-64 min-h-screen p-4 flex flex-col justify-between">
     <div>
-      <div class="text-center mb-10">
-        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
-          <i class="fas fa-leaf text-green-600 text-2xl"></i>
+      <!-- Logo and Title -->
+      <div class="flex items-center gap-3 mb-8 px-2 py-2">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
+          <i class="fas fa-leaf text-green-700 text-lg"></i>
         </div>
-        <h1 class="text-2xl font-bold">Farmers Mall</h1>
-        <p class="text-sm text-green-200">Admin Panel</p>
+        <h1 class="text-xl font-bold">Farmers Mall</h1>
       </div>
-      <nav class="space-y-2">
-        <a href="admin-dashboard.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
-          <i class="fa-solid fa-tachometer-alt w-5"></i>
+
+      <!-- Navigation: GENERAL -->
+      <p class="text-xs font-semibold text-green-300 uppercase tracking-widest mb-2 px-2">GENERAL</p>
+      <nav class="space-y-1">
+        <!-- Active Link: Dashboard -->
+        <a href="admin-dashboard.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
+          <i class="fa-solid fa-tachometer-alt w-5 text-green-200"></i>
           <span>Dashboard</span>
         </a>
-        <a href="admin-users.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
-          <i class="fa-solid fa-users w-5"></i>
-          <span>Users</span>
-        </a>
-        <a href="admin-retailers.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
-          <i class="fa-solid fa-store w-5"></i>
-          <span>Retailers</span>
-        </a>
-        <a href="admin-products.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-product.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-box w-5"></i>
           <span>Products</span>
         </a>
-        <a href="admin-orders.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+        <a href="admin-inventory.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
+          <i class="fa-solid fa-truck-ramp-box w-5 text-green-200"></i>
+          <span>Inventory</span>
+        </a>
+        <a href="admin-retailers.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-store w-5"></i>
+          <span>Retailers</span>
+        </a>
+        <a href="admin-reviews.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-star w-5"></i>
+          <span>Review</span>
+          <span class="ml-auto text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium">02</span>
+        </a>
+        <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
-        <a href="admin-settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-green-700">
+      </nav>
+
+      <!-- Navigation: ACCOUNT -->
+      <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
+      <nav class="space-y-1">
+        <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-cog w-5"></i>
           <span>Settings</span>
+        </a>
+        <a href="admin-help.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-circle-info w-5"></i>
+          <span>Help</span>
+        </a>
+        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-user-gear w-5"></i>
+          <span>Manage Users</span>
         </a>
       </nav>
     </div>
