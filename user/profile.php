@@ -33,7 +33,10 @@
          <a href="user-homepage.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house"></i></a>
         <a href="message.php" class="text-gray-600 hover:text-green-600 transition" title="Messages"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.php" class="text-gray-600 hover:text-green-600 transition" title="Notifications"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.php" class="text-gray-600 hover:text-green-600 transition" title="Cart"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="cart.php" class="text-gray-600 hover:text-green-600 transition relative" title="Cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </a>
         <a href="profile.php">
           <!-- Active state shown with a ring -->
           <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600">
@@ -881,6 +884,31 @@
           }
         });
       }
+
+      // --- Cart Badge Functionality ---
+      function updateCartIcon() {
+        const cartBadge = document.getElementById('cartBadge');
+        if (!cartBadge) return;
+
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+        cartBadge.textContent = totalItems;
+        cartBadge.classList.toggle('hidden', totalItems === 0);
+      }
+
+      // Update cart icon on load
+      updateCartIcon();
+
+      // Listen for cart updates from other pages/tabs
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'cart') {
+          updateCartIcon();
+        }
+      });
+
+      // Listen for cart updates within the same page
+      window.addEventListener('cartUpdated', updateCartIcon);
     });
   </script>
 </body>

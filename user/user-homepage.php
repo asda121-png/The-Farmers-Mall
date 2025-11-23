@@ -319,7 +319,9 @@
       <div class="flex items-center space-x-6">
         <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="cart.php" class="text-gray-600 relative"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="cart.php" class="text-gray-600 relative"><i class="fa-solid fa-cart-shopping"></i>
+          <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </a>
         <a href="profile.php">
           <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
         </a>
@@ -806,19 +808,11 @@
       // Update cart icon with item count
       function updateCartIcon() {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const cartIcon = document.querySelector('a[href="cart.php"]');
-        if (!cartIcon) return;
-        // Create or update a badge for the count
-        let badge = cartIcon.querySelector('.cart-badge');
-        if (!badge) {
-          badge = document.createElement('span');
-          badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5';
-          cartIcon.classList.add('relative');
-          cartIcon.appendChild(badge);
-        }
+        const badge = document.getElementById('cartBadge');
+        if (!badge) return;
         const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
         badge.textContent = totalItems;
-        badge.style.display = totalItems > 0 ? 'block' : 'none';
+        badge.classList.toggle('hidden', totalItems === 0);
       }
 
       document.querySelectorAll('.add-btn').forEach(button => {
