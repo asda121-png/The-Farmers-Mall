@@ -446,19 +446,5 @@
       }
     });
   </script>
-</body>
-</html>
-        currentStep++;
-        showStep(currentStep);
-      }
-    }
 
-    function prevStep() {
-      if (currentStep > 1) {
-        currentStep--;
-        showStep(currentStep);
-      }
-    }
-  </script>
-</body>
 </html>
