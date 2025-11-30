@@ -12,7 +12,7 @@
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
   <!-- Header -->
-  <?php include '../retailer/retailerheader.php'; ?>
+  <?php include 'retailerheader.php'; ?>
 
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-6 py-10 flex gap-8 flex-grow mb-40">

@@ -1,235 +1,219 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // --- Real-time Badge Update ---
-  const updateNotificationBadgeOnLoad = () => {
-    const count = localStorage.getItem('unreadNotifications');
-    const badge = document.querySelector('a[href="retailernotifications.php"] .absolute');
-    if (badge) {
-      if (count && parseInt(count) > 0) {
-        badge.textContent = count;
-        badge.style.display = 'inline-flex';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
-  };
-
-  // Call it on page load
-  updateNotificationBadgeOnLoad();
-
-  // --- Load Profile Data from localStorage ---
-  const loadProfileData = () => {
-    const sellerProfile = JSON.parse(localStorage.getItem('sellerProfile'));
-    if (sellerProfile) {
-      // Populate inputs for edit mode
-      document.getElementById('firstName').value = sellerProfile.firstName || '';
-      document.getElementById('lastName').value = sellerProfile.lastName || '';
-      document.getElementById('mobileNumber').value = sellerProfile.mobile || '';
-      document.getElementById('email').value = sellerProfile.email || '';
-      document.getElementById('shopAddress').value = sellerProfile.shopAddress || 'Not provided';
-      document.getElementById('shopName').value = sellerProfile.shopName || 'Not provided';
-
-      // --- NEW: Populate sidebar info ---
-      document.getElementById('sidebarShopName').textContent = sellerProfile.shopName || 'Shop Name';
-      document.getElementById('sidebarEmail').textContent = sellerProfile.email || 'email@example.com';
-
-      // Populate display fields for view mode
-      document.getElementById('displayFirstName').textContent = sellerProfile.firstName || 'Not provided';
-      document.getElementById('displayLastName').textContent = sellerProfile.lastName || 'Not provided';
-      document.getElementById('displayMobileNumber').textContent = sellerProfile.mobile || 'Not provided';
-      document.getElementById('displayEmail').textContent = sellerProfile.email || 'Not provided';
-
-      // --- Business Permit Logic ---
-      const seePermitBtn = document.getElementById('seePermitBtn');
-      const permitModal = document.getElementById('permitModal');
-      const closePermitModal = document.getElementById('closePermitModal');
-      const permitImageContainer = document.getElementById('permitImageContainer');
-
-      if (sellerProfile.permitImage) {
-        seePermitBtn.disabled = false;
-        permitImageContainer.innerHTML = `<img src="https://filipinobusinesshub.com/wp-content/uploads/2025/08/Barangay-Business-Permit-Template-and-Sample-4-1-1086x1536.webp" alt="Business Permit" class="w-full max-w-lg h-auto rounded-lg shadow-md border">`;
-
-        seePermitBtn.addEventListener('click', () => {
-          if (!seePermitBtn.disabled) {
-            permitModal.classList.remove('hidden');
-          }
-        });
-      } else {
-        seePermitBtn.disabled = true;
-      }
-
-      // Listeners to close the permit modal
-      if (permitModal && closePermitModal) {
-        closePermitModal.addEventListener('click', () => {
-          permitModal.classList.add('hidden');
-        });
-        permitModal.addEventListener('click', (e) => {
-          if (e.target === permitModal) { // Click on overlay
-            permitModal.classList.add('hidden');
-          }
-        });
-      }
-    }
-  };
-
-  // Load data when the page loads
-  loadProfileData();
-
-
-  // --- All button and form logic must be inside the DOMContentLoaded event listener ---
-  
-  // --- Profile Edit Mode Logic ---
+document.addEventListener('DOMContentLoaded', function () {
+  // Profile Edit Elements
   const editProfileBtn = document.getElementById('editProfileBtn');
   const saveChangesBtn = document.getElementById('saveChangesBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const firstNameInput = document.getElementById('firstName');
-  const lastNameInput = document.getElementById('lastName');
-  const mobileNumberInput = document.getElementById('mobileNumber');
-  const emailInput = document.getElementById('email');
-  const shopNameInput = document.getElementById('shopName');
-  const shopAddressInput = document.getElementById('shopAddress');
-  const changePictureBtn = document.getElementById('changePictureBtn');
+  const infoBlocks = document.querySelectorAll('.info-block');
+  const formInputs = document.querySelectorAll('#my-profile form input:not([type="file"])');
   const imageUpload = document.getElementById('imageUpload');
+  const changePictureBtn = document.getElementById('changePictureBtn');
 
-  const toggleEditMode = (isEditing) => {
-    // Toggle personal info inputs
-    firstNameInput.disabled = !isEditing;
-    lastNameInput.disabled = !isEditing;
-    mobileNumberInput.disabled = !isEditing;
-    emailInput.disabled = !isEditing;
+  // Profile Data Elements
+  const profileImage = document.getElementById('profileImage');
+  const sidebarProfilePic = document.getElementById('sidebarProfilePic');
+  const shopNameInput = document.getElementById('shopName');
+  const sidebarShopName = document.getElementById('sidebarShopName');
+  const emailInput = document.getElementById('email');
+  const sidebarEmail = document.getElementById('sidebarEmail');
 
-    // Toggle shop info inputs
-    shopNameInput.disabled = !isEditing;
-    shopAddressInput.disabled = !isEditing;
-    changePictureBtn.disabled = !isEditing;
-    imageUpload.disabled = !isEditing; // Disable the hidden file input as well
+  // Logout Modal Elements
+  const logoutBtn = document.getElementById('logoutBtn');
+  const logoutModal = document.getElementById('logoutModal');
+  const cancelLogout = document.getElementById('cancelLogout');
+  const confirmLogout = document.getElementById('confirmLogout');
 
-    // Toggle between display and edit views for info blocks
-    document.querySelectorAll('.info-block').forEach(block => {
-      const displayView = block.querySelector('.display-view');
-      const editView = block.querySelector('.edit-view');
-      displayView.classList.toggle('hidden', isEditing);
-      editView.classList.toggle('hidden', !isEditing);
+  // Save Changes Modal Elements
+  const saveChangesModal = document.getElementById('saveChangesModal');
+  const cancelSaveChanges = document.getElementById('cancelSaveChanges');
+  const confirmSaveChanges = document.getElementById('confirmSaveChanges');
+
+  // Business Permit Modal Elements
+  const seePermitBtn = document.getElementById('seePermitBtn');
+  const permitModal = document.getElementById('permitModal');
+  const closePermitModal = document.getElementById('closePermitModal');
+  const permitImageContainer = document.getElementById('permitImageContainer');
+
+  let isEditMode = false;
+
+  // --- Main Profile Edit Logic ---
+
+  const toggleEditMode = (enable) => {
+    isEditMode = enable;
+
+    // Toggle visibility of display vs. edit views
+    infoBlocks.forEach(block => {
+      block.querySelector('.display-view').classList.toggle('hidden', enable);
+      block.querySelector('.edit-view').classList.toggle('hidden', !enable);
     });
 
-    if (isEditing) {
-      editProfileBtn.classList.add('hidden');
-      saveChangesBtn.classList.remove('hidden');
+    // Enable/disable form inputs
+    formInputs.forEach(input => {
+      input.disabled = !enable;
+    });
+    imageUpload.disabled = !enable;
+
+    // Show/hide buttons
+    saveChangesBtn.classList.toggle('hidden', !enable);
+    changePictureBtn.classList.toggle('hidden', !enable);
+
+    // Update Edit/Cancel button
+    if (enable) {
+      editProfileBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+      editProfileBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+      editProfileBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
     } else {
-      editProfileBtn.classList.remove('hidden');
-      saveChangesBtn.classList.add('hidden');
+      editProfileBtn.innerHTML = '<i class="fas fa-pen"></i> Edit Profile';
+      editProfileBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+      editProfileBtn.classList.add('bg-green-600', 'hover:bg-green-700');
     }
   };
 
-  // Event listener for Edit Profile button
-  if (editProfileBtn) {
-    editProfileBtn.addEventListener('click', () => toggleEditMode(true));
-  }
+  editProfileBtn.addEventListener('click', () => {
+    // If we are entering edit mode, populate inputs with current values
+    if (!isEditMode) {
+      infoBlocks.forEach(block => {
+        const displayValue = block.querySelector('.display-view p').textContent;
+        const inputValue = block.querySelector('.edit-view input');
+        if (inputValue) {
+          inputValue.value = displayValue;
+        }
+      });
+    }
+    toggleEditMode(!isEditMode);
+  });
 
-  // --- Save Changes Modal Logic ---
-  const saveChangesModal = document.getElementById('saveChangesModal');
-  const cancelSaveChangesBtn = document.getElementById('cancelSaveChanges');
-  const confirmSaveChangesBtn = document.getElementById('confirmSaveChanges');
+  // --- Image Upload Logic ---
 
-  // Event listener for Save Changes button (form submission)
-  const profileForm = document.querySelector('.space-y-6'); // Assuming this is the form
-  if (profileForm && saveChangesModal && cancelSaveChangesBtn && confirmSaveChangesBtn) {
-    profileForm.addEventListener('submit', (e) => {
-      e.preventDefault(); // Prevent default form submission for now
-      saveChangesModal.classList.remove('hidden'); // Show the confirmation modal
-    });
+  imageUpload.addEventListener('change', function (event) {
+    if (event.target.files && event.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        profileImage.src = e.target.result;
+        sidebarProfilePic.src = e.target.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  });
 
-    // Hide modal on "Cancel"
-    cancelSaveChangesBtn.addEventListener('click', () => {
-      saveChangesModal.classList.add('hidden');
-    });
+  // --- Save Changes Logic ---
 
-    // Perform save on "Save"
-    confirmSaveChangesBtn.addEventListener('click', () => {
-      // In a real application, you would send data to a server here.
-      console.log('Saving changes...');
+  saveChangesBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // Prevent form submission
+    saveChangesModal.classList.remove('hidden');
+  });
 
-      saveChangesModal.classList.add('hidden'); // Hide the modal
+  cancelSaveChanges.addEventListener('click', () => {
+    saveChangesModal.classList.add('hidden');
+  });
 
-      // After successful save, switch back to view mode
-      toggleEditMode(false);
-
-      // Update display fields with new values from inputs
-      document.getElementById('displayFirstName').textContent = firstNameInput.value;
-      document.getElementById('displayLastName').textContent = lastNameInput.value;
-      document.getElementById('displayMobileNumber').textContent = mobileNumberInput.value;
-      document.getElementById('displayEmail').textContent = emailInput.value;
-
-      // Optionally, show a success message
-      showNotification('Profile changes saved!', 'success');
-    });
-  }
-
-  // --- Change Picture Logic ---
-  const profileImage = document.getElementById('profileImage');
-
-  if (changePictureBtn && imageUpload && profileImage) {
-    changePictureBtn.addEventListener('click', () => { // Only trigger if not disabled
-      if (!changePictureBtn.disabled) {
-        imageUpload.click(); // Trigger the hidden file input
+  confirmSaveChanges.addEventListener('click', () => {
+    // Update display views with values from input fields
+    infoBlocks.forEach(block => {
+      const displayPara = block.querySelector('.display-view p');
+      const inputValue = block.querySelector('.edit-view input').value;
+      if (displayPara) {
+        displayPara.textContent = inputValue;
       }
     });
 
-    imageUpload.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          // Update the src of the profile image to the selected file
-          profileImage.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
+    // Update sidebar info
+    sidebarShopName.textContent = shopNameInput.value;
+    sidebarEmail.textContent = emailInput.value;
+
+    // Hide modal and switch back to view mode
+    saveChangesModal.classList.add('hidden');
+    toggleEditMode(false);
+    // Here you would typically send the data to the server via an API call (e.g., using fetch)
+    console.log('Changes saved (simulated).');
+  });
 
   // --- Logout Modal Logic ---
-  if (logoutBtn && logoutModal) {
-    logoutBtn.addEventListener('click', () => {
-      logoutModal.classList.remove('hidden');
-    });
-    
-    cancelLogoutBtn.addEventListener('click', () => {
-      logoutModal.classList.add('hidden');
-    });
 
-    // Close modal if user clicks on the background overlay
-    logoutModal.addEventListener('click', (e) => {
-      if (e.target === logoutModal) {
-        logoutModal.classList.add('hidden');
-      }
-    });
-  }
+  logoutBtn.addEventListener('click', () => {
+    logoutModal.classList.remove('hidden');
+  });
 
-  // Set initial state to non-editing after all elements are found
-  toggleEditMode(false);
+  cancelLogout.addEventListener('click', () => {
+    logoutModal.classList.add('hidden');
+  });
 
-  // --- Toast Notification Logic ---
-  function showNotification(message, type = 'success') {
-    const existing = document.querySelector('.toast-notification');
-    if (existing) existing.remove();
+  // The confirmLogout button is an <a> tag, so it will navigate automatically.
+  // If you needed to do something before logging out (like an API call),
+  // you would change it to a <button> and handle the redirect in JS.
+  // For example:
+  // confirmLogout.addEventListener('click', () => {
+  //   window.location.href = '../auth/login.php';
+  // });
 
-    const toast = document.createElement('div');
-    const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
-    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+  // --- Business Permit Modal Logic ---
 
-    toast.className = `toast-notification fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${bgColor} text-white`;
-    toast.innerHTML = `
-      <div class="flex items-center gap-3">
-        <i class="fas ${icon} text-xl"></i>
-        <span class="font-medium">${message}</span>
-      </div>
-    `;
-    document.body.appendChild(toast);
+  seePermitBtn.addEventListener('click', () => {
+    // In a real application, you would fetch the permit URL from the user's data.
+    // For this example, we'll use a placeholder image.
+    const permitUrl = 'https://via.placeholder.com/800x1100.png?text=Business+Permit+Sample';
 
-    setTimeout(() => toast.classList.remove('translate-x-full'), 10);
-    setTimeout(() => {
-      toast.classList.add('translate-x-full');
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
+    // Clear previous content and show loading state if needed
+    permitImageContainer.innerHTML = '<p class="text-center text-gray-500">Loading permit...</p>';
+    permitModal.classList.remove('hidden');
+
+    // Create and load the image
+    const img = new Image();
+    img.onload = function () {
+      permitImageContainer.innerHTML = ''; // Clear loading text
+      permitImageContainer.appendChild(img);
+    };
+    img.onerror = function () {
+      permitImageContainer.innerHTML = '<p class="text-center text-red-500">Could not load business permit.</p>';
+    };
+    img.src = permitUrl;
+    img.alt = 'Business Permit';
+    img.className = 'w-full h-auto rounded-md';
+  });
+
+  const closePermit = () => {
+    permitModal.classList.add('hidden');
+    permitImageContainer.innerHTML = ''; // Clean up
+  };
+
+  closePermitModal.addEventListener('click', closePermit);
+
+  // Close modal if clicking outside the content area
+  permitModal.addEventListener('click', (event) => {
+    if (event.target === permitModal) {
+      closePermit();
+    }
+  });
+
+  // --- Initial Data Load (Simulation) ---
+  // In a real app, you'd fetch this data from a server/API and populate the fields.
+  const loadInitialData = () => {
+    const userData = {
+      shopName: "Green Valley Organics",
+      shopAddress: "Mati, Davao Oriental",
+      firstName: "Juan",
+      lastName: "Dela Cruz",
+      mobileNumber: "09123456789",
+      email: "juan.delacruz@example.com",
+      profilePic: "https://randomuser.me/api/portraits/men/32.jpg",
+      hasPermit: true,
+    };
+
+    // Populate sidebar
+    document.getElementById('sidebarProfilePic').src = userData.profilePic;
+    document.getElementById('sidebarShopName').textContent = userData.shopName;
+    document.getElementById('sidebarEmail').textContent = userData.email;
+
+    // Populate main profile
+    document.getElementById('profileImage').src = userData.profilePic;
+    document.getElementById('shopName').value = userData.shopName;
+    document.getElementById('shopAddress').value = userData.shopAddress;
+    document.getElementById('displayFirstName').textContent = userData.firstName;
+    document.getElementById('displayLastName').textContent = userData.lastName;
+    document.getElementById('displayMobileNumber').textContent = userData.mobileNumber;
+    document.getElementById('displayEmail').textContent = userData.email;
+
+    // Enable or disable permit button
+    document.getElementById('seePermitBtn').disabled = !userData.hasPermit;
+  };
+
+  loadInitialData();
 });
