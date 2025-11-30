@@ -31,40 +31,15 @@ include '../retailer/retailerheader.php';
         <button id="markAllRead" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700">Mark all as read</button>
       </div>
 
+      <!-- Filter Tabs -->
+      <div id="filterTabs" class="flex items-center gap-4 mb-4 border-b">
+        <button data-filter="all" class="filter-tab py-2 px-1 border-b-2 border-green-600 text-green-600 font-semibold text-sm">All</button>
+        <button data-filter="unread" class="filter-tab py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-black text-sm">Unread</button>
+      </div>
+
       <!-- Notifications List -->
       <div id="notificationList" class="bg-white rounded-lg shadow-sm divide-y">
-        <!-- Unread Notification - New Order -->
-        <a href="retailerorderdetails.php?orderId=FM-1025" class="block p-5 flex items-start gap-4 hover:bg-green-200 bg-green-100 border-l-4 border-green-500">
-            <div class="bg-green-100 text-green-600 p-3 rounded-full"><i class="fa-solid fa-box"></i></div>
-            <div class="flex-1">
-                <p class="font-medium">New Order Received</p>
-                <p class="text-sm text-gray-600">You have a new order (#FM-1025) from Piodos De Blanco.</p>
-                <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
-            </div>
-            <button class="delete-notification text-gray-400 hover:text-red-500 text-xs z-10 relative"><i class="fa-solid fa-xmark"></i></button>
-        </a>
-
-        <!-- Unread Notification - Low Stock -->
-        <a href="retailerinventory.php" class="block p-5 flex items-start gap-4 hover:bg-green-200 bg-green-50 border-l-4 border-green-500">
-            <div class="bg-orange-100 text-orange-600 p-3 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <div class="flex-1">
-                <p class="font-medium">Low Stock Warning</p>
-                <p class="text-sm text-gray-600">Your product "Red Onions" is running low on stock (5 left).</p>
-                <p class="text-xs text-gray-400 mt-1">1 day ago</p>
-            </div>
-            <button class="delete-notification text-gray-400 hover:text-red-500 text-xs z-10 relative"><i class="fa-solid fa-xmark"></i></button>
-        </a>
-
-        <!-- Read Notification - New Review -->
-        <a href="retailerproducts.php" class="block p-5 flex items-start gap-4 hover:bg-green-200">
-            <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i class="fa-solid fa-star"></i></div>
-            <div class="flex-1">
-                <p class="font-medium">New 5-Star Review</p>
-                <p class="text-sm text-gray-600">Jane Smith left a 5-star review for your product "Iceberg Lettuce".</p>
-                <p class="text-xs text-gray-400 mt-1">3 days ago</p>
-            </div>
-            <button class="delete-notification text-gray-400 hover:text-red-500 text-xs z-10 relative"><i class="fa-solid fa-xmark"></i></button>
-        </a>
+        <!-- Notifications will be dynamically loaded here -->
       </div>
     </div>
   </main>
@@ -98,11 +73,110 @@ include '../retailer/retailerheader.php';
     document.addEventListener('DOMContentLoaded', () => {
       const markAllReadBtn = document.getElementById('markAllRead');
       const notificationList = document.getElementById('notificationList');
+      const filterTabs = document.getElementById('filterTabs');
+
+      let currentFilter = 'all';
+      
+      // --- SIMULATED NOTIFICATION DATA ---
+      // In a real application, you would fetch this from a PHP endpoint.
+      let notifications = [
+        {
+          id: 1,
+          type: 'order',
+          title: 'New Order Received',
+          message: 'You have a new order (#FM-1025) from Piodos De Blanco.',
+          time: '2 hours ago',
+          read: false,
+          link: 'retailerorderdetails.php?orderId=FM-1025'
+        },
+        {
+          id: 2,
+          type: 'stock',
+          title: 'Low Stock Warning',
+          message: 'Your product "Red Onions" is running low on stock (5 left).',
+          time: '1 day ago',
+          read: false,
+          link: 'retailerinventory.php'
+        },
+        {
+          id: 3,
+          type: 'review',
+          title: 'New 5-Star Review',
+          message: 'Jane Smith left a 5-star review for your product "Iceberg Lettuce".',
+          time: '3 days ago',
+          read: true,
+          link: 'retailerproducts.php'
+        },
+        {
+          id: 4,
+          type: 'message',
+          title: 'New Message',
+          message: 'John Doe sent you a message regarding his order.',
+          time: '4 days ago',
+          read: true,
+          link: 'retailermessage.php'
+        },
+        {
+          id: 5,
+          type: 'payment',
+          title: 'Payment Received',
+          message: 'Payment of ₱1,250.00 for order #FM-1024 has been confirmed.',
+          time: '5 days ago',
+          read: true,
+          link: 'retailerproducts.php'
+        }
+      ];
+
+      const getIconForType = (type) => {
+        switch (type) {
+          case 'order': return { icon: 'fa-box', color: 'green' };
+          case 'stock': return { icon: 'fa-triangle-exclamation', color: 'orange' };
+          case 'review': return { icon: 'fa-star', color: 'blue' };
+          case 'message': return { icon: 'fa-comment-dots', color: 'purple' };
+          case 'payment': return { icon: 'fa-credit-card', color: 'teal' };
+          default: return { icon: 'fa-bell', color: 'gray' };
+        }
+      };
+
+      const renderNotifications = () => {
+        notificationList.innerHTML = '';
+
+        const filteredNotifications = notifications.filter(n => {
+          if (currentFilter === 'unread') return !n.read;
+          return true;
+        }).sort((a, b) => new Date(b.time) - new Date(a.time)); // Sort by time, newest first
+
+        if (filteredNotifications.length === 0) {
+          notificationList.innerHTML = '<p class="text-center text-gray-500 py-10">🎉 All caught up! No notifications left.</p>';
+          updateNotificationBadge();
+          return;
+        }
+
+        filteredNotifications.forEach(notif => {
+          const { icon, color } = getIconForType(notif.type);
+          const readClass = !notif.read ? 'bg-green-50 border-l-4 border-green-500' : '';
+          const item = document.createElement('a');
+          item.href = notif.link;
+          item.className = `block p-5 flex items-start gap-4 hover:bg-gray-100 ${readClass}`;
+          item.dataset.id = notif.id;
+
+          item.innerHTML = `
+            <div class="bg-${color}-100 text-${color}-600 p-3 rounded-full"><i class="fa-solid ${icon}"></i></div>
+            <div class="flex-1">
+                <p class="font-medium">${notif.title}</p>
+                <p class="text-sm text-gray-600">${notif.message}</p>
+                <p class="text-xs text-gray-400 mt-1">${notif.time}</p>
+            </div>
+            <button class="delete-notification text-gray-400 hover:text-red-500 text-xs z-10 relative"><i class="fa-solid fa-xmark"></i></button>
+          `;
+          notificationList.appendChild(item);
+        });
+        updateNotificationBadge();
+      };
 
       // --- Centralized Notification Count Management ---
       const getUnreadCount = () => {
-        const unreadItems = document.querySelectorAll('#notificationList .bg-green-50');
-        return unreadItems.length;
+        return notifications.filter(n => !n.read).length;
       };
 
       const updateNotificationBadge = () => {
@@ -122,11 +196,36 @@ include '../retailer/retailerheader.php';
       };
 
       markAllReadBtn.addEventListener('click', () => {
-        const unreadNotifications = notificationList.querySelectorAll('.bg-green-50');
-        unreadNotifications.forEach(notification => {
-          notification.classList.remove('bg-green-50', 'border-l-4', 'border-green-500');
-        });
-        updateNotificationBadge();
+        notifications.forEach(n => n.read = true);
+        renderNotifications();
+      });
+
+      // --- Mark as Read on Click ---
+      notificationList.addEventListener('click', (e) => {
+        const targetLink = e.target.closest('a');
+        if (targetLink && !e.target.closest('.delete-notification')) {
+          const notifId = parseInt(targetLink.dataset.id);
+          const notification = notifications.find(n => n.id === notifId);
+          if (notification && !notification.read) {
+            notification.read = true;
+            // No need to call renderNotifications() here, as the page will navigate away.
+            // The badge will be correct on the next page load.
+            updateNotificationBadge();
+          }
+        }
+      });
+
+      // --- Filter Logic ---
+      filterTabs.addEventListener('click', (e) => {
+        if (e.target.matches('.filter-tab')) {
+          currentFilter = e.target.dataset.filter;
+          document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('border-green-600', 'text-green-600', 'font-semibold');
+            tab.classList.add('border-transparent', 'text-gray-500');
+          });
+          e.target.classList.add('border-green-600', 'text-green-600', 'font-semibold');
+          renderNotifications();
+        }
       });
 
       // --- Delete Logic with Confirmation ---
@@ -142,7 +241,7 @@ include '../retailer/retailerheader.php';
           e.preventDefault();
           e.stopPropagation();
 
-          notificationToDelete = deleteBtn.closest('a');
+          notificationToDelete = e.target.closest('a');
           deleteNotificationModal.classList.remove('hidden');
         }
       });
@@ -154,21 +253,16 @@ include '../retailer/retailerheader.php';
 
       confirmDeleteNotificationBtn.addEventListener('click', () => {
         if (notificationToDelete) {
-          notificationToDelete.remove();
-          updateNotificationBadge();
-
-          const remainingItems = notificationList.querySelectorAll('a');
-          if (remainingItems.length === 0) {
-            notificationList.innerHTML = '<p class="text-center text-gray-500 py-10">🎉 All caught up! No notifications left.</p>';
-          }
+          const notifId = parseInt(notificationToDelete.dataset.id);
+          notifications = notifications.filter(n => n.id !== notifId);
+          renderNotifications();
         }
         deleteNotificationModal.classList.add('hidden');
         notificationToDelete = null;
       });
 
-
       // Initial count update on page load
-      updateNotificationBadge();
+      renderNotifications();
     });
   </script>
 
