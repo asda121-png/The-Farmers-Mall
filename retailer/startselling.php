@@ -439,10 +439,14 @@
 
     // Final form submission validation
     document.getElementById('retailer-signup-form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Stop form submission to handle it with JavaScript
+
       const termsCheckbox = document.getElementById('terms-checkbox');
       if (!termsCheckbox.checked) {
-        event.preventDefault(); // Stop form submission
         alert('You must agree to the Terms and Conditions to create an account.');
+      } else {
+        // On successful validation, redirect to the login page.
+        window.location.href = '../auth/login.php';
       }
     });
   </script>
