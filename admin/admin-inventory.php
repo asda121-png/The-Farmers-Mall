@@ -152,10 +152,7 @@ $inventory_items = [
           <i class="fa-solid fa-cog w-5"></i>
           <span>Settings</span>
         </a>
-        <a href="admin-help.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-circle-info w-5"></i>
-          <span>Help</span>
-        </a>
+      
         <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
