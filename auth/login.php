@@ -352,6 +352,18 @@ $registered_success = isset($_GET['registered']) && $_GET['registered'] === 'suc
         resetErrors(); // Hide any initial errors
 
         if (status === 'success') {
+            // Clear any existing profile data from localStorage for fresh login
+            localStorage.removeItem('userProfile');
+            
+            // Initialize empty profile for new users
+            const newProfile = {
+                fullName: '<?= addslashes($_SESSION['full_name'] ?? '') ?>',
+                email: '<?= addslashes($_SESSION['email'] ?? '') ?>',
+                phone: '<?= addslashes($_SESSION['phone'] ?? '') ?>',
+                // No profilePic - new users start without image
+            };
+            localStorage.setItem('userProfile', JSON.stringify(newProfile));
+            
             // Immediately redirect to the loading page upon successful login
             if (redirectUrl) {
                 window.location.href = `../public/loading.php?redirect_to=${encodeURIComponent(redirectUrl)}`;

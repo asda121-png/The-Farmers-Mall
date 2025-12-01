@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             }
             
             if (!empty($newUser)) {
-                // SUCCESS: Log user in and redirect to homepage
+                // SUCCESS: Redirect to login page
                 $registration_status = 'success';
                 
                 // Log success
@@ -129,23 +129,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 $logEntry .= "User ID: " . ($newUser[0]['id'] ?? 'unknown') . "\n";
                 @file_put_contents($logFile, $logEntry, FILE_APPEND);
                 
-                // Auto-login: Set session variables
-                $_SESSION['loggedin'] = true;
-                $_SESSION['user_id'] = $newUser[0]['id'] ?? null;
-                $_SESSION['email'] = $email;
-                $_SESSION['full_name'] = $fullName;
-                $_SESSION['username'] = $username;
-                $_SESSION['phone'] = $phone;
-                $_SESSION['address'] = $address;
-                $_SESSION['role'] = 'customer';
-                $_SESSION['user_type'] = 'customer';
-                
-                // Always return JSON for fetch requests
+                // Return JSON for fetch requests - redirect to login
                 header('Content-Type: application/json');
                 echo json_encode([
                     'status' => 'success',
-                    'message' => 'Registration successful! Redirecting to your homepage...',
-                    'redirect' => '../user/user-homepage.php'
+                    'message' => 'Registration successful! Please login to continue.',
+                    'redirect' => 'login.php?registered=success'
                 ]);
                 exit();
             } else {
