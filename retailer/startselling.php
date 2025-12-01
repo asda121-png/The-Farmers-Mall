@@ -1,3 +1,120 @@
+<?php
+// PHP SCRIPT START - RETAILER REGISTRATION WITH SUPABASE
+session_start();
+
+// Load Supabase API
+require_once __DIR__ . '/../config/supabase-api.php';
+
+$registration_status = '';
+$registration_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
+    try {
+        $api = getSupabaseAPI();
+        
+        // Collect form data
+        $firstName = trim($_POST['firstname'] ?? '');
+        $lastName = trim($_POST['lastname'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+        $shopName = trim($_POST['shop_name'] ?? '');
+        $shopAddress = trim($_POST['shop_address'] ?? '');
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        $terms = isset($_POST['terms']);
+        
+        $errors = [];
+        
+        // Validation
+        if (empty($firstName)) $errors[] = "First name is required.";
+        if (empty($lastName)) $errors[] = "Last name is required.";
+        if (!preg_match('/^09\d{9}$/', $phone)) $errors[] = "Invalid phone number (must be 09XXXXXXXXX).";
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
+        if (empty($shopName)) $errors[] = "Shop name is required.";
+        if (empty($shopAddress)) $errors[] = "Shop address is required.";
+        if (empty($username)) $errors[] = "Username is required.";
+        if (strlen($password) < 6) $errors[] = "Password must be at least 6 characters.";
+        if ($password !== $confirmPassword) $errors[] = "Passwords do not match.";
+        if (!$terms) $errors[] = "You must agree to the Terms and Conditions.";
+        
+        // Check if email already exists
+        if (empty($errors)) {
+            $existingUser = $api->select('users', ['email' => $email]);
+            if (!empty($existingUser)) {
+                $errors[] = "Email already registered.";
+            }
+            
+            // Check if username already exists
+            $existingUsername = $api->select('users', ['username' => $username]);
+            if (!empty($existingUsername)) {
+                $errors[] = "Username already taken.";
+            }
+        }
+        
+        if (empty($errors)) {
+            // Create user account
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $fullName = $firstName . ' ' . $lastName;
+            
+            $newUser = $api->insert('users', [
+                'email' => $email,
+                'username' => $username,
+                'password_hash' => $hashedPassword,
+                'full_name' => $fullName,
+                'phone' => $phone,
+                'user_type' => 'retailer',
+                'status' => 'active'
+            ]);
+            
+            if (!empty($newUser)) {
+                $userId = $newUser[0]['id'];
+                
+                // Create retailer profile
+                $retailerData = [
+                    'user_id' => $userId,
+                    'shop_name' => $shopName,
+                    'business_address' => $shopAddress,
+                    'verification_status' => 'pending',
+                    'rating' => 0.00,
+                    'total_sales' => 0.00
+                ];
+                
+                $newRetailer = $api->insert('retailers', $retailerData);
+                
+                if (!empty($newRetailer)) {
+                    // Success - set session and redirect
+                    $_SESSION['loggedin'] = true;
+                    $_SESSION['user_id'] = $userId;
+                    $_SESSION['email'] = $email;
+                    $_SESSION['username'] = $fullName;
+                    $_SESSION['role'] = 'retailer';
+                    $_SESSION['retailer_id'] = $newRetailer[0]['id'];
+                    
+                    $registration_status = 'success';
+                    header('Location: retailerdashboard.php');
+                    exit();
+                } else {
+                    $errors[] = "Failed to create retailer profile.";
+                }
+            } else {
+                $errors[] = "Failed to create user account.";
+            }
+        }
+        
+        if (!empty($errors)) {
+            $registration_status = 'error';
+            $registration_message = implode(" | ", $errors);
+        }
+        
+    } catch (Exception $e) {
+        error_log("Retailer Registration Error: " . $e->getMessage());
+        $registration_status = 'error';
+        $registration_message = "A system error occurred. Please try again.";
+    }
+}
+// PHP SCRIPT END
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,8 +239,16 @@ include '../includes/header1.php';
       </ul>
     </div>
     <div class="md:w-2/5 bg-white p-8 rounded-lg shadow-lg mt-10 md:mt-0 w-full">
+      <!-- Error/Success Messages -->
+      <?php if ($registration_status === 'error'): ?>
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-red-700 text-sm"><?= htmlspecialchars($registration_message) ?></p>
+      </div>
+      <?php endif; ?>
+      
       <!-- UPDATED: Added flex classes and a fixed height -->
-      <form id="retailer-signup-form" class="flex flex-col h-[480px]">
+      <form id="retailer-signup-form" method="POST" class="flex flex-col h-[480px]">
+        <input type="hidden" name="retailer_signup" value="1">
         <h4 class="text-xl font-semibold mb-1">Become a Seller</h4>
         <p id="step-indicator" class="text-sm text-gray-500 mb-6">Step 1 of 5: Personal Info</p>
 
@@ -132,11 +257,11 @@ include '../includes/header1.php';
           <div class="form-step active" data-step="1">
             <div class="step-content">
               <div class="flex gap-4 mb-4">
-                <input type="text" placeholder="First Name" class="form-input !mb-0">
-                <input type="text" placeholder="Last Name" class="form-input !mb-0">
+                <input type="text" name="firstname" id="firstname" placeholder="First Name" class="form-input !mb-0" required>
+                <input type="text" name="lastname" id="lastname" placeholder="Last Name" class="form-input !mb-0" required>
               </div>
-              <input type="text" placeholder="Mobile Number" class="form-input">
-              <input type="email" placeholder="Email Address" class="form-input">
+              <input type="text" name="phone" id="phone" placeholder="Mobile Number (09XXXXXXXXX)" class="form-input" pattern="09[0-9]{9}" required>
+              <input type="email" name="email" id="email" placeholder="Email Address" class="form-input" required>
             </div>
             <button type="button" onclick="nextStep()" class="w-full bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
           </div>
@@ -144,8 +269,8 @@ include '../includes/header1.php';
           <!-- Step 2: Shop Details -->
           <div class="form-step" data-step="2">
             <div class="step-content">
-              <input type="text" placeholder="Shop / Farm Name" class="form-input">
-              <input type="text" placeholder="Shop Address" class="form-input">
+              <input type="text" name="shop_name" id="shop_name" placeholder="Shop / Farm Name" class="form-input" required>
+              <input type="text" name="shop_address" id="shop_address" placeholder="Shop Address" class="form-input" required>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -156,9 +281,9 @@ include '../includes/header1.php';
           <!-- Step 3: Upload Permit -->
           <div class="form-step" data-step="3">
             <div class="step-content">
-              <label for="permit-upload" class="block text-sm font-medium text-gray-700 mb-2">Upload Business Permit</label>
-              <input type="file" id="permit-upload" class="form-input">
-              <p class="text-xs text-gray-500 mb-4">Please upload a clear photo of your business or seller's permit.</p>
+              <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <input type="text" name="username" id="username" placeholder="Choose a username" class="form-input" required>
+              <p class="text-xs text-gray-500 mb-4">This will be your unique identifier on the platform.</p>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -169,8 +294,8 @@ include '../includes/header1.php';
           <!-- Step 4: Create Account -->
           <div class="form-step" data-step="4">
             <div class="step-content">
-              <input type="password" placeholder="Create Password" class="form-input">
-              <input type="password" placeholder="Confirm Password" class="form-input">
+              <input type="password" name="password" id="password" placeholder="Create Password" class="form-input" minlength="6" required>
+              <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-input" minlength="6" required>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -188,7 +313,7 @@ include '../includes/header1.php';
                 <p class="mb-2"><strong>4. Fees and Payments</strong><br>Listing products is free. Farmers Mall will charge a commission fee on each completed sale. This fee is subject to change upon prior notification. Payments will be processed according to our payment schedule.</p>
                 <p class="mb-2"><strong>5. Termination</strong><br>Farmers Mall reserves the right to terminate or suspend your seller account at any time for conduct that violates these Terms and Conditions or is harmful to other users of the platform.</p>
               </div>
-              <label class="flex items-center mb-4"><input type="checkbox" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2"> I agree to the Terms and Conditions</label>
+              <label class="flex items-center mb-4"><input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2" required> I agree to the Terms and Conditions</label>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -369,7 +494,13 @@ include '../includes/header1.php';
     let currentStep = 1;
     const totalSteps = 5;
     const stepIndicator = document.getElementById('step-indicator');
-    const stepTitles = ["Step 1 of 5: Personal Info", "Step 2 of 5: Shop Details", "Step 3 of 5: Upload Permit", "Step 4 of 5: Create Account", "Step 5 of 5: Terms & Conditions"];
+    const stepTitles = [
+      "Step 1 of 5: Personal Info", 
+      "Step 2 of 5: Shop Details", 
+      "Step 3 of 5: Username", 
+      "Step 4 of 5: Create Password", 
+      "Step 5 of 5: Terms & Conditions"
+    ];
 
     function showStep(step) {
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
@@ -385,24 +516,49 @@ include '../includes/header1.php';
       let isValid = true;
 
       // Get all inputs within the current step
-      const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="file"]');
+      const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
       
       inputs.forEach(input => {
-        input.classList.remove('error'); // Clear previous errors
+        input.classList.remove('error');
         if (input.value.trim() === '') {
           isValid = false;
           input.classList.add('error');
         }
       });
 
-      // Special validation for password confirmation
+      // Step 1: Validate phone number
+      if (step === 1) {
+        const phone = document.getElementById('phone');
+        if (!/^09\d{9}$/.test(phone.value)) {
+          isValid = false;
+          phone.classList.add('error');
+          alert('Phone number must be in format: 09XXXXXXXXX');
+        }
+        
+        const email = document.getElementById('email');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+          isValid = false;
+          email.classList.add('error');
+          alert('Please enter a valid email address');
+        }
+      }
+
+      // Step 4: Password confirmation
       if (step === 4) {
-        const password = currentStepElement.querySelector('input[placeholder="Create Password"]');
-        const confirmPassword = currentStepElement.querySelector('input[placeholder="Confirm Password"]');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        
+        if (password.value.length < 6) {
+          isValid = false;
+          password.classList.add('error');
+          alert('Password must be at least 6 characters');
+        }
+        
         if (password.value !== confirmPassword.value) {
           isValid = false;
           password.classList.add('error');
           confirmPassword.classList.add('error');
+          alert('Passwords do not match');
         }
       }
 
@@ -427,17 +583,16 @@ include '../includes/header1.php';
 
     // Final form submission handler
     document.getElementById('retailer-signup-form').addEventListener('submit', function(event) {
-      // Only handle submission if we are on the final step
       if (currentStep === totalSteps) {
-        event.preventDefault(); // Stop default form submission to handle with JS
-
         const termsCheckbox = document.getElementById('terms-checkbox');
         if (!termsCheckbox.checked) {
+          event.preventDefault();
           alert('You must agree to the Terms and Conditions to create an account.');
-        } else {
-          // On successful validation, redirect to the login page.
-          window.location.href = '../auth/login.php';
+          return false;
         }
+        // Form will submit normally to PHP
+      } else {
+        event.preventDefault();
       }
     });
   </script>
