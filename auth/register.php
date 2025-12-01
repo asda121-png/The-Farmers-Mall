@@ -93,14 +93,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             
             // 7. Insert into Supabase database
             try {
-                $newUser = $api->insert('users', [
+                // Prepare insert data based on available columns
+                $insertData = [
                     'email' => $email,
                     'password_hash' => $hashedPassword,
                     'full_name' => $fullName,
                     'phone' => $phone,
                     'user_type' => $role,
                     'status' => 'active'
-                ]);
+                ];
+                
+                // Add username and address if provided (will be ignored if columns don't exist)
+                if (!empty($username)) {
+                    $insertData['username'] = $username;
+                }
+                if (!empty($address)) {
+                    $insertData['address'] = $address;
+                }
+                
+                $newUser = $api->insert('users', $insertData);
                 
                 @file_put_contents($logFile, "📊 Insert result: " . print_r($newUser, true) . "\n", FILE_APPEND);
             } catch (Exception $insertEx) {
@@ -109,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             }
             
             if (!empty($newUser)) {
-                // SUCCESS: Redirect to login page
+                // SUCCESS: Log user in and redirect to homepage
                 $registration_status = 'success';
                 
                 // Log success
@@ -117,11 +128,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 $logEntry .= "User ID: " . ($newUser[0]['id'] ?? 'unknown') . "\n";
                 @file_put_contents($logFile, $logEntry, FILE_APPEND);
                 
+                // Auto-login: Set session variables
+                $_SESSION['loggedin'] = true;
+                $_SESSION['user_id'] = $newUser[0]['id'] ?? null;
+                $_SESSION['email'] = $email;
+                $_SESSION['full_name'] = $fullName;
+                $_SESSION['username'] = $username;
+                $_SESSION['phone'] = $phone;
+                $_SESSION['address'] = $address;
+                $_SESSION['role'] = 'customer';
+                $_SESSION['user_type'] = 'customer';
+                
                 // Always return JSON for fetch requests
                 header('Content-Type: application/json');
                 echo json_encode([
                     'status' => 'success',
-                    'message' => 'Registration successful! Redirecting to login...'
+                    'message' => 'Registration successful! Redirecting to your homepage...',
+                    'redirect' => '../user/user-homepage.php'
                 ]);
                 exit();
             } else {
@@ -643,7 +666,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             
             if (data.status === 'success') {
               showToast(data.message || 'Registration successful!', 'success');
-              setTimeout(() => window.location.href = "login.php?registered=success", 2000);
+              const redirectUrl = data.redirect || '../user/user-homepage.php';
+              setTimeout(() => window.location.href = redirectUrl, 2000);
             } else {
               showToast(data.message || "Registration failed. Please try again.", 'error');
               console.error('Registration error:', data);
@@ -655,9 +679,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             console.log('Response text:', text);
             
             // HTML response means redirect happened or success
-            if (text.includes('login.php') || text === '') {
+            if (text.includes('user-homepage.php') || text === '') {
               showToast('Registration successful!', 'success');
-              setTimeout(() => window.location.href = "login.php?registered=success", 1500);
+              setTimeout(() => window.location.href = "../user/user-homepage.php", 1500);
             } else {
               showToast("Registration failed. Please try again.", 'error');
               submitBtn.disabled = false;

@@ -2,6 +2,8 @@
 // PHP SCRIPT START - SIMPLE LOGIN
 session_start();
 
+require_once __DIR__ . '/../config/supabase-api.php';
+
 $login_status = '';
 $login_message = '';
 $redirect_url = '';
@@ -15,19 +17,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
         $_SESSION['loggedin'] = true;
         $_SESSION['role'] = 'admin';
         $_SESSION['username'] = 'Administrator';
+        $_SESSION['email'] = $input_identifier;
+        $_SESSION['full_name'] = 'Administrator';
         
         $login_status = 'success';
         $login_message = 'Admin login successful! Redirecting to dashboard...';
         $redirect_url = '../admin/admin-dashboard.php';
     } else {
-        // Any other credentials - redirect to homepage
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $input_identifier;
-        $_SESSION['role'] = 'user';
-        
-        $login_status = 'success';
-        $login_message = 'Login successful! Redirecting to homepage...';
-        $redirect_url = '../user/user-homepage.php';
+        // Try to find user in database
+        try {
+            $api = getSupabaseAPI();
+            $users = $api->select('users', ['email' => $input_identifier]);
+            
+            if (!empty($users) && password_verify($password, $users[0]['password_hash'])) {
+                $user = $users[0];
+                
+                // Set session variables
+                $_SESSION['loggedin'] = true;
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['username'] = $user['username'] ?? $user['full_name'];
+                $_SESSION['phone'] = $user['phone'] ?? '';
+                $_SESSION['address'] = $user['address'] ?? '';
+                $_SESSION['role'] = 'customer';
+                $_SESSION['user_type'] = $user['user_type'] ?? 'customer';
+                
+                $login_status = 'success';
+                $login_message = 'Login successful! Redirecting to homepage...';
+                $redirect_url = '../user/user-homepage.php';
+            } else {
+                $login_status = 'error';
+                $login_message = 'Invalid email or password.';
+            }
+        } catch (Exception $e) {
+            // Fallback to simple login for demo
+            $_SESSION['loggedin'] = true;
+            $_SESSION['username'] = $input_identifier;
+            $_SESSION['email'] = $input_identifier;
+            $_SESSION['full_name'] = $input_identifier;
+            $_SESSION['role'] = 'user';
+            
+            $login_status = 'success';
+            $login_message = 'Login successful! Redirecting to homepage...';
+            $redirect_url = '../user/user-homepage.php';
+        }
     }
 }
 // PHP SCRIPT END

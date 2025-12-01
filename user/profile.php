@@ -1,3 +1,56 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: ../auth/login.php');
+    exit();
+}
+
+// Get user data from session
+$user_id = $_SESSION['user_id'] ?? null;
+$email = $_SESSION['email'] ?? 'user@email.com';
+$full_name = $_SESSION['full_name'] ?? 'Guest User';
+$phone = $_SESSION['phone'] ?? '';
+$address = $_SESSION['address'] ?? '';
+$username = $_SESSION['username'] ?? '';
+
+// Load Supabase API for profile updates
+require_once __DIR__ . '/../config/supabase-api.php';
+
+// Handle profile update via AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
+    try {
+        $api = getSupabaseAPI();
+        
+        $updateData = [
+            'full_name' => trim($_POST['full_name'] ?? $full_name),
+            'phone' => trim($_POST['phone'] ?? $phone),
+            'email' => trim($_POST['email'] ?? $email)
+        ];
+        
+        // Update in database
+        if ($user_id) {
+            $result = $api->update('users', ['id' => $user_id], $updateData);
+            
+            // Update session
+            $_SESSION['full_name'] = $updateData['full_name'];
+            $_SESSION['phone'] = $updateData['phone'];
+            $_SESSION['email'] = $updateData['email'];
+            
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!']);
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'User ID not found']);
+        }
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
+    }
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +92,9 @@
         </a>
         <a href="profile.php">
           <!-- Active state shown with a ring -->
-          <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600">
+          <div class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 bg-green-600 flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
         </a>
       </div>
     </div>
@@ -52,9 +107,11 @@
     <aside class="w-72 bg-white rounded-lg shadow p-6">
       <!-- Profile Info -->
       <div class="flex flex-col items-center text-center mb-6">
-        <img src="../images/karl.png" class="w-20 h-20 rounded-full mb-3" alt="Profile">
-        <h2 class="font-semibold">Piodos De Blanco</h2>
-        <p class="text-gray-500 text-sm">PiodosDe.Blanco@email.com</p>
+        <div class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
+          <i class="fas fa-user text-white text-3xl"></i>
+        </div>
+        <h2 class="font-semibold"><?php echo htmlspecialchars($full_name); ?></h2>
+        <p class="text-gray-500 text-sm"><?php echo htmlspecialchars($email); ?></p>
       </div>
 
       <!-- Navigation -->
@@ -102,15 +159,17 @@
           <!-- Profile Picture & Basic Info -->
           <div class="flex items-start gap-6 pb-6 border-b">
             <div class="relative">
-              <img id="displayProfilePic" src="../images/karl.png" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-green-100">
+              <div id="displayProfilePic" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                <i class="fas fa-user text-white text-5xl"></i>
+              </div>
               <div class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white">
                 <i class="fas fa-camera text-sm"></i>
               </div>
             </div>
             <div class="flex-1">
-              <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1">Piodos De Blanco</h3>
-              <p id="displayEmail" class="text-gray-600 mb-3">PiodosDe.Blanco@email.com</p>
-              <p id="displayBio" class="text-gray-600 text-sm italic">Passionate about fresh, organic produce and supporting local farmers.</p>
+              <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($full_name); ?></h3>
+              <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
+              <p id="displayBio" class="text-gray-600 text-sm italic">Welcome to Farmers Mall!</p>
             </div>
           </div>
 
@@ -118,7 +177,7 @@
           <div class="grid md:grid-cols-2 gap-6">
             <div class="bg-gray-50 p-4 rounded-lg">
               <label class="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-              <p id="displayPhone" class="text-gray-800 font-medium mt-1">+63 912 345 6789</p>
+              <p id="displayPhone" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
               <label class="text-xs text-gray-500 uppercase tracking-wide">Date of Birth</label>
@@ -159,7 +218,9 @@
           <!-- Profile Picture Upload -->
           <div class="flex items-start gap-6 pb-6 border-b">
             <div class="relative">
-              <img id="editProfilePicPreview" src="../images/karl.png" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-green-100">
+              <div id="editProfilePicPreview" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                <i class="fas fa-user text-white text-5xl"></i>
+              </div>
               <label for="profilePicInput" class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white cursor-pointer hover:bg-green-700 transition">
                 <i class="fas fa-camera text-sm"></i>
               </label>
@@ -730,21 +791,42 @@
       const editProfilePicPreview = document.getElementById('editProfilePicPreview');
       const removeProfilePic = document.getElementById('removeProfilePic');
 
-      // Load user profile from localStorage or use defaults
-      let userProfile = JSON.parse(localStorage.getItem('userProfile')) || {
-        fullName: 'Piodos De Blanco',
-        email: 'PiodosDe.Blanco@email.com',
-        phone: '+63 912 345 6789',
-        dob: '1990-01-15',
-        gender: 'Male',
-        bio: 'Passionate about fresh, organic produce and supporting local farmers.',
-        profilePic: '../images/karl.png',
-        memberSince: 'March 2024'
+      // Load user profile from PHP session or localStorage
+      const serverProfile = {
+        fullName: <?php echo json_encode($full_name); ?>,
+        email: <?php echo json_encode($email); ?>,
+        phone: <?php echo json_encode($phone); ?>,
+        username: <?php echo json_encode($username); ?>
       };
+      
+      let userProfile = JSON.parse(localStorage.getItem('userProfile')) || {
+        fullName: serverProfile.fullName,
+        email: serverProfile.email,
+        phone: serverProfile.phone,
+        dob: '',
+        gender: '',
+        bio: 'Welcome to Farmers Mall!',
+        profilePic: null, // No default image
+        memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+      };
+      
+      // Update with server data if available
+      userProfile.fullName = serverProfile.fullName;
+      userProfile.email = serverProfile.email;
+      userProfile.phone = serverProfile.phone || userProfile.phone;
 
       function renderProfile() {
-        // Update display mode
-        document.getElementById('displayProfilePic').src = userProfile.profilePic;
+        // Update display mode - handle profile pic or icon
+        const displayPicEl = document.getElementById('displayProfilePic');
+        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+          // Has uploaded image
+          displayPicEl.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+        } else {
+          // Show icon
+          displayPicEl.innerHTML = '<i class="fas fa-user text-white text-5xl"></i>';
+          displayPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center';
+        }
+        
         document.getElementById('displayFullName').textContent = userProfile.fullName;
         document.getElementById('displayEmail').textContent = userProfile.email;
         document.getElementById('displayPhone').textContent = userProfile.phone || 'Not provided';
@@ -754,12 +836,23 @@
         document.getElementById('displayMemberSince').textContent = userProfile.memberSince;
 
         // Update sidebar profile info
-        document.querySelector('aside img').src = userProfile.profilePic;
+        const sidebarPic = document.querySelector('aside .w-20');
+        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+          sidebarPic.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+          sidebarPic.className = 'w-20 h-20 rounded-full mb-3';
+        } else {
+          sidebarPic.innerHTML = '<i class="fas fa-user text-white text-3xl"></i>';
+          sidebarPic.className = 'w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center';
+        }
         document.querySelector('aside h2').textContent = userProfile.fullName;
         document.querySelector('aside p').textContent = userProfile.email;
 
         // Update navbar profile pic
-        document.querySelector('header img[alt="User"]').src = userProfile.profilePic;
+        const navPic = document.querySelector('header a[href="profile.php"] div');
+        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+          navPic.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+          navPic.className = 'w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600';
+        }
 
         // Pre-fill edit form
         document.getElementById('editFullName').value = userProfile.fullName;
@@ -768,7 +861,16 @@
         document.getElementById('editDob').value = userProfile.dob || '';
         document.getElementById('editGender').value = userProfile.gender || '';
         document.getElementById('editBio').value = userProfile.bio || '';
-        editProfilePicPreview.src = userProfile.profilePic;
+        
+        // Update edit preview
+        const editPicEl = document.getElementById('editProfilePicPreview');
+        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+          editPicEl.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+          editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
+        } else {
+          editPicEl.innerHTML = '<i class="fas fa-user text-white text-5xl"></i>';
+          editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center';
+        }
       }
 
       // Switch to edit mode
@@ -792,7 +894,9 @@
         if (file) {
           const reader = new FileReader();
           reader.onload = (event) => {
-            editProfilePicPreview.src = event.target.result;
+            const editPicEl = document.getElementById('editProfilePicPreview');
+            editPicEl.innerHTML = `<img src="${event.target.result}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+            editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
           };
           reader.readAsDataURL(file);
         }
@@ -800,12 +904,14 @@
 
       // Remove profile picture
       removeProfilePic.addEventListener('click', () => {
-        editProfilePicPreview.src = '../images/karl.png';
+        const editPicEl = document.getElementById('editProfilePicPreview');
+        editPicEl.innerHTML = '<i class="fas fa-user text-white text-5xl"></i>';
+        editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center';
         profilePicInput.value = '';
       });
 
       // Save profile changes
-      profileEditForm.addEventListener('submit', (e) => {
+      profileEditForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         // Update profile data
@@ -815,27 +921,54 @@
         userProfile.dob = document.getElementById('editDob').value;
         userProfile.gender = document.getElementById('editGender').value;
         userProfile.bio = document.getElementById('editBio').value;
-        userProfile.profilePic = editProfilePicPreview.src;
-
-        // Save to localStorage
-        localStorage.setItem('userProfile', JSON.stringify(userProfile));
-
-        // Dispatch custom event for other tabs/windows to listen
-        window.dispatchEvent(new Event('storage'));
         
-        // Dispatch event for same page listeners
-        window.dispatchEvent(new CustomEvent('profileUpdated', { detail: userProfile }));
+        // Get profile pic if uploaded
+        const editPicEl = document.getElementById('editProfilePicPreview');
+        const imgTag = editPicEl.querySelector('img');
+        userProfile.profilePic = imgTag ? imgTag.src : null;
 
-        // Update display
-        renderProfile();
+        // Save to database via AJAX
+        try {
+          const formData = new FormData();
+          formData.append('action', 'update_profile');
+          formData.append('full_name', userProfile.fullName);
+          formData.append('email', userProfile.email);
+          formData.append('phone', userProfile.phone);
+          
+          const response = await fetch('profile.php', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.status === 'success') {
+            // Save to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
 
-        // Switch back to display mode
-        profileDisplay.classList.remove('hidden');
-        profileEditForm.classList.add('hidden');
-        editProfileBtn.classList.remove('hidden');
+            // Dispatch custom event for other tabs/windows to listen
+            window.dispatchEvent(new Event('storage'));
+            
+            // Dispatch event for same page listeners
+            window.dispatchEvent(new CustomEvent('profileUpdated', { detail: userProfile }));
 
-        // Show success message
-        alert('Profile updated successfully! Your changes will be reflected across all pages.');
+            // Update display
+            renderProfile();
+
+            // Switch back to display mode
+            profileDisplay.classList.remove('hidden');
+            profileEditForm.classList.add('hidden');
+            editProfileBtn.classList.remove('hidden');
+
+            // Show success message
+            alert(result.message || 'Profile updated successfully! Your changes will be reflected across all pages.');
+          } else {
+            alert(result.message || 'Failed to update profile. Please try again.');
+          }
+        } catch (error) {
+          console.error('Profile update error:', error);
+          alert('An error occurred while updating your profile. Please try again.');
+        }
       });
 
       // Initial render

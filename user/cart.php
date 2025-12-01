@@ -68,7 +68,9 @@
         <a href="../user/notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="../user/cart.php" class="text-gray-600 relative"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="../user/profile.php">
-          <img src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+          <div id="headerProfilePic" class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
         </a>
       </div>
     </div>
@@ -325,10 +327,17 @@
     // Load user profile data
     function loadUserProfile() {
       const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-      if (userProfile && userProfile.profilePic) {
-        const headerProfilePic = document.getElementById('headerProfilePic');
-        if (headerProfilePic) {
-          headerProfilePic.src = userProfile.profilePic;
+      const headerProfilePic = document.getElementById('headerProfilePic');
+      
+      if (headerProfilePic) {
+        if (userProfile && userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+          // Has uploaded image
+          headerProfilePic.innerHTML = `<img src="${userProfile.profilePic}" alt="User" class="w-full h-full rounded-full object-cover">`;
+          headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer';
+        } else {
+          // Show icon
+          headerProfilePic.innerHTML = '<i class="fas fa-user text-white text-sm"></i>';
+          headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center';
         }
       }
     }

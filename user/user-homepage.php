@@ -1,3 +1,16 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: ../auth/login.php');
+    exit();
+}
+
+// Get user data from session
+$full_name = $_SESSION['full_name'] ?? 'Guest User';
+$email = $_SESSION['email'] ?? 'user@email.com';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -323,7 +336,9 @@
           <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
         </a>
         <a href="profile.php">
-          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+          <div id="headerProfilePic" class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
         </a>
       </div>
     </div>
@@ -835,10 +850,17 @@
       // --- Load User Profile Data ---
       function loadUserProfile() {
         const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-        if (userProfile && userProfile.profilePic) {
-          const headerProfilePic = document.getElementById('headerProfilePic');
-          if (headerProfilePic) {
-            headerProfilePic.src = userProfile.profilePic;
+        const headerProfilePic = document.getElementById('headerProfilePic');
+        
+        if (headerProfilePic) {
+          if (userProfile && userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+            // Has uploaded image
+            headerProfilePic.innerHTML = `<img src="${userProfile.profilePic}" alt="User" class="w-full h-full rounded-full object-cover">`;
+            headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer';
+          } else {
+            // Show icon
+            headerProfilePic.innerHTML = '<i class="fas fa-user text-white text-sm"></i>';
+            headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center';
           }
         }
       }

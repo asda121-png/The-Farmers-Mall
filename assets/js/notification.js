@@ -1,28 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Dynamically load header.html
-  fetch('header.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('header').innerHTML = data;
+  // Highlight the notification icon
+  const notifIcon = document.querySelector('a[href="notification.php"] i');
+  if (notifIcon) {
+    notifIcon.parentElement.classList.remove('text-gray-600');
+    notifIcon.parentElement.classList.add('text-green-600');
+  }
 
-      // Highlight the notification icon once header is loaded
-      const notifIcon = document.querySelector('a[href="notification.html"] i');
-      if (notifIcon) {
-        notifIcon.parentElement.classList.remove('text-gray-600');
-        notifIcon.parentElement.classList.add('text-green-600');
-      }
+  // Add search functionality
+  const headerSearchInput = document.querySelector('#header input[type="text"]');
+  if (headerSearchInput) {
+    const form = document.createElement('form');
+    form.action = 'products.php';
+    form.method = 'GET';
+    headerSearchInput.name = 'search';
+    headerSearchInput.parentElement.insertBefore(form, headerSearchInput);
+    form.appendChild(headerSearchInput);
+  }
 
-      // Add search functionality to the loaded header
-      const headerSearchInput = document.querySelector('#header input[type="text"]');
-      if (headerSearchInput) {
-        const form = document.createElement('form');
-        form.action = 'products.php';
-        form.method = 'GET';
-        headerSearchInput.name = 'search';
-        headerSearchInput.parentElement.insertBefore(form, headerSearchInput);
-        form.appendChild(headerSearchInput);
-      }
-    });
+  // Load user profile in header
+  loadUserProfile();
 
   // Script to handle notification actions
   const notificationList = document.getElementById('notificationList');
