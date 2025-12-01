@@ -96,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 // Prepare insert data based on available columns
                 $insertData = [
                     'email' => $email,
+                    'username' => $username,
                     'password_hash' => $hashedPassword,
                     'full_name' => $fullName,
                     'phone' => $phone,

@@ -1,5 +1,49 @@
 <?php
 // admin-manage-users.php
+
+// Mock notifications for the dropdown
+$notifications = [
+    [
+        "id" => "N001",
+        "type" => "New User",
+        "icon" => "fa-user-plus",
+        "color" => "green",
+        "title" => "New Customer Registered",
+        "message" => "Alex Reyes has created an account.",
+        "time" => "15m ago",
+        "read" => false
+    ],
+    [
+        "id" => "N002",
+        "type" => "New Order",
+        "icon" => "fa-receipt",
+        "color" => "blue",
+        "title" => "New Order #ORD-006",
+        "message" => "An order amounting to ₱1,250 has been placed.",
+        "time" => "1h ago",
+        "read" => false
+    ],
+    [
+        "id" => "N003",
+        "type" => "Low Stock",
+        "icon" => "fa-box-open",
+        "color" => "yellow",
+        "title" => "Low Stock Warning",
+        "message" => "'Organic Apples' are running low.",
+        "time" => "3h ago",
+        "read" => true
+    ],
+    [
+        "id" => "N004",
+        "type" => "System Alert",
+        "icon" => "fa-shield-halved",
+        "color" => "red",
+        "title" => "System Maintenance Scheduled",
+        "message" => "A system-wide maintenance is scheduled for tonight.",
+        "time" => "1d ago",
+        "read" => true
+    ],
+];
 // Mock Data
 
 $customers = [
@@ -202,9 +246,30 @@ $sellers = [
       </div>
 
       <div class="flex items-center gap-4 ml-auto">
-        <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer relative">
-            <span class="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-        </i>
+        <!-- Notification Dropdown -->
+        <div class="relative">
+            <button id="notification-btn" class="relative" title="View Notifications">
+                <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
+                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+                <div class="p-4 border-b">
+                    <h4 class="font-bold text-gray-800">Notifications</h4>
+                </div>
+                <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
+                    <?php foreach($notifications as $notif): ?>
+                    <a href="#" class="flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>">
+                        <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
+                            <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
+                        </div>
+                        <div class="flex-1"><p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p><p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p></div>
+                        <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+                <div class="p-2 border-t"><a href="#" id="view-all-notifications-btn" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
+            </div>
+        </div>
         <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
         <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
@@ -408,6 +473,10 @@ $sellers = [
                 <button type="button" class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
                 <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Add User</button>
             </div>
+        </form> <!-- This was missing the closing tag -->
+      </div>
+    </div>
+
         </div>
     </div>
 
@@ -484,263 +553,238 @@ $sellers = [
 
 
   </div> 
-  <script src="admin-theme.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      let activeTab = 'customers';
-      let currentAction = null; // Track action (edit, delete, suspend)
-      let currentRowElement = null; // Track the table row for the action
-      let currentUserId = null; // Track user ID for actions
+    // --- Main Application State ---
+    const app = {
+        activeTab: 'customers',
+        currentAction: null,
+        currentRowElement: null,
+        currentUserId: null,
+        elements: {},
 
+        // --- Initialization ---
+        init() {
+            this.cacheDOMElements();
+            this.bindEvents();
+            this.applyFilters(); // Initial filter on page load
+        },
 
-      // --- Element Selectors ---
-      const searchInput = document.getElementById('search-input');
-      const customerFilter = document.getElementById('customer-status-filter');
-      const sellerFilter = document.getElementById('seller-status-filter');
-      const customerRows = document.querySelectorAll('.customer-row');
-      const sellerRows = document.querySelectorAll('.seller-row');
-      const addUserBtn = document.getElementById('add-user-btn');
-      const addUserModal = document.getElementById('add-user-modal');
-      const exportBtn = document.getElementById('export-btn');
-      const editUserModal = document.getElementById('edit-user-modal');
-      const editUserNameInput = document.getElementById('edit-user-name');
-      const editUserEmailInput = document.getElementById('edit-user-email');
-      const editUserPhoneInput = document.getElementById('edit-user-phone');
-      const confirmationModal = document.getElementById('confirmation-modal');
-      const cancelActionBtn = document.getElementById('cancel-action-btn');
-      const confirmActionBtn = document.getElementById('confirm-action-btn');
+        // --- Cache DOM Elements for performance ---
+        cacheDOMElements() {
+            this.elements = {
+                searchInput: document.getElementById('search-input'),
+                customerFilter: document.getElementById('customer-status-filter'),
+                sellerFilter: document.getElementById('seller-status-filter'),
+                customersTableBody: document.getElementById('customers-table-body'),
+                sellersTableBody: document.getElementById('sellers-table-body'),
+                addUserBtn: document.getElementById('add-user-btn'),
+                addUserModal: document.getElementById('add-user-modal'),
+                addUserForm: document.getElementById('add-user-form'),
+                exportBtn: document.getElementById('export-btn'),
+                editUserModal: document.getElementById('edit-user-modal'),
+                editUserForm: document.getElementById('edit-user-form'),
+                editUserNameInput: document.getElementById('edit-user-name'),
+                editUserEmailInput: document.getElementById('edit-user-email'),
+                editUserPhoneInput: document.getElementById('edit-user-phone'),
+                confirmationModal: document.getElementById('confirmation-modal'),
+                cancelActionBtn: document.getElementById('cancel-action-btn'),
+                confirmActionBtn: document.getElementById('confirm-action-btn'),
+                tabsContainer: document.getElementById('tabs'),
+                allModals: document.querySelectorAll('.fixed[id$="-modal"], .fixed[id$="Modal"]'),
+                allTBody: document.querySelectorAll('tbody'),
+                logoutButton: document.getElementById('logoutButton'),
+                logoutModal: document.getElementById('logoutModal'),
+                notificationBtn: document.getElementById('notification-btn'),
+                notificationDropdown: document.getElementById('notification-dropdown'),
+                viewAllNotificationsBtn: document.getElementById('view-all-notifications-btn'),
+            };
+        },
 
-      // --- Tab Switching Logic ---
-      document.getElementById('tabs').addEventListener('click', (e) => {
-        const tabButton = e.target.closest('.tab-btn');
-        if (!tabButton) return;
+        // --- Bind all event listeners ---
+        bindEvents() {
+            this.elements.tabsContainer.addEventListener('click', this.handleTabSwitch.bind(this));
+            this.elements.searchInput.addEventListener('input', this.applyFilters.bind(this));
+            this.elements.customerFilter.addEventListener('change', this.applyFilters.bind(this));
+            this.elements.sellerFilter.addEventListener('change', this.applyFilters.bind(this));
+            this.elements.addUserBtn.addEventListener('click', () => this.showModal(this.elements.addUserModal));
+            this.elements.exportBtn.addEventListener('click', this.handleExport.bind(this));
+            this.elements.addUserForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+            this.elements.editUserForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+            this.elements.cancelActionBtn.addEventListener('click', () => this.hideModal(this.elements.confirmationModal));
+            this.elements.confirmActionBtn.addEventListener('click', this.handleConfirmAction.bind(this));
 
-        activeTab = tabButton.dataset.tab;
+            this.elements.allTBody.forEach(tbody => {
+                tbody.addEventListener('click', this.handleTableAction.bind(this));
+            });
 
-        // Update button styles
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active', 'text-green-600', 'border-green-600', 'font-semibold');
-            btn.classList.add('text-gray-500', 'border-transparent', 'font-medium', 'hover:text-green-600', 'hover:border-green-300');
-        });
-        tabButton.classList.add('active', 'text-green-600', 'border-green-600', 'font-semibold');
-        tabButton.classList.remove('text-gray-500', 'border-transparent', 'font-medium', 'hover:text-green-600', 'hover:border-green-300');
+            this.elements.allModals.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal || e.target.closest('.modal-close-btn') || e.target.id === 'cancelLogout') {
+                        this.hideModal(modal);
+                    }
+                });
+            });
+            
+            this.elements.logoutButton.addEventListener('click', () => this.showModal(this.elements.logoutModal));
+            this.elements.notificationBtn.addEventListener('click', this.toggleNotificationDropdown.bind(this));
+            this.elements.viewAllNotificationsBtn.addEventListener('click', this.expandNotifications.bind(this));
+            window.addEventListener('click', this.closeNotificationDropdown.bind(this));
+        },
 
-        // Show/hide tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        document.getElementById(`tab-${activeTab}`).classList.add('active');
-        applyFilters(); // Re-apply filters for the new active tab
-      });
+        // --- Event Handlers ---
+        handleTabSwitch(e) {
+            const tabButton = e.target.closest('.tab-btn');
+            if (!tabButton) return;
 
-      // --- Modal Logic ---
-      const showModal = (modal) => modal.classList.replace('hidden', 'flex');
-      const hideModal = (modal) => modal.classList.replace('flex', 'hidden');
-      const resetModal = (form) => form.reset();
+            this.activeTab = tabButton.dataset.tab;
 
-      addUserBtn.addEventListener('click', () => showModal(addUserModal));
-      document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => hideModal(btn.closest('.fixed'))));
-      addUserModal.addEventListener('click', (e) => { if(e.target === addUserModal) hideModal(addUserModal); });
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            tabButton.classList.add('active');
 
-      // Logout Modal Logic
-      const logoutButton = document.getElementById('logoutButton');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${this.activeTab}`).classList.add('active');
 
+            this.applyFilters();
+        },
 
+        applyFilters() {
+            const searchTerm = this.elements.searchInput.value.toLowerCase();
+            const isCustomers = this.activeTab === 'customers';
+            const status = isCustomers ? this.elements.customerFilter.value : this.elements.sellerFilter.value;
+            const tableBody = isCustomers ? this.elements.customersTableBody : this.elements.sellersTableBody;
+            const rows = tableBody.querySelectorAll('tr');
 
-
-
-
-      const logoutModal = document.getElementById('logoutModal');
-      const cancelLogout = document.getElementById('cancelLogout');
-
-      logoutButton.addEventListener('click', function() {
-        logoutModal.classList.remove('hidden');
-        logoutModal.classList.add('flex');
-      });
-
-      cancelLogout.addEventListener('click', function() {
-        logoutModal.classList.add('hidden');
-        logoutModal.classList.remove('flex');
-      });
-
-      logoutModal.addEventListener('click', function(e) {
-          if (e.target === logoutModal) {
-              logoutModal.classList.add('hidden');
-              logoutModal.classList.remove('flex');
-          }
-      });
-
-      // --- Filtering Logic ---
-      function applyFilters() {
-        const searchTerm = searchInput.value.toLowerCase();
-
-        if (activeTab === 'customers') {
-            const status = customerFilter.value;
-            customerRows.forEach(row => {
+            rows.forEach(row => {
                 const rowText = row.textContent.toLowerCase();
                 const statusMatch = status === 'All Statuses' || row.dataset.status === status;
                 const searchMatch = rowText.includes(searchTerm);
                 row.style.display = (statusMatch && searchMatch) ? '' : 'none';
             });
-        } else { // Sellers
-            const status = sellerFilter.value;
-            sellerRows.forEach(row => {
-                const rowText = row.textContent.toLowerCase();
-                const statusMatch = status === 'All Statuses' || row.dataset.status === status;
-                const searchMatch = rowText.includes(searchTerm);
-                row.style.display = (statusMatch && searchMatch) ? '' : 'none';
-            });
-        }
-      }
+        },
 
-      searchInput.addEventListener('input', applyFilters);
-      customerFilter.addEventListener('change', applyFilters);
-      sellerFilter.addEventListener('change', applyFilters);
-
-      // --- Action Button Logic ---
-      document.querySelectorAll('tbody').forEach(tbody => {
-        tbody.addEventListener('click', (e) => {
+        handleTableAction(e) {
             const btn = e.target.closest('.action-btn');
             if (!btn) return;
-            
-            const id = btn.dataset.id;
-            const action = btn.dataset.action;
 
-            currentAction = action;
-            currentUserId = id;
-            currentRowElement = btn.closest('tr'); // Store the row element
+            this.currentUserId = btn.dataset.id;
+            this.currentAction = btn.dataset.action;
+            this.currentRowElement = btn.closest('tr');
 
-            if (action === 'view') {
-                // Redirect to a mock store view page
-                window.location.href = `/admin/mock-store-view.php?sellerId=${id}`;
-            } else if (action === 'edit') {
-                // Populate the edit modal with user data (replace with actual data fetching)
-                const row = btn.closest('tr');
-                const name = row.querySelector('.font-medium').textContent;
-                const email = row.querySelector('.text-xs').textContent;
-
-                editUserNameInput.value = name;
-                editUserEmailInput.value = email;
-                document.getElementById('edit-user-id').value = id;
-
-                showModal(editUserModal);
-            } else if (action === 'delete' || action === 'suspend') {
-                // Show confirmation modal for delete/suspend actions
-                showModal(confirmationModal);
+            if (this.currentAction === 'edit') {
+                const name = this.currentRowElement.querySelector('.font-medium')?.textContent || '';
+                const email = this.currentRowElement.querySelector('.text-sm')?.textContent || this.currentRowElement.querySelector('.text-xs')?.textContent || '';
+                const phone = this.currentRowElement.querySelector('.text-xs.text-gray-500')?.textContent || '';
+                
+                this.elements.editUserNameInput.value = name;
+                this.elements.editUserEmailInput.value = email;
+                this.elements.editUserPhoneInput.value = phone;
+                document.getElementById('edit-user-id').value = this.currentUserId;
+                this.showModal(this.elements.editUserModal);
+            } else if (this.currentAction === 'delete' || this.currentAction === 'suspend') {
+                this.showModal(this.elements.confirmationModal);
+            } else if (this.currentAction === 'view') {
+                window.location.href = `/admin/mock-store-view.php?sellerId=${this.currentUserId}`;
             }
-        });
-      });
+        },
 
-      // --- Edit User Form Submission ---
-      document.getElementById('edit-user-form').addEventListener('submit', (e) => {
-          e.preventDefault();
-
-          const id = document.getElementById('edit-user-id').value;
-          const name = editUserNameInput.value;
-          const email = editUserEmailInput.value;
-          // In a real app, you'd send this data to the server to update the user
-          console.log(`Saving changes for user ${id}: Name=${name}, Email=${email}`);
-
-          hideModal(editUserModal);
-      });
-
-      // --- Confirmation Modal Actions ---
-      cancelActionBtn.addEventListener('click', () => {
-          hideModal(confirmationModal);
-          resetActionState();
-      });
-
-      confirmActionBtn.addEventListener('click', () => {
-          // Perform the actual action here (e.g., delete or suspend)
-          if (currentAction === 'delete') {
-              console.log(`Deleting user with ID: ${currentUserId}`);
-              if (currentRowElement) {
-                  currentRowElement.remove(); // Remove the row from the DOM
-              }
-          } else if (currentAction === 'suspend') {
-              console.log(`Suspending user with ID: ${currentUserId}`);
-              if (currentRowElement) {
-                  // Instead of removing, we could update the status and style
-                  currentRowElement.querySelector('.px-2.inline-flex').textContent = 'Suspended';
-                  currentRowElement.querySelector('.px-2.inline-flex').className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200';
-              }
-          } else {
-              console.warn('No action specified.');
+        handleFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            if (form.id === 'add-user-form') {
+                // Logic to add user (currently mock)
+                alert('New user added (demo)!');
+                this.hideModal(this.elements.addUserModal);
+            } else if (form.id === 'edit-user-form') {
+                // Logic to update UI after edit
+                this.currentRowElement.querySelector('.font-medium').textContent = this.elements.editUserNameInput.value;
+                (this.currentRowElement.querySelector('.text-sm') || this.currentRowElement.querySelector('.text-xs')).textContent = this.elements.editUserEmailInput.value;
+                if (this.currentRowElement.querySelector('.text-xs.text-gray-500')) {
+                    this.currentRowElement.querySelector('.text-xs.text-gray-500').textContent = this.elements.editUserPhoneInput.value;
+                }
+                this.hideModal(this.elements.editUserModal);
             }
+            form.reset();
+        },
 
-          hideModal(confirmationModal);
-          resetActionState();
-      });
+        handleConfirmAction() {
+            if (this.currentAction === 'delete') {
+                this.currentRowElement.remove();
+            } else if (this.currentAction === 'suspend') {
+                const statusCell = this.currentRowElement.querySelector('.px-2.inline-flex');
+                statusCell.textContent = 'Suspended';
+                statusCell.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+            }
+            this.hideModal(this.elements.confirmationModal);
+        },
 
+        handleExport() {
+            // This function remains largely the same, just integrated here
+            const isCustomers = this.activeTab === 'customers';
+            const tableBody = isCustomers ? this.elements.customersTableBody : this.elements.sellersTableBody;
+            const rows = [...tableBody.querySelectorAll('tr')].filter(row => row.style.display !== 'none');
+            let data, headers, filename;
 
-      const resetActionState = () => {
-          currentAction = null;
-          currentUserId = null;
-          currentRowElement = null;
-      };
+            if (isCustomers) {
+                headers = ["ID", "Name", "Email", "Phone", "Total Orders", "Status", "Joined"];
+                data = rows.map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return [
+                        cells[0].querySelector('.text-xs').textContent.replace('ID: ', ''),
+                        cells[0].querySelector('.font-medium').textContent,
+                        cells[1].querySelector('.text-sm').textContent,
+                        cells[1].querySelectorAll('div')[1]?.textContent || 'N/A',
+                        cells[2].textContent.trim(),
+                        cells[3].textContent.trim(),
+                        cells[4].textContent.trim()
+                    ];
+                });
+                filename = 'customers-export.csv';
+            } else {
+                headers = ["ID", "Name", "Store Name", "Email", "Location", "Total Sales", "Status", "Joined"];
+                data = rows.map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return [
+                        cells[0].querySelector('.text-xs').textContent.replace('ID: ', ''),
+                        cells[0].querySelector('.font-medium').textContent,
+                        cells[1].querySelector('.font-bold').textContent,
+                        cells[0].querySelector('.text-xs.text-gray-500')?.textContent || 'N/A',
+                        cells[1].querySelector('.text-xs').textContent.replace(' ', '').trim(),
+                        cells[2].textContent.trim(),
+                        cells[3].textContent.trim(),
+                        cells[4].textContent.trim()
+                    ];
+                });
+                filename = 'sellers-export.csv';
+            }
+            this.downloadCSV(headers, data, filename);
+        },
 
-
-
-
-
-      // --- Export Logic ---
-      exportBtn.addEventListener('click', () => {
-        let data, headers, filename;
-
-        if (activeTab === 'customers') {
-            headers = ["ID", "Name", "Email", "Phone", "Location", "Total Orders", "Status", "Joined"];
-            data = [...customerRows].filter(row => row.style.display !== 'none').map(row => {
-                const cells = row.querySelectorAll('td');
-                return [
-                    cells[0].querySelector('.text-xs').textContent.replace('ID: ', ''),
-                    cells[0].querySelector('.font-medium').textContent,
-                    cells[1].querySelector('.text-sm').textContent,
-                    cells[1].querySelector('.text-xs').textContent,
-                    "N/A", // Location not in table
-                    cells[2].textContent.trim(),
-                    cells[3].textContent.trim(),
-                    cells[4].textContent.trim()
-                ];
-            });
-            filename = 'customers-export.csv';
-        } else { // Sellers
-            headers = ["ID", "Name", "Store Name", "Email", "Location", "Total Sales", "Status", "Joined"];
-            data = [...sellerRows].filter(row => row.style.display !== 'none').map(row => {
-                const cells = row.querySelectorAll('td');
-                return [
-                    "N/A", // ID not in table
-                    cells[0].querySelector('.font-medium').textContent,
-                    cells[1].querySelector('.font-bold').textContent,
-                    cells[0].querySelector('.text-xs').textContent,
-                    cells[1].querySelector('.text-xs').textContent.replace(' ', ''),
-                    cells[2].textContent.trim(),
-                    cells[3].textContent.trim(),
-                    cells[4].textContent.trim()
-                ];
-            });
-            filename = 'sellers-export.csv';
+        // --- Utility Functions ---
+        showModal(modal) { modal?.classList.replace('hidden', 'flex'); },
+        hideModal(modal) { modal?.classList.replace('flex', 'hidden'); },
+        toggleNotificationDropdown(e) { e.stopPropagation(); this.elements.notificationDropdown.classList.toggle('hidden'); },
+        closeNotificationDropdown(e) {
+            if (!this.elements.notificationDropdown.classList.contains('hidden') && !this.elements.notificationBtn.contains(e.target) && !this.elements.notificationDropdown.contains(e.target)) {
+                this.elements.notificationDropdown.classList.add('hidden');
+            }
+        },
+        expandNotifications(e) { e.preventDefault(); this.elements.notificationDropdown.querySelector('#notification-list').classList.replace('max-h-80', 'max-h-[60vh]'); e.target.style.display = 'none'; },
+        downloadCSV(headers, data, filename) {
+            let csvContent = [headers.join(","), ...data.map(row => row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(','))].join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
+    };
 
-        downloadCSV(headers, data, filename);
-      });
-
-      function downloadCSV(headers, data, filename) {
-        let csvContent = headers.join(",") + "\n";
-        csvContent += data.map(row => 
-            row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(',')
-        ).join("\n");
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", filename);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    });
+    // --- Entry Point ---
+    document.addEventListener('DOMContentLoaded', () => app.init());
   </script>
+  <script src="admin-theme.js"></script>
 </body>
 </html>

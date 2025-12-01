@@ -1,7 +1,8 @@
 <?php
-// PHP SCRIPT START - SIMPLE LOGIN
+// PHP SCRIPT START - SUPABASE LOGIN
 session_start();
 
+// Load Supabase API
 require_once __DIR__ . '/../config/supabase-api.php';
 
 $login_status = '';
@@ -9,61 +10,99 @@ $login_message = '';
 $redirect_url = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
-    $input_identifier = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    // Check for admin credentials
-    if ($input_identifier === 'Admin1234@gmail.com' && $password === 'Admin123') {
-        $_SESSION['loggedin'] = true;
-        $_SESSION['role'] = 'admin';
-        $_SESSION['username'] = 'Administrator';
-        $_SESSION['email'] = $input_identifier;
-        $_SESSION['full_name'] = 'Administrator';
+    try {
+        $api = getSupabaseAPI();
         
-        $login_status = 'success';
-        $login_message = 'Admin login successful! Redirecting to dashboard...';
-        $redirect_url = '../admin/admin-dashboard.php';
-    } else {
-        // Try to find user in database
-        try {
-            $api = getSupabaseAPI();
-            $users = $api->select('users', ['email' => $input_identifier]);
-            
-            if (!empty($users) && password_verify($password, $users[0]['password_hash'])) {
-                $user = $users[0];
-                
-                // Set session variables
+        $input_identifier = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if (empty($input_identifier) || empty($password)) {
+            $login_status = 'error';
+            $login_message = 'Please enter both email/username and password.';
+        } else {
+            // Check for hardcoded admin credentials first
+            if ($input_identifier === 'Admin1234@gmail.com' && $password === 'Admin123') {
                 $_SESSION['loggedin'] = true;
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['full_name'] = $user['full_name'];
-                $_SESSION['username'] = $user['username'] ?? $user['full_name'];
-                $_SESSION['phone'] = $user['phone'] ?? '';
-                $_SESSION['address'] = $user['address'] ?? '';
-                $_SESSION['role'] = 'customer';
-                $_SESSION['user_type'] = $user['user_type'] ?? 'customer';
+                $_SESSION['role'] = 'admin';
+                $_SESSION['username'] = 'Administrator';
+                $_SESSION['user_id'] = 'admin';
+                $_SESSION['email'] = 'Admin1234@gmail.com';
+                $_SESSION['full_name'] = 'Administrator';
                 
                 $login_status = 'success';
-                $login_message = 'Login successful! Redirecting to homepage...';
-                $redirect_url = '../user/user-homepage.php';
+                $login_message = 'Admin login successful! Redirecting to dashboard...';
+                $redirect_url = '../admin/admin-dashboard.php';
             } else {
-                $login_status = 'error';
-                $login_message = 'Invalid email or password.';
+                // Query Supabase for user by email or username
+                $user = null;
+                
+                // Try to find by email first
+                $users = $api->select('users', ['email' => $input_identifier]);
+                
+                if (!empty($users)) {
+                    $user = $users[0];
+                } else {
+                    // Try to find by username
+                    $users = $api->select('users', ['username' => $input_identifier]);
+                    if (!empty($users)) {
+                        $user = $users[0];
+                    }
+                }
+                
+                if ($user) {
+                    
+                    // Verify password
+                    if (password_verify($password, $user['password_hash'])) {
+                        // Check if account is active
+                        if ($user['status'] !== 'active') {
+                            $login_status = 'error';
+                            $login_message = 'Your account is not active. Please contact support.';
+                        } else {
+                            // Login successful
+                            $_SESSION['loggedin'] = true;
+                            $_SESSION['user_id'] = $user['id'];
+                            $_SESSION['email'] = $user['email'];
+                            $_SESSION['username'] = $user['username'] ?? $user['full_name'];
+                            $_SESSION['full_name'] = $user['full_name'];
+                            $_SESSION['phone'] = $user['phone'] ?? '';
+                            $_SESSION['address'] = $user['address'] ?? '';
+                            $_SESSION['role'] = $user['user_type'];
+                            $_SESSION['user_type'] = $user['user_type'];
+                            
+                            $login_status = 'success';
+                            
+                            // Redirect based on user type
+                            if ($user['user_type'] === 'admin') {
+                                $login_message = 'Admin login successful! Redirecting to dashboard...';
+                                $redirect_url = '../admin/admin-dashboard.php';
+                            } elseif ($user['user_type'] === 'retailer') {
+                                $login_message = 'Retailer login successful! Redirecting to dashboard...';
+                                $redirect_url = '../retailer/retailerdashboard.php';
+                            } else {
+                                // Default to customer
+                                $login_message = 'Login successful! Redirecting to homepage...';
+                                $redirect_url = '../user/user-homepage.php';
+                            }
+                        }
+                    } else {
+                        $login_status = 'error';
+                        $login_message = 'Invalid email/username or password.';
+                    }
+                } else {
+                    $login_status = 'error';
+                    $login_message = 'Invalid email/username or password.';
+                }
             }
-        } catch (Exception $e) {
-            // Fallback to simple login for demo
-            $_SESSION['loggedin'] = true;
-            $_SESSION['username'] = $input_identifier;
-            $_SESSION['email'] = $input_identifier;
-            $_SESSION['full_name'] = $input_identifier;
-            $_SESSION['role'] = 'user';
-            
-            $login_status = 'success';
-            $login_message = 'Login successful! Redirecting to homepage...';
-            $redirect_url = '../user/user-homepage.php';
         }
+    } catch (Exception $e) {
+        error_log("Login Error: " . $e->getMessage());
+        $login_status = 'error';
+        $login_message = 'A system error occurred. Please try again later.';
     }
 }
+
+// Check for registration success message
+$registered_success = isset($_GET['registered']) && $_GET['registered'] === 'success';
 // PHP SCRIPT END
 ?>
 <!DOCTYPE html>
@@ -192,6 +231,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
           <i class="fas fa-leaf text-3xl"></i>
         </div>
       </div>
+      
+      <?php if ($registered_success): ?>
+      <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div class="flex items-start">
+          <i class="fas fa-check-circle text-green-600 text-xl mt-0.5 mr-3"></i>
+          <div>
+            <h3 class="text-green-800 font-semibold">Registration Successful!</h3>
+            <p class="text-green-700 text-sm mt-1">Your account has been created. Please login with your credentials.</p>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+      
       <h2 class="text-2xl font-bold text-gray-800 text-center">Welcome Back</h2>
       <p class="text-gray-600 mt-1 text-center mb-8">Sign in to your account</p>
       <form id="loginForm" method="POST" class="space-y-6">
