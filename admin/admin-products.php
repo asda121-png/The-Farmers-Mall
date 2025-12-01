@@ -1,71 +1,57 @@
 <?php
-// admin-inventory.php
-// Mock Inventory Data
-$inventory_stats = [
-    "total_products" => 97,
-    "low_stock" => 12,
-    "out_of_stock" => 5,
-    "incoming" => 240
-];
+// admin-products.php
+// Simulated Database Connection/Data
+$admin_name = "Admin User";
 
-$inventory_items = [
+// Mock Product Data
+$products = [
     [
         "id" => "98432",
-        "sku" => "VEG-CRT-001",
         "name" => "Fresh Carrots",
         "category" => "Vegetables",
+        "price" => 120.00,
         "stock" => 450,
-        "max_stock" => 1000,
-        "reorder_level" => 100,
-        "last_updated" => "2023-10-25",
+        "sold" => 1200,
         "status" => "In Stock",
         "image" => "https://placehold.co/40x40/f3f4f6/1f2937?text=VEG"
     ],
     [
         "id" => "76112",
-        "sku" => "FRU-APP-022",
         "name" => "Organic Apples",
         "category" => "Fruits",
+        "price" => 85.50,
         "stock" => 12,
-        "max_stock" => 500,
-        "reorder_level" => 50,
-        "last_updated" => "2023-10-26",
+        "sold" => 850,
         "status" => "Low Stock",
         "image" => "https://placehold.co/40x40/f3f4f6/1f2937?text=FRU"
     ],
     [
         "id" => "23891",
-        "sku" => "MEA-CHK-103",
         "name" => "Chicken Breast",
         "category" => "Meat",
+        "price" => 240.00,
         "stock" => 0,
-        "max_stock" => 200,
-        "reorder_level" => 20,
-        "last_updated" => "2023-10-24",
+        "sold" => 2100,
         "status" => "Out of Stock",
         "image" => "https://placehold.co/40x40/f3f4f6/1f2937?text=MEA"
     ],
     [
         "id" => "11234",
-        "sku" => "DAI-MLK-005",
         "name" => "Fresh Milk (1L)",
         "category" => "Dairy",
+        "price" => 90.00,
         "stock" => 150,
-        "max_stock" => 300,
-        "reorder_level" => 30,
-        "last_updated" => "2023-10-27",
+        "sold" => 430,
         "status" => "In Stock",
         "image" => "https://placehold.co/40x40/f3f4f6/1f2937?text=DAI"
     ],
     [
         "id" => "55431",
-        "sku" => "GRN-RIC-099",
         "name" => "Brown Rice (5kg)",
         "category" => "Grains",
+        "price" => 350.00,
         "stock" => 80,
-        "max_stock" => 200,
-        "reorder_level" => 40,
-        "last_updated" => "2023-10-20",
+        "sold" => 150,
         "status" => "In Stock",
         "image" => "https://placehold.co/40x40/f3f4f6/1f2937?text=GRN"
     ],
@@ -77,11 +63,11 @@ $inventory_items = [
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Farmers Mall Admin Panel - Inventory</title>
+  <title>Farmers Mall Admin Panel - Products</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* Global Styles (Consistent) */
+    /* Global Styles (Consistent with Dashboard) */
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f7f9fc;
@@ -103,7 +89,7 @@ $inventory_items = [
     .card-shadow {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     }
-    
+
     .bg-green-950 {
         background-color: #184D34;
     }
@@ -123,37 +109,37 @@ $inventory_items = [
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest mb-2 px-2">GENERAL</p>
       <nav class="space-y-1">
-  <a href="admin-dashboard.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-    <i class="fa-solid fa-tachometer-alt w-5"></i>
-    <span>Dashboard</span>
-  </a>
+        <a href="admin-dashboard.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+            <i class="fa-solid fa-tachometer-alt w-5 "></i>
+            <span>Dashboard</span>
+        </a>
 
-  <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-    <i class="fa-solid fa-box w-5"></i>
-    <span>Products</span>
-  </a>
+        <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
+            <i class="fa-solid fa-box w-5 text-green-200"></i>
+            <span>Products</span>
+        </a>
 
-  <a href="admin-inventory.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
-    <i class="fa-solid fa-truck-ramp-box w-5 text-green-200"></i>
-    <span>Inventory</span>
-  </a>
+        <a href="admin-inventory.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+            <i class="fa-solid fa-truck-ramp-box w-5"></i>
+            <span>Inventory</span>
+        </a>
 
-  <a href="admin-retailers.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-    <i class="fa-solid fa-store w-5"></i>
-    <span>Retailers</span>
-  </a>
+        <a href="admin-retailers.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+            <i class="fa-solid fa-store w-5"></i>
+            <span>Retailers</span>
+        </a>
 
-  <a href="admin-reviews.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-    <i class="fa-solid fa-star w-5"></i>
-    <span>Review</span>
-    <span class="ml-auto text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium">02</span>
-  </a>
+        <a href="admin-reviews.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+            <i class="fa-solid fa-star w-5"></i>
+            <span>Review</span>
+            <span class="ml-auto text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium">02</span>
+        </a>
 
-  <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-    <i class="fa-solid fa-receipt w-5"></i>
-    <span>Orders</span>
-  </a>
-</nav>
+        <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+            <i class="fa-solid fa-receipt w-5"></i>
+            <span>Orders</span>
+        </a>
+        </nav>
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
       <nav class="space-y-1">
@@ -181,7 +167,7 @@ $inventory_items = [
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
       <div class="relative w-full max-w-lg hidden md:block">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search by SKU, Name or Category..."
+        <input type="text" placeholder="Search products..."
           class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
       </div>
 
@@ -198,131 +184,130 @@ $inventory_items = [
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h2 class="text-3xl font-bold text-gray-900">Inventory Management</h2>
-            <p class="text-sm text-gray-500">Track stock levels and manage reorders</p>
+            <h2 class="text-3xl font-bold text-gray-900">Products</h2>
+            <p class="text-sm text-gray-500">Manage your product catalog and inventory</p>
         </div>
         <div class="flex gap-3">
              <button class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
-                <i class="fa-solid fa-download"></i> Report
+                <i class="fa-solid fa-file-export"></i> Export
             </button>
             <button class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
-                <i class="fa-solid fa-plus"></i> Stock Adjustment
+                <i class="fa-solid fa-plus"></i> Add Product
             </button>
         </div>
     </div>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded-xl card-shadow border-l-4 border-blue-500">
-            <div class="text-gray-500 text-sm font-medium">Total Products</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1"><?php echo $inventory_stats['total_products']; ?></div>
+
+    <div class="bg-white p-4 rounded-xl card-shadow flex flex-wrap gap-4 items-center">
+        <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 w-full md:w-auto md:min-w-[200px]">
+            <i class="fa-solid fa-filter text-gray-400"></i>
+            <select class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
+                <option value="">All Categories</option>
+                <option value="Vegetables">Vegetables</option>
+                <option value="Fruits">Fruits</option>
+                <option value="Meat">Meat</option>
+                <option value="Dairy">Dairy</option>
+            </select>
         </div>
-        <div class="bg-white p-4 rounded-xl card-shadow border-l-4 border-yellow-500">
-             <div class="text-gray-500 text-sm font-medium">Low Stock Alerts</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1"><?php echo $inventory_stats['low_stock']; ?></div>
-        </div>
-        <div class="bg-white p-4 rounded-xl card-shadow border-l-4 border-red-500">
-             <div class="text-gray-500 text-sm font-medium">Out of Stock</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1"><?php echo $inventory_stats['out_of_stock']; ?></div>
-        </div>
-        <div class="bg-white p-4 rounded-xl card-shadow border-l-4 border-green-500">
-             <div class="text-gray-500 text-sm font-medium">Incoming (PO)</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1"><?php echo $inventory_stats['incoming']; ?></div>
+        
+        <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 w-full md:w-auto md:min-w-[200px]">
+             <i class="fa-solid fa-layer-group text-gray-400"></i>
+            <select class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
+                <option value="">Status</option>
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+            </select>
         </div>
     </div>
 
     <div class="bg-white rounded-xl card-shadow overflow-hidden">
-        <div class="p-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
-            <h3 class="font-semibold text-lg">Stock Overview</h3>
-            <div class="flex items-center gap-2">
-                <select class="border border-gray-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-green-500">
-                    <option>All Categories</option>
-                    <option>Vegetables</option>
-                    <option>Fruits</option>
-                    <option>Meat</option>
-                </select>
-                <select class="border border-gray-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-green-500">
-                    <option>Stock Status</option>
-                    <option>Low Stock</option>
-                    <option>Out of Stock</option>
-                </select>
-            </div>
-        </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product / SKU</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/4">Stock Level</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Updated</th>
-                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Sold</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <?php foreach ($inventory_items as $item): 
-                        // Calculate percentage for progress bar
-                        $percent = ($item['stock'] / $item['max_stock']) * 100;
-                        if($percent > 100) $percent = 100;
-                        
-                        // Color logic for progress bar
-                        $barColor = 'bg-green-500';
-                        if($percent < 30) $barColor = 'bg-yellow-500';
-                        if($item['stock'] == 0) $barColor = 'bg-red-500';
-                    ?>
+                    <?php foreach ($products as $product): ?>
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-lg object-cover border border-gray-100" src="<?php echo $item['image']; ?>" alt="">
+                                    <img class="h-10 w-10 rounded-lg object-cover border border-gray-100" src="<?php echo $product['image']; ?>" alt="">
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900"><?php echo $item['name']; ?></div>
-                                    <div class="text-xs text-gray-500 font-mono"><?php echo $item['sku']; ?></div>
-                                </div>
-                            </div>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            <?php echo $item['category']; ?>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap align-middle">
-                            <div class="w-full">
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="font-medium text-gray-700"><?php echo $item['stock']; ?></span>
-                                    <span class="text-gray-400">/ <?php echo $item['max_stock']; ?></span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="<?php echo $barColor; ?> h-2 rounded-full" style="width: <?php echo $percent; ?>%"></div>
+                                    <div class="text-sm font-medium text-gray-900"><?php echo $product['name']; ?></div>
+                                    <div class="text-xs text-gray-500">ID: #<?php echo $product['id']; ?></div>
                                 </div>
                             </div>
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap">
-                             <?php 
-                                $statusClass = 'bg-gray-100 text-gray-800';
-                                if($item['status'] === 'In Stock') $statusClass = 'bg-green-100 text-green-800 border border-green-200';
-                                if($item['status'] === 'Low Stock') $statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-                                if($item['status'] === 'Out of Stock') $statusClass = 'bg-red-100 text-red-800 border border-red-200';
-                            ?>
-                            <span class="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $statusClass; ?>">
-                                <?php echo $item['status']; ?>
-                            </span>
+                            <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md"><?php echo $product['category']; ?></span>
+                        </td>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-gray-900">₱<?php echo number_format($product['price'], 2); ?></div>
+                        </td>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-col gap-1">
+                                <?php 
+                                    $statusClass = 'bg-gray-100 text-gray-800';
+                                    if($product['status'] === 'In Stock') $statusClass = 'bg-green-100 text-green-800';
+                                    if($product['status'] === 'Low Stock') $statusClass = 'bg-yellow-100 text-yellow-800';
+                                    if($product['status'] === 'Out of Stock') $statusClass = 'bg-red-100 text-red-800';
+                                ?>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit <?php echo $statusClass; ?>">
+                                    <?php echo $product['status']; ?>
+                                </span>
+                                <span class="text-xs text-gray-500"><?php echo $product['stock']; ?> items left</span>
+                            </div>
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <?php echo $item['last_updated']; ?>
+                            <?php echo $product['sold']; ?>
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-green-600 hover:text-green-900 mr-3" title="Restock"><i class="fa-solid fa-rotate-right"></i></button>
-                            <button class="text-indigo-600 hover:text-indigo-900" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="text-red-600 hover:text-red-900" title="Delete"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+        
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">97</span> results
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">Previous</span>
+                            <i class="fa-solid fa-chevron-left h-4 w-4"></i>
+                        </a>
+                        <a href="#" aria-current="page" class="z-10 bg-green-50 border-green-500 text-green-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">1</a>
+                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">2</a>
+                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">3</a>
+                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">Next</span>
+                             <i class="fa-solid fa-chevron-right h-4 w-4"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -346,7 +331,7 @@ $inventory_items = [
 
   </div> <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Logout Modal Logic
+      // Logout Logic
       const logoutButton = document.getElementById('logoutButton');
       const logoutModal = document.getElementById('logoutModal');
       const cancelLogout = document.getElementById('cancelLogout');
@@ -370,4 +355,4 @@ $inventory_items = [
     });
   </script>
 </body>
-</html>
+</html> 
