@@ -104,7 +104,7 @@
     </div>
   </footer>
 
-  <script src="../js/customernotification.js"></script>
+  <script src="../assets/js/customernotification.js"></script>
   <script>
     // Update cart icon with item count
     function updateCartIcon() {

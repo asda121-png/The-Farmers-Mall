@@ -6,7 +6,7 @@
   <title>Your Cart – Farmers Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="../css/productdetails.css">
+  <link rel="stylesheet" href="../assets/css/productdetails.css">
   <style>
     /* Modal Animation */
     #deleteModal.show, #clearCartModal.show {
@@ -297,7 +297,7 @@
   </div>
 
   <!-- JavaScript -->
-  <script src="../js/cart.js"></script>
+  <script src="../assets/js/cart.js"></script>
   <script>
     // Update cart icon with item count
     function updateCartIcon() {

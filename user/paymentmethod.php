@@ -200,7 +200,7 @@
     </div>
   </footer>
 
-  <script src="../js/paymentmethod.js"></script>
+  <script src="../assets/js/paymentmethod.js"></script>
   <script>
     // Load User Profile Data
     function loadUserProfile() {

@@ -166,7 +166,7 @@
     </div>
   </div>
 
-  <script src="../js/retailerprofile.js"></script>
+  <script src="../assets/js/retailerprofile.js"></script>
   <!-- Footer -->
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">

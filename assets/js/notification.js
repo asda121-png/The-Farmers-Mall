@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const headerSearchInput = document.querySelector('#header input[type="text"]');
       if (headerSearchInput) {
         const form = document.createElement('form');
-        form.action = 'products.html';
+        form.action = 'products.php';
         form.method = 'GET';
         headerSearchInput.name = 'search';
         headerSearchInput.parentElement.insertBefore(form, headerSearchInput);

@@ -8,7 +8,7 @@
   <!-- Tailwind + Font Awesome (CDN as in your project) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="../css/productdetails.css">
+  <link rel="stylesheet" href="../assets/css/productdetails.css">
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -315,7 +315,7 @@
     </div>
   </footer>
 
-  <script src="../js/products.js"></script>
+  <script src="../assets/js/products.js"></script>
   <script>
     // Load user profile data
     document.addEventListener('DOMContentLoaded', function() {

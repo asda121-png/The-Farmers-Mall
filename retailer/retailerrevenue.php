@@ -69,7 +69,7 @@ include '../retailer/retailerheader.php';
   </footer>
 
 
-  <script src="../js/retailerrevenue.js"></script>
+  <script src="../assets/js/retailerrevenue.js"></script>
   <script>    document.addEventListener('DOMContentLoaded', () => {
       const allOrders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
 

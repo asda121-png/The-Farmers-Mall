@@ -1,30 +1,5 @@
- // Dynamically load header.html
-    fetch('header.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('header').innerHTML = data;
-
-        // Highlight the cart icon
-        const cartIcon = document.querySelector('a[href="cart.html"] i');
-        if (cartIcon) {
-          cartIcon.parentElement.classList.remove('text-gray-600');
-          cartIcon.parentElement.classList.add('text-green-600');
-        }
-
-        // Add search functionality to the loaded header
-        const headerSearchInput = document.querySelector('#header input[type="text"]');
-        if (headerSearchInput) {
-          const form = document.createElement('form');
-          form.action = 'products.html';
-          form.method = 'GET';
-          headerSearchInput.name = 'search';
-          headerSearchInput.parentElement.insertBefore(form, headerSearchInput);
-          form.appendChild(headerSearchInput);
-        }
-
-        // Update cart icon badge
-        updateCartIcon();
-      });
+    // Update cart icon badge on load
+    updateCartIcon();
 
     // CART FUNCTIONALITY
     const cartContainer = document.getElementById('cartItems');
@@ -48,7 +23,7 @@
             <i class="fas fa-shopping-cart text-gray-300 text-6xl mb-4"></i>
             <p class="text-gray-500 text-xl mb-2">Your cart is empty</p>
             <p class="text-gray-400 mb-6">Add some products to get started!</p>
-            <a href="products.html" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-md">
+            <a href="products.php" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-md">
               <i class="fa-solid fa-shopping-bag mr-2"></i>
               Browse Products
             </a>
@@ -69,7 +44,7 @@
         div.className = 'bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-md transition-shadow gap-4';
         div.innerHTML = `
           <div class="flex items-center gap-4 flex-1">
-            <img src="${item.image || 'images/products/Fresh Vegetable Box.png'}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+        <img src="${item.image || '../images/products/Fresh Vegetable Box.png'}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
             <div class="flex-1">
               <h3 class="font-semibold text-gray-800 text-lg">${escapeHtml(item.name)}</h3>
               <p class="text-green-700 font-medium text-sm">₱${item.price.toFixed(2)} each</p>
@@ -103,6 +78,7 @@
               item.quantity--;
             }
             localStorage.setItem('cart', JSON.stringify(cart));
+            window.dispatchEvent(new Event('cartUpdated'));
             renderCart();
             updateCartIcon();
           });
@@ -158,13 +134,13 @@
     }
 
     function updateCartIcon() {
-      const cartIcon = document.querySelector('a[href="cart.html"]');
+      const cartIcon = document.querySelector('a[href="cart.php"]');
       if (!cartIcon) return;
 
       let badge = cartIcon.querySelector('.cart-badge');
       if (!badge) {
         badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.25rem] text-center';
+      badge.className = 'cart-badge absolute -top-1 -right-1 bg-red-600 text-white text-sm font-semibold rounded-full px-2 min-w-[1.5rem] text-center z-10';
         cartIcon.classList.add('relative');
         cartIcon.appendChild(badge);
       }
@@ -248,13 +224,16 @@
       const productImage = document.getElementById('modalProductImage');
       const productName = document.getElementById('modalProductName');
       const productPrice = document.getElementById('modalProductPrice');
+      const productQuantity = document.getElementById('modalProductQuantity');
       const confirmBtn = document.getElementById('confirmDeleteBtn');
       const cancelBtn = document.getElementById('cancelDeleteBtn');
+      const closeBtn = document.getElementById('closeDeleteModal');
 
       // Set product info
       productImage.src = item.image || 'images/products/Fresh Vegetable Box.png';
       productName.textContent = item.name;
-      productPrice.textContent = `₱${item.price.toFixed(2)} × ${item.quantity || 1}`;
+      productPrice.textContent = `₱${item.price.toFixed(2)}`;
+      productQuantity.textContent = `Quantity: ${item.quantity || 1}`;
 
       // Show modal
       modal.classList.remove('hidden');
@@ -263,8 +242,10 @@
       // Remove existing event listeners by cloning buttons
       const newConfirmBtn = confirmBtn.cloneNode(true);
       const newCancelBtn = cancelBtn.cloneNode(true);
+      const newCloseBtn = closeBtn.cloneNode(true);
       confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
       cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+      closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
 
       // Add event listeners
       newConfirmBtn.addEventListener('click', () => {
@@ -277,7 +258,8 @@
       });
 
       newCancelBtn.addEventListener('click', hideDeleteModal);
-      
+      newCloseBtn.addEventListener('click', hideDeleteModal);
+
       // Click outside to close
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {

@@ -73,7 +73,7 @@ include '../retailer/retailerheader.php';
       rights reserved.</div>
   </footer>
 
-  <script src="../js/retailersearchresults.js"></script>
+  <script src="../assets/js/retailersearchresults.js"></script>
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('searchInput');
       const resultsTitle = document.getElementById('resultsTitle');

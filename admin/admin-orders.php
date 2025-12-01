@@ -139,7 +139,7 @@
     </div>
   </div>
 
-  <script src="../js/admin-orders.js"></script>
+  <script src="../assets/js/admin-orders.js"></script>
 
 </body>
 </html>
