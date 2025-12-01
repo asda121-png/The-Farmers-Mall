@@ -71,7 +71,7 @@ include '../retailer/retailerheader.php';
               <img id="customerAvatar" src="" class="w-10 h-10 rounded-full" alt="">
               <div>
                 <p id="customerName" class="font-medium"></p>
-                <p id="customerEmail" class="text-sm text-gray-500"></p>
+                <p id="customerEmail" class="text-sm text-gray-500 break-all"></p>
               </div>
             </div>
           </div>

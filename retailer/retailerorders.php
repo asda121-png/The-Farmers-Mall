@@ -230,8 +230,8 @@ include '../retailer/retailerheader.php';
             <td class="px-6 py-4">
               <span class="${statusClass} px-2 py-1 text-xs font-medium rounded-full">${order.status}</span>
             </td>
-            <td class="px-6 py-4 text-right text-green-600">
-              <i class="fa-solid fa-chevron-right"></i>
+            <td class="px-6 py-4 text-right">
+              <button class="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-green-700">See Order Details</button>
             </td>
           `;
           ordersTableBody.appendChild(tr);
