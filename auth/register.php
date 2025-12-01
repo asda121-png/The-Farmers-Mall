@@ -1,51 +1,24 @@
 <?php
-// PHP SCRIPT START - SERVER-SIDE REGISTRATION WITH MYSQL INTEGRATION
+// PHP SCRIPT START - SERVER-SIDE REGISTRATION WITH SUPABASE INTEGRATION
 
-// --- MySQL Connection Details (Based on user input) ---
-// WARNING: In a production environment, these should never be hardcoded 
-// and should be loaded from a secure configuration file outside the web root.
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', ''); // No password as specified by the user
-define('DB_NAME', 'farmers');
+// Load Supabase database connection
+require_once __DIR__ . '/../config/supabase-api.php';
 
 $registration_status = '';
 $registration_message = '';
 
-/**
- * Establishes a connection to the MySQL database.
- * @return mysqli|null The database connection object or null on failure.
- */
-function connectToDatabase() {
-    // The @ suppresses warnings/errors, we handle the error via $conn->connect_error below
-    $conn = @new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-    // Check connection
-    if ($conn->connect_error) {
-        // In a real app, this would log to a file, not output directly.
-        error_log("Connection failed: " . $conn->connect_error);
-        return null;
-    }
-    return $conn;
-}
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])) {
-    // 1. Connect to Database
-    $conn = connectToDatabase();
-    
-    if (!$conn) {
-        $registration_status = 'error';
-        $registration_message = "Registration failed: Database connection failed. Please ensure MySQL is running and database '" . DB_NAME . "' exists.";
-    } else {
+    try {
+        // 1. Get Supabase API instance
+        $api = getSupabaseAPI();
+        
         // 2. Collect and Sanitize Data
-        // Use real_escape_string for safety, although prepared statements below are the primary defense.
-        $firstName = $conn->real_escape_string(trim($_POST['firstname'] ?? ''));
-        $lastName = $conn->real_escape_string(trim($_POST['lastname'] ?? ''));
-        $email = $conn->real_escape_string(filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL));
-        $username = $conn->real_escape_string(trim($_POST['username'] ?? ''));
-        $address = $conn->real_escape_string(trim($_POST['address'] ?? ''));
-        $phone = $conn->real_escape_string(trim($_POST['phone'] ?? ''));
+        $firstName = trim($_POST['firstname'] ?? '');
+        $lastName = trim($_POST['lastname'] ?? '');
+        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+        $username = trim($_POST['username'] ?? '');
+        $address = trim($_POST['address'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirm = $_POST['confirm'] ?? '';
         $terms = isset($_POST['terms']);
@@ -53,72 +26,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         $errors = [];
 
         // 3. Server-Side Validation
+        if (empty($firstName)) {
+            $errors[] = "First name is required.";
+        }
+        if (empty($lastName)) {
+            $errors[] = "Last name is required.";
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format.";
+        }
+        if (empty($username)) {
+            $errors[] = "Username is required.";
+        }
+        if (strlen($password) < 6) {
+            $errors[] = "Password must be at least 6 characters.";
+        }
         if ($password !== $confirm) {
             $errors[] = "Passwords do not match.";
         }
         if (!preg_match('/^09\d{9}$/', $phone)) {
-            $errors[] = "Invalid phone number format.";
+            $errors[] = "Invalid phone number format (must be 09XXXXXXXXX).";
         }
         if (!$terms) {
             $errors[] = "You must agree to the Terms and Privacy Policy.";
         }
         
-        // IMPORTANT: In a production app, you would check here to see if the username/email already exists.
+        // Check if email already exists
+        if (empty($errors)) {
+            try {
+                $existingUser = $api->select('users', ['email' => $email]);
+                if (!empty($existingUser)) {
+                    $errors[] = "Email already registered. Please use a different email.";
+                }
+            } catch (Exception $e) {
+                // Continue if table check fails
+            }
+        }
         
         if (empty($errors)) {
-            // 4. Set Static Role as requested
+            // 4. Set static role as customer
             $role = 'customer';
             
             // 5. Hash the password securely
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             
-            // --- MYSQL INSERTION USING PREPARED STATEMENTS (Assumes 'users' table exists) ---
-            // NOTE: Must ensure 8 columns match 8 placeholders in VALUES
-            $sql = "INSERT INTO users (first_name, last_name, email, role, username, address, phone, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            // 6. Prepare full name for database
+            $fullName = $firstName . ' ' . $lastName;
             
-            // Prepare statement
-            if ($stmt = $conn->prepare($sql)) {
-                // Bind parameters (s = string)
-                // Binding 8 variables: $firstName, $lastName, $email, $role, $username, $address, $phone, $hashedPassword
-                $stmt->bind_param("ssssssss", 
-                    $firstName, 
-                    $lastName, 
-                    $email, 
-                    $role,             // <--- The static 'customer' role
-                    $username, 
-                    $address, 
-                    $phone, 
-                    $hashedPassword
-                );
-
-                // Execute statement
-                if ($stmt->execute()) {
-                    // *** SUCCESS: IMMEDIATE REDIRECT TO LOGIN.PHP ***
-                    header("Location: login.php");
-                    exit(); // Stop further script execution
-                } else {
-                    // Log detailed database error
-                    error_log("MySQL Insertion Error: " . $stmt->error);
-                    $registration_status = 'error';
-                    $registration_message = "Registration failed due to a database error. Please contact support. (Code: 500)";
-                }
-
-                // Close statement
-                $stmt->close();
+            // 7. Insert into Supabase database
+            $newUser = $api->insert('users', [
+                'email' => $email,
+                'password_hash' => $hashedPassword,
+                'full_name' => $fullName,
+                'phone' => $phone,
+                'user_type' => $role,
+                'status' => 'active'
+            ]);
+            
+            if (!empty($newUser)) {
+                // SUCCESS: Redirect to login page
+                $registration_status = 'success';
+                header("Location: login.php?registered=success");
+                exit();
             } else {
-                error_log("MySQL Prepare Error: " . $conn->error);
                 $registration_status = 'error';
-                $registration_message = "Registration failed: Could not prepare SQL statement. (Code: 501)";
+                $registration_message = "Registration failed. Please try again.";
             }
             
         } else {
-            // Errors from validation
+            // Validation errors
             $registration_status = 'error';
-            $registration_message = "Registration failed: " . implode(" | ", $errors);
+            $registration_message = implode(" | ", $errors);
         }
-
-        // 6. Close Connection
-        $conn->close();
+        
+    } catch (Exception $e) {
+        error_log("Registration Error: " . $e->getMessage());
+        $registration_status = 'error';
+        $registration_message = "Registration failed due to a system error. Please try again later.";
     }
 }
 // PHP SCRIPT END
