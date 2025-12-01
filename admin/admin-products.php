@@ -170,9 +170,9 @@ $products = [
             <span class="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
         </i>
         <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <div class="flex items-center gap-2 cursor-pointer">
+        <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-        </div>
+        </a>
       </div>
     </header>
 
