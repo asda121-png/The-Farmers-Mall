@@ -103,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
 
 // Check for registration success message
 $registered_success = isset($_GET['registered']) && $_GET['registered'] === 'success';
+$registration_type = $_GET['type'] ?? 'customer';
 // PHP SCRIPT END
 ?>
 <!DOCTYPE html>
@@ -237,8 +238,20 @@ $registered_success = isset($_GET['registered']) && $_GET['registered'] === 'suc
         <div class="flex items-start">
           <i class="fas fa-check-circle text-green-600 text-xl mt-0.5 mr-3"></i>
           <div>
-            <h3 class="text-green-800 font-semibold">Registration Successful!</h3>
-            <p class="text-green-700 text-sm mt-1">Your account has been created. Please login with your credentials.</p>
+            <h3 class="text-green-800 font-semibold">
+              <?php if ($registration_type === 'retailer'): ?>
+                Seller Account Created Successfully!
+              <?php else: ?>
+                Registration Successful!
+              <?php endif; ?>
+            </h3>
+            <p class="text-green-700 text-sm mt-1">
+              <?php if ($registration_type === 'retailer'): ?>
+                Your seller account has been created. Please login to access your seller dashboard and start listing your products.
+              <?php else: ?>
+                Your account has been created. Please login with your credentials.
+              <?php endif; ?>
+            </p>
           </div>
         </div>
       </div>

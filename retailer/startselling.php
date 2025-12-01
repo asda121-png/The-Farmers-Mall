@@ -83,16 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
                 $newRetailer = $api->insert('retailers', $retailerData);
                 
                 if (!empty($newRetailer)) {
-                    // Success - set session and redirect
-                    $_SESSION['loggedin'] = true;
-                    $_SESSION['user_id'] = $userId;
-                    $_SESSION['email'] = $email;
-                    $_SESSION['username'] = $fullName;
-                    $_SESSION['role'] = 'retailer';
-                    $_SESSION['retailer_id'] = $newRetailer[0]['id'];
-                    
+                    // Success - redirect to login with success message
                     $registration_status = 'success';
-                    header('Location: retailerdashboard.php');
+                    header('Location: ../auth/login.php?registered=success&type=retailer');
                     exit();
                 } else {
                     $errors[] = "Failed to create retailer profile.";
