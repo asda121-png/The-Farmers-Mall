@@ -425,16 +425,19 @@ include '../includes/header1.php';
       }
     }
 
-    // Final form submission validation
+    // Final form submission handler
     document.getElementById('retailer-signup-form').addEventListener('submit', function(event) {
-      event.preventDefault(); // Stop form submission to handle it with JavaScript
+      // Only handle submission if we are on the final step
+      if (currentStep === totalSteps) {
+        event.preventDefault(); // Stop default form submission to handle with JS
 
-      const termsCheckbox = document.getElementById('terms-checkbox');
-      if (!termsCheckbox.checked) {
-        alert('You must agree to the Terms and Conditions to create an account.');
-      } else {
-        // On successful validation, redirect to the login page.
-        window.location.href = '../auth/login.php';
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        if (!termsCheckbox.checked) {
+          alert('You must agree to the Terms and Conditions to create an account.');
+        } else {
+          // On successful validation, redirect to the login page.
+          window.location.href = '../auth/login.php';
+        }
       }
     });
   </script>
