@@ -1,28 +1,26 @@
 # 🚀 Quick Setup for Team Members
 
-## Step 1: Clone/Pull the Project
+## Automated Setup (Recommended)
 
+### Method 1: Double-Click Setup (Easiest)
+1. Pull the latest code: `git pull`
+2. Double-click **`setup.bat`** in the project folder
+3. Wait for it to complete - Done! ✅
+
+### Method 2: PowerShell Command
+1. Pull the latest code: `git pull`
+2. Run: `.\setup.ps1`
+3. Done! ✅
+
+### Method 3: Manual Setup
 ```powershell
-# If you don't have the project yet
-git clone https://github.com/asda121-png/The-Farmers-Mall.git
-cd The-Farmers-Mall
-
-# If you already have it
+# 1. Pull latest code
 git pull
-```
 
-## Step 2: Create Your .env File
-
-```powershell
-# Copy the example file to create your .env
+# 2. Create .env file
 Copy-Item config\.env.example config\.env
-```
 
-**That's it!** The `.env.example` already contains all the working credentials.
-
-## Step 3: Test Your Connection
-
-```powershell
+# 3. Test connection
 php config/test-database.php
 ```
 
@@ -31,6 +29,15 @@ You should see:
 🎉 ALL TESTS PASSED! 🎉
 Your Supabase database is working perfectly!
 ```
+
+## What the Setup Script Does
+
+✅ Creates `.env` file automatically  
+✅ Checks PHP installation  
+✅ Enables CURL extension if needed  
+✅ Downloads SSL certificates if needed  
+✅ Tests database connection  
+✅ Shows clear error messages if something fails
 
 ## Step 4: Start Coding!
 
@@ -102,21 +109,25 @@ $api->delete('products', ['name' => 'Fresh Tomatoes']);
 
 ## 🆘 Troubleshooting
 
+### Setup script fails
+1. Make sure you ran `git pull` first
+2. Run PowerShell as Administrator
+3. Try: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass`
+4. Run `.\setup.ps1` again
+
 ### "config/.env file not found"
-```powershell
-Copy-Item config\.env.example config\.env
-```
+Run the setup script: `.\setup.ps1` or double-click `setup.bat`
 
 ### "Call to undefined function curl_init()"
-CURL extension needs to be enabled (already done on main setup, but if you get this error):
-1. Find your `php.ini` file: `php --ini`
-2. Edit it and uncomment: `extension=curl`
-3. Add: `curl.cainfo = "C:\php\cacert.pem"`
+The setup script will fix this automatically. If not:
+1. Run setup script as Administrator
+2. Or manually enable in php.ini: `extension=curl`
 
 ### Connection test fails
 - Check your internet connection
-- Verify `.env` file exists in `config/` folder
-- Make sure you copied it from `.env.example`
+- Make sure you're not behind a firewall blocking Supabase
+- Try running `.\setup.ps1` again
+- Contact team lead if still failing
 
 ## 📚 Database Tables
 

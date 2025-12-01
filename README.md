@@ -4,18 +4,17 @@ An e-commerce platform connecting farmers/retailers with customers.
 
 ## 🚀 Quick Start for Team Members
 
-### 1️⃣ Get the Code
+### Option 1: Automated Setup (Recommended) 🎯
 ```powershell
 git pull
+.\setup.ps1
 ```
+Or just double-click **`setup.bat`** ✨
 
-### 2️⃣ Setup Database Connection (One-time)
+### Option 2: Manual Setup
 ```powershell
+git pull
 Copy-Item config\.env.example config\.env
-```
-
-### 3️⃣ Test Everything Works
-```powershell
 php config/test-database.php
 ```
 
