@@ -95,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             try {
                 $newUser = $api->insert('users', [
                     'email' => $email,
+                    'username' => $username,
                     'password_hash' => $hashedPassword,
                     'full_name' => $fullName,
                     'phone' => $phone,

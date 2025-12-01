@@ -33,24 +33,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
                 $redirect_url = '../admin/admin-dashboard.php';
             } else {
                 // Query Supabase for user by email or username
-                // Try email first
-                $users = $api->select('users', ['email' => $input_identifier]);
+                $user = null;
                 
-                // If not found by email, try username (case-insensitive search)
-                if (empty($users)) {
-                    // For username search, we need to get all users and filter
-                    // This is a limitation of the simple API, but works for small datasets
-                    $allUsers = $api->select('users', []);
-                    foreach ($allUsers as $u) {
-                        if (isset($u['email']) && strcasecmp($u['email'], $input_identifier) === 0) {
-                            $users = [$u];
-                            break;
-                        }
-                    }
-                }
+                // Try to find by email first
+                $users = $api->select('users', ['email' => $input_identifier]);
                 
                 if (!empty($users)) {
                     $user = $users[0];
+                } else {
+                    // Try to find by username
+                    $users = $api->select('users', ['username' => $input_identifier]);
+                    if (!empty($users)) {
+                        $user = $users[0];
+                    }
+                }
+                
+                if ($user) {
                     
                     // Verify password
                     if (password_verify($password, $user['password_hash'])) {
