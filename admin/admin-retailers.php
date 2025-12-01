@@ -134,7 +134,7 @@ $retailers = [
           <i class="fa-solid fa-store w-5 text-green-200"></i>
           <span>Retailers</span>
         </a>
-        <a href="admin-dashboard.php#reviews" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-reviews.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-star w-5"></i>
           <span>Review</span>
         </a>
