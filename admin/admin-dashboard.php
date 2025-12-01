@@ -101,10 +101,7 @@ $admin_email = "admin@farmersmall.com";
           <i class="fa-solid fa-cog w-5"></i>
           <span>Settings</span>
         </a>
-        <a href="admin-help.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-circle-info w-5"></i>
-          <span>Help</span>
-        </a>
+        
         <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
@@ -138,11 +135,12 @@ $admin_email = "admin@farmersmall.com";
         <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer relative">
             <span class="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
         </i>
-        <i class="fa-regular fa-bookmark text-xl text-gray-500 hover:text-green-600 cursor-pointer hidden sm:block"></i>
         <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <div class="flex items-center gap-2 cursor-pointer">
+        <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-        </div>
+        </a>
+
+
       </div>
     </header>
     
