@@ -122,23 +122,7 @@ $user_settings = [
 
   <div class="flex-1 p-6 space-y-6 custom-scrollbar">
 
-    <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
-      <div class="relative w-full max-w-lg hidden md:block">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search settings..."
-          class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
-      </div>
-
-      <div class="flex items-center gap-4 ml-auto">
-        <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer relative">
-            <span class="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-        </i>
-        <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <div class="flex items-center gap-2 cursor-pointer">
-          <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-        </div>
-      </div>
-    </header>
+    
 
     <div>
         <h2 class="text-3xl font-bold text-gray-900">Settings</h2>
