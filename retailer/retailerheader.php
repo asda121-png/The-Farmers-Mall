@@ -47,17 +47,6 @@
         <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
       </div>
 
-      <div class="flex-1 mx-6">
-        <form action="products.php" method="GET">
-          <input 
-            type="text" 
-            name="search"
-            placeholder="Search for fresh product..."
-            class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
-        </form>
-      </div>
-
       <div class="flex items-center space-x-6">
         <a href="retailerdashboard.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
