@@ -348,6 +348,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 </div>
               </div>
               <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="tel" id="phone" name="phone" required placeholder="09XXXXXXXXX" pattern="09[0-9]{9}" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Format: 09XXXXXXXXX (11 digits)</p>
+              </div>
+              <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
