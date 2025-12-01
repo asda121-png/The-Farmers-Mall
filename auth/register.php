@@ -7,6 +7,17 @@ require_once __DIR__ . '/../config/supabase-api.php';
 $registration_status = '';
 $registration_message = '';
 
+// Debug logging
+$logFile = __DIR__ . '/registration_debug.log';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $logEntry = "\n========================================\n";
+    $logEntry .= "Timestamp: " . date('Y-m-d H:i:s') . "\n";
+    $logEntry .= "Has register_submitted: " . (isset($_POST['register_submitted']) ? 'YES' : 'NO') . "\n";
+    $logEntry .= "POST count: " . count($_POST) . "\n";
+    $logEntry .= "POST data: " . print_r($_POST, true) . "\n";
+    @file_put_contents($logFile, $logEntry, FILE_APPEND);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])) {
     try {
         // 1. Get Supabase API instance
@@ -86,23 +97,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             if (!empty($newUser)) {
                 // SUCCESS: Redirect to login page
                 $registration_status = 'success';
-                header("Location: login.php?registered=success");
-                exit();
+                
+                // Log success
+                $logEntry = "✅ SUCCESS: User registered - " . $fullName . " (" . $email . ")\n";
+                $logEntry .= "User ID: " . ($newUser[0]['id'] ?? 'unknown') . "\n";
+                @file_put_contents($logFile, $logEntry, FILE_APPEND);
+                
+                // Check if it's an AJAX request
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                    // Return JSON for AJAX
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => 'Registration successful! Redirecting to login...'
+                    ]);
+                    exit();
+                } else {
+                    // Regular redirect
+                    header("Location: login.php?registered=success");
+                    exit();
+                }
             } else {
                 $registration_status = 'error';
                 $registration_message = "Registration failed. Please try again.";
+                @file_put_contents($logFile, "❌ ERROR: Insert returned empty\n", FILE_APPEND);
             }
             
         } else {
             // Validation errors
             $registration_status = 'error';
             $registration_message = implode(" | ", $errors);
+            @file_put_contents($logFile, "❌ Validation errors: " . $registration_message . "\n", FILE_APPEND);
         }
         
     } catch (Exception $e) {
         error_log("Registration Error: " . $e->getMessage());
         $registration_status = 'error';
         $registration_message = "Registration failed due to a system error. Please try again later.";
+        @file_put_contents($logFile, "❌ Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
     }
 }
 // PHP SCRIPT END
@@ -557,6 +590,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
 
         fetch('register.php', {
           method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           body: formData
         })
         .then(response => response.text())
