@@ -197,7 +197,7 @@ $sellers = [
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
       <div class="relative w-full max-w-lg hidden md:block">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search by name, email, or user ID..."
+        <input type="text" id="search-input" placeholder="Search by name, email, or user ID..."
           class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
       </div>
 
@@ -218,23 +218,23 @@ $sellers = [
             <p class="text-sm text-gray-500">Oversee customer accounts and seller profiles</p>
         </div>
         <div class="flex gap-3">
-             <button class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+             <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-download"></i> Export Data
             </button>
-            <button class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
+            <button id="add-user-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
                 <i class="fa-solid fa-user-plus"></i> Add User
             </button>
         </div>
     </div>
 
     <div class="border-b border-gray-200">
-        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-            <button id="btn-customers" onclick="switchTab('customers')" class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 text-gray-500 hover:text-gray-700 hover:border-gray-300">
+        <nav id="tabs" class="-mb-px flex space-x-6">
+            <button data-tab="customers" class="tab-btn active whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm flex items-center gap-2">
                 <i class="fa-solid fa-user"></i>
                 Customers (Buyers)
-                <span class="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2">1,204</span>
+                <span class="bg-green-100 text-green-800 py-0.5 px-2.5 rounded-full text-xs ml-2">1,204</span>
             </button>
-            <button id="btn-sellers" onclick="switchTab('sellers')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <button data-tab="sellers" class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 text-gray-500 hover:text-green-600 hover:border-green-300">
                 <i class="fa-solid fa-store"></i>
                 Sellers (Retailers)
                 <span class="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2">48</span>
@@ -247,7 +247,7 @@ $sellers = [
             <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
                 <h3 class="font-bold text-gray-700">Customer List</h3>
                 <div class="flex gap-2">
-                    <select class="text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
+                    <select id="customer-status-filter" class="filter-dropdown text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
                         <option>All Statuses</option>
                         <option>Active</option>
                         <option>Inactive</option>
@@ -266,9 +266,9 @@ $sellers = [
                             <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody id="customers-table-body" class="bg-white divide-y divide-gray-200">
                         <?php foreach ($customers as $c): ?>
-                        <tr class="hover:bg-gray-50">
+                        <tr class="customer-row hover:bg-gray-50" data-status="<?php echo $c['status']; ?>">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <img class="h-10 w-10 rounded-full object-cover" src="<?php echo $c['avatar']; ?>" alt="">
@@ -299,8 +299,8 @@ $sellers = [
                                 <?php echo $c['joined']; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-indigo-600 hover:text-indigo-900 mr-2"><i class="fa-solid fa-pen"></i></button>
-                                <button class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button>
+                                <button class="action-btn text-green-600 hover:text-green-800 mr-2" data-action="edit" data-id="<?php echo $c['id']; ?>"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn text-red-600 hover:text-red-900" data-action="delete" data-id="<?php echo $c['id']; ?>"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -315,7 +315,7 @@ $sellers = [
              <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
                 <h3 class="font-bold text-gray-700">Seller / Retailer List</h3>
                 <div class="flex gap-2">
-                    <select class="text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
+                    <select id="seller-status-filter" class="filter-dropdown text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
                         <option>All Statuses</option>
                         <option>Verified</option>
                         <option>Pending</option>
@@ -335,9 +335,9 @@ $sellers = [
                             <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody id="sellers-table-body" class="bg-white divide-y divide-gray-200">
                         <?php foreach ($sellers as $s): ?>
-                        <tr class="hover:bg-gray-50">
+                        <tr class="seller-row hover:bg-gray-50" data-status="<?php echo $s['status']; ?>">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <img class="h-10 w-10 rounded-full object-cover border-2 border-green-100" src="<?php echo $s['avatar']; ?>" alt="">
@@ -369,9 +369,9 @@ $sellers = [
                                 <?php echo $s['joined']; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-green-600 hover:text-green-900 mr-2" title="View Store"><i class="fa-solid fa-store"></i></button>
-                                <button class="text-indigo-600 hover:text-indigo-900 mr-2" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="text-gray-400 hover:text-red-600" title="Block"><i class="fa-solid fa-ban"></i></button>
+                                <button class="action-btn text-green-600 hover:text-green-900 mr-2" title="View Store" data-action="view" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-store"></i></button>
+                                <button class="action-btn text-green-600 hover:text-green-800 mr-2" title="Edit" data-action="edit" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn text-gray-400 hover:text-red-600" title="Suspend" data-action="suspend" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-ban"></i></button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -380,6 +380,89 @@ $sellers = [
             </div>
         </div>
     </div>
+
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
+        <h3 class="font-bold text-xl mb-4 text-gray-900">Add New User</h3>
+        <form id="add-user-form">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+                    <select required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                        <option value="customer">Customer (Buyer)</option>
+                        <option value="seller">Seller (Retailer)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-6">
+                <button type="button" class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Add User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal (Generic for both Customers and Sellers) -->
+    <div id="edit-user-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
+        <h3 class="font-bold text-xl mb-4 text-gray-900">Edit User Details</h3>
+        <form id="edit-user-form">
+            <input type="hidden" id="edit-user-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="edit-user-name" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" id="edit-user-email" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input type="tel" id="edit-user-phone" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-6">
+                <button type="button" class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Save Changes</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Generic Confirmation Modal (Delete/Suspend) -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
+            <div class="text-red-500 text-5xl mb-4 mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-red-100">
+                <i class="fa-solid fa-question"></i>
+            </div>
+            <h3 class="font-bold text-xl mb-2 text-gray-900">Confirm Action</h3>
+            <p class="text-gray-600 text-sm mb-6">Are you sure you want to proceed with this action?</p>
+            <div class="flex justify-center gap-4">
+                <button type="button" id="cancel-action-btn" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                    Cancel
+                </button>
+                <button type="button" id="confirm-action-btn" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
 
     <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
@@ -399,37 +482,74 @@ $sellers = [
       </div>
     </div>
 
-  </div> <script src="admin-theme.js"></script>
+
+  </div> 
+  <script src="admin-theme.js"></script>
   <script>
-    // Tab Switching Logic
-    function switchTab(tabName) {
-        // Hide all tab contents
+    document.addEventListener('DOMContentLoaded', function() {
+      let activeTab = 'customers';
+      let currentAction = null; // Track action (edit, delete, suspend)
+      let currentRowElement = null; // Track the table row for the action
+      let currentUserId = null; // Track user ID for actions
+
+
+      // --- Element Selectors ---
+      const searchInput = document.getElementById('search-input');
+      const customerFilter = document.getElementById('customer-status-filter');
+      const sellerFilter = document.getElementById('seller-status-filter');
+      const customerRows = document.querySelectorAll('.customer-row');
+      const sellerRows = document.querySelectorAll('.seller-row');
+      const addUserBtn = document.getElementById('add-user-btn');
+      const addUserModal = document.getElementById('add-user-modal');
+      const exportBtn = document.getElementById('export-btn');
+      const editUserModal = document.getElementById('edit-user-modal');
+      const editUserNameInput = document.getElementById('edit-user-name');
+      const editUserEmailInput = document.getElementById('edit-user-email');
+      const editUserPhoneInput = document.getElementById('edit-user-phone');
+      const confirmationModal = document.getElementById('confirmation-modal');
+      const cancelActionBtn = document.getElementById('cancel-action-btn');
+      const confirmActionBtn = document.getElementById('confirm-action-btn');
+
+      // --- Tab Switching Logic ---
+      document.getElementById('tabs').addEventListener('click', (e) => {
+        const tabButton = e.target.closest('.tab-btn');
+        if (!tabButton) return;
+
+        activeTab = tabButton.dataset.tab;
+
+        // Update button styles
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active', 'text-green-600', 'border-green-600', 'font-semibold');
+            btn.classList.add('text-gray-500', 'border-transparent', 'font-medium', 'hover:text-green-600', 'hover:border-green-300');
+        });
+        tabButton.classList.add('active', 'text-green-600', 'border-green-600', 'font-semibold');
+        tabButton.classList.remove('text-gray-500', 'border-transparent', 'font-medium', 'hover:text-green-600', 'hover:border-green-300');
+
+        // Show/hide tab content
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
-        
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.remove('text-gray-900');
-            btn.classList.add('text-gray-500');
-            // Remove border color reset
-            btn.classList.add('border-transparent'); 
-        });
+        document.getElementById(`tab-${activeTab}`).classList.add('active');
+        applyFilters(); // Re-apply filters for the new active tab
+      });
 
-        // Show selected tab content
-        document.getElementById('tab-' + tabName).classList.add('active');
-        
-        // Activate button styling
-        const activeBtn = document.getElementById('btn-' + tabName);
-        activeBtn.classList.add('active');
-        activeBtn.classList.remove('text-gray-500');
-        activeBtn.classList.remove('border-transparent');
-    }
+      // --- Modal Logic ---
+      const showModal = (modal) => modal.classList.replace('hidden', 'flex');
+      const hideModal = (modal) => modal.classList.replace('flex', 'hidden');
+      const resetModal = (form) => form.reset();
 
-    document.addEventListener('DOMContentLoaded', function() {
+      addUserBtn.addEventListener('click', () => showModal(addUserModal));
+      document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => hideModal(btn.closest('.fixed'))));
+      addUserModal.addEventListener('click', (e) => { if(e.target === addUserModal) hideModal(addUserModal); });
+
       // Logout Modal Logic
       const logoutButton = document.getElementById('logoutButton');
+
+
+
+
+
+
       const logoutModal = document.getElementById('logoutModal');
       const cancelLogout = document.getElementById('cancelLogout');
 
@@ -449,6 +569,177 @@ $sellers = [
               logoutModal.classList.remove('flex');
           }
       });
+
+      // --- Filtering Logic ---
+      function applyFilters() {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        if (activeTab === 'customers') {
+            const status = customerFilter.value;
+            customerRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const statusMatch = status === 'All Statuses' || row.dataset.status === status;
+                const searchMatch = rowText.includes(searchTerm);
+                row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+            });
+        } else { // Sellers
+            const status = sellerFilter.value;
+            sellerRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const statusMatch = status === 'All Statuses' || row.dataset.status === status;
+                const searchMatch = rowText.includes(searchTerm);
+                row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+            });
+        }
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      customerFilter.addEventListener('change', applyFilters);
+      sellerFilter.addEventListener('change', applyFilters);
+
+      // --- Action Button Logic ---
+      document.querySelectorAll('tbody').forEach(tbody => {
+        tbody.addEventListener('click', (e) => {
+            const btn = e.target.closest('.action-btn');
+            if (!btn) return;
+            
+            const id = btn.dataset.id;
+            const action = btn.dataset.action;
+
+            currentAction = action;
+            currentUserId = id;
+            currentRowElement = btn.closest('tr'); // Store the row element
+
+            if (action === 'view') {
+                // Redirect to a mock store view page
+                window.location.href = `/admin/mock-store-view.php?sellerId=${id}`;
+            } else if (action === 'edit') {
+                // Populate the edit modal with user data (replace with actual data fetching)
+                const row = btn.closest('tr');
+                const name = row.querySelector('.font-medium').textContent;
+                const email = row.querySelector('.text-xs').textContent;
+
+                editUserNameInput.value = name;
+                editUserEmailInput.value = email;
+                document.getElementById('edit-user-id').value = id;
+
+                showModal(editUserModal);
+            } else if (action === 'delete' || action === 'suspend') {
+                // Show confirmation modal for delete/suspend actions
+                showModal(confirmationModal);
+            }
+        });
+      });
+
+      // --- Edit User Form Submission ---
+      document.getElementById('edit-user-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          const id = document.getElementById('edit-user-id').value;
+          const name = editUserNameInput.value;
+          const email = editUserEmailInput.value;
+          // In a real app, you'd send this data to the server to update the user
+          console.log(`Saving changes for user ${id}: Name=${name}, Email=${email}`);
+
+          hideModal(editUserModal);
+      });
+
+      // --- Confirmation Modal Actions ---
+      cancelActionBtn.addEventListener('click', () => {
+          hideModal(confirmationModal);
+          resetActionState();
+      });
+
+      confirmActionBtn.addEventListener('click', () => {
+          // Perform the actual action here (e.g., delete or suspend)
+          if (currentAction === 'delete') {
+              console.log(`Deleting user with ID: ${currentUserId}`);
+              if (currentRowElement) {
+                  currentRowElement.remove(); // Remove the row from the DOM
+              }
+          } else if (currentAction === 'suspend') {
+              console.log(`Suspending user with ID: ${currentUserId}`);
+              if (currentRowElement) {
+                  // Instead of removing, we could update the status and style
+                  currentRowElement.querySelector('.px-2.inline-flex').textContent = 'Suspended';
+                  currentRowElement.querySelector('.px-2.inline-flex').className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200';
+              }
+          } else {
+              console.warn('No action specified.');
+            }
+
+          hideModal(confirmationModal);
+          resetActionState();
+      });
+
+
+      const resetActionState = () => {
+          currentAction = null;
+          currentUserId = null;
+          currentRowElement = null;
+      };
+
+
+
+
+
+      // --- Export Logic ---
+      exportBtn.addEventListener('click', () => {
+        let data, headers, filename;
+
+        if (activeTab === 'customers') {
+            headers = ["ID", "Name", "Email", "Phone", "Location", "Total Orders", "Status", "Joined"];
+            data = [...customerRows].filter(row => row.style.display !== 'none').map(row => {
+                const cells = row.querySelectorAll('td');
+                return [
+                    cells[0].querySelector('.text-xs').textContent.replace('ID: ', ''),
+                    cells[0].querySelector('.font-medium').textContent,
+                    cells[1].querySelector('.text-sm').textContent,
+                    cells[1].querySelector('.text-xs').textContent,
+                    "N/A", // Location not in table
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim()
+                ];
+            });
+            filename = 'customers-export.csv';
+        } else { // Sellers
+            headers = ["ID", "Name", "Store Name", "Email", "Location", "Total Sales", "Status", "Joined"];
+            data = [...sellerRows].filter(row => row.style.display !== 'none').map(row => {
+                const cells = row.querySelectorAll('td');
+                return [
+                    "N/A", // ID not in table
+                    cells[0].querySelector('.font-medium').textContent,
+                    cells[1].querySelector('.font-bold').textContent,
+                    cells[0].querySelector('.text-xs').textContent,
+                    cells[1].querySelector('.text-xs').textContent.replace(' ', ''),
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim()
+                ];
+            });
+            filename = 'sellers-export.csv';
+        }
+
+        downloadCSV(headers, data, filename);
+      });
+
+      function downloadCSV(headers, data, filename) {
+        let csvContent = headers.join(",") + "\n";
+        csvContent += data.map(row => 
+            row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(',')
+        ).join("\n");
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     });
   </script>
 </body>
