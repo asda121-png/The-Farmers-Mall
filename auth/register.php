@@ -84,15 +84,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             // 6. Prepare full name for database
             $fullName = $firstName . ' ' . $lastName;
             
+            @file_put_contents($logFile, "📝 Attempting to insert user: $fullName ($email)\n", FILE_APPEND);
+            
             // 7. Insert into Supabase database
-            $newUser = $api->insert('users', [
-                'email' => $email,
-                'password_hash' => $hashedPassword,
-                'full_name' => $fullName,
-                'phone' => $phone,
-                'user_type' => $role,
-                'status' => 'active'
-            ]);
+            try {
+                $newUser = $api->insert('users', [
+                    'email' => $email,
+                    'password_hash' => $hashedPassword,
+                    'full_name' => $fullName,
+                    'phone' => $phone,
+                    'user_type' => $role,
+                    'status' => 'active'
+                ]);
+                
+                @file_put_contents($logFile, "📊 Insert result: " . print_r($newUser, true) . "\n", FILE_APPEND);
+            } catch (Exception $insertEx) {
+                @file_put_contents($logFile, "❌ Insert Exception: " . $insertEx->getMessage() . "\n", FILE_APPEND);
+                throw $insertEx;
+            }
             
             if (!empty($newUser)) {
                 // SUCCESS: Redirect to login page
@@ -103,25 +112,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 $logEntry .= "User ID: " . ($newUser[0]['id'] ?? 'unknown') . "\n";
                 @file_put_contents($logFile, $logEntry, FILE_APPEND);
                 
-                // Check if it's an AJAX request
-                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                    // Return JSON for AJAX
-                    header('Content-Type: application/json');
-                    echo json_encode([
-                        'status' => 'success',
-                        'message' => 'Registration successful! Redirecting to login...'
-                    ]);
-                    exit();
-                } else {
-                    // Regular redirect
-                    header("Location: login.php?registered=success");
-                    exit();
-                }
+                // Always return JSON for fetch requests
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Registration successful! Redirecting to login...'
+                ]);
+                exit();
             } else {
                 $registration_status = 'error';
                 $registration_message = "Registration failed. Please try again.";
                 @file_put_contents($logFile, "❌ ERROR: Insert returned empty\n", FILE_APPEND);
+                
+                // Return JSON error
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Registration failed. Please try again.'
+                ]);
+                exit();
             }
             
         } else {
@@ -129,6 +138,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             $registration_status = 'error';
             $registration_message = implode(" | ", $errors);
             @file_put_contents($logFile, "❌ Validation errors: " . $registration_message . "\n", FILE_APPEND);
+            
+            // Return JSON error
+            header('Content-Type: application/json');
+            echo json_encode([
+                'status' => 'error',
+                'message' => $registration_message
+            ]);
+            exit();
         }
         
     } catch (Exception $e) {
@@ -136,6 +153,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         $registration_status = 'error';
         $registration_message = "Registration failed due to a system error. Please try again later.";
         @file_put_contents($logFile, "❌ Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
+        
+        // Return JSON error
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => $registration_message
+        ]);
+        exit();
     }
 }
 // PHP SCRIPT END
