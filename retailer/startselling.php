@@ -104,22 +104,10 @@
 <body class="bg-gray-50 font-sans">
 
   <!-- Header -->
-  <header class="bg-white shadow">
-    <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-6">
-      <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
-      <nav class="space-x-6">
-        <a href="../public/index.php" class="text-gray-700 hover:text-green-700">Home</a>
-        <a href="../public/about.php" class="text-gray-700 hover:text-green-700">About</a>
-        <a href="../public/how.php" class="text-gray-700 hover:text-green-700">How It Works</a>
-        <a href="../index.php#shop" class="text-gray-700 hover:text-green-700">Shop</a>
-        <a href="../public/support.php" class="text-gray-700 hover:text-green-700">Support</a>
-      </nav>
-      <div class="space-x-2">
-        <a href="../auth/register.php" class="bg-white border border-green-700 text-green-700 px-4 py-2 rounded-full hover:bg-green-700 hover:text-white">Sign Up</a>
-        <a href="../auth/login.php" class="bg-green-700 text-white px-4 py-2 rounded-full hover:bg-green-800">Shop Now</a>
-      </div>
-    </div>
-  </header>
+<?php
+// Include the header
+include '../includes/header1.php';
+?>
 
   <!-- Hero / Sign Up Section -->
   <section class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between py-16 px-6">
