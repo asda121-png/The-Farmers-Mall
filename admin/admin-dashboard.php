@@ -3,6 +3,70 @@
 // In a real-world scenario, dynamic data fetching and authentication would happen here.
 $admin_name = "Admin User";
 $admin_email = "admin@farmersmall.com";
+
+// Mock notifications for the dropdown
+$notifications = [
+    [
+        "id" => "N001",
+        "type" => "New User",
+        "icon" => "fa-user-plus",
+        "color" => "green",
+        "title" => "New Customer Registered",
+        "message" => "Alex Reyes has created an account.",
+        "time" => "15m ago",
+        "read" => false
+    ],
+    [
+        "id" => "N002",
+        "type" => "New Order",
+        "icon" => "fa-receipt",
+        "color" => "blue",
+        "title" => "New Order #ORD-006",
+        "message" => "An order amounting to ₱1,250 has been placed.",
+        "time" => "1h ago",
+        "read" => false
+    ],
+    [
+        "id" => "N003",
+        "type" => "Low Stock",
+        "icon" => "fa-box-open",
+        "color" => "yellow",
+        "title" => "Low Stock Warning",
+        "message" => "'Organic Apples' are running low.",
+        "time" => "3h ago",
+        "read" => true
+    ],
+    [
+        "id" => "N004",
+        "type" => "System Alert",
+        "icon" => "fa-shield-halved",
+        "color" => "red",
+        "title" => "System Maintenance Scheduled",
+        "message" => "A system-wide maintenance is scheduled for tonight.",
+        "time" => "1d ago",
+        "read" => true
+    ],
+    [
+        "id" => "N005",
+        "type" => "New Review",
+        "icon" => "fa-star",
+        "color" => "purple",
+        "title" => "New Product Review",
+        "message" => "A 5-star review was left for 'Fresh Carrots'.",
+        "time" => "2d ago",
+        "read" => true
+    ],
+    [
+        "id" => "N006",
+        "type" => "New Order",
+        "icon" => "fa-receipt",
+        "color" => "blue",
+        "title" => "New Order #ORD-007",
+        "message" => "An order amounting to ₱850 has been placed.",
+        "time" => "2d ago",
+        "read" => true
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -132,9 +196,39 @@ $admin_email = "admin@farmersmall.com";
       <!-- Right Header Icons -->
       <div class="flex items-center gap-4 ml-auto">
         <i class="fa-solid fa-chart-column text-xl text-gray-500 hover:text-green-600 cursor-pointer hidden sm:block"></i>
-        <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer relative">
-            <span class="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-        </i>
+        
+        <!-- Notification Dropdown -->
+        <div class="relative">
+            <button id="notification-btn" class="relative" title="View Notifications">
+                <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
+                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+                <div class="p-4 border-b">
+                    <h4 class="font-bold text-gray-800">Notifications</h4>
+                </div>
+                <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
+                    <?php foreach($notifications as $notif): ?>
+                    <a href="#" class="flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>">
+                        <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
+                            <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p>
+                            <p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p>
+                        </div>
+                        <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+                <div class="p-2 border-t">
+                    <a href="#" id="view-all-notifications-btn" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">
+                        View all notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
         <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
           <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
@@ -445,6 +539,33 @@ $admin_email = "admin@farmersmall.com";
           }
       });
 
+      // --- Notification Dropdown Logic ---
+      const notificationBtn = document.getElementById('notification-btn');
+      const notificationDropdown = document.getElementById('notification-dropdown');
+      const viewAllBtn = document.getElementById('view-all-notifications-btn');
+
+      notificationBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent the window click event from firing immediately
+        notificationDropdown.classList.toggle('hidden');
+      });
+
+      // Close dropdown if clicked outside
+      window.addEventListener('click', (e) => {
+        if (!notificationDropdown.classList.contains('hidden')) {
+          if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+            notificationDropdown.classList.add('hidden');
+          }
+        }
+      });
+
+      // Expand notifications list
+      viewAllBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const notificationList = document.getElementById('notification-list');
+        notificationList.classList.remove('max-h-80'); // Remove the old height
+        notificationList.classList.add('max-h-[60vh]'); // Apply a larger, but still limited, scrollable height
+        viewAllBtn.style.display = 'none'; // Hide the "View all" button
+      });
 
       // --- Chart.js Initialization ---
       const ctx = document.getElementById('adminChart');
