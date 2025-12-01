@@ -1,6 +1,11 @@
 <?php
 // PHP SCRIPT START - SERVER-SIDE REGISTRATION WITH SUPABASE INTEGRATION
 
+// Start session for verification codes
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Load Supabase database connection
 require_once __DIR__ . '/../config/supabase-api.php';
 
@@ -629,18 +634,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         })
         .then(response => response.text())
         .then(text => {
+          console.log('Raw response:', text);
+          
           // Check if response is HTML (page reload) or JSON
           try {
             const data = JSON.parse(text);
+            console.log('Parsed JSON:', data);
+            
             if (data.status === 'success') {
               showToast(data.message || 'Registration successful!', 'success');
               setTimeout(() => window.location.href = "login.php?registered=success", 2000);
             } else {
               showToast(data.message || "Registration failed. Please try again.", 'error');
+              console.error('Registration error:', data);
               submitBtn.disabled = false;
               submitBtn.textContent = 'Complete Registration';
             }
           } catch (e) {
+            console.error('JSON parse error:', e);
+            console.log('Response text:', text);
+            
             // HTML response means redirect happened or success
             if (text.includes('login.php') || text === '') {
               showToast('Registration successful!', 'success');

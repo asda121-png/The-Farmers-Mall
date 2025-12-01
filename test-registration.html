@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Registration</title>
+</head>
+<body>
+    <h1>Test Registration Form</h1>
+    <form id="testForm">
+        <input type="text" name="firstname" value="John" placeholder="First Name"><br>
+        <input type="text" name="lastname" value="Doe" placeholder="Last Name"><br>
+        <input type="email" name="email" value="john.doe.test@example.com" placeholder="Email"><br>
+        <input type="text" name="phone" value="09123456789" placeholder="Phone"><br>
+        <input type="text" name="username" value="johndoe123" placeholder="Username"><br>
+        <input type="password" name="password" value="Test123!@#" placeholder="Password"><br>
+        <input type="password" name="confirm" value="Test123!@#" placeholder="Confirm Password"><br>
+        <input type="text" name="address" value="123 Test St" placeholder="Address"><br>
+        <input type="checkbox" name="terms" checked> I agree to terms<br>
+        <button type="submit">Register</button>
+    </form>
+
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            formData.append('register_submitted', '1');
+            
+            console.log('Submitting form...');
+            console.log('FormData entries:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
+            fetch('auth/register.php', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Raw response:', text);
+                console.log('Response length:', text.length);
+                
+                document.getElementById('result').innerHTML = '<pre>' + text + '</pre>';
+                
+                try {
+                    const json = JSON.parse(text);
+                    console.log('Parsed JSON:', json);
+                    
+                    if (json.status === 'success') {
+                        alert('✅ SUCCESS: ' + json.message);
+                    } else {
+                        alert('❌ ERROR: ' + json.message);
+                    }
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    alert('❌ Invalid response format');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('❌ Network error: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
