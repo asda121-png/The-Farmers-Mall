@@ -3,3 +3,23 @@
 .idea/
 .DS_Store
 nbproject/
+
+# Environment and sensitive files
+.env
+config/.env
+
+# Ignore uploads and user-generated content
+uploads/*
+!uploads/.gitkeep
+images/products/*
+!images/products/.gitkeep
+
+# Ignore logs
+*.log
+error_log
+access_log
+
+# Ignore temp files
+*.tmp
+*.temp
+~*

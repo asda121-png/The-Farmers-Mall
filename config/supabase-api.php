@@ -1,0 +1,129 @@
+<?php
+/**
+ * Alternative Supabase Connection using REST API
+ * Use this if direct PostgreSQL connection doesn't work due to network issues
+ */
+
+require_once __DIR__ . '/env.php';
+
+class SupabaseAPI {
+    private static $instance = null;
+    private $url;
+    private $apiKey;
+    
+    private function __construct() {
+        $this->url = getenv('SUPABASE_URL');
+        $this->apiKey = getenv('SUPABASE_ANON_KEY');
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    /**
+     * Execute a query using Supabase REST API
+     */
+    public function query($table, $action = 'select', $data = [], $filters = []) {
+        $url = $this->url . '/rest/v1/' . $table;
+        
+        $headers = [
+            'apikey: ' . $this->apiKey,
+            'Authorization: Bearer ' . $this->apiKey,
+            'Content-Type: application/json',
+            'Prefer: return=representation'
+        ];
+        
+        $ch = curl_init();
+        
+        switch ($action) {
+            case 'select':
+                $url .= $this->buildFilters($filters);
+                curl_setopt($ch, CURLOPT_HTTPGET, true);
+                break;
+                
+            case 'insert':
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                break;
+                
+            case 'update':
+                $url .= $this->buildFilters($filters);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                break;
+                
+            case 'delete':
+                $url .= $this->buildFilters($filters);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                break;
+        }
+        
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new Exception("API Error: " . $error);
+        }
+        
+        curl_close($ch);
+        
+        if ($httpCode >= 400) {
+            throw new Exception("API Error: " . $response);
+        }
+        
+        return json_decode($response, true);
+    }
+    
+    private function buildFilters($filters) {
+        if (empty($filters)) {
+            return '';
+        }
+        
+        $params = [];
+        foreach ($filters as $key => $value) {
+            if (is_array($value)) {
+                // Handle operators like ['eq', 'value'] or ['gt', 5]
+                $operator = $value[0];
+                $val = $value[1];
+                $params[] = $key . '=' . $operator . '.' . urlencode($val);
+            } else {
+                // Default to equals
+                $params[] = $key . '=eq.' . urlencode($value);
+            }
+        }
+        
+        return '?' . implode('&', $params);
+    }
+    
+    // Helper methods
+    public function select($table, $filters = []) {
+        return $this->query($table, 'select', [], $filters);
+    }
+    
+    public function insert($table, $data) {
+        return $this->query($table, 'insert', $data);
+    }
+    
+    public function update($table, $data, $filters) {
+        return $this->query($table, 'update', $data, $filters);
+    }
+    
+    public function delete($table, $filters) {
+        return $this->query($table, 'delete', [], $filters);
+    }
+}
+
+// Helper function
+function getSupabaseAPI() {
+    return SupabaseAPI::getInstance();
+}
