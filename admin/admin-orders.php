@@ -130,10 +130,7 @@ $orders = [
           <i class="fa-solid fa-truck-ramp-box w-5"></i>
           <span>Inventory</span>
         </a>
-        <a href="admin-retailers.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-store w-5"></i>
-          <span>Retailers</span>
-        </a>
+     
         
         <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
           <i class="fa-solid fa-receipt w-5 text-green-200"></i>
