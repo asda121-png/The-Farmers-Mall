@@ -7,6 +7,7 @@
   <title>Admin Notifications – Farmers Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="admin-theme.css">
 </head>
 
 <body class="bg-gray-100 text-gray-800 flex">
@@ -115,4 +116,5 @@
   </div>
 
 </body>
+<script src="admin-theme.js"></script>
 </html>

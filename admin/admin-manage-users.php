@@ -86,6 +86,7 @@ $sellers = [
   <title>Farmers Mall Admin Panel - Manage Users</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="admin-theme.css">
   <style>
     /* Global Styles */
     body {
@@ -399,7 +400,8 @@ $sellers = [
       </div>
     </div>
 
-  </div> <script>
+  </div> <script src="admin-theme.js"></script>
+  <script>
     // Tab Switching Logic
     function switchTab(tabName) {
         // Hide all tab contents

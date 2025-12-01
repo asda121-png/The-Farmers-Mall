@@ -75,6 +75,7 @@ $retailers = [
   <title>Farmers Mall Admin Panel - Retailers</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="admin-theme.css">
   <style>
     /* Global Styles (Consistent) */
     body {
@@ -361,7 +362,8 @@ $retailers = [
       </div>
     </div>
 
-  </div> <script>
+  </div> <script src="admin-theme.js"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Logout Modal Logic
       const logoutButton = document.getElementById('logoutButton');

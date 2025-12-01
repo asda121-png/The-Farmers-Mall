@@ -1,0 +1,169 @@
+<?php
+$servername = "localhost:3307";
+$username = "root";
+$password = "";
+$dbname = "farmers_mall";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT first_name, last_name, email, status, joined_at FROM users WHERE role = 'retailer'";
+$result = $conn->query($sql);
+$retailers = [];
+if ($result && $result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+                $retailers[] = $row;
+        }
+}
+$conn->close();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Retailers – Farmers Mall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800 flex">
+    <!-- Sidebar -->
+    <aside class="bg-green-800 text-white w-64 min-h-screen p-4 flex flex-col justify-between">
+        <div>
+            <div class="text-center mb-10">
+                <h1 class="text-2xl font-bold">Farmers Mall</h1>
+                <p class="text-sm text-green-200">Admin Panel</p>
+            </div>
+            <nav class="space-y-2">
+                <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-tachometer-alt w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="admin-users.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-users w-5"></i>
+                    <span>Users</span>
+                </a>
+                <a href="admin-retailers.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-green-700">
+                    <i class="fa-solid fa-store w-5"></i>
+                    <span>Retailers</span>
+                </a>
+                <a href="admin-products.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-box w-5"></i>
+                    <span>Products</span>
+                </a>
+                <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-receipt w-5"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-cog w-5"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </div>
+        <div>
+            <a href="#" id="logoutButton" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-green-700">
+                <i class="fa-solid fa-sign-out-alt w-5"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <div class="flex-1">
+        <!-- Header -->
+        <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+            <h2 class="text-xl font-semibold">Manage Retailers</h2>
+            <div class="flex items-center gap-4">
+                <a href="admin-notification.html">
+                    <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer"></i>
+                </a>
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-8 h-8 rounded-full" alt="Admin">
+                    <div>
+                        <p class="text-sm font-medium">Admin User</p>
+                        <p class="text-xs text-gray-500">admin@farmersmall.com</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Content -->
+        <main class="p-6 space-y-6">
+            <!-- Controls -->
+            <div class="flex justify-between items-center">
+                <div class="relative w-full max-w-xs">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input id="searchInput" type="text" placeholder="Search retailers..." class="w-full pl-9 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <button id="addRetailerBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Add Retailer
+                </button>
+            </div>
+            <!-- Table -->
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-left">
+                        <tr>
+                            <th class="p-4 font-medium">Store Name</th>
+                            <th class="p-4 font-medium">Email</th>
+                            <th class="p-4 font-medium">Status</th>
+                            <th class="p-4 font-medium">Joined Date</th>
+                            <th class="p-4 font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <?php foreach ($retailers as $retailer): ?>
+                        <tr>
+                            <td class="p-4"><?php echo htmlspecialchars($retailer['first_name'] . ' ' . $retailer['last_name']); ?></td>
+                            <td class="p-4"><?php echo htmlspecialchars($retailer['email']); ?></td>
+                            <td class="p-4"><?php echo htmlspecialchars($retailer['status']); ?></td>
+                            <td class="p-4"><?php echo htmlspecialchars($retailer['joined_at']); ?></td>
+                            <td class="p-4">
+                                <a href="#" class="text-blue-600 hover:underline mr-2">View</a>
+                                <a href="#" class="text-red-600 hover:underline">Delete</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <!-- Add/Edit Retailer Modal -->
+    <div id="retailerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 id="modalTitle" class="font-semibold text-lg mb-4">Add New Retailer</h3>
+            <form id="retailerForm" class="space-y-4">
+                <input type="hidden" id="retailerId">
+                <div>
+                    <label for="storeName" class="block text-sm font-medium text-gray-700">Store Name</label>
+                    <input type="text" id="storeName" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+                </div>
+                <div>
+                    <label for="retailerEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="retailerEmail" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" id="closeRetailerModal" class="px-4 py-2 border rounded-md text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Retailer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+            <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+            <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <a href="login.html" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+            </div>
+        </div>
+    </div>
+    <!-- <script src="js/admin-retailers.js"></script> -->
+</body>
+</html>

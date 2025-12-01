@@ -1,0 +1,122 @@
+/* Shared dark mode theme for all admin pages */
+
+/* Base */
+body.dark-mode {
+  background-color: #020617; /* slate-950 */
+  color: #e5e7eb; /* gray-200 */
+}
+
+body.dark-mode a {
+  color: inherit;
+}
+
+/* Layout surfaces */
+body.dark-mode .bg-white,
+body.dark-mode .bg-gray-50,
+body.dark-mode .bg-gray-100 {
+  background-color: #020617 !important;
+}
+
+body.dark-mode header,
+body.dark-mode .card-shadow {
+  background-color: #020617 !important;
+}
+
+body.dark-mode .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #6b7280;
+}
+
+/* Typography */
+body.dark-mode .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+body.dark-mode .text-gray-800 {
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+body.dark-mode .text-gray-600,
+body.dark-mode .text-gray-500,
+body.dark-mode .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* Borders & dividers */
+body.dark-mode .border-gray-200,
+body.dark-mode .border-gray-100,
+body.dark-mode .divide-gray-200,
+body.dark-mode .divide-gray-100 {
+  border-color: #1f2937 !important;
+}
+
+/* Inputs and controls */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: #020617;
+  color: #e5e7eb;
+  border-color: #1f2937;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #6b7280;
+}
+
+/* Tables & cards */
+body.dark-mode table {
+  color: inherit;
+}
+
+body.dark-mode thead.bg-gray-50 {
+  background-color: #020617 !important;
+}
+
+body.dark-mode tr.hover\:bg-gray-50:hover {
+  background-color: #030712 !important;
+}
+
+/* Status/background badges */
+body.dark-mode .bg-green-50 {
+  background-color: #064e3b !important;
+  color: #bbf7d0 !important;
+}
+
+body.dark-mode .bg-blue-50 {
+  background-color: #0b1120 !important;
+}
+
+body.dark-mode .bg-yellow-50 {
+  background-color: #451a03 !important;
+}
+
+body.dark-mode .bg-red-50 {
+  background-color: #450a0a !important;
+}
+
+body.dark-mode .bg-indigo-100,
+body.dark-mode .bg-blue-100,
+body.dark-mode .bg-yellow-100,
+body.dark-mode .bg-orange-100,
+body.dark-mode .bg-red-100,
+body.dark-mode .bg-green-100,
+body.dark-mode .bg-purple-100 {
+  filter: brightness(0.8);
+}
+
+/* Modals */
+body.dark-mode #logoutModal > div,
+body.dark-mode #actionModal > div {
+  background-color: #020617 !important;
+}
+
+/* Sidebar stays dark but text contrast is improved */
+body.dark-mode .bg-green-950 {
+  background-color: #02120c !important;
+}
+
+
