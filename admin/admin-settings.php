@@ -220,17 +220,20 @@ $user_settings = [
                     <form id="security-form" class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Current Password</label>
-                            <input type="password" placeholder="••••••••" class="password-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" disabled>
+                            <input type="password" id="current-password" placeholder="••••••••" class="password-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" disabled>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">New Password</label>
-                                <input type="password" placeholder="Enter new password" class="password-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" disabled>
+                                <input type="password" id="new-password" placeholder="Enter new password" class="password-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" disabled>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Confirm New Password</label>
-                                <input type="password" placeholder="Confirm new password" class="password-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" disabled>
+                                <input type="password" id="confirm-new-password" placeholder="Confirm new password" class="password-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" disabled>
                             </div>
+                        </div>
+                        <div id="password-mismatch-error" class="hidden">
+                            <p class="text-xs text-red-500">The new passwords do not match. Please try again.</p>
                         </div>
                         <div class="pt-2">
                             <p class="text-xs text-gray-500 dark:text-gray-400">Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.</p>
@@ -368,7 +371,7 @@ $user_settings = [
                 <div class="bg-white p-6 rounded-xl card-shadow max-w-3xl mx-auto dark:bg-gray-800">
                     <h3 class="text-lg font-bold text-gray-900 mb-1 dark:text-white">Theme</h3>
                     <p class="text-sm text-gray-500 mb-6 dark:text-gray-400">Select your preferred interface theme.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Light Mode -->
                         <label for="theme-light" class="theme-option border-2 border-green-500 rounded-lg p-4 cursor-pointer relative">
                             <input type="radio" name="theme" id="theme-light" value="light" class="absolute top-3 right-3">
@@ -386,15 +389,6 @@ $user_settings = [
                                 <div class="flex-1 h-full bg-gray-900 rounded"></div>
                             </div>
                             <p class="text-sm font-semibold text-center mt-3 text-gray-800 dark:text-gray-200">Dark</p>
-                        </label>
-                        <!-- System Default -->
-                        <label for="theme-system" class="theme-option border-2 border-gray-200 hover:border-gray-400 rounded-lg p-4 cursor-pointer relative dark:border-gray-700 dark:hover:border-gray-500">
-                            <input type="radio" name="theme" id="theme-system" value="system" class="absolute top-3 right-3">
-                            <div class="w-full h-20 bg-gradient-to-r from-gray-100 to-gray-800 rounded-md flex items-center p-2 gap-2 border border-gray-400">
-                                <div class="w-5 h-full bg-gray-500 rounded"></div>
-                                <div class="flex-1 h-full bg-gray-200 rounded"></div>
-                            </div>
-                            <p class="text-sm font-semibold text-center mt-3 text-gray-800 dark:text-gray-200">System</p>
                         </label>
                     </div>
                 </div>
@@ -434,6 +428,25 @@ $user_settings = [
           </button>
           <button id="confirmSave" class="px-6 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors dark:bg-green-600 dark:hover:bg-green-700">
             Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Update Confirmation Modal -->
+    <div id="updatePasswordModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4 dark:bg-opacity-50">
+      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center dark:bg-gray-800">
+        <div class="text-green-500 text-4xl mb-4">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 class="font-bold text-xl mb-2 text-gray-900 dark:text-white">Confirm Password Update</h3>
+        <p class="text-gray-600 text-sm mb-6 dark:text-gray-400">Are you sure you want to update your password? This action cannot be undone.</p>
+        <div class="flex justify-center gap-4">
+          <button id="cancelPasswordUpdate" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+            Cancel
+          </button>
+          <button id="confirmPasswordUpdate" class="px-6 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors dark:bg-green-600 dark:hover:bg-green-700">
+            Update Password
           </button>
         </div>
       </div>
@@ -496,18 +509,12 @@ $user_settings = [
 
       const updateThemeSelection = (theme) => {
         localStorage.setItem('theme', theme);
-        if (theme === 'system') {
-          localStorage.removeItem('theme');
-          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          applyTheme(systemTheme);
-        } else {
-          applyTheme(theme);
-        }
+        applyTheme(theme);
         updateRadioUI();
       };
 
       const updateRadioUI = () => {
-        const activeTheme = localStorage.getItem('theme') || 'system';
+        const activeTheme = localStorage.getItem('theme') || 'light';
         document.getElementById(`theme-${activeTheme}`).checked = true;
 
         themeOptions.forEach(opt => {
@@ -529,14 +536,7 @@ $user_settings = [
       });
 
       // Apply theme on initial load
-      updateThemeSelection(localStorage.getItem('theme') || 'system');
-
-      // Listen for system theme changes
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('theme')) { // Only if theme is 'system'
-          applyTheme(e.matches ? 'dark' : 'light');
-        }
-      });
+      updateThemeSelection(localStorage.getItem('theme') || 'light');
 
       // Logout Modal Logic
       const logoutButton = document.getElementById('logoutButton');
@@ -628,35 +628,97 @@ $user_settings = [
       const changePassBtn = document.getElementById('change-password-btn');
       const updatePassBtn = document.getElementById('update-password-btn');
       const passwordInputs = document.querySelectorAll('.password-input');
+      const updatePasswordModal = document.getElementById('updatePasswordModal');
+      const currentPasswordInput = document.getElementById('current-password');
+      const newPasswordInput = document.getElementById('new-password');
+      const confirmNewPasswordInput = document.getElementById('confirm-new-password');
+      const passwordMismatchError = document.getElementById('password-mismatch-error');
 
+      const cancelPasswordUpdate = document.getElementById('cancelPasswordUpdate');
+      const confirmPasswordUpdate = document.getElementById('confirmPasswordUpdate');
+
+      const revertPasswordForm = () => {
+        // Revert the state
+        passwordInputs.forEach(input => {
+            input.disabled = true;
+            input.classList.add('bg-gray-100', 'border-gray-300', 'dark:bg-gray-700', 'dark:border-gray-600');
+            input.classList.remove('bg-white', 'focus:ring-green-500', 'focus:border-green-500', 'dark:bg-gray-900', 'dark:focus:ring-green-500', 'dark:focus:border-green-500');
+            input.value = ''; // Clear fields
+
+            // Hide error message and remove error styles
+            passwordMismatchError.classList.add('hidden');
+            newPasswordInput.classList.remove('border-red-500', 'dark:border-red-500');
+            confirmNewPasswordInput.classList.remove('border-red-500', 'dark:border-red-500');
+
+        });
+
+        // Revert placeholder
+        currentPasswordInput.placeholder = "••••••••";
+
+        updatePassBtn.classList.add('hidden');
+        changePassBtn.classList.remove('hidden');
+
+        updatePasswordModal.classList.add('hidden');
+        updatePasswordModal.classList.remove('flex');
+      };
       changePassBtn.addEventListener('click', function() {
         // Enable inputs
         passwordInputs.forEach(input => {
             input.disabled = false;
             input.classList.remove('bg-gray-100', 'border-gray-300', 'dark:bg-gray-700', 'dark:border-gray-600');
-            input.classList.add('bg-white', 'focus:ring-green-500', 'focus:border-green-500', 'dark:bg-gray-900');
+            input.classList.add('bg-white', 'focus:ring-green-500', 'focus:border-green-500', 'dark:bg-gray-900', 'dark:focus:ring-green-500', 'dark:focus:border-green-500');
         });
+
+        // Update placeholder for current password
+        currentPasswordInput.placeholder = "Enter your current password";
 
         // Toggle buttons
         changePassBtn.classList.add('hidden');
         updatePassBtn.classList.remove('hidden');
       });
-
+      
       updatePassBtn.addEventListener('click', function() {
-        // In a real app, you'd add validation and a confirmation modal here.
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmNewPasswordInput.value;
+
+        // Validate if passwords match
+        if (newPassword !== confirmPassword) {
+            passwordMismatchError.classList.remove('hidden');
+            newPasswordInput.classList.add('border-red-500', 'dark:border-red-500');
+            confirmNewPasswordInput.classList.add('border-red-500', 'dark:border-red-500');
+            newPasswordInput.focus();
+        } else {
+            // Clear any previous errors and show the modal
+            passwordMismatchError.classList.add('hidden');
+            newPasswordInput.classList.remove('border-red-500', 'dark:border-red-500');
+            confirmNewPasswordInput.classList.remove('border-red-500', 'dark:border-red-500');
+
+            // Show the confirmation modal
+            updatePasswordModal.classList.remove('hidden');
+            updatePasswordModal.classList.add('flex');
+        }
+      });
+
+      cancelPasswordUpdate.addEventListener('click', function() {
+        revertPasswordForm();
+      });
+
+      updatePasswordModal.addEventListener('click', function(e) {
+          if (e.target === updatePasswordModal) {
+              updatePasswordModal.classList.add('hidden');
+              updatePasswordModal.classList.remove('flex');
+          }
+      });
+
+      confirmPasswordUpdate.addEventListener('click', function() {
+        // In a real app, you'd add validation here before proceeding.
+        // For example, check if "New Password" and "Confirm New Password" match.
+        // Also, an AJAX call would be made to a backend script to validate the current password and save the new one.
         console.log("Password update process initiated!");
 
-        // For now, just revert the state
-        passwordInputs.forEach(input => {
-            input.disabled = true;
-            input.classList.add('bg-gray-100', 'border-gray-300', 'dark:bg-gray-700', 'dark:border-gray-600');
-            input.classList.remove('bg-white', 'focus:ring-green-500', 'focus:border-green-500', 'dark:bg-gray-900');
-        });
-
-        updatePassBtn.classList.add('hidden');
-        changePassBtn.classList.remove('hidden');
+        revertPasswordForm();
       });
     });
   </script>
 </body>
-</html>
+</html> 

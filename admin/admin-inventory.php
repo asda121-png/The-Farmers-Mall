@@ -173,7 +173,7 @@ $inventory_items = [
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
       <div class="relative w-full max-w-lg hidden md:block">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search by SKU, Name or Category..."
+        <input type="text" id="search-input" placeholder="Search by SKU, Name or Category..."
           class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
       </div>
 
@@ -194,10 +194,10 @@ $inventory_items = [
             <p class="text-sm text-gray-500">Track stock levels and manage reorders</p>
         </div>
         <div class="flex gap-3">
-             <button class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+             <button id="report-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-download"></i> Report
             </button>
-            <button class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
+            <button id="stock-adjustment-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
                 <i class="fa-solid fa-plus"></i> Stock Adjustment
             </button>
         </div>
@@ -226,16 +226,17 @@ $inventory_items = [
         <div class="p-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
             <h3 class="font-semibold text-lg">Stock Overview</h3>
             <div class="flex items-center gap-2">
-                <select class="border border-gray-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-green-500">
-                    <option>All Categories</option>
-                    <option>Vegetables</option>
-                    <option>Fruits</option>
-                    <option>Meat</option>
+                <select id="category-filter" class="border border-gray-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-green-500">
+                    <option value="">All Categories</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Meat">Meat</option>
                 </select>
-                <select class="border border-gray-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-green-500">
-                    <option>Stock Status</option>
-                    <option>Low Stock</option>
-                    <option>Out of Stock</option>
+                <select id="status-filter" class="border border-gray-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-green-500">
+                    <option value="">Stock Status</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="In Stock">In Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
                 </select>
             </div>
         </div>
@@ -251,7 +252,7 @@ $inventory_items = [
                         <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody id="inventory-table-body" class="bg-white divide-y divide-gray-200">
                     <?php foreach ($inventory_items as $item): 
                         // Calculate percentage for progress bar
                         $percent = ($item['stock'] / $item['max_stock']) * 100;
@@ -262,7 +263,7 @@ $inventory_items = [
                         if($percent < 30) $barColor = 'bg-yellow-500';
                         if($item['stock'] == 0) $barColor = 'bg-red-500';
                     ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="inventory-row hover:bg-gray-50 transition-colors" data-category="<?php echo $item['category']; ?>" data-status="<?php echo $item['status']; ?>">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
@@ -308,14 +309,90 @@ $inventory_items = [
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-green-600 hover:text-green-900 mr-3" title="Restock"><i class="fa-solid fa-rotate-right"></i></button>
-                            <button class="text-indigo-600 hover:text-indigo-900" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn text-green-600 hover:text-green-900 mr-3" title="Restock" data-action="restock" data-id="<?php echo $item['id']; ?>"><i class="fa-solid fa-dolly"></i></button>
+                            <button class="action-btn text-indigo-600 hover:text-indigo-900" title="Edit" data-action="edit" data-id="<?php echo $item['id']; ?>"><i class="fa-solid fa-pen"></i></button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Stock Adjustment Modal -->
+    <div id="adjustmentModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-md">
+        <h3 class="font-bold text-xl mb-4 text-gray-900">Stock Adjustment</h3>
+        <form id="adjustmentForm">
+            <div class="space-y-4">
+                <div>
+                    <label for="adjProduct" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                    <select id="adjProduct" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                        <option value="">Select a product...</option>
+                        <?php foreach($inventory_items as $item) echo "<option value='{$item['id']}'>{$item['name']}</option>"; ?>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="adjType" class="block text-sm font-medium text-gray-700 mb-1">Adjustment Type</label>
+                        <select id="adjType" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                            <option value="add">Add Stock</option>
+                            <option value="remove">Remove Stock</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="adjQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                        <input type="number" id="adjQuantity" required min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                <div>
+                    <label for="adjReason" class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                    <input type="text" id="adjReason" placeholder="e.g., Damaged goods, Stock count correction" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-6">
+                <button type="button" class="modal-cancel-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Apply Adjustment</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Item Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-md">
+        <h3 class="font-bold text-xl mb-4 text-gray-900">Edit Inventory Details</h3>
+        <form id="editForm">
+            <input type="hidden" id="editProductId">
+            <p class="text-sm font-bold mb-4" id="editProductName"></p>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="editReorderLevel" class="block text-sm font-medium text-gray-700 mb-1">Reorder Level</label>
+                    <input type="number" id="editReorderLevel" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label for="editMaxStock" class="block text-sm font-medium text-gray-700 mb-1">Max Stock</label>
+                    <input type="number" id="editMaxStock" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-6">
+                <button type="button" class="modal-cancel-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Save Changes</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
+        <h3 class="font-bold text-xl mb-2 text-gray-900">Download Report</h3>
+        <p class="text-gray-600 text-sm mb-6">Download a CSV of the current inventory view.</p>
+        <div class="flex justify-center gap-4">
+          <button type="button" class="modal-cancel-btn px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button id="confirm-download-btn" class="px-6 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Download</button>
+        </div>
+      </div>
     </div>
 
     <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
@@ -338,6 +415,17 @@ $inventory_items = [
 
   </div> <script>
     document.addEventListener('DOMContentLoaded', function() {
+      const inventoryData = <?php echo json_encode($inventory_items); ?>;
+
+      // --- Element Selectors ---
+      const searchInput = document.getElementById('search-input');
+      const categoryFilter = document.getElementById('category-filter');
+      const statusFilter = document.getElementById('status-filter');
+      const tableBody = document.getElementById('inventory-table-body');
+      const inventoryRows = document.querySelectorAll('.inventory-row');
+      const adjustmentBtn = document.getElementById('stock-adjustment-btn');
+      const reportBtn = document.getElementById('report-btn');
+
       // Logout Modal Logic
       const logoutButton = document.getElementById('logoutButton');
       const logoutModal = document.getElementById('logoutModal');
@@ -358,6 +446,124 @@ $inventory_items = [
               logoutModal.classList.add('hidden');
               logoutModal.classList.remove('flex');
           }
+      });
+
+      // --- Modal Handling ---
+      const modals = {
+        adjustment: document.getElementById('adjustmentModal'),
+        edit: document.getElementById('editModal'),
+        report: document.getElementById('reportModal'),
+      };
+
+      const showModal = (modalName) => modals[modalName]?.classList.replace('hidden', 'flex');
+      const hideModal = (modalName) => modals[modalName]?.classList.replace('flex', 'hidden');
+
+      adjustmentBtn.addEventListener('click', () => showModal('adjustment'));
+      reportBtn.addEventListener('click', () => showModal('report'));
+
+      document.querySelectorAll('.modal-cancel-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modal = btn.closest('.fixed');
+            modal.classList.replace('flex', 'hidden');
+        });
+      });
+
+      // --- Filtering and Search ---
+      function filterInventory() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+        const selectedStatus = statusFilter.value;
+
+        inventoryRows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            const categoryMatch = !selectedCategory || row.dataset.category.toLowerCase() === selectedCategory.toLowerCase();
+            const statusMatch = !selectedStatus || row.dataset.status.toLowerCase() === selectedStatus.toLowerCase();
+            const searchMatch = rowText.includes(searchTerm);
+
+            if (categoryMatch && statusMatch && searchMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+      }
+
+      searchInput.addEventListener('input', filterInventory);
+      categoryFilter.addEventListener('change', filterInventory);
+      statusFilter.addEventListener('change', filterInventory);
+
+      // --- Row Actions ---
+      tableBody.addEventListener('click', (e) => {
+        const button = e.target.closest('.action-btn');
+        if (!button) return;
+
+        const action = button.dataset.action;
+        const productId = button.dataset.id;
+        const product = inventoryData.find(p => p.id === productId);
+
+        if (!product) return;
+
+        if (action === 'edit') {
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProductName').textContent = product.name;
+            document.getElementById('editReorderLevel').value = product.reorder_level;
+            document.getElementById('editMaxStock').value = product.max_stock;
+            showModal('edit');
+        } else if (action === 'restock') {
+            // For restock, we can reuse the adjustment modal
+            document.getElementById('adjProduct').value = product.id;
+            document.getElementById('adjType').value = 'add';
+            document.getElementById('adjReason').value = 'Restock from supplier';
+            showModal('adjustment');
+        }
+      });
+
+      // --- Form Submissions (Mock) ---
+      document.getElementById('adjustmentForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('Adjustment Submitted:', {
+            product: document.getElementById('adjProduct').value,
+            type: document.getElementById('adjType').value,
+            quantity: document.getElementById('adjQuantity').value,
+            reason: document.getElementById('adjReason').value,
+        });
+        hideModal('adjustment');
+        e.target.reset();
+      });
+
+      document.getElementById('editForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('Edit Submitted:', {
+            product: document.getElementById('editProductId').value,
+            reorderLevel: document.getElementById('editReorderLevel').value,
+            maxStock: document.getElementById('editMaxStock').value,
+        });
+        hideModal('edit');
+      });
+
+      // --- Report Download ---
+      document.getElementById('confirm-download-btn').addEventListener('click', () => {
+        const headers = ["ID", "SKU", "Name", "Category", "Stock", "Max Stock", "Reorder Level", "Status"];
+        let csvContent = headers.join(",") + "\n";
+
+        inventoryRows.forEach(row => {
+            if (row.style.display === 'none') return; // Export only visible rows
+
+            const productId = row.querySelector('.font-mono').textContent.trim();
+            const product = inventoryData.find(p => p.sku === productId);
+
+            if (product) {
+                const rowData = [product.id, product.sku, `"${product.name}"`, product.category, product.stock, product.max_stock, product.reorder_level, product.status].join(",");
+                csvContent += rowData + "\n";
+            }
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "inventory-report.csv";
+        link.click();
+        hideModal('report');
       });
     });
   </script>

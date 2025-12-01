@@ -159,9 +159,9 @@ $products = [
   <div class="flex-1 p-6 space-y-6 custom-scrollbar">
 
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
-      <div class="relative w-full max-w-lg hidden md:block">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search products..."
+      <div class="relative w-full max-w-lg hidden md:block"> 
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i> 
+        <input type="text" id="search-input" placeholder="Search products by name or ID..."
           class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
       </div>
 
@@ -182,10 +182,10 @@ $products = [
             <p class="text-sm text-gray-500">Manage your product catalog and inventory</p>
         </div>
         <div class="flex gap-3">
-             <button class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+             <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-file-export"></i> Export
             </button>
-            <button class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
+            <button id="add-product-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
                 <i class="fa-solid fa-plus"></i> Add Product
             </button>
         </div>
@@ -194,7 +194,7 @@ $products = [
     <div class="bg-white p-4 rounded-xl card-shadow flex flex-wrap gap-4 items-center">
         <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 w-full md:w-auto md:min-w-[200px]">
             <i class="fa-solid fa-filter text-gray-400"></i>
-            <select class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
+            <select id="category-filter" class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
                 <option value="">All Categories</option>
                 <option value="Vegetables">Vegetables</option>
                 <option value="Fruits">Fruits</option>
@@ -205,7 +205,7 @@ $products = [
         
         <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 w-full md:w-auto md:min-w-[200px]">
              <i class="fa-solid fa-layer-group text-gray-400"></i>
-            <select class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
+            <select id="status-filter" class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
                 <option value="">Status</option>
                 <option value="In Stock">In Stock</option>
                 <option value="Low Stock">Low Stock</option>
@@ -219,6 +219,9 @@ $products = [
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th scope="col" class="px-6 py-3">
+                            <input type="checkbox" id="select-all-checkbox" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                        </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
@@ -227,9 +230,12 @@ $products = [
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody id="products-table-body" class="bg-white divide-y divide-gray-200">
                     <?php foreach ($products as $product): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="product-row hover:bg-gray-50 transition-colors" data-category="<?php echo $product['category']; ?>" data-status="<?php echo $product['status']; ?>">
+                        <td class="px-6 py-4">
+                            <input type="checkbox" class="product-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-id="<?php echo $product['id']; ?>">
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
@@ -270,8 +276,20 @@ $products = [
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="text-red-600 hover:text-red-900" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            <div class="relative inline-block text-left">
+                                <button type="button" class="action-dropdown-btn inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-id="<?php echo $product['id']; ?>">
+                                    Actions
+                                    <i class="fa-solid fa-chevron-down -mr-1 ml-2 h-5 w-5"></i>
+                                </button>
+                                <div id="action-menu-<?php echo $product['id']; ?>" class="action-menu hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                    <div class="py-1" role="menu" aria-orientation="vertical">
+                                        <a href="#" class="action-btn block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" data-action="edit" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-pen-to-square w-5 mr-2"></i>Edit Product</a>
+                                        <a href="#" class="action-btn block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" data-action="export-pdf" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-file-pdf w-5 mr-2"></i>Export as PDF</a>
+                                        <a href="#" class="action-btn block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" data-action="export-json" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-file-code w-5 mr-2"></i>Export as JSON</a>
+                                        <a href="#" class="action-btn block px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem" data-action="delete" data-id="<?php echo $product['id']; ?>" data-name="<?php echo $product['name']; ?>"><i class="fa-solid fa-trash-can w-5 mr-2"></i>Delete Product</a>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -305,6 +323,82 @@ $products = [
         </div>
     </div>
 
+    <!-- Export Options Modal -->
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-md text-center">
+        <div class="text-green-500 text-4xl mb-4">
+          <i class="fa-solid fa-file-csv"></i>
+        </div>
+        <h3 class="font-bold text-xl mb-2 text-gray-900">Export Product Data</h3>
+        <p class="text-gray-600 text-sm mb-6">Choose which set of data you would like to export to a CSV file.</p>
+        <div class="flex flex-col justify-center gap-3">
+          <button id="exportSelectedBtn" disabled class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+            Export Selected (0)
+          </button>
+          <button id="exportFilteredBtn" class="w-full px-6 py-3 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">
+            Export Filtered View
+          </button>
+          <button id="exportAllBtn" class="w-full px-6 py-3 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors">
+            Export All Products
+          </button>
+        </div>
+        <button id="cancelExport" class="mt-6 text-sm text-gray-500 hover:underline">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
+        <h3 id="modalTitle" class="font-bold text-xl mb-4 text-gray-900 border-b pb-2">Add New Product</h3>
+        <form id="productForm" class="space-y-4">
+            <input type="hidden" id="productId" name="productId">
+            <div>
+                <label for="productName" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                <input type="text" id="productName" name="productName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="productCategory" name="productCategory" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                        <option>Vegetables</option>
+                        <option>Fruits</option>
+                        <option>Meat</option>
+                        <option>Dairy</option>
+                        <option>Grains</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1">Price (₱)</label>
+                    <input type="number" id="productPrice" name="productPrice" step="0.01" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+            </div>
+            <div>
+                <label for="productStock" class="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                <input type="number" id="productStock" name="productStock" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" id="cancelProductModal" class="px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Save Product</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
+        <div class="text-red-500 text-4xl mb-4">
+          <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <h3 class="font-bold text-xl mb-2 text-gray-900">Confirm Deletion</h3>
+        <p class="text-gray-600 text-sm mb-6">Are you sure you want to delete "<span id="deleteProductName" class="font-bold"></span>"? This action cannot be undone.</p>
+        <div class="flex justify-center gap-4">
+          <button id="cancelDelete" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button id="confirmDelete" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Delete</button>
+        </div>
+      </div>
+    </div>
+
     <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
         <div class="text-red-500 text-4xl mb-4">
@@ -326,9 +420,29 @@ $products = [
   </div> <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Logout Logic
+      // Mock product data for JS
+      const productsData = <?php echo json_encode($products); ?>;
+
+      // --- Modal Elements ---
       const logoutButton = document.getElementById('logoutButton');
       const logoutModal = document.getElementById('logoutModal');
       const cancelLogout = document.getElementById('cancelLogout');
+      const productModal = document.getElementById('productModal');
+      const deleteModal = document.getElementById('deleteModal');
+      const addProductBtn = document.getElementById('add-product-btn');
+      const cancelProductModalBtn = document.getElementById('cancelProductModal');
+      const productForm = document.getElementById('productForm');
+      const modalTitle = document.getElementById('modalTitle');
+      const cancelDeleteBtn = document.getElementById('cancelDelete');
+      const confirmDeleteBtn = document.getElementById('confirmDelete');
+      const tableBody = document.getElementById('products-table-body');
+      const exportBtn = document.getElementById('export-btn');
+      const exportModal = document.getElementById('exportModal');
+      const cancelExportBtn = document.getElementById('cancelExport');
+      const exportFilteredBtn = document.getElementById('exportFilteredBtn');
+      const exportSelectedBtn = document.getElementById('exportSelectedBtn');
+      const exportAllBtn = document.getElementById('exportAllBtn');
+      const selectAllCheckbox = document.getElementById('select-all-checkbox');
 
       logoutButton.addEventListener('click', function() {
         logoutModal.classList.remove('hidden');
@@ -345,6 +459,280 @@ $products = [
               logoutModal.classList.add('hidden');
               logoutModal.classList.remove('flex');
           }
+      });
+
+      // --- Product Modal Logic ---
+      const showProductModal = (product = null) => {
+        productForm.reset();
+        if (product) {
+            modalTitle.textContent = 'Edit Product';
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productStock').value = product.stock;
+        } else {
+            modalTitle.textContent = 'Add New Product';
+            document.getElementById('productId').value = '';
+        }
+        productModal.classList.remove('hidden');
+        productModal.classList.add('flex');
+      };
+
+      const hideProductModal = () => {
+        productModal.classList.add('hidden');
+        productModal.classList.remove('flex');
+      };
+
+      addProductBtn.addEventListener('click', () => showProductModal());
+      cancelProductModalBtn.addEventListener('click', hideProductModal);
+      productModal.addEventListener('click', (e) => {
+        if (e.target === productModal) hideProductModal();
+      });
+
+      productForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(productForm);
+        const productData = Object.fromEntries(formData.entries());
+        console.log('Saving product:', productData); // In a real app, send this to the server
+        hideProductModal();
+        // Here you would typically re-fetch data or dynamically update the table
+      });
+
+      // --- Delete Modal Logic ---
+      let rowToDelete = null;
+
+      const showDeleteModal = (productName, rowElement) => {
+        document.getElementById('deleteProductName').textContent = productName;
+        rowToDelete = rowElement;
+        deleteModal.classList.remove('hidden');
+        deleteModal.classList.add('flex');
+      };
+
+      const hideDeleteModal = () => {
+        deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
+        rowToDelete = null;
+      };
+
+      cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) hideDeleteModal();
+      });
+
+      confirmDeleteBtn.addEventListener('click', () => {
+        if (rowToDelete) {
+            console.log('Deleting product row:', rowToDelete);
+            rowToDelete.remove(); // Remove the row from the DOM
+        }
+        hideDeleteModal();
+      });
+
+      // --- Table Actions (Edit/Delete) ---
+        tableBody.addEventListener('click', (e) => {
+            const dropdownBtn = e.target.closest('.action-dropdown-btn');
+            const actionBtn = e.target.closest('.action-btn');
+
+            // --- Handle Dropdown Toggle ---
+            if (dropdownBtn) {
+                e.preventDefault();
+                const productId = dropdownBtn.dataset.id;
+                const menu = document.getElementById(`action-menu-${productId}`);
+                
+                // Close all other open menus
+                document.querySelectorAll('.action-menu').forEach(m => {
+                    if (m !== menu) m.classList.add('hidden');
+                });
+
+                menu.classList.toggle('hidden');
+            }
+
+            // --- Handle Action Button Clicks ---
+            if (actionBtn) {
+                e.preventDefault();
+                const action = actionBtn.dataset.action;
+                const productId = actionBtn.dataset.id;
+                const product = productsData.find(p => p.id === productId);
+
+                if (!product) return;
+
+                switch (action) {
+                    case 'edit':
+                        showProductModal(product);
+                        break;
+                    case 'delete':
+                        const row = actionBtn.closest('tr');
+                        showDeleteModal(product.name, row);
+                        break;
+                    case 'export-json':
+                        const jsonString = JSON.stringify(product, null, 2);
+                        const blob = new Blob([jsonString], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `product-${product.id}.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        break;
+                    case 'export-pdf':
+                        alert(`Simulating PDF export for: ${product.name}.\nIn a real app, this would generate and download a PDF file.`);
+                        break;
+                }
+            }
+        });
+
+      // --- Filtering Logic ---
+      const categoryFilter = document.getElementById('category-filter');
+      const statusFilter = document.getElementById('status-filter');
+      const searchInput = document.getElementById('search-input');
+      const productRows = document.querySelectorAll('.product-row');
+      const allCheckboxes = document.querySelectorAll('.product-checkbox');
+
+      function filterProducts() {
+        const selectedCategory = categoryFilter.value;
+        const selectedStatus = statusFilter.value;
+        const searchTerm = searchInput.value.toLowerCase();
+
+        productRows.forEach(row => {
+            const categoryMatch = !selectedCategory || row.dataset.category === selectedCategory;
+            const statusMatch = !selectedStatus || row.dataset.status === selectedStatus;
+            const productText = row.querySelector('td').textContent.toLowerCase();
+            const searchMatch = productText.includes(searchTerm);
+
+            if (categoryMatch && statusMatch && searchMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        updateSelectionState();
+      }
+
+      categoryFilter.addEventListener('change', filterProducts);
+      statusFilter.addEventListener('change', filterProducts);
+      searchInput.addEventListener('input', filterProducts);
+
+      // --- Checkbox Selection Logic ---
+      function updateSelectionState() {
+        const visibleCheckboxes = [...allCheckboxes].filter(cb => cb.closest('tr').style.display !== 'none');
+        const checkedVisibleCheckboxes = visibleCheckboxes.filter(cb => cb.checked);
+
+        // Update "Select All" checkbox state
+        if (checkedVisibleCheckboxes.length === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedVisibleCheckboxes.length === visibleCheckboxes.length) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+
+        // Update export button
+        const totalSelectedCount = [...allCheckboxes].filter(cb => cb.checked).length;
+        exportSelectedBtn.textContent = `Export Selected (${totalSelectedCount})`;
+        exportSelectedBtn.disabled = totalSelectedCount === 0;
+      }
+
+      selectAllCheckbox.addEventListener('change', () => {
+        const isChecked = selectAllCheckbox.checked;
+        const visibleCheckboxes = [...allCheckboxes].filter(cb => cb.closest('tr').style.display !== 'none');
+        visibleCheckboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+        updateSelectionState();
+      });
+
+      tableBody.addEventListener('change', (e) => {
+        if (e.target.classList.contains('product-checkbox')) {
+            updateSelectionState();
+        }
+      });
+
+      // --- Export to CSV Logic ---
+      const downloadCSV = (dataToExport, filename) => {
+        const headers = ["ID", "Name", "Category", "Price", "Stock", "Sold", "Status"];
+        let csvContent = headers.join(",") + "\n";
+
+        dataToExport.forEach(product => {
+            const rowData = [
+                product.id,
+                `"${product.name}"`,
+                product.category,
+                product.price,
+                product.stock,
+                product.sold,
+                product.status
+            ].join(",");
+            csvContent += rowData + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        hideExportModal();
+      };
+
+      const showExportModal = () => {
+        updateSelectionState(); // Ensure count is up-to-date when opening
+        exportModal.classList.remove('hidden');
+        exportModal.classList.add('flex');
+      };
+
+      const hideExportModal = () => {
+        exportModal.classList.add('hidden');
+        exportModal.classList.remove('flex');
+      };
+
+      exportBtn.addEventListener('click', showExportModal);
+      cancelExportBtn.addEventListener('click', hideExportModal);
+      exportModal.addEventListener('click', (e) => {
+        if (e.target === exportModal) hideExportModal();
+      });
+
+      exportFilteredBtn.addEventListener('click', () => {
+        const filteredData = [];
+        const visibleRows = document.querySelectorAll('.product-row');
+        visibleRows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const productId = row.querySelector('.text-xs.text-gray-500').textContent.replace('ID: #', '').trim();
+                const product = productsData.find(p => p.id === productId);
+                if (product) filteredData.push(product);
+            }
+        });
+        downloadCSV(filteredData, 'products-filtered-export.csv');
+      });
+
+      exportAllBtn.addEventListener('click', () => {
+        downloadCSV(productsData, 'products-all-export.csv');
+      });
+
+      exportSelectedBtn.addEventListener('click', () => {
+        const selectedData = [];
+        const selectedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+        selectedCheckboxes.forEach(checkbox => {
+            const productId = checkbox.dataset.id;
+            const product = productsData.find(p => p.id === productId);
+            if (product) selectedData.push(product);
+        });
+        downloadCSV(selectedData, 'products-selected-export.csv');
+      });
+
+      // Close action dropdowns if clicking outside
+      window.addEventListener('click', function(e) {
+        if (!e.target.closest('.action-dropdown-btn')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        }
       });
     });
   </script>

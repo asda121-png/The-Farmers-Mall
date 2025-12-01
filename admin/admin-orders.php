@@ -165,7 +165,7 @@ $orders = [
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
       <div class="relative w-full max-w-lg hidden md:block">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search orders, customers, or IDs..."
+        <input type="text" id="search-input" placeholder="Search orders, customers, or IDs..."
           class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
       </div>
 
@@ -186,10 +186,10 @@ $orders = [
             <p class="text-sm text-gray-500">Track and manage customer orders</p>
         </div>
         <div class="flex gap-3">
-             <button class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+             <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-file-invoice"></i> Export Report
             </button>
-            <button class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
+            <button id="create-order-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
                 <i class="fa-solid fa-plus"></i> Create Order
             </button>
         </div>
@@ -236,14 +236,14 @@ $orders = [
 
     <div class="bg-white rounded-xl card-shadow overflow-hidden">
         <div class="p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center justify-between">
-            <div class="flex gap-2">
-                <button class="px-3 py-1.5 text-xs font-medium text-white bg-green-700 rounded-lg shadow-sm">All Orders</button>
-                <button class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Pending</button>
-                <button class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Unpaid</button>
+            <div id="status-filters" class="flex gap-2">
+                <button data-filter="all" class="filter-btn px-3 py-1.5 text-xs font-medium text-white bg-green-700 rounded-lg shadow-sm">All Orders</button>
+                <button data-filter="pending" class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Pending</button>
+                <button data-filter="unpaid" class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Unpaid</button>
             </div>
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-calendar text-gray-400"></i>
-                <select class="text-sm border-none bg-transparent text-gray-600 font-medium outline-none cursor-pointer">
+                <select id="date-filter" class="text-sm border-none bg-transparent text-gray-600 font-medium outline-none cursor-pointer">
                     <option>Last 30 Days</option>
                     <option>This Week</option>
                     <option>Yesterday</option>
@@ -264,7 +264,7 @@ $orders = [
                         <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
                     <?php foreach ($orders as $order): ?>
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -315,8 +315,8 @@ $orders = [
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-gray-400 hover:text-green-600 mr-2" title="View Details"><i class="fa-solid fa-eye"></i></button>
-                            <button class="text-gray-400 hover:text-blue-600" title="Print Invoice"><i class="fa-solid fa-print"></i></button>
+                            <button class="action-btn text-gray-400 hover:text-green-600 mr-2" title="View Details" data-action="view" data-id="<?php echo $order['id']; ?>"><i class="fa-solid fa-eye"></i></button>
+                            <button class="action-btn text-gray-400 hover:text-blue-600" title="Print Invoice" data-action="print" data-id="<?php echo $order['id']; ?>"><i class="fa-solid fa-print"></i></button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -326,13 +326,13 @@ $orders = [
         
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
+                <div id="pagination-info">
                     <p class="text-sm text-gray-700">
                         Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">20</span> results
                     </p>
                 </div>
                 <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <nav id="pagination-controls" class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                         <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                             <i class="fa-solid fa-chevron-left h-4 w-4"></i>
                         </a>
@@ -346,6 +346,60 @@ $orders = [
             </div>
         </div>
     </div>
+
+    <!-- Order Details Modal -->
+    <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-2xl">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h3 class="font-bold text-xl text-gray-900">Order Details</h3>
+            <button class="modal-close-btn text-gray-400 hover:text-gray-600">&times;</button>
+        </div>
+        <div id="modal-content" class="space-y-4">
+            <!-- Dynamic content will be injected here -->
+        </div>
+        <div class="flex justify-end gap-3 pt-6">
+            <button class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Order Modal -->
+    <div id="create-order-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
+        <h3 class="font-bold text-xl mb-4 text-gray-900">Create New Order</h3>
+        <form id="create-order-form">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+                    <input type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Items (comma-separated)</label>
+                    <textarea required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Total Amount (₱)</label>
+                        <input type="number" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                            <option>Pending</option>
+                            <option>Processing</option>
+                            <option>Shipped</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-6">
+                <button type="button" class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Create Order</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
 
     <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
@@ -367,7 +421,11 @@ $orders = [
 
   </div> <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Logout Modal Logic
+      const ordersData = <?php echo json_encode($orders); ?>;
+
+      // --- Elements ---
+      const searchInput = document.getElementById('search-input');
+      const exportBtn = document.getElementById('export-btn');
       const logoutButton = document.getElementById('logoutButton');
       const logoutModal = document.getElementById('logoutModal');
       const cancelLogout = document.getElementById('cancelLogout');
@@ -388,6 +446,221 @@ $orders = [
               logoutModal.classList.remove('flex');
           }
       });
+
+      // --- Filtering and Pagination State ---
+      let state = {
+        currentPage: 1,
+        rowsPerPage: 5,
+        searchTerm: '',
+        statusFilter: 'all',
+      };
+
+      const tableBody = document.getElementById('orders-table-body');
+
+      function displayOrders() {
+        let filteredOrders = ordersData.filter(order => {
+            const searchMatch = state.searchTerm === '' || 
+                                order.id.toLowerCase().includes(state.searchTerm) ||
+                                order.customer.toLowerCase().includes(state.searchTerm) ||
+                                order.email.toLowerCase().includes(state.searchTerm);
+
+            const statusMatch = state.statusFilter === 'all' ||
+                                (state.statusFilter === 'pending' && order.status.toLowerCase() === 'pending') ||
+                                (state.statusFilter === 'unpaid' && order.payment_status.toLowerCase() === 'pending');
+
+            return searchMatch && statusMatch;
+        });
+
+        const totalResults = filteredOrders.length;
+        const totalPages = Math.ceil(totalResults / state.rowsPerPage);
+        state.currentPage = Math.min(state.currentPage, totalPages) || 1;
+
+        const start = (state.currentPage - 1) * state.rowsPerPage;
+        const end = start + state.rowsPerPage;
+        const paginatedOrders = filteredOrders.slice(start, end);
+
+        tableBody.innerHTML = paginatedOrders.map(order => {
+            let payColor = 'text-gray-500';
+            if(order.payment_status === 'Paid') payColor = 'text-green-600';
+            if(order.payment_status === 'Pending') payColor = 'text-orange-500';
+            if(order.payment_status === 'Cancelled') payColor = 'text-red-500';
+
+            let statusClass = 'bg-gray-100 text-gray-800';
+            if(order.status === 'Delivered') statusClass = 'bg-green-100 text-green-800 border border-green-200';
+            if(order.status === 'Shipped') statusClass = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+            if(order.status === 'Processing') statusClass = 'bg-blue-100 text-blue-800 border border-blue-200';
+            if(order.status === 'Pending') statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+            if(order.status === 'Cancelled') statusClass = 'bg-red-100 text-red-800 border border-red-200';
+
+            return `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-bold text-green-700">${order.id}</div><div class="text-xs text-gray-400">${order.date}</div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-gray-900">${order.customer}</div><div class="text-xs text-gray-500">${order.email}</div></td>
+                    <td class="px-6 py-4"><div class="text-xs text-gray-600 max-w-xs truncate" title="${order.items}">${order.items}</div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-semibold text-gray-900">₱${order.total.toFixed(2)}</div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="text-xs"><span class="block font-medium text-gray-700">${order.payment_method}</span><span class="${payColor} font-bold text-[10px] uppercase tracking-wide">${order.payment_status}</span></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="action-btn text-gray-400 hover:text-green-600 mr-2" title="View Details" data-action="view" data-id="${order.id}"><i class="fa-solid fa-eye"></i></button>
+                        <button class="action-btn text-gray-400 hover:text-blue-600" title="Print Invoice" data-action="print" data-id="${order.id}"><i class="fa-solid fa-print"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        updatePagination(totalResults, totalPages);
+      }
+
+      function updatePagination(totalResults, totalPages) {
+        const paginationInfo = document.getElementById('pagination-info');
+        const paginationControls = document.getElementById('pagination-controls');
+
+        if (totalResults === 0) {
+            paginationInfo.innerHTML = `<p class="text-sm text-gray-700">No results found</p>`;
+            paginationControls.innerHTML = '';
+            return;
+        }
+
+        const startItem = (state.currentPage - 1) * state.rowsPerPage + 1;
+        const endItem = Math.min(startItem + state.rowsPerPage - 1, totalResults);
+        paginationInfo.innerHTML = `<p class="text-sm text-gray-700">Showing <span class="font-medium">${startItem}</span> to <span class="font-medium">${endItem}</span> of <span class="font-medium">${totalResults}</span> results</p>`;
+
+        let buttons = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const activeClasses = 'z-10 bg-green-50 border-green-500 text-green-600';
+            const defaultClasses = 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50';
+            buttons += `<a href="#" data-page="${i}" class="page-btn ${i === state.currentPage ? activeClasses : defaultClasses} relative inline-flex items-center px-4 py-2 border text-sm font-medium">${i}</a>`;
+        }
+        paginationControls.innerHTML = `
+            <a href="#" data-page="${state.currentPage - 1}" class="page-btn relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${state.currentPage === 1 ? 'hidden' : ''}"><i class="fa-solid fa-chevron-left h-4 w-4"></i></a>
+            ${buttons}
+            <a href="#" data-page="${state.currentPage + 1}" class="page-btn relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${state.currentPage === totalPages ? 'hidden' : ''}"><i class="fa-solid fa-chevron-right h-4 w-4"></i></a>
+        `;
+      }
+
+      // --- Event Listeners ---
+      searchInput.addEventListener('input', (e) => {
+        state.searchTerm = e.target.value.toLowerCase();
+        state.currentPage = 1;
+        displayOrders();
+      });
+
+      document.getElementById('status-filters').addEventListener('click', (e) => {
+        const btn = e.target.closest('.filter-btn');
+        if (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('bg-green-700', 'text-white');
+                b.classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
+            btn.classList.add('bg-green-700', 'text-white');
+            btn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+            state.statusFilter = btn.dataset.filter;
+            state.currentPage = 1;
+            displayOrders();
+        }
+      });
+
+      document.getElementById('pagination-controls').addEventListener('click', (e) => {
+        e.preventDefault();
+        const pageBtn = e.target.closest('.page-btn');
+        if (pageBtn) {
+            state.currentPage = parseInt(pageBtn.dataset.page);
+            displayOrders();
+        }
+      });
+
+      // --- Modal Logic ---
+      const orderDetailsModal = document.getElementById('order-details-modal');
+      const createOrderModal = document.getElementById('create-order-modal');
+
+      const showModal = (modal) => modal.classList.replace('hidden', 'flex');
+      const hideModal = (modal) => modal.classList.replace('flex', 'hidden');
+
+      document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => {
+        hideModal(btn.closest('.fixed'));
+      }));
+
+      document.getElementById('create-order-btn').addEventListener('click', () => showModal(createOrderModal));
+
+      tableBody.addEventListener('click', (e) => {
+        const btn = e.target.closest('.action-btn');
+        if (!btn) return;
+        const order = ordersData.find(o => o.id === btn.dataset.id);
+        if (!order) return;
+
+        if (btn.dataset.action === 'view') {
+            document.getElementById('modal-content').innerHTML = `
+                <p><strong>Order ID:</strong> ${order.id}</p>
+                <p><strong>Customer:</strong> ${order.customer} (${order.email})</p>
+                <p><strong>Items:</strong> ${order.items}</p>
+                <p><strong>Total:</strong> ₱${order.total.toFixed(2)}</p>
+                <p><strong>Status:</strong> ${order.status}</p>
+            `;
+            showModal(orderDetailsModal);
+        } else if (btn.dataset.action === 'print') { 
+            printInvoice(order);
+        }
+      });
+
+      // --- Export Logic ---
+      exportBtn.addEventListener('click', () => {
+        let filteredOrders = ordersData.filter(order => {
+            const searchMatch = state.searchTerm === '' || 
+                                order.id.toLowerCase().includes(state.searchTerm) ||
+                                order.customer.toLowerCase().includes(state.searchTerm);
+            const statusMatch = state.statusFilter === 'all' ||
+                                (state.statusFilter === 'pending' && order.status.toLowerCase() === 'pending') ||
+                                (state.statusFilter === 'unpaid' && order.payment_status.toLowerCase() === 'pending');
+            return searchMatch && statusMatch;
+        });
+
+        const headers = ["Order ID", "Date", "Customer", "Email", "Items", "Total", "Payment Method", "Payment Status", "Status"];
+        let csvContent = headers.join(",") + "\n";
+
+        filteredOrders.forEach(order => {
+            const row = [
+                order.id,
+                order.date,
+                `"${order.customer}"`,
+                order.email,
+                `"${order.items}"`,
+                order.total,
+                order.payment_method,
+                order.payment_status,
+                order.status
+            ].join(",");
+            csvContent += row + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "orders-report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      // --- Print Invoice Logic ---
+      function printInvoice(order) {
+        const invoiceHTML = `
+            <html><head><title>Invoice for ${order.id}</title>
+            <style>body{font-family:sans-serif;padding:20px}h1{color:#184D34}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}th{background-color:#f2f2f2}</style>
+            </head><body>
+            <h1>Invoice</h1><p><strong>Order ID:</strong> ${order.id}</p><p><strong>Customer:</strong> ${order.customer}</p>
+            <hr><h3>Items</h3><p>${order.items.replace(/, /g, '<br>')}</p><hr>
+            <h3>Total: ₱${order.total.toFixed(2)}</h3>
+            </body></html>`;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(invoiceHTML);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+
+      // Initial Load
+      displayOrders();
     });
   </script>
 </body>
