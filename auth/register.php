@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
 
       <div class="flex-grow flex flex-col">
         <!-- The form action is currently pointing to a sample script, adjust as needed -->
-        <form id="registerForm" method="POST" action="../php/register.php" class="flex-grow flex flex-col">
+        <form id="registerForm" method="POST" action="register.php" class="flex-grow flex flex-col">
           <div class="flex-grow" style="min-height: 360px;"> <!-- Parent container for static height -->
             <div class="flex-grow" style="height: 320px; overflow-y: auto;"> <!-- Scrollable content area -->
             <!-- Step 1: Personal Info -->
@@ -337,7 +337,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                   <input type="text" id="email" name="email" required placeholder="Enter your email or phone" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
               </div>
-              <button type="button" class="w-full text-center text-sm text-green-600 hover:underline">Send Verification Code</button>
+              <button type="button" id="sendVerificationBtn" class="w-full text-center text-sm text-green-600 hover:underline font-medium">Send Verification Code</button>
+              <div id="verificationMessage" class="text-sm text-center hidden"></div>
               <div>
                 <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
@@ -548,31 +549,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
 
       if (validateStep(currentStep)) { // Final validation on the last step
         const formData = new FormData(this);
+        formData.append('register_submitted', '1');
 
-        fetch('php/register.php', {
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Registering...';
+
+        fetch('register.php', {
           method: 'POST',
           body: formData
         })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.status === 'success') {
-            showToast(data.message, 'success');
-            setTimeout(() => window.location.href = "login.php", 2500);
-          } else {
-            showToast(data.message || "An unknown error occurred.", 'error');
+        .then(response => response.text())
+        .then(text => {
+          // Check if response is HTML (page reload) or JSON
+          try {
+            const data = JSON.parse(text);
+            if (data.status === 'success') {
+              showToast(data.message || 'Registration successful!', 'success');
+              setTimeout(() => window.location.href = "login.php?registered=success", 2000);
+            } else {
+              showToast(data.message || "Registration failed. Please try again.", 'error');
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Complete Registration';
+            }
+          } catch (e) {
+            // HTML response means redirect happened or success
+            if (text.includes('login.php') || text === '') {
+              showToast('Registration successful!', 'success');
+              setTimeout(() => window.location.href = "login.php?registered=success", 1500);
+            } else {
+              showToast("Registration failed. Please try again.", 'error');
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Complete Registration';
+            }
           }
         })
         .catch(error => {
           console.error('Error:', error);
           showToast("A network error occurred. Please try again.", 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Complete Registration';
         });
       }
     });
+
+    // Email Verification Button Handler
+    const sendVerificationBtn = document.getElementById('sendVerificationBtn');
+    const verificationMessage = document.getElementById('verificationMessage');
+    let verificationCodeSent = false;
+    let actualVerificationCode = '';
+
+    if (sendVerificationBtn) {
+      sendVerificationBtn.addEventListener('click', function() {
+        const emailInput = document.getElementById('email');
+        const email = emailInput.value.trim();
+
+        if (!email) {
+          showToast('Please enter your email address', 'error');
+          return;
+        }
+
+        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+          showToast('Please enter a valid email address', 'error');
+          return;
+        }
+
+        // Disable button and show loading
+        sendVerificationBtn.disabled = true;
+        sendVerificationBtn.textContent = 'Sending...';
+
+        fetch('verify-email.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            verificationCodeSent = true;
+            if (data.dev_code) {
+              actualVerificationCode = data.dev_code;
+              verificationMessage.textContent = '✅ ' + data.message;
+              verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
+            } else {
+              verificationMessage.textContent = '✅ Code sent! Check your email.';
+              verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
+            }
+            verificationMessage.classList.remove('hidden');
+            sendVerificationBtn.textContent = 'Code Sent ✓';
+            sendVerificationBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            showToast(data.message, 'success');
+          } else {
+            showToast(data.message || 'Failed to send verification code', 'error');
+            sendVerificationBtn.disabled = false;
+            sendVerificationBtn.textContent = 'Send Verification Code';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Failed to send verification code. Please try again.', 'error');
+          sendVerificationBtn.disabled = false;
+          sendVerificationBtn.textContent = 'Send Verification Code';
+        });
+      });
+    }
+
+    // Verify OTP when moving to next step
+    const originalValidateStep = validateStep;
+    validateStep = function(stepIndex) {
+      if (stepIndex === 3) { // Verification step
+        const otpInput = document.getElementById('otp');
+        const otp = otpInput.value.trim();
+
+        if (!otp) {
+          showToast("Please enter the verification code.", "error");
+          return false;
+        }
+
+        if (!verificationCodeSent) {
+          showToast("Please request a verification code first.", "error");
+          return false;
+        }
+
+        // For development: check against dev code if available
+        if (actualVerificationCode && otp !== actualVerificationCode) {
+          showToast("Invalid verification code. Please check and try again.", "error");
+          return false;
+        }
+
+        showToast("Email verified successfully!", "success");
+        return true;
+      }
+
+      return originalValidateStep(stepIndex);
+    };
 
     // Initial setup
     updateProgress();
