@@ -1,10 +1,12 @@
 # Database Migration: Add Username Column
 
-## ⚠️ IMPORTANT: Run This Migration First!
+## ⚠️ IMPORTANT: Run These Migrations First!
 
-Before the updated registration and login will work, you need to add the `username` column to the Supabase database.
+Before the updated registration and login will work, you need to:
+1. Add the `username` column to the Supabase database
+2. Disable Row Level Security (RLS) for API access
 
-## Steps to Run Migration:
+## Part 1: Add Username Column
 
 ### 1. Go to Supabase SQL Editor
 1. Open your browser and go to: https://supabase.com/dashboard
@@ -18,7 +20,23 @@ Before the updated registration and login will work, you need to add the `userna
 3. Paste it into the Supabase SQL Editor
 4. Click **Run** (or press Ctrl+Enter)
 
-### 3. Verify Results
+## Part 2: Disable Row Level Security (CRITICAL!)
+
+### Why This Is Needed:
+Supabase has Row Level Security (RLS) enabled by default. This blocks API access unless policies are configured.
+
+### Steps:
+1. In the same Supabase SQL Editor
+2. Open the file: `config/DISABLE_RLS.sql`
+3. Copy ALL the SQL code
+4. Paste it into the Supabase SQL Editor
+5. Click **Run**
+
+This will disable RLS on all tables, allowing the REST API to work properly.
+
+## Verification
+
+After running both migrations, test in PowerShell:
 You should see a success message and a table showing all users with their new usernames.
 
 The migration will:
