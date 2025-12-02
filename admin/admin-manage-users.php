@@ -286,9 +286,6 @@ $sellers = [
              <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-download"></i> Export Data
             </button>
-            <button id="add-user-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
-                <i class="fa-solid fa-user-plus"></i> Add User
-            </button>
         </div>
     </div>
 
@@ -364,7 +361,7 @@ $sellers = [
                                 <?php echo $c['joined']; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="action-btn text-green-600 hover:text-green-800 mr-2" data-action="edit" data-id="<?php echo $c['id']; ?>"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn text-green-600 hover:text-green-800 mr-2" title="Edit" data-action="edit" data-id="<?php echo $c['id']; ?>"><i class="fa-solid fa-pen"></i></button>
                                 <button class="action-btn text-red-600 hover:text-red-900" data-action="delete" data-id="<?php echo $c['id']; ?>"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
@@ -434,9 +431,11 @@ $sellers = [
                                 <?php echo $s['joined']; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="action-btn text-green-600 hover:text-green-900 mr-2" title="View Store" data-action="view" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-store"></i></button>
+                                <button class="action-btn text-green-600 hover:text-green-900 mr-2" title="<?php echo ($s['status'] === 'Pending') ? 'Review & Verify' : 'View Store'; ?>" data-action="view" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-store"></i></button>
                                 <button class="action-btn text-green-600 hover:text-green-800 mr-2" title="Edit" data-action="edit" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-btn text-gray-400 hover:text-red-600" title="Suspend" data-action="suspend" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-ban"></i></button>
+                                <?php if ($s['status'] !== 'Suspended' && $s['status'] !== 'Pending'): ?>
+                                    <button class="action-btn text-gray-400 hover:text-red-600" title="Suspend" data-action="suspend" data-id="<?php echo $s['id']; ?>"><i class="fa-solid fa-ban"></i></button>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -576,10 +575,7 @@ $sellers = [
                 customerFilter: document.getElementById('customer-status-filter'),
                 sellerFilter: document.getElementById('seller-status-filter'),
                 customersTableBody: document.getElementById('customers-table-body'),
-                sellersTableBody: document.getElementById('sellers-table-body'),
-                addUserBtn: document.getElementById('add-user-btn'),
-                addUserModal: document.getElementById('add-user-modal'),
-                addUserForm: document.getElementById('add-user-form'),
+                sellersTableBody: document.getElementById('sellers-table-body'),                
                 exportBtn: document.getElementById('export-btn'),
                 editUserModal: document.getElementById('edit-user-modal'),
                 editUserForm: document.getElementById('edit-user-form'),
@@ -606,9 +602,7 @@ $sellers = [
             this.elements.searchInput.addEventListener('input', this.applyFilters.bind(this));
             this.elements.customerFilter.addEventListener('change', this.applyFilters.bind(this));
             this.elements.sellerFilter.addEventListener('change', this.applyFilters.bind(this));
-            this.elements.addUserBtn.addEventListener('click', () => this.showModal(this.elements.addUserModal));
             this.elements.exportBtn.addEventListener('click', this.handleExport.bind(this));
-            this.elements.addUserForm.addEventListener('submit', this.handleFormSubmit.bind(this));
             this.elements.editUserForm.addEventListener('submit', this.handleFormSubmit.bind(this));
             this.elements.cancelActionBtn.addEventListener('click', () => this.hideModal(this.elements.confirmationModal));
             this.elements.confirmActionBtn.addEventListener('click', this.handleConfirmAction.bind(this));
@@ -671,13 +665,19 @@ $sellers = [
             this.currentRowElement = btn.closest('tr');
 
             if (this.currentAction === 'edit') {
-                const name = this.currentRowElement.querySelector('.font-medium')?.textContent || '';
-                const email = this.currentRowElement.querySelector('.text-sm')?.textContent || this.currentRowElement.querySelector('.text-xs')?.textContent || '';
-                const phone = this.currentRowElement.querySelector('.text-xs.text-gray-500')?.textContent || '';
+                // Use more specific selectors to reliably get user data
+                const name = this.currentRowElement.querySelector('.text-sm.font-medium.text-gray-900')?.textContent || '';
+                const email = this.currentRowElement.querySelector('.text-xs.text-gray-500, .text-sm.text-gray-900')?.textContent || '';
+                
+                // Different phone selectors for customer vs seller
+                let phone = this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')?.textContent || ''; // Customer phone
+                if (!phone) {
+                    phone = this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')?.textContent || ''; // Seller phone
+                }
                 
                 this.elements.editUserNameInput.value = name;
                 this.elements.editUserEmailInput.value = email;
-                this.elements.editUserPhoneInput.value = phone;
+                this.elements.editUserPhoneInput.value = phone.trim();
                 document.getElementById('edit-user-id').value = this.currentUserId;
                 this.showModal(this.elements.editUserModal);
             } else if (this.currentAction === 'delete' || this.currentAction === 'suspend') {
@@ -690,16 +690,12 @@ $sellers = [
         handleFormSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            if (form.id === 'add-user-form') {
-                // Logic to add user (currently mock)
-                alert('New user added (demo)!');
-                this.hideModal(this.elements.addUserModal);
-            } else if (form.id === 'edit-user-form') {
+            if (form.id === 'edit-user-form' && this.currentRowElement) {
                 // Logic to update UI after edit
-                this.currentRowElement.querySelector('.font-medium').textContent = this.elements.editUserNameInput.value;
-                (this.currentRowElement.querySelector('.text-sm') || this.currentRowElement.querySelector('.text-xs')).textContent = this.elements.editUserEmailInput.value;
-                if (this.currentRowElement.querySelector('.text-xs.text-gray-500')) {
-                    this.currentRowElement.querySelector('.text-xs.text-gray-500').textContent = this.elements.editUserPhoneInput.value;
+                this.currentRowElement.querySelector('.text-sm.font-medium.text-gray-900').textContent = this.elements.editUserNameInput.value;
+                this.currentRowElement.querySelector('td:nth-child(2) .text-sm, td:nth-child(1) .text-xs.text-gray-500').textContent = this.elements.editUserEmailInput.value;
+                if (this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')) {
+                    this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500').textContent = this.elements.editUserPhoneInput.value;
                 }
                 this.hideModal(this.elements.editUserModal);
             }
@@ -710,9 +706,14 @@ $sellers = [
             if (this.currentAction === 'delete') {
                 this.currentRowElement.remove();
             } else if (this.currentAction === 'suspend') {
-                const statusCell = this.currentRowElement.querySelector('.px-2.inline-flex');
+                const statusCell = this.currentRowElement.querySelector('td:nth-child(4) span');
                 statusCell.textContent = 'Suspended';
-                statusCell.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+                statusCell.className = 'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200';
+                this.currentRowElement.dataset.status = 'Suspended';
+                
+                // Remove the suspend button after action
+                const suspendButton = this.currentRowElement.querySelector('button[data-action="suspend"]');
+                if (suspendButton) suspendButton.remove();
             }
             this.hideModal(this.elements.confirmationModal);
         },
