@@ -7,27 +7,103 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-// Get user data from session
-$user_id = $_SESSION['user_id'] ?? null;
-$email = $_SESSION['email'] ?? 'user@email.com';
-$full_name = $_SESSION['full_name'] ?? 'Guest User';
-$phone = $_SESSION['phone'] ?? '';
-$address = $_SESSION['address'] ?? '';
-$username = $_SESSION['username'] ?? '';
-
-// Load Supabase API for profile updates
+// Load Supabase API
 require_once __DIR__ . '/../config/supabase-api.php';
+
+$user_id = $_SESSION['user_id'] ?? null;
+$api = getSupabaseAPI();
+
+// Fetch user data from Supabase
+$userData = [];
+if ($user_id) {
+    $users = $api->select('users', ['id' => $user_id]);
+    if (!empty($users)) {
+        $userData = $users[0];
+    }
+}
+
+// Set default values
+$email = $userData['email'] ?? $_SESSION['email'] ?? 'user@email.com';
+$full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest User';
+$phone = $userData['phone'] ?? '';
+$username = $userData['username'] ?? '';
+$profile_picture = $userData['profile_picture'] ?? '';
+$date_of_birth = $userData['date_of_birth'] ?? '';
+$gender = $userData['gender'] ?? '';
+$bio = $userData['bio'] ?? '';
+$address = $userData['address'] ?? '';
+$created_at = $userData['created_at'] ?? '';
+
+// Handle profile picture upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
+    header('Content-Type: application/json');
+    
+    try {
+        $file = $_FILES['profile_picture'];
+        
+        // Validate file
+        $allowed_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        if (!in_array($file['type'], $allowed_types)) {
+            echo json_encode(['status' => 'error', 'message' => 'Only image files (JPG, PNG, GIF) are allowed']);
+            exit();
+        }
+        
+        if ($file['size'] > 5 * 1024 * 1024) { // 5MB
+            echo json_encode(['status' => 'error', 'message' => 'File size must be less than 5MB']);
+            exit();
+        }
+        
+        // Create uploads/profiles directory if it doesn't exist
+        $upload_dir = __DIR__ . '/../uploads/profiles/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
+        $filepath = $upload_dir . $filename;
+        
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            // Update database
+            $relative_path = 'uploads/profiles/' . $filename;
+            $result = $api->update('users', ['id' => $user_id], ['profile_picture' => $relative_path]);
+            
+            // Delete old profile picture if exists
+            if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
+                unlink(__DIR__ . '/../' . $profile_picture);
+            }
+            
+            echo json_encode(['status' => 'success', 'message' => 'Profile picture uploaded!', 'image_url' => '../' . $relative_path]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to upload file']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Upload error: ' . $e->getMessage()]);
+    }
+    exit();
+}
 
 // Handle profile update via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
+    header('Content-Type: application/json');
+    
     try {
-        $api = getSupabaseAPI();
-        
         $updateData = [
             'full_name' => trim($_POST['full_name'] ?? $full_name),
             'phone' => trim($_POST['phone'] ?? $phone),
-            'email' => trim($_POST['email'] ?? $email)
+            'email' => trim($_POST['email'] ?? $email),
+            'date_of_birth' => trim($_POST['date_of_birth'] ?? ''),
+            'gender' => trim($_POST['gender'] ?? ''),
+            'bio' => trim($_POST['bio'] ?? ''),
+            'address' => trim($_POST['address'] ?? '')
         ];
+        
+        // Remove empty date_of_birth
+        if (empty($updateData['date_of_birth'])) {
+            unset($updateData['date_of_birth']);
+        }
         
         // Update in database
         if ($user_id) {
@@ -37,18 +113,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_SESSION['full_name'] = $updateData['full_name'];
             $_SESSION['phone'] = $updateData['phone'];
             $_SESSION['email'] = $updateData['email'];
+            $_SESSION['username'] = $updateData['full_name'];
             
-            header('Content-Type: application/json');
             echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!']);
         } else {
-            header('Content-Type: application/json');
             echo json_encode(['status' => 'error', 'message' => 'User ID not found']);
         }
     } catch (Exception $e) {
-        header('Content-Type: application/json');
         echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
     }
     exit();
+}
+
+// Get order statistics
+$total_orders = 0;
+$total_spent = 0;
+try {
+    $orders = $api->select('orders', ['user_id' => $user_id]);
+    $total_orders = count($orders);
+    foreach ($orders as $order) {
+        $total_spent += floatval($order['total_amount'] ?? 0);
+    }
+} catch (Exception $e) {
+    // Silent fail
+}
+
+// Get saved items count (cart items)
+$saved_items = 0;
+try {
+    $cart_items = $api->select('cart', ['user_id' => $user_id]);
+    $saved_items = count($cart_items);
+} catch (Exception $e) {
+    // Silent fail
 }
 ?>
 <!DOCTYPE html>
@@ -107,9 +203,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <aside class="w-72 bg-white rounded-lg shadow p-6">
       <!-- Profile Info -->
       <div class="flex flex-col items-center text-center mb-6">
-        <div class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
-          <i class="fas fa-user text-white text-3xl"></i>
-        </div>
+        <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+          <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">
+        <?php else: ?>
+          <div class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
+            <i class="fas fa-user text-white text-3xl"></i>
+          </div>
+        <?php endif; ?>
         <h2 class="font-semibold"><?php echo htmlspecialchars($full_name); ?></h2>
         <p class="text-gray-500 text-sm"><?php echo htmlspecialchars($email); ?></p>
       </div>
@@ -159,9 +259,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
           <!-- Profile Picture & Basic Info -->
           <div class="flex items-start gap-6 pb-6 border-b">
             <div class="relative">
-              <div id="displayProfilePic" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
-                <i class="fas fa-user text-white text-5xl"></i>
-              </div>
+              <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                <img id="displayProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">
+              <?php else: ?>
+                <div id="displayProfilePic" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                  <i class="fas fa-user text-white text-5xl"></i>
+                </div>
+              <?php endif; ?>
               <div class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white">
                 <i class="fas fa-camera text-sm"></i>
               </div>
@@ -169,7 +273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="flex-1">
               <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($full_name); ?></h3>
               <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
-              <p id="displayBio" class="text-gray-600 text-sm italic">Welcome to Farmers Mall!</p>
+              <p id="displayBio" class="text-gray-600 text-sm italic"><?php echo htmlspecialchars($bio ?: 'Welcome to Farmers Mall!'); ?></p>
             </div>
           </div>
 
@@ -181,15 +285,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
               <label class="text-xs text-gray-500 uppercase tracking-wide">Date of Birth</label>
-              <p id="displayDob" class="text-gray-800 font-medium mt-1">January 15, 1990</p>
+              <p id="displayDob" class="text-gray-800 font-medium mt-1">
+                <?php 
+                  if (!empty($date_of_birth)) {
+                    echo date('F d, Y', strtotime($date_of_birth));
+                  } else {
+                    echo 'Not provided';
+                  }
+                ?>
+              </p>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
               <label class="text-xs text-gray-500 uppercase tracking-wide">Gender</label>
-              <p id="displayGender" class="text-gray-800 font-medium mt-1">Male</p>
+              <p id="displayGender" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($gender ?: 'Not specified'); ?></p>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
               <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
-              <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">March 2024</p>
+              <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
+                <?php 
+                  if (!empty($created_at)) {
+                    echo date('F Y', strtotime($created_at));
+                  } else {
+                    echo 'Recently';
+                  }
+                ?>
+              </p>
             </div>
           </div>
 
@@ -198,15 +318,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <h4 class="font-semibold mb-4 text-gray-700">Account Statistics</h4>
             <div class="grid grid-cols-3 gap-4">
               <div class="text-center p-4 bg-green-50 rounded-lg">
-                <p class="text-2xl font-bold text-green-600">24</p>
+                <p class="text-2xl font-bold text-green-600"><?php echo $total_orders; ?></p>
                 <p class="text-sm text-gray-600 mt-1">Total Orders</p>
               </div>
               <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <p class="text-2xl font-bold text-blue-600">₱12,450</p>
+                <p class="text-2xl font-bold text-blue-600">₱<?php echo number_format($total_spent, 2); ?></p>
                 <p class="text-sm text-gray-600 mt-1">Total Spent</p>
               </div>
               <div class="text-center p-4 bg-purple-50 rounded-lg">
-                <p class="text-2xl font-bold text-purple-600">5</p>
+                <p class="text-2xl font-bold text-purple-600"><?php echo $saved_items; ?></p>
                 <p class="text-sm text-gray-600 mt-1">Saved Items</p>
               </div>
             </div>
@@ -218,9 +338,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
           <!-- Profile Picture Upload -->
           <div class="flex items-start gap-6 pb-6 border-b">
             <div class="relative">
-              <div id="editProfilePicPreview" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
-                <i class="fas fa-user text-white text-5xl"></i>
-              </div>
+              <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                <img id="editProfilePicPreview" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">
+              <?php else: ?>
+                <div id="editProfilePicPreview" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                  <i class="fas fa-user text-white text-5xl"></i>
+                </div>
+              <?php endif; ?>
               <label for="profilePicInput" class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white cursor-pointer hover:bg-green-700 transition">
                 <i class="fas fa-camera text-sm"></i>
               </label>
@@ -229,7 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="flex-1">
               <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
               <p class="text-sm text-gray-500 mb-2">Click the camera icon to upload a new profile picture</p>
-              <button type="button" id="removeProfilePic" class="text-sm text-red-600 hover:text-red-700">
+              <button type="button" id="removeProfilePic" class="text-sm text-red-600 hover:text-red-700 <?php echo empty($profile_picture) ? 'hidden' : ''; ?>">
                 <i class="fas fa-trash-alt mr-1"></i> Remove Picture
               </button>
             </div>
@@ -239,36 +363,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-              <input type="text" id="editFullName" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              <input type="text" id="editFullName" name="full_name" value="<?php echo htmlspecialchars($full_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-              <input type="email" id="editEmail" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-              <input type="tel" id="editPhone" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="+63">
+              <input type="tel" id="editPhone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX" pattern="09[0-9]{9}">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-              <input type="date" id="editDob" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              <input type="date" id="editDob" name="date_of_birth" value="<?php echo htmlspecialchars($date_of_birth); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-              <select id="editGender" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              <select id="editGender" name="gender" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
                 <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-                <option value="Prefer not to say">Prefer not to say</option>
+                <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male</option>
+                <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
+                <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>Other</option>
+                <option value="Prefer not to say" <?php echo ($gender === 'Prefer not to say') ? 'selected' : ''; ?>>Prefer not to say</option>
               </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <input type="text" id="editAddress" name="address" value="<?php echo htmlspecialchars($address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Full address">
             </div>
           </div>
 
           <!-- Bio -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-            <textarea id="editBio" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Tell us about yourself..."></textarea>
+            <textarea id="editBio" name="bio" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Tell us about yourself..."><?php echo htmlspecialchars($bio); ?></textarea>
           </div>
 
           <!-- Action Buttons -->
@@ -889,52 +1017,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
       });
 
       // Handle profile picture upload
-      profilePicInput.addEventListener('change', (e) => {
+      profilePicInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (file) {
+          // Show preview
           const reader = new FileReader();
           reader.onload = (event) => {
             const editPicEl = document.getElementById('editProfilePicPreview');
             editPicEl.innerHTML = `<img src="${event.target.result}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
             editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
+            document.getElementById('removeProfilePic').classList.remove('hidden');
           };
           reader.readAsDataURL(file);
+
+          // Upload immediately
+          const formData = new FormData();
+          formData.append('profile_picture', file);
+
+          try {
+            const response = await fetch('profile.php', {
+              method: 'POST',
+              body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+              alert('Profile picture uploaded successfully!');
+              // Reload page to update all instances
+              location.reload();
+            } else {
+              alert(result.message || 'Failed to upload profile picture');
+            }
+          } catch (error) {
+            console.error('Upload error:', error);
+            alert('An error occurred while uploading. Please try again.');
+          }
         }
       });
 
       // Remove profile picture
-      removeProfilePic.addEventListener('click', () => {
-        const editPicEl = document.getElementById('editProfilePicPreview');
-        editPicEl.innerHTML = '<i class="fas fa-user text-white text-5xl"></i>';
-        editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center';
-        profilePicInput.value = '';
+      removeProfilePic.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to remove your profile picture?')) return;
+
+        try {
+          const formData = new FormData();
+          formData.append('action', 'update_profile');
+          formData.append('full_name', '<?php echo addslashes($full_name); ?>');
+          formData.append('email', '<?php echo addslashes($email); ?>');
+          formData.append('phone', '<?php echo addslashes($phone); ?>');
+          formData.append('profile_picture', ''); // Remove picture
+
+          const response = await fetch('profile.php', {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+            alert('Profile picture removed successfully!');
+            location.reload();
+          } else {
+            alert(result.message || 'Failed to remove profile picture');
+          }
+        } catch (error) {
+          console.error('Remove error:', error);
+          alert('An error occurred. Please try again.');
+        }
       });
 
       // Save profile changes
       profileEditForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Update profile data
-        userProfile.fullName = document.getElementById('editFullName').value;
-        userProfile.email = document.getElementById('editEmail').value;
-        userProfile.phone = document.getElementById('editPhone').value;
-        userProfile.dob = document.getElementById('editDob').value;
-        userProfile.gender = document.getElementById('editGender').value;
-        userProfile.bio = document.getElementById('editBio').value;
-        
-        // Get profile pic if uploaded
-        const editPicEl = document.getElementById('editProfilePicPreview');
-        const imgTag = editPicEl.querySelector('img');
-        userProfile.profilePic = imgTag ? imgTag.src : null;
+        // Get form data
+        const formData = new FormData();
+        formData.append('action', 'update_profile');
+        formData.append('full_name', document.getElementById('editFullName').value);
+        formData.append('email', document.getElementById('editEmail').value);
+        formData.append('phone', document.getElementById('editPhone').value);
+        formData.append('date_of_birth', document.getElementById('editDob').value);
+        formData.append('gender', document.getElementById('editGender').value);
+        formData.append('bio', document.getElementById('editBio').value);
+        formData.append('address', document.getElementById('editAddress').value);
 
         // Save to database via AJAX
         try {
-          const formData = new FormData();
-          formData.append('action', 'update_profile');
-          formData.append('full_name', userProfile.fullName);
-          formData.append('email', userProfile.email);
-          formData.append('phone', userProfile.phone);
-          
           const response = await fetch('profile.php', {
             method: 'POST',
             body: formData
@@ -943,25 +1112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
           const result = await response.json();
           
           if (result.status === 'success') {
-            // Save to localStorage
-            localStorage.setItem('userProfile', JSON.stringify(userProfile));
-
-            // Dispatch custom event for other tabs/windows to listen
-            window.dispatchEvent(new Event('storage'));
-            
-            // Dispatch event for same page listeners
-            window.dispatchEvent(new CustomEvent('profileUpdated', { detail: userProfile }));
-
-            // Update display
-            renderProfile();
-
-            // Switch back to display mode
-            profileDisplay.classList.remove('hidden');
-            profileEditForm.classList.add('hidden');
-            editProfileBtn.classList.remove('hidden');
-
-            // Show success message
-            alert(result.message || 'Profile updated successfully! Your changes will be reflected across all pages.');
+            alert(result.message || 'Profile updated successfully!');
+            location.reload(); // Reload to show updated data
           } else {
             alert(result.message || 'Failed to update profile. Please try again.');
           }
