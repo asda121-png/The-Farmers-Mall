@@ -1,4 +1,10 @@
 <?php
+// Suppress all warnings and errors when handling AJAX requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    error_reporting(0);
+    ini_set('display_errors', '0');
+}
+
 session_start();
 
 // Check if user is logged in
@@ -34,60 +40,27 @@ $bio = $userData['bio'] ?? '';
 $address = $userData['address'] ?? '';
 $created_at = $userData['created_at'] ?? '';
 
-// Handle profile picture upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
-    header('Content-Type: application/json');
-    
-    try {
-        $file = $_FILES['profile_picture'];
-        
-        // Validate file
-        $allowed_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
-        if (!in_array($file['type'], $allowed_types)) {
-            echo json_encode(['status' => 'error', 'message' => 'Only image files (JPG, PNG, GIF) are allowed']);
-            exit();
-        }
-        
-        if ($file['size'] > 5 * 1024 * 1024) { // 5MB
-            echo json_encode(['status' => 'error', 'message' => 'File size must be less than 5MB']);
-            exit();
-        }
-        
-        // Create uploads/profiles directory if it doesn't exist
-        $upload_dir = __DIR__ . '/../uploads/profiles/';
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
-        }
-        
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
-        $filepath = $upload_dir . $filename;
-        
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            // Update database
-            $relative_path = 'uploads/profiles/' . $filename;
-            $result = $api->update('users', ['id' => $user_id], ['profile_picture' => $relative_path]);
-            
-            // Delete old profile picture if exists
-            if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
-                unlink(__DIR__ . '/../' . $profile_picture);
-            }
-            
-            echo json_encode(['status' => 'success', 'message' => 'Profile picture uploaded!', 'image_url' => '../' . $relative_path]);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to upload file']);
-        }
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => 'Upload error: ' . $e->getMessage()]);
-    }
-    exit();
-}
-
 // Handle profile update via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
+    // Debug logging - use absolute path
+    $log_file = 'C:\tools_\The-Farmers-Mall\profile_upload.log';
+    file_put_contents($log_file, date('[Y-m-d H:i:s] ') . "Profile Update Request\n", FILE_APPEND);
+    
     header('Content-Type: application/json');
+    
+    file_put_contents($log_file, "POST: " . json_encode($_POST) . "\n", FILE_APPEND);
+    
+    $files_info = [];
+    if (!empty($_FILES)) {
+        foreach ($_FILES as $key => $file) {
+            if (is_array($file['name'])) {
+                $files_info[$key] = 'multiple files';
+            } else {
+                $files_info[$key] = ['name' => $file['name'] ?? 'none', 'size' => $file['size'] ?? 0, 'error' => $file['error'] ?? 4];
+            }
+        }
+    }
+    file_put_contents($log_file, "FILES: " . json_encode($files_info) . "\n", FILE_APPEND);
     
     try {
         $updateData = [
@@ -105,9 +78,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             unset($updateData['date_of_birth']);
         }
         
+        // Handle profile picture upload if file is provided
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            file_put_contents($log_file, "Processing file upload...\n", FILE_APPEND);
+            $file = $_FILES['profile_picture'];
+            
+            // Validate file - use simple extension check
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            
+            file_put_contents($log_file, "File extension: " . $extension . "\n", FILE_APPEND);
+            
+            if (!in_array($extension, $allowed_extensions)) {
+                file_put_contents($log_file, "Invalid file type\n", FILE_APPEND);
+                echo json_encode(['status' => 'error', 'message' => 'Only image files (JPG, PNG, GIF) are allowed']);
+                exit();
+            }
+            
+            if ($file['size'] > 5 * 1024 * 1024) { // 5MB
+                echo json_encode(['status' => 'error', 'message' => 'File size must be less than 5MB']);
+                exit();
+            }
+            
+            // Create uploads/profiles directory if it doesn't exist
+            $upload_dir = __DIR__ . '/../uploads/profiles/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
+            }
+            
+            // Generate unique filename
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
+            $filepath = $upload_dir . $filename;
+            
+            file_put_contents($log_file, "Attempting to save to: " . $filepath . "\n", FILE_APPEND);
+            
+            // Move uploaded file
+            if (move_uploaded_file($file['tmp_name'], $filepath)) {
+                file_put_contents($log_file, "File saved successfully\n", FILE_APPEND);
+                // Delete old profile picture if exists
+                if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
+                    @unlink(__DIR__ . '/../' . $profile_picture);
+                }
+                
+                // Add to update data
+                $updateData['profile_picture'] = 'uploads/profiles/' . $filename;
+                file_put_contents($log_file, "Profile picture path: " . $updateData['profile_picture'] . "\n", FILE_APPEND);
+            } else {
+                file_put_contents($log_file, "Failed to move uploaded file\n", FILE_APPEND);
+            }
+        } else {
+            if (isset($_FILES['profile_picture'])) {
+                file_put_contents($log_file, "File error: " . $_FILES['profile_picture']['error'] . "\n", FILE_APPEND);
+            } else {
+                file_put_contents($log_file, "No file uploaded\n", FILE_APPEND);
+            }
+        }
+        
         // Update in database
         if ($user_id) {
-            $result = $api->update('users', ['id' => $user_id], $updateData);
+            file_put_contents($log_file, "Updating database with data: " . json_encode($updateData) . "\n", FILE_APPEND);
+            file_put_contents($log_file, "User ID: " . $user_id . "\n", FILE_APPEND);
+            
+            // Correct parameter order: update($table, $data, $filters)
+            $result = $api->update('users', $updateData, ['id' => $user_id]);
+            
+            file_put_contents($log_file, "Database update result: " . json_encode($result) . "\n", FILE_APPEND);
             
             // Update session
             $_SESSION['full_name'] = $updateData['full_name'];
@@ -115,9 +151,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_SESSION['email'] = $updateData['email'];
             $_SESSION['username'] = $updateData['full_name'];
             
-            echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!']);
+            echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!', 'debug' => 'v2_with_logging']);
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'User ID not found']);
+            file_put_contents($log_file, "ERROR: User ID not found\n", FILE_APPEND);
+            echo json_encode(['status' => 'error', 'message' => 'User ID not found', 'debug' => 'no_user_id']);
         }
     } catch (Exception $e) {
         echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
@@ -188,9 +225,13 @@ try {
         </a>
         <a href="profile.php">
           <!-- Active state shown with a ring -->
-          <div class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 bg-green-600 flex items-center justify-center">
-            <i class="fas fa-user text-white text-sm"></i>
-          </div>
+          <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+            <img id="navProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">
+          <?php else: ?>
+            <div id="navProfilePic" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 bg-green-600 flex items-center justify-center">
+              <i class="fas fa-user text-white text-sm"></i>
+            </div>
+          <?php endif; ?>
         </a>
       </div>
     </div>
@@ -204,9 +245,9 @@ try {
       <!-- Profile Info -->
       <div class="flex flex-col items-center text-center mb-6">
         <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-          <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">
+          <img id="sidebarProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">
         <?php else: ?>
-          <div class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
+          <div id="sidebarProfilePic" class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
             <i class="fas fa-user text-white text-3xl"></i>
           </div>
         <?php endif; ?>
@@ -1017,10 +1058,10 @@ try {
       });
 
       // Handle profile picture upload
-      profilePicInput.addEventListener('change', async (e) => {
+      profilePicInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-          // Show preview
+          // Show preview only - don't upload yet
           const reader = new FileReader();
           reader.onload = (event) => {
             const editPicEl = document.getElementById('editProfilePicPreview');
@@ -1029,30 +1070,6 @@ try {
             document.getElementById('removeProfilePic').classList.remove('hidden');
           };
           reader.readAsDataURL(file);
-
-          // Upload immediately
-          const formData = new FormData();
-          formData.append('profile_picture', file);
-
-          try {
-            const response = await fetch('profile.php', {
-              method: 'POST',
-              body: formData
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-              alert('Profile picture uploaded successfully!');
-              // Reload page to update all instances
-              location.reload();
-            } else {
-              alert(result.message || 'Failed to upload profile picture');
-            }
-          } catch (error) {
-            console.error('Upload error:', error);
-            alert('An error occurred while uploading. Please try again.');
-          }
         }
       });
 
@@ -1101,15 +1118,26 @@ try {
         formData.append('gender', document.getElementById('editGender').value);
         formData.append('bio', document.getElementById('editBio').value);
         formData.append('address', document.getElementById('editAddress').value);
+        
+        // Include profile picture if one was selected
+        const profilePicFile = profilePicInput.files[0];
+        if (profilePicFile) {
+          formData.append('profile_picture', profilePicFile);
+        }
 
         // Save to database via AJAX
         try {
+          console.log('Submitting form with file:', profilePicFile ? profilePicFile.name : 'no file');
+          
           const response = await fetch('profile.php', {
             method: 'POST',
             body: formData
           });
           
-          const result = await response.json();
+          const responseText = await response.text();
+          console.log('Server response:', responseText);
+          
+          const result = JSON.parse(responseText);
           
           if (result.status === 'success') {
             alert(result.message || 'Profile updated successfully!');
