@@ -323,44 +323,6 @@ $user_settings = [
                         </div>
 
                     </div>
-                     <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900 dark:text-gray-200">Marketing & Tips</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Receive marketing tips and platform news.</p>
-                        </div>
-
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifMarket" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                            <label for="notifMarket" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
-                        </div>
-
-                    </div>
-
-                     <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900 dark:text-gray-200">New Retailers</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Get notified when new retailers apply.</p>
-                        </div>
-
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifRetail" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                            <label for="notifRetail" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
-                        </div>
-
-                    </div>
-
-                     <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900 dark:text-gray-200">Promotions</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Get notified about new promotions.</p>
-                        </div>
-
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifPromo" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                            <label for="notifPromo" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer dark:bg-gray-600"></label>
-                        </div>
-
-                    </div>
                 </div>
             </div>
         </div>
