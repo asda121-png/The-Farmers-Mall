@@ -461,37 +461,42 @@ $user_settings = [
 
     document.addEventListener('DOMContentLoaded', function() {
       // --- Theme Switcher Logic ---
+      const THEME_STORAGE_KEY = 'adminTheme';
       const themeRadios = document.querySelectorAll('input[name="theme"]');
       const themeOptions = document.querySelectorAll('.theme-option');
 
-      const applyTheme = (theme) => {
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
+      const setThemePreference = (theme) => {
+        if (typeof window.setAdminTheme === 'function') {
+          window.setAdminTheme(theme);
         } else {
-          document.documentElement.classList.remove('dark');
+          localStorage.setItem(THEME_STORAGE_KEY, theme);
+          const isDark = theme === 'dark';
+          document.body.classList.toggle('dark-mode', isDark);
+          document.documentElement.classList.toggle('dark', isDark);
         }
+      };
+
+      const updateRadioUI = (activeThemeParam) => {
+        const activeTheme = activeThemeParam || localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+        const activeRadio = document.getElementById(`theme-${activeTheme}`);
+        if (activeRadio) {
+          activeRadio.checked = true;
+        }
+
+        themeOptions.forEach(opt => {
+            const input = opt.querySelector('input[name="theme"]');
+            if (!input) return;
+            const isActive = input.value === activeTheme;
+            opt.classList.toggle('border-green-500', isActive);
+            opt.classList.toggle('dark:border-green-500', isActive);
+            opt.classList.toggle('border-gray-200', !isActive);
+            opt.classList.toggle('dark:border-gray-700', !isActive);
+        });
       };
 
       const updateThemeSelection = (theme) => {
-        localStorage.setItem('theme', theme);
-        applyTheme(theme);
-        updateRadioUI();
-      };
-
-      const updateRadioUI = () => {
-        const activeTheme = localStorage.getItem('theme') || 'light';
-        document.getElementById(`theme-${activeTheme}`).checked = true;
-
-        themeOptions.forEach(opt => {
-            opt.classList.remove('border-green-500', 'dark:border-green-500');
-            opt.classList.add('border-gray-200', 'dark:border-gray-700');
-        });
-
-        const activeLabel = document.querySelector(`label[for="theme-${activeTheme}"]`);
-        if (activeLabel) {
-            activeLabel.classList.add('border-green-500', 'dark:border-green-500');
-            activeLabel.classList.remove('border-gray-200', 'dark:border-gray-700');
-        }
+        setThemePreference(theme);
+        updateRadioUI(theme);
       };
 
       themeRadios.forEach(radio => {
@@ -500,8 +505,8 @@ $user_settings = [
         });
       });
 
-      // Apply theme on initial load
-      updateThemeSelection(localStorage.getItem('theme') || 'light');
+      // Sync UI with saved theme on initial load (theme already applied globally)
+      updateRadioUI(localStorage.getItem(THEME_STORAGE_KEY) || 'light');
 
       // Logout Modal Logic
       const logoutButton = document.getElementById('logoutButton');

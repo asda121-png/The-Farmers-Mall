@@ -6,29 +6,35 @@
 
 function initializeAdminTheme() {
     const body = document.body;
+    const root = document.documentElement;
     const THEME_KEY = 'adminTheme';
-
-    // 1. Apply saved theme on load
-    const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-    } else {
-        body.classList.remove('dark-mode');
-    }
-
-    // 2. Wire up dark mode toggle if it exists on the page
     const darkToggle = document.getElementById('darkModeToggle');
-    if (darkToggle) {
-        darkToggle.checked = body.classList.contains('dark-mode');
 
+    const applyTheme = (theme) => {
+        const isDark = theme === 'dark';
+        body.classList.toggle('dark-mode', isDark);
+        root.classList.toggle('dark', isDark);
+        if (darkToggle) {
+            darkToggle.checked = isDark;
+        }
+    };
+
+    const setTheme = (theme) => {
+        localStorage.setItem(THEME_KEY, theme);
+        applyTheme(theme);
+    };
+
+    // expose helper so other scripts (e.g. settings) can reuse
+    window.setAdminTheme = setTheme;
+
+    // Apply saved theme on load
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+    applyTheme(savedTheme);
+
+    // Wire up legacy dark mode toggle if it exists
+    if (darkToggle) {
         darkToggle.addEventListener('change', function () {
-            if (this.checked) {
-                body.classList.add('dark-mode');
-                localStorage.setItem(THEME_KEY, 'dark');
-            } else {
-                body.classList.remove('dark-mode');
-                localStorage.setItem(THEME_KEY, 'light');
-            }
+            setTheme(this.checked ? 'dark' : 'light');
         });
     }
 }
