@@ -14,10 +14,17 @@
     .amex { color: #2E77BB; }          /* American Express Blue */
     .gpay { color: #4285F4; }          /* Google Pay Blue */
     .paypal { color: #003087; }        /* PayPal Deep Blue */
+
+    /* Style to make an element invisible but still occupy space */
+    .invisible-placeholder {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
 
   <!-- HEADER -->
    <!-- Navbar -->
@@ -51,10 +58,10 @@
   </header>
 
   <!-- PAYMENT SECTION -->
-  <main class="max-w-7xl mx-auto p-6 flex flex-col lg:flex-row gap-8 mt-6">
+  <main class="max-w-7xl mx-auto p-6 flex flex-col lg:flex-row gap-8 mt-6 flex-grow w-full mb-20">
     
     <!-- LEFT SIDE: Payment Form -->
-    <section class="flex-1 bg-white p-6 rounded-xl shadow-sm">
+    <section class="flex-1 bg-white p-6 rounded-xl shadow-sm min-h-[400px]">
       <h2 class="text-2xl font-semibold mb-6">Payment Details</h2>
 
       <!-- Payment Method Options -->
@@ -94,8 +101,22 @@
         </label>
       </div>
 
+      <!-- BILLING ADDRESS -->
+      <div class="mt-6">
+        <label class="flex items-center space-x-2">
+          <input type="checkbox" checked class="accent-green-600">
+          <span class="text-sm text-gray-700">Same as shipping address</span>
+        </label>
+      </div>
+
+      <!-- SECURE PAYMENT NOTICE -->
+      <div class="mt-6 p-4 bg-green-50 text-green-800 text-sm rounded-lg flex items-center gap-2">
+        <i class="fa-solid fa-lock"></i>
+        <span>Your payment is secured — protected by 256-bit SSL encryption</span>
+      </div>
+
       <!-- CARD INFORMATION -->
-      <div id="card-info" class="space-y-4">
+      <div id="card-info" class="space-y-4 transition-opacity duration-300">
         <div>
           <label class="block text-sm text-gray-700 mb-1">Card Number</label>
           <input type="text" placeholder="1234 5678 9012 3456" 
@@ -124,19 +145,6 @@
         </div>
       </div>
 
-      <!-- BILLING ADDRESS -->
-      <div class="mt-6">
-        <label class="flex items-center space-x-2">
-          <input type="checkbox" checked class="accent-green-600">
-          <span class="text-sm text-gray-700">Same as shipping address</span>
-        </label>
-      </div>
-
-      <!-- SECURE PAYMENT NOTICE -->
-      <div class="mt-6 p-4 bg-green-50 text-green-800 text-sm rounded-lg flex items-center gap-2">
-        <i class="fa-solid fa-lock"></i>
-        <span>Your payment is secured — protected by 256-bit SSL encryption</span>
-      </div>
     </section>
 
     <!-- RIGHT SIDE: Order Summary -->
@@ -162,7 +170,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="text-white py-12 mt-10" style="background-color: #1B5E20;">
+  <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div>
         <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
