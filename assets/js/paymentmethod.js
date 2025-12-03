@@ -5,7 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   paymentRadios.forEach(radio => {
     radio.addEventListener('change', () => {
-      cardInfo.style.display = (radio.value === 'card') ? 'block' : 'none';
+      if (radio.value === 'card') {
+        cardInfo.classList.remove('invisible-placeholder');
+      } else {
+        cardInfo.classList.add('invisible-placeholder');
+      }
     });
   });
 
