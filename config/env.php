@@ -4,6 +4,12 @@
  * Loads .env file and makes variables available via getenv()
  */
 
+// Guard against multiple includes
+if (defined('ENV_LOADED')) {
+    return;
+}
+define('ENV_LOADED', true);
+
 if (!file_exists(__DIR__ . '/.env')) {
     die('Error: .env file not found. Please copy .env.example to .env and configure your Supabase credentials.');
 }
@@ -33,3 +39,4 @@ foreach ($lines as $line) {
         $_ENV[$key] = $value;
     }
 }
+

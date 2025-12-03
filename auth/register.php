@@ -54,8 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         if (empty($username)) {
             $errors[] = "Username is required.";
         }
-        if (strlen($password) < 6) {
-            $errors[] = "Password must be at least 6 characters.";
+        // Password must be 6+ characters with at least one number and one symbol
+        if (!preg_match('/^(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).{6,}$/', $password)) {
+            $errors[] = "Password must be 6+ characters with at least one number and symbol (!@#$%^&* etc).";
         }
         if ($password !== $confirm) {
             $errors[] = "Passwords do not match.";
@@ -258,6 +259,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+        /* Field Error Styles */
+        .input-error {
+            border-color: #dc2626 !important;
+        }
+        .error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+            min-height: 1.25rem;
+        }
+        .error-message.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4" style="background: #228B22;">
@@ -326,24 +341,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="firstname" name="firstname" required placeholder="Enter your first name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="firstname-error" class="error-message hidden"></span>
               </div>
               <div>
                 <label for="middlename" class="block text-sm font-medium text-gray-700 mb-1">Middle Name <span class="text-gray-400">(Optional)</span></label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="middlename" name="middlename" placeholder="Enter your middle name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="middlename-error" class="error-message hidden"></span>
               </div>
               <div>
                 <label for="lastname" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="lastname" name="lastname" required placeholder="Enter your last name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="lastname-error" class="error-message hidden"></span>
               </div>
               <div>
                 <label for="suffix" class="block text-sm font-medium text-gray-700 mb-1">Suffix <span class="text-gray-400">(Optional)</span></label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="suffix" name="suffix" placeholder="e.g. Jr., Sr." class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="suffix-error" class="error-message hidden"></span>
               </div>
             </div>
     
@@ -354,6 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="street" name="street" required placeholder="Enter your street address" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="street-error" class="error-message hidden"></span>
               </div>
               <div>
                 <label for="barangay" class="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
@@ -363,6 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                     <!-- Options will be populated by JavaScript -->
                   </select>
                 </div>
+                <span id="barangay-error" class="error-message hidden"></span>
               </div>
               <div>
                 <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
@@ -389,12 +410,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="username" name="username" required placeholder="Choose a username" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="username-error" class="error-message hidden"></span>
               </div>
               <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="tel" id="phone" name="phone" required placeholder="09XXXXXXXXX" pattern="09[0-9]{9}" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="phone-error" class="error-message hidden"></span>
                 <p class="text-xs text-gray-500 mt-1">Format: 09XXXXXXXXX (11 digits)</p>
               </div>
               <div>
@@ -402,13 +425,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="password-error" class="error-message hidden"></span>
+                <!-- Password Strength Meter -->
+                <div id="password-strength" class="mt-2 hidden">
+                  <div class="flex items-center gap-2 mb-1">
+                    <div class="flex-grow h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div id="strength-bar" class="h-full w-0 rounded-full transition-all duration-300" style="background-color: #ef4444;"></div>
+                    </div>
+                    <span id="strength-text" class="text-xs font-semibold text-red-600">Weak</span>
+                  </div>
+                  <p class="text-xs text-gray-600">Requires: numbers, symbols, 6+ characters</p>
+                </div>
               </div>
               <div>
                 <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="confirm" name="confirm" required placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
-                <p id="passwordError" class="text-red-500 text-sm mt-1 hidden">Passwords do not match!</p>
+                <span id="confirm-error" class="error-message hidden"></span>
               </div>
             </div>
      
@@ -419,6 +453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="email" name="email" required placeholder="Enter your email or phone" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="email-error" class="error-message hidden"></span>
               </div>
               <button type="button" id="sendVerificationBtn" class="w-full text-center text-sm text-green-600 hover:underline font-medium">Send Verification Code</button>
               <div id="verificationMessage" class="text-sm text-center hidden"></div>
@@ -427,6 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="text" id="otp" name="otp" required placeholder="Enter the code you received" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
                 </div>
+                <span id="otp-error" class="error-message hidden"></span>
               </div>
             </div>
 
@@ -436,8 +472,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
               <p class="text-sm text-gray-600">Please review and agree to the following terms before creating your account. By proceeding, you acknowledge and accept:</p>
               
               <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside bg-gray-50 p-4 rounded-lg">
-                <li>You agree to our <a href="#" class="text-green-600 font-medium hover:underline">Terms of Service</a>, which govern your use of our platform.</li>
-                <li>You have read and understood our <a href="#" class="text-green-600 font-medium hover:underline">Privacy Policy</a>, which details how we handle your data.</li>
+                <li>You agree to our <a href="#" id="termsLink" class="text-green-600 font-medium hover:underline cursor-pointer">Terms of Service</a>, which govern your use of our platform.</li>
+                <li>You have read and understood our <a href="#" id="privacyLink" class="text-green-600 font-medium hover:underline cursor-pointer">Privacy Policy</a>, which details how we handle your data.</li>
                 <li>You consent to receive communications from us regarding your account and our services.</li>
                 <li>You confirm that all information provided is accurate and that you are at least 18 years of age..</li>
               </ul>
@@ -475,6 +511,257 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
   <script>
     feather.replace();
 
+    // ====== VALIDATION REGEX PATTERNS ======
+    const validationPatterns = {
+      // Names: Allow only letters, spaces, hyphens, apostrophes (2-50 characters)
+      name: /^[a-zA-Z\s\-']{2,50}$/,
+      
+      // Username: Alphanumeric and underscores/hyphens (3-20 characters)
+      username: /^[a-zA-Z0-9_-]{3,20}$/,
+      
+      // Email: Standard email format
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      
+      // Phone: Philippine phone format 09XXXXXXXXX (11 digits)
+      phone: /^09\d{9}$/,
+      
+      // Password: At least 6 characters, must contain at least one number and one symbol
+      password: /^(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
+      
+      // Street: Allow letters, numbers, spaces, commas, dots, hyphens
+      street: /^[a-zA-Z0-9\s,.\-]{3,100}$/,
+      
+      // OTP: Numeric only, typically 4-6 digits
+      otp: /^\d{4,6}$/
+    };
+
+    // ====== VALIDATION ERROR MESSAGES ======
+    const errorMessages = {
+      firstname: "First name must contain only letters and be 2-50 characters",
+      lastname: "Last name must contain only letters and be 2-50 characters",
+      middlename: "Middle name must contain only letters and be 2-50 characters",
+      suffix: "Suffix must contain only letters and be 2-50 characters",
+      username: "Username must be 3-20 characters (letters, numbers, _, -)",
+      email: "Please enter a valid email address",
+      phone: "Phone must be in format 09XXXXXXXXX (11 digits)",
+      password: "Password must be 6+ characters with at least one number and symbol (!@#$%^&* etc)",
+      confirm: "Passwords do not match",
+      street: "Street address must be 3-100 characters",
+      barangay: "Please select a barangay",
+      otp: "Verification code must be 4-6 digits"
+    };
+
+    // ====== VALIDATION FUNCTIONS ======
+    function validateField(fieldId, fieldType) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      if (!field) return true;
+
+      const value = field.value.trim();
+      const isRequired = field.hasAttribute('required');
+      
+      // Special case: optional fields that are empty are valid
+      if (!isRequired && !value) {
+        clearFieldError(fieldId);
+        return true;
+      }
+
+      // Required fields must not be empty
+      if (isRequired && !value) {
+        setFieldError(fieldId, `${field.name || fieldId} is required`);
+        return false;
+      }
+
+      // Validate against regex pattern if pattern exists
+      if (validationPatterns[fieldType] && value) {
+        if (!validationPatterns[fieldType].test(value)) {
+          setFieldError(fieldId, errorMessages[fieldId] || "Invalid format");
+          return false;
+        }
+      }
+
+      // Special validation: password confirmation
+      if (fieldId === 'confirm') {
+        const passwordValue = document.getElementById('password').value;
+        if (value !== passwordValue) {
+          setFieldError(fieldId, errorMessages.confirm);
+          return false;
+        }
+      }
+
+      clearFieldError(fieldId);
+      return true;
+    }
+
+    function setFieldError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      
+      if (field) {
+        field.parentElement.classList.add('input-error');
+      }
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+      }
+    }
+
+    function clearFieldError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      
+      if (field) {
+        field.parentElement.classList.remove('input-error');
+      }
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.classList.add('hidden');
+      }
+    }
+
+    // ====== PASSWORD STRENGTH METER ======
+    function calculatePasswordStrength(password) {
+      let strength = 0;
+      let feedbackText = '';
+      let color = '';
+      
+      if (!password) {
+        return { strength: 0, text: 'Weak', color: '#ef4444', feedback: [] };
+      }
+
+      const feedback = [];
+      
+      // Check length
+      if (password.length >= 6 && password.length < 8) strength += 1;
+      else if (password.length >= 8 && password.length < 12) strength += 2;
+      else if (password.length >= 12) strength += 3;
+      
+      // Check for numbers
+      if (/\d/.test(password)) {
+        strength += 1;
+      } else {
+        feedback.push('Add numbers');
+      }
+      
+      // Check for lowercase letters
+      if (/[a-z]/.test(password)) {
+        strength += 1;
+      }
+      
+      // Check for uppercase letters
+      if (/[A-Z]/.test(password)) {
+        strength += 1;
+      }
+      
+      // Check for symbols
+      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        strength += 1;
+      } else {
+        feedback.push('Add symbols');
+      }
+      
+      // Determine strength level
+      let strengthLevel = 'Weak';
+      if (strength <= 2) {
+        strengthLevel = 'Weak';
+        color = '#ef4444'; // Red
+      } else if (strength <= 4) {
+        strengthLevel = 'Medium';
+        color = '#f59e0b'; // Amber
+      } else if (strength <= 6) {
+        strengthLevel = 'Strong';
+        color = '#10b981'; // Green
+      } else {
+        strengthLevel = 'Very Strong';
+        color = '#059669'; // Dark Green
+      }
+      
+      return {
+        strength: Math.min((strength / 8) * 100, 100),
+        text: strengthLevel,
+        color: color,
+        feedback: feedback
+      };
+    }
+
+    function updatePasswordStrength(password) {
+      const strengthDiv = document.getElementById('password-strength');
+      const strengthBar = document.getElementById('strength-bar');
+      const strengthText = document.getElementById('strength-text');
+      
+      if (!strengthDiv) return;
+      
+      const strength = calculatePasswordStrength(password);
+      
+      if (!password) {
+        strengthDiv.classList.add('hidden');
+        return;
+      }
+      
+      strengthDiv.classList.remove('hidden');
+      strengthBar.style.width = strength.strength + '%';
+      strengthBar.style.backgroundColor = strength.color;
+      strengthText.textContent = strength.text;
+      strengthText.style.color = strength.color;
+    }
+
+    // ====== ATTACH REAL-TIME VALIDATION ======
+    const fieldsToValidate = [
+      { id: 'firstname', type: 'name' },
+      { id: 'lastname', type: 'name' },
+      { id: 'middlename', type: 'name' },
+      { id: 'suffix', type: 'name' },
+      { id: 'username', type: 'username' },
+      { id: 'email', type: 'email' },
+      { id: 'phone', type: 'phone' },
+      { id: 'password', type: 'password' },
+      { id: 'confirm', type: 'password' },
+      { id: 'street', type: 'street' },
+      { id: 'otp', type: 'otp' }
+    ];
+
+    // ====== FORM INITIALIZATION (after DOM is ready) ======
+    function initializeValidation() {
+      // Attach input and blur listeners for real-time validation
+      fieldsToValidate.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element) {
+          element.addEventListener('input', () => validateField(field.id, field.type));
+          element.addEventListener('blur', () => validateField(field.id, field.type));
+        }
+      });
+
+      // Special handling for barangay select
+      const barangaySelect = document.getElementById('barangay');
+      if (barangaySelect) {
+        barangaySelect.addEventListener('change', () => {
+          if (!barangaySelect.value) {
+            setFieldError('barangay', errorMessages.barangay);
+          } else {
+            clearFieldError('barangay');
+          }
+        });
+      }
+
+      // Special handling for password confirmation
+      const passwordField = document.getElementById('password');
+      const confirmField = document.getElementById('confirm');
+      if (passwordField && confirmField) {
+        passwordField.addEventListener('input', () => {
+          // Update password strength meter
+          updatePasswordStrength(passwordField.value);
+          // Validate confirm field if it has a value
+          if (confirmField.value) {
+            validateField('confirm', 'password');
+          }
+        });
+        confirmField.addEventListener('input', () => {
+          validateField('confirm', 'password');
+        });
+      }
+    }
+
+    // ====== EXISTING FORM LOGIC ======
     const steps = Array.from(document.querySelectorAll('.form-step'));
     const form = document.getElementById('registerForm');
     const progressBar = document.getElementById('progress-bar');
@@ -544,44 +831,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     }
 
     function validateStep(stepIndex) {
-      const inputs = steps[stepIndex].querySelectorAll('input[required]');
+      const inputs = steps[stepIndex].querySelectorAll('input[required], select[required]');
       let isValid = true;
+      let firstInvalidField = null;
+
       inputs.forEach(input => {
+        const fieldId = input.id;
+        const fieldType = getFieldValidationType(fieldId);
+        
+        // For required fields, first check if empty
         if (!input.value.trim()) {
           isValid = false;
+          setFieldError(fieldId, `${input.name || fieldId} is required`);
+          if (!firstInvalidField) firstInvalidField = fieldId;
+        } else {
+          // Then validate against regex
+          if (validationPatterns[fieldType] && !validationPatterns[fieldType].test(input.value.trim())) {
+            isValid = false;
+            setFieldError(fieldId, errorMessages[fieldId] || "Invalid format");
+            if (!firstInvalidField) firstInvalidField = fieldId;
+          } else {
+            clearFieldError(fieldId);
+          }
         }
       });
 
       if (!isValid) {
-        showToast("Please fill out all required fields.", "error");
+        showToast("Please fix the highlighted errors before proceeding.", "error");
         return false;
       }
 
       // Step-specific validation
       if (stepIndex === 1) { // Address
         if (!document.getElementById('barangay').value) {
+          setFieldError('barangay', errorMessages.barangay);
           showToast("Please select a barangay.", "error");
           return false;
         }
+        clearFieldError('barangay');
       }
 
       if (stepIndex === 2) { // Account Details
         const pass = document.getElementById('password').value.trim();
         const confirm = document.getElementById('confirm').value.trim();
-        const passError = document.getElementById("passwordError");
+        
+        // Validate password strength
+        if (!validationPatterns.password.test(pass)) {
+          setFieldError('password', errorMessages.password);
+          showToast("Password must be 6+ characters with at least one number and symbol.", "error");
+          return false;
+        }
+        clearFieldError('password');
+        
+        // Validate password match
         if (pass !== confirm) {
-          passError.classList.remove("hidden");
+          setFieldError('confirm', errorMessages.confirm);
           showToast("Passwords do not match.", "error");
           return false;
         }
-        passError.classList.add("hidden");
+        clearFieldError('confirm');
       }
 
       if (stepIndex === 3) { // Verification
-        if (!document.getElementById('otp').value.trim()) {
+        const otpValue = document.getElementById('otp').value.trim();
+        if (!otpValue) {
+          setFieldError('otp', "Verification code is required");
           showToast("Please enter the verification code.", "error");
           return false;
         }
+        if (!validationPatterns.otp.test(otpValue)) {
+          setFieldError('otp', errorMessages.otp);
+          showToast("Verification code must be 4-6 digits.", "error");
+          return false;
+        }
+        clearFieldError('otp');
       }
 
       if (stepIndex === 4) { // Finalize
@@ -592,6 +915,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       }
 
       return true;
+    }
+
+    // Helper function to determine validation type based on field ID
+    function getFieldValidationType(fieldId) {
+      const typeMap = {
+        'firstname': 'name',
+        'lastname': 'name',
+        'middlename': 'name',
+        'suffix': 'name',
+        'username': 'username',
+        'email': 'email',
+        'phone': 'phone',
+        'password': 'password',
+        'confirm': 'password',
+        'street': 'street',
+        'otp': 'otp',
+        'barangay': 'barangay'
+      };
+      return typeMap[fieldId] || 'text';
+    }
+
+    // Comprehensive validation for all required fields across all steps
+    function validateAllFields() {
+      let isValid = true;
+      
+      // Get all required fields in the entire form
+      const allRequiredFields = form.querySelectorAll('input[required], select[required]');
+      
+      allRequiredFields.forEach(field => {
+        const fieldId = field.id;
+        const fieldType = getFieldValidationType(fieldId);
+        const value = field.value.trim();
+        
+        // Check if empty
+        if (!value) {
+          setFieldError(fieldId, `${field.name || fieldId} is required`);
+          isValid = false;
+          return;
+        }
+        
+        // Validate against regex
+        if (validationPatterns[fieldType] && !validationPatterns[fieldType].test(value)) {
+          setFieldError(fieldId, errorMessages[fieldId] || "Invalid format");
+          isValid = false;
+          return;
+        }
+        
+        clearFieldError(fieldId);
+      });
+      
+      // Special check: password match
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm').value;
+      if (password && confirm && password !== confirm) {
+        setFieldError('confirm', errorMessages.confirm);
+        isValid = false;
+      }
+      
+      // Special check: terms checkbox
+      if (!document.getElementById('terms').checked) {
+        isValid = false;
+      }
+      
+      return isValid;
     }
 
     nextBtn.addEventListener('click', () => {
@@ -609,6 +996,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     });
 
     populateBarangays(); // Populate barangays on load
+    initializeValidation(); // Initialize real-time validation listeners
 
 
     function showToast(message, type = "error") {
@@ -635,7 +1023,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         formData.append('register_submitted', '1');
 
         // Show loading state
-        submitBtn.disabled = true;
+        submitBtn.disabled = false;
         submitBtn.textContent = 'Registering...';
 
         fetch('register.php', {
@@ -693,6 +1081,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     const verificationMessage = document.getElementById('verificationMessage');
     let verificationCodeSent = false;
     let actualVerificationCode = '';
+    let verificationAttempts = 0;
 
     if (sendVerificationBtn) {
       sendVerificationBtn.addEventListener('click', function() {
@@ -700,18 +1089,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         const email = emailInput.value.trim();
 
         if (!email) {
+          setFieldError('email', 'Email is required');
           showToast('Please enter your email address', 'error');
           return;
         }
 
-        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        if (!validationPatterns.email.test(email)) {
+          setFieldError('email', errorMessages.email);
           showToast('Please enter a valid email address', 'error');
           return;
         }
 
+        clearFieldError('email');
+
         // Disable button and show loading
         sendVerificationBtn.disabled = true;
         sendVerificationBtn.textContent = 'Sending...';
+        verificationAttempts = 0; // Reset attempts when sending new code
 
         fetch('verify-email.php', {
           method: 'POST',
@@ -736,6 +1130,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             sendVerificationBtn.textContent = 'Code Sent ✓';
             sendVerificationBtn.classList.add('opacity-50', 'cursor-not-allowed');
             showToast(data.message, 'success');
+            
+            // Clear OTP field and error for new code entry
+            const otpInput = document.getElementById('otp');
+            if (otpInput) {
+              otpInput.value = '';
+              clearFieldError('otp');
+            }
           } else {
             showToast(data.message || 'Failed to send verification code', 'error');
             sendVerificationBtn.disabled = false;
@@ -759,27 +1160,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         const otp = otpInput.value.trim();
 
         if (!otp) {
+          setFieldError('otp', 'Verification code is required');
           showToast("Please enter the verification code.", "error");
           return false;
         }
 
+        if (!validationPatterns.otp.test(otp)) {
+          setFieldError('otp', errorMessages.otp);
+          showToast("Verification code must be 4-6 digits.", "error");
+          return false;
+        }
+
         if (!verificationCodeSent) {
+          setFieldError('otp', 'No verification code has been sent');
           showToast("Please request a verification code first.", "error");
           return false;
         }
 
-        // For development: check against dev code if available
-        if (actualVerificationCode && otp !== actualVerificationCode) {
-          showToast("Invalid verification code. Please check and try again.", "error");
+        // Strict check: Code must match exactly
+        if (!actualVerificationCode) {
+          setFieldError('otp', 'Unable to verify - no code on file');
+          showToast("Verification code not found. Please request a new code.", "error");
           return false;
         }
 
+        // Case-sensitive exact match
+        if (otp !== actualVerificationCode) {
+          verificationAttempts++;
+          const remaining = Math.max(0, 3 - verificationAttempts);
+          let errorMsg = 'Verification code does not match. Please check and try again.';
+          
+          if (remaining > 0) {
+            errorMsg += ` (${remaining} attempts remaining)`;
+          }
+          
+          setFieldError('otp', 'Invalid verification code');
+          showToast(errorMsg, "error");
+          return false;
+        }
+
+        // Code matches - verification successful!
+        clearFieldError('otp');
         showToast("Email verified successfully!", "success");
         return true;
       }
 
       return originalValidateStep(stepIndex);
     };
+
+    // Add real-time OTP validation listener with immediate feedback
+    const otpInputField = document.getElementById('otp');
+    if (otpInputField) {
+      otpInputField.addEventListener('input', () => {
+        const otp = otpInputField.value.trim();
+        
+        // Real-time format validation
+        if (otp && !validationPatterns.otp.test(otp)) {
+          setFieldError('otp', 'Code must be 4-6 digits');
+          return;
+        }
+
+        // If code is correct length and matches, show success immediately
+        if (otp && validationPatterns.otp.test(otp) && verificationCodeSent && actualVerificationCode) {
+          if (otp === actualVerificationCode) {
+            clearFieldError('otp');
+            // Show inline success indicator
+            const errorSpan = document.getElementById('otp-error');
+            if (errorSpan) {
+              errorSpan.textContent = 'Code verified!';
+              errorSpan.className = 'error-message text-green-600';
+              errorSpan.classList.remove('hidden');
+            }
+          } else {
+            // Code doesn't match but is valid format
+            setFieldError('otp', 'Code does not match');
+          }
+        } else if (!otp) {
+          clearFieldError('otp');
+        }
+      });
+
+      // Blur event for final validation
+      otpInputField.addEventListener('blur', () => {
+        const otp = otpInputField.value.trim();
+        if (otp) {
+          if (!validationPatterns.otp.test(otp)) {
+            setFieldError('otp', 'Code must be 4-6 digits');
+          } else if (verificationCodeSent && actualVerificationCode && otp !== actualVerificationCode) {
+            setFieldError('otp', 'Code does not match');
+          }
+        }
+      });
+    }
 
     // Initial setup
     updateProgress();

@@ -4,6 +4,12 @@
  * Use this if direct PostgreSQL connection doesn't work due to network issues
  */
 
+// Guard against multiple includes
+if (defined('SUPABASE_API_LOADED')) {
+    return;
+}
+define('SUPABASE_API_LOADED', true);
+
 require_once __DIR__ . '/env.php';
 
 class SupabaseAPI {
