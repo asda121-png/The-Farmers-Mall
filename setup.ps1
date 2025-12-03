@@ -112,7 +112,7 @@ Write-Host ""
 Write-Host "=========================================" -ForegroundColor Cyan
 
 try {
-    php config/test-database.php
+    php config/test-connection.php
     $testResult = $LASTEXITCODE
     
     Write-Host "=========================================" -ForegroundColor Cyan
