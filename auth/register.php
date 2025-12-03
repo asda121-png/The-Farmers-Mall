@@ -507,6 +507,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       </div>
     </div>
   </div>
+
+  <!-- Terms of Service Modal -->
+  <div id="termsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <!-- Modal Header -->
+      <div class="bg-green-600 text-white p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Terms of Service</h2>
+        <button id="closeTermsModal" class="text-white hover:bg-green-700 rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <!-- Modal Content -->
+      <div class="overflow-y-auto flex-grow p-6">
+        <div class="space-y-4 text-gray-700 text-sm leading-relaxed">
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">1. Acceptance of Terms</h3>
+            <p>By accessing and using The Farmers Mall platform, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">2. Use License</h3>
+            <p>Permission is granted to temporarily download one copy of the materials (information or software) on The Farmers Mall for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+            <ul class="list-disc list-inside ml-2 space-y-1 mt-2">
+              <li>Modifying or copying the materials</li>
+              <li>Using the materials for any commercial purpose or for any public display</li>
+              <li>Attempting to decompile or reverse engineer any software contained on The Farmers Mall</li>
+              <li>Removing any copyright or other proprietary notations from the materials</li>
+              <li>Transferring the materials to another person or "mirroring" the materials on any other server</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">3. Disclaimer</h3>
+            <p>The materials on The Farmers Mall are provided "as is". The Farmers Mall makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">4. Limitations</h3>
+            <p>In no event shall The Farmers Mall or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on The Farmers Mall.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">5. Accuracy of Materials</h3>
+            <p>The materials appearing on The Farmers Mall could include technical, typographical, or photographic errors. The Farmers Mall does not warrant that any of the materials on its website are accurate, complete, or current. The Farmers Mall may make changes to the materials contained on its website at any time without notice.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">6. Links</h3>
+            <p>The Farmers Mall has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by The Farmers Mall of the site. Use of any such linked website is at the user's own risk.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">7. Modifications</h3>
+            <p>The Farmers Mall may revise these terms of service for its website at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">8. Governing Law</h3>
+            <p>These terms and conditions are governed by and construed in accordance with the laws of the Philippines, and you irrevocably submit to the exclusive jurisdiction of the courts located in Davao Oriental.</p>
+          </section>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-gray-100 p-4 flex justify-end gap-3">
+        <button id="closeTermsBtn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div id="privacyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <!-- Modal Header -->
+      <div class="bg-green-600 text-white p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Privacy Policy</h2>
+        <button id="closePrivacyModal" class="text-white hover:bg-green-700 rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <!-- Modal Content -->
+      <div class="overflow-y-auto flex-grow p-6">
+        <div class="space-y-4 text-gray-700 text-sm leading-relaxed">
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">1. Information We Collect</h3>
+            <p>We collect information you provide directly to us, such as when you create an account, place an order, or contact us. This information may include your name, email address, phone number, address, payment information, and any other information you choose to provide.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">2. How We Use Your Information</h3>
+            <p>We use the information we collect to:</p>
+            <ul class="list-disc list-inside ml-2 space-y-1 mt-2">
+              <li>Process and fulfill your orders</li>
+              <li>Send you transactional and promotional communications</li>
+              <li>Improve and personalize your experience</li>
+              <li>Respond to your inquiries and requests</li>
+              <li>Comply with legal obligations</li>
+              <li>Prevent fraudulent transactions</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">3. Information Sharing</h3>
+            <p>We do not share, sell, or rent your personal information to third parties without your explicit consent, except as required by law or to service providers who assist us in operating our website and conducting our business, subject to confidentiality agreements.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">4. Data Security</h3>
+            <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet or electronic storage is 100% secure.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">5. Cookies</h3>
+            <p>We use cookies and similar tracking technologies to enhance your experience on our platform. You can control cookie settings through your browser preferences.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">6. Your Rights</h3>
+            <p>You have the right to access, correct, or delete your personal information. You may also opt out of receiving promotional communications. Contact us at support@farmersmall.com to exercise these rights.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">7. Third-Party Links</h3>
+            <p>Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. Please review their privacy policies before providing your information.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">8. Policy Changes</h3>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last Updated" date at the bottom of this policy. Your continued use of The Farmers Mall after changes constitutes your acceptance of the updated policy.</p>
+          </section>
+
+          <section>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">9. Contact Us</h3>
+            <p>If you have questions about this Privacy Policy or our privacy practices, please contact us at support@farmersmall.com or call +63 (XXX) XXX-XXXX.</p>
+          </section>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-gray-100 p-4 flex justify-end gap-3">
+        <button id="closePrivacyBtn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium">Close</button>
+      </div>
+    </div>
+  </div>
   
   <script>
     feather.replace();
@@ -1023,7 +1169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         formData.append('register_submitted', '1');
 
         // Show loading state
-        submitBtn.disabled = false;
+        submitBtn.disabled = true;
         submitBtn.textContent = 'Registering...';
 
         fetch('register.php', {
@@ -1253,8 +1399,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       });
     }
 
+    // ====== MODAL HANDLERS ======
+    function setupModalHandlers() {
+      // Get modal elements
+      const termsModal = document.getElementById('termsModal');
+      const privacyModal = document.getElementById('privacyModal');
+      
+      // Get trigger links
+      const termsLink = document.getElementById('termsLink');
+      const privacyLink = document.getElementById('privacyLink');
+      
+      // Get close buttons
+      const closeTermsModal = document.getElementById('closeTermsModal');
+      const closeTermsBtn = document.getElementById('closeTermsBtn');
+      const closePrivacyModal = document.getElementById('closePrivacyModal');
+      const closePrivacyBtn = document.getElementById('closePrivacyBtn');
+
+      // Function to open modal
+      function openModal(modal) {
+        if (modal) {
+          modal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden'; // Prevent body scroll
+        }
+      }
+
+      // Function to close modal
+      function closeModal(modal) {
+        if (modal) {
+          modal.classList.add('hidden');
+          document.body.style.overflow = 'auto'; // Re-enable body scroll
+        }
+      }
+
+      // Terms Modal Events
+      if (termsLink) {
+        termsLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          openModal(termsModal);
+        });
+      }
+
+      if (closeTermsModal) {
+        closeTermsModal.addEventListener('click', () => {
+          closeModal(termsModal);
+        });
+      }
+
+      if (closeTermsBtn) {
+        closeTermsBtn.addEventListener('click', () => {
+          closeModal(termsModal);
+        });
+      }
+
+      // Privacy Modal Events
+      if (privacyLink) {
+        privacyLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          openModal(privacyModal);
+        });
+      }
+
+      if (closePrivacyModal) {
+        closePrivacyModal.addEventListener('click', () => {
+          closeModal(privacyModal);
+        });
+      }
+
+      if (closePrivacyBtn) {
+        closePrivacyBtn.addEventListener('click', () => {
+          closeModal(privacyModal);
+        });
+      }
+
+      // Close modal when clicking outside of it (on backdrop)
+      if (termsModal) {
+        termsModal.addEventListener('click', (e) => {
+          if (e.target === termsModal) {
+            closeModal(termsModal);
+          }
+        });
+      }
+
+      if (privacyModal) {
+        privacyModal.addEventListener('click', (e) => {
+          if (e.target === privacyModal) {
+            closeModal(privacyModal);
+          }
+        });
+      }
+    }
+
     // Initial setup
     updateProgress();
+    setupModalHandlers();
   </script>
 </body>
 
