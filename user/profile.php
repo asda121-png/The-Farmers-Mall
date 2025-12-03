@@ -151,7 +151,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_SESSION['email'] = $updateData['email'];
             $_SESSION['username'] = $updateData['full_name'];
             
-            echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!', 'debug' => 'v2_with_logging']);
+            // Fetch updated data from database to return to client
+            $updatedUser = $api->select('users', ['id' => $user_id]);
+            $userData = !empty($updatedUser) ? $updatedUser[0] : [];
+            
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Profile updated successfully!',
+                'data' => [
+                    'full_name' => $userData['full_name'] ?? '',
+                    'email' => $userData['email'] ?? '',
+                    'phone' => $userData['phone'] ?? '',
+                    'profile_picture' => $userData['profile_picture'] ?? '',
+                    'date_of_birth' => $userData['date_of_birth'] ?? '',
+                    'gender' => $userData['gender'] ?? '',
+                    'bio' => $userData['bio'] ?? '',
+                    'address' => $userData['address'] ?? '',
+                    'created_at' => $userData['created_at'] ?? ''
+                ]
+            ]);
         } else {
             file_put_contents($log_file, "ERROR: User ID not found\n", FILE_APPEND);
             echo json_encode(['status' => 'error', 'message' => 'User ID not found', 'debug' => 'no_user_id']);
@@ -351,6 +369,10 @@ try {
                   }
                 ?>
               </p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+              <label class="text-xs text-gray-500 uppercase tracking-wide">Address</label>
+              <p id="displayAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($address ?: 'Not provided'); ?></p>
             </div>
           </div>
 
@@ -682,6 +704,45 @@ try {
     </div>
   </div>
 
+  <!-- Success Notification Modal -->
+  <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center transform transition-all">
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+        <i class="fas fa-check text-green-600 text-3xl"></i>
+      </div>
+      <h3 class="font-semibold text-xl mb-2 text-gray-900">Success!</h3>
+      <p id="successMessage" class="text-gray-600 text-sm mb-6">Your profile has been updated successfully.</p>
+      <button id="closeSuccessModal" class="px-8 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+        Great!
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Modal -->
+  <div id="loadingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center">
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+        <i class="fas fa-spinner fa-spin text-green-600 text-3xl"></i>
+      </div>
+      <h3 class="font-semibold text-xl mb-2 text-gray-900">Saving Changes...</h3>
+      <p class="text-gray-600 text-sm">Please wait while we update your profile.</p>
+    </div>
+  </div>
+
+  <!-- Error Notification Modal -->
+  <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center transform transition-all">
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+        <i class="fas fa-exclamation-circle text-red-600 text-3xl"></i>
+      </div>
+      <h3 class="font-semibold text-xl mb-2 text-gray-900">Oops!</h3>
+      <p id="errorMessage" class="text-gray-600 text-sm mb-6">Something went wrong. Please try again.</p>
+      <button id="closeErrorModal" class="px-8 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+
   <!-- Logout Confirmation Modal -->
   <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
@@ -697,6 +758,48 @@ try {
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Modal helper functions
+      const successModal = document.getElementById('successModal');
+      const errorModal = document.getElementById('errorModal');
+      const loadingModal = document.getElementById('loadingModal');
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+      
+      function showSuccessModal(message) {
+        successMessage.textContent = message;
+        loadingModal.classList.add('hidden');
+        successModal.classList.remove('hidden');
+      }
+      
+      function showErrorModal(message) {
+        errorMessage.textContent = message;
+        loadingModal.classList.add('hidden');
+        errorModal.classList.remove('hidden');
+      }
+      
+      function showLoadingModal() {
+        loadingModal.classList.remove('hidden');
+      }
+      
+      function closeSuccessModal() {
+        successModal.classList.add('hidden');
+      }
+      
+      function closeErrorModal() {
+        errorModal.classList.add('hidden');
+      }
+      
+      document.getElementById('closeSuccessModal').addEventListener('click', closeSuccessModal);
+      document.getElementById('closeErrorModal').addEventListener('click', closeErrorModal);
+      
+      // Close modals when clicking outside
+      successModal.addEventListener('click', (e) => {
+        if (e.target === successModal) closeSuccessModal();
+      });
+      errorModal.addEventListener('click', (e) => {
+        if (e.target === errorModal) closeErrorModal();
+      });
+
       const sidebarLinks = document.querySelectorAll('.sidebar-link');
       const contentSections = document.querySelectorAll('.content-section');
 
@@ -960,88 +1063,6 @@ try {
       const editProfilePicPreview = document.getElementById('editProfilePicPreview');
       const removeProfilePic = document.getElementById('removeProfilePic');
 
-      // Load user profile from PHP session or localStorage
-      const serverProfile = {
-        fullName: <?php echo json_encode($full_name); ?>,
-        email: <?php echo json_encode($email); ?>,
-        phone: <?php echo json_encode($phone); ?>,
-        username: <?php echo json_encode($username); ?>
-      };
-      
-      let userProfile = JSON.parse(localStorage.getItem('userProfile')) || {
-        fullName: serverProfile.fullName,
-        email: serverProfile.email,
-        phone: serverProfile.phone,
-        dob: '',
-        gender: '',
-        bio: 'Welcome to Farmers Mall!',
-        profilePic: null, // No default image
-        memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
-      };
-      
-      // Update with server data if available
-      userProfile.fullName = serverProfile.fullName;
-      userProfile.email = serverProfile.email;
-      userProfile.phone = serverProfile.phone || userProfile.phone;
-
-      function renderProfile() {
-        // Update display mode - handle profile pic or icon
-        const displayPicEl = document.getElementById('displayProfilePic');
-        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
-          // Has uploaded image
-          displayPicEl.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
-        } else {
-          // Show icon
-          displayPicEl.innerHTML = '<i class="fas fa-user text-white text-5xl"></i>';
-          displayPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center';
-        }
-        
-        document.getElementById('displayFullName').textContent = userProfile.fullName;
-        document.getElementById('displayEmail').textContent = userProfile.email;
-        document.getElementById('displayPhone').textContent = userProfile.phone || 'Not provided';
-        document.getElementById('displayDob').textContent = userProfile.dob ? new Date(userProfile.dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not provided';
-        document.getElementById('displayGender').textContent = userProfile.gender || 'Not specified';
-        document.getElementById('displayBio').textContent = userProfile.bio || 'No bio added yet.';
-        document.getElementById('displayMemberSince').textContent = userProfile.memberSince;
-
-        // Update sidebar profile info
-        const sidebarPic = document.querySelector('aside .w-20');
-        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
-          sidebarPic.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
-          sidebarPic.className = 'w-20 h-20 rounded-full mb-3';
-        } else {
-          sidebarPic.innerHTML = '<i class="fas fa-user text-white text-3xl"></i>';
-          sidebarPic.className = 'w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center';
-        }
-        document.querySelector('aside h2').textContent = userProfile.fullName;
-        document.querySelector('aside p').textContent = userProfile.email;
-
-        // Update navbar profile pic
-        const navPic = document.querySelector('header a[href="profile.php"] div');
-        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
-          navPic.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
-          navPic.className = 'w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600';
-        }
-
-        // Pre-fill edit form
-        document.getElementById('editFullName').value = userProfile.fullName;
-        document.getElementById('editEmail').value = userProfile.email;
-        document.getElementById('editPhone').value = userProfile.phone || '';
-        document.getElementById('editDob').value = userProfile.dob || '';
-        document.getElementById('editGender').value = userProfile.gender || '';
-        document.getElementById('editBio').value = userProfile.bio || '';
-        
-        // Update edit preview
-        const editPicEl = document.getElementById('editProfilePicPreview');
-        if (userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
-          editPicEl.innerHTML = `<img src="${userProfile.profilePic}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
-          editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
-        } else {
-          editPicEl.innerHTML = '<i class="fas fa-user text-white text-5xl"></i>';
-          editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center';
-        }
-      }
-
       // Switch to edit mode
       editProfileBtn.addEventListener('click', () => {
         profileDisplay.classList.add('hidden');
@@ -1054,7 +1075,8 @@ try {
         profileDisplay.classList.remove('hidden');
         profileEditForm.classList.add('hidden');
         editProfileBtn.classList.remove('hidden');
-        renderProfile(); // Reset form to current values
+        // Reset form to original values from page load
+        location.reload();
       });
 
       // Handle profile picture upload
@@ -1093,20 +1115,23 @@ try {
           const result = await response.json();
 
           if (result.status === 'success') {
-            alert('Profile picture removed successfully!');
-            location.reload();
+            showSuccessModal('Profile picture removed successfully!');
+            setTimeout(() => location.reload(), 1500);
           } else {
-            alert(result.message || 'Failed to remove profile picture');
+            showErrorModal(result.message || 'Failed to remove profile picture');
           }
         } catch (error) {
           console.error('Remove error:', error);
-          alert('An error occurred. Please try again.');
+          showErrorModal('An error occurred. Please try again.');
         }
       });
 
       // Save profile changes
       profileEditForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Show loading modal
+        showLoadingModal();
         
         // Get form data
         const formData = new FormData();
@@ -1140,19 +1165,92 @@ try {
           const result = JSON.parse(responseText);
           
           if (result.status === 'success') {
-            alert(result.message || 'Profile updated successfully!');
-            location.reload(); // Reload to show updated data
+            // Show success modal instead of alert
+            showSuccessModal(result.message || 'Profile updated successfully!');
+            
+            // Update all display elements with fresh data from database
+            if (result.data) {
+              const data = result.data;
+              
+              // Update display mode
+              document.getElementById('displayFullName').textContent = data.full_name;
+              document.getElementById('displayEmail').textContent = data.email;
+              document.getElementById('displayPhone').textContent = data.phone || 'Not provided';
+              document.getElementById('displayBio').textContent = data.bio || 'Welcome to Farmers Mall!';
+              document.getElementById('displayAddress').textContent = data.address || 'Not provided';
+              
+              // Format and display date of birth
+              if (data.date_of_birth) {
+                const dobDate = new Date(data.date_of_birth);
+                const formattedDob = dobDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('displayDob').textContent = formattedDob;
+              } else {
+                document.getElementById('displayDob').textContent = 'Not provided';
+              }
+              
+              document.getElementById('displayGender').textContent = data.gender || 'Not specified';
+              
+              // Format member since
+              if (data.created_at) {
+                const createdDate = new Date(data.created_at);
+                const formattedDate = createdDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                document.getElementById('displayMemberSince').textContent = formattedDate;
+              }
+              
+              // Update profile pictures in all locations
+              if (data.profile_picture) {
+                const picPath = '../' + data.profile_picture;
+                
+                // Display mode profile picture
+                const displayPicEl = document.getElementById('displayProfilePic');
+                displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                
+                // Sidebar profile picture
+                const sidebarPicEl = document.getElementById('sidebarProfilePic');
+                sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
+                
+                // Navbar profile picture
+                const navPicEl = document.getElementById('navProfilePic');
+                navPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">`;
+                
+                // Edit mode preview
+                const editPicEl = document.getElementById('editProfilePicPreview');
+                editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                
+                document.getElementById('removeProfilePic').classList.remove('hidden');
+              }
+              
+              // Update sidebar name and email
+              document.querySelector('aside h2').textContent = data.full_name;
+              document.querySelector('aside p').textContent = data.email;
+              
+              // Update edit form with fresh data
+              document.getElementById('editFullName').value = data.full_name;
+              document.getElementById('editEmail').value = data.email;
+              document.getElementById('editPhone').value = data.phone || '';
+              document.getElementById('editDob').value = data.date_of_birth || '';
+              document.getElementById('editGender').value = data.gender || '';
+              document.getElementById('editBio').value = data.bio || '';
+              document.getElementById('editAddress').value = data.address || '';
+            }
+            
+            // Switch back to display mode
+            profileDisplay.classList.remove('hidden');
+            profileEditForm.classList.add('hidden');
+            editProfileBtn.classList.remove('hidden');
+            
+            // Clear the file input
+            profilePicInput.value = '';
           } else {
-            alert(result.message || 'Failed to update profile. Please try again.');
+            // Show error modal instead of alert
+            showErrorModal(result.message || 'Failed to update profile. Please try again.');
           }
         } catch (error) {
           console.error('Profile update error:', error);
-          alert('An error occurred while updating your profile. Please try again.');
+          // Show error modal instead of alert
+          showErrorModal('An error occurred while updating your profile. Please try again.');
         }
       });
-
-      // Initial render
-      renderProfile();
 
       // --- Logout Modal Logic ---
       const logoutButton = document.getElementById('logoutButton');
