@@ -6,7 +6,143 @@
     const subtotalEl = document.getElementById('subtotal');
     const totalEl = document.getElementById('total');
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let cart = [];
+
+    // Load cart from database
+    async function loadCartFromDB() {
+      try {
+        const response = await fetch('../api/cart.php');
+        const data = await response.json();
+        
+        if (data.success) {
+          cart = data.items || [];
+          renderCart();
+          updateCartIcon();
+        } else {
+          console.error('Failed to load cart:', data.message);
+          showNotification('Failed to load cart', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        showNotification('Error loading cart', 'error');
+      }
+    }
+
+    // Add item to cart in database
+    async function addToCartDB(productId, quantity = 1) {
+      try {
+        const response = await fetch('../api/cart.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          await loadCartFromDB();
+          return true;
+        } else {
+          showNotification(data.message || 'Failed to add to cart', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('Error adding to cart', 'error');
+        return false;
+      }
+    }
+
+    // Update cart item quantity in database
+    async function updateCartItemDB(cartId, quantity) {
+      try {
+        const response = await fetch('../api/cart.php', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            cart_id: cartId,
+            quantity: quantity
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          await loadCartFromDB();
+          return true;
+        } else {
+          showNotification(data.message || 'Failed to update cart', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error updating cart:', error);
+        showNotification('Error updating cart', 'error');
+        return false;
+      }
+    }
+
+    // Delete cart item from database
+    async function deleteCartItemDB(cartId) {
+      try {
+        const response = await fetch('../api/cart.php', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            cart_id: cartId
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          await loadCartFromDB();
+          return true;
+        } else {
+          showNotification(data.message || 'Failed to remove item', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error removing item:', error);
+        showNotification('Error removing item', 'error');
+        return false;
+      }
+    }
+
+    // Clear entire cart from database
+    async function clearCartDB() {
+      try {
+        const response = await fetch('../api/cart.php', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            clear_all: true
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          cart = [];
+          renderCart();
+          updateCartIcon();
+          return true;
+        } else {
+          showNotification(data.message || 'Failed to clear cart', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error clearing cart:', error);
+        showNotification('Error clearing cart', 'error');
+        return false;
+      }
+    }
 
     function renderCart() {
       cartContainer.innerHTML = '';
@@ -70,17 +206,18 @@
 
         // Quantity buttons
         div.querySelectorAll('.quantity-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', async () => {
             if(!item.quantity) item.quantity = 1;
+            let newQuantity = item.quantity;
+            
             if(btn.dataset.action === 'increase') {
-              item.quantity++;
+              newQuantity++;
             } else if(btn.dataset.action === 'decrease' && item.quantity > 1) {
-              item.quantity--;
+              newQuantity--;
             }
-            localStorage.setItem('cart', JSON.stringify(cart));
-            window.dispatchEvent(new Event('cartUpdated'));
-            renderCart();
-            updateCartIcon();
+            
+            // Update in database
+            await updateCartItemDB(item.cart_id, newQuantity);
           });
         });
 
@@ -248,13 +385,12 @@
       closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
 
       // Add event listeners
-      newConfirmBtn.addEventListener('click', () => {
-        cart.splice(index, 1);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        renderCart();
-        updateCartIcon();
-        hideDeleteModal();
-        showNotification(`${item.name} removed from cart`, 'info');
+      newConfirmBtn.addEventListener('click', async () => {
+        const success = await deleteCartItemDB(item.cart_id);
+        if (success) {
+          hideDeleteModal();
+          showNotification(`${item.name} removed from cart`, 'info');
+        }
       });
 
       newCancelBtn.addEventListener('click', hideDeleteModal);
@@ -298,13 +434,12 @@
       cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
 
       // Add event listeners
-      newConfirmBtn.addEventListener('click', () => {
-        cart = [];
-        localStorage.setItem('cart', JSON.stringify(cart));
-        renderCart();
-        updateCartIcon();
-        hideClearCartModal();
-        showNotification('Cart cleared successfully', 'success');
+      newConfirmBtn.addEventListener('click', async () => {
+        const success = await clearCartDB();
+        if (success) {
+          hideClearCartModal();
+          showNotification('Cart cleared successfully', 'success');
+        }
       });
 
       newCancelBtn.addEventListener('click', hideClearCartModal);
@@ -325,4 +460,5 @@
       }, 200);
     }
 
-    renderCart();
+    // Load cart from database on page load
+    loadCartFromDB();

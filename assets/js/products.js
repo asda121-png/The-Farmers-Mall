@@ -249,8 +249,7 @@
   }
 
   // Update cart icon with item count
-  function updateCartIcon() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  async function updateCartIcon() {
     const cartIcon = document.querySelector('a[href*="cart"]');
     if (!cartIcon) return;
 
@@ -262,35 +261,68 @@
       cartIcon.classList.add('relative');
       cartIcon.appendChild(badge);
     }
+
+    try {
+      // Try to fetch from database first
+      const response = await fetch('../api/cart.php');
+      const data = await response.json();
+      
+      if (data.success && data.items) {
+        const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        badge.textContent = totalItems;
+        badge.style.display = totalItems > 0 ? 'block' : 'none';
+        return;
+      }
+    } catch (error) {
+      console.log('Database cart not available, using localStorage');
+    }
+
+    // Fallback to localStorage
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     badge.textContent = totalItems;
     badge.style.display = totalItems > 0 ? 'block' : 'none';
   }
 
   // Add to cart functionality
-  function addToCart(product) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    
-    // Check if product already exists in cart
-    const existingIndex = cart.findIndex(item => item.name === product.name);
-    
-    if (existingIndex > -1) {
-      // Increment quantity if product exists
-      cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
-    } else {
-      // Add new product to cart
-      cart.push({
-        name: product.name,
-        price: parseFloat(product.price),
-        image: product.image,
-        quantity: 1,
-        description: product.description
+  async function addToCart(product) {
+    try {
+      // Prepare the payload
+      const payload = {
+        quantity: 1
+      };
+
+      // If product has an ID, use it
+      if (product.id) {
+        payload.product_id = product.id;
+      } else {
+        // Otherwise send product details to create/find product
+        payload.product_name = product.name;
+        payload.price = parseFloat(product.price);
+        payload.description = product.description || '';
+        payload.image = product.image || '';
+        payload.category = product.category || 'other';
+      }
+
+      const response = await fetch('../api/cart.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
+      
+      const data = await response.json();
+      if (data.success) {
+        updateCartIcon();
+        showNotification(`${product.name} added to cart!`);
+      } else {
+        showNotification(data.message || 'Failed to add to cart', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showNotification('Error adding to cart', 'error');
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartIcon();
-    showNotification(`${product.name} added to cart!`);
   }
 
   // Show toast notification
@@ -325,7 +357,8 @@
       name: card.dataset.name,
       price: card.dataset.price,
       image: card.querySelector('img')?.getAttribute('src') || '',
-      description: card.dataset.description || ''
+      description: card.dataset.description || '',
+      category: card.dataset.category || 'other'
     };
     addToCart(product);
   }
