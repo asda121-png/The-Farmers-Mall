@@ -29,8 +29,6 @@ echo "Sending test registration...\n\n";
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-curl_close($ch);
-
 echo "HTTP Code: $httpCode\n";
 echo "Response Length: " . strlen($response) . " bytes\n";
 echo "First 200 chars: " . substr($response, 0, 200) . "\n\n";

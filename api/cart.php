@@ -25,11 +25,21 @@ $method = $_SERVER['REQUEST_METHOD'];
 $customer = $api->select('users', ['id' => $user_id]);
 $customer_name = 'Unknown Customer';
 if (!empty($customer)) {
-    $first_name = $customer[0]['first_name'] ?? '';
-    $last_name = $customer[0]['last_name'] ?? '';
-    $customer_name = trim($first_name . ' ' . $last_name);
+    $customer_data = $customer[0];
+    
+    // Get customer name from full_name field or build from first/last name
+    if (!empty($customer_data['full_name'])) {
+        $customer_name = trim($customer_data['full_name']);
+    } else {
+        // Fallback to first_name + last_name if full_name doesn't exist
+        $first_name = $customer_data['first_name'] ?? '';
+        $last_name = $customer_data['last_name'] ?? '';
+        $customer_name = trim($first_name . ' ' . $last_name);
+    }
+    
+    // If still empty, use username or email as fallback
     if (empty($customer_name)) {
-        $customer_name = $customer[0]['email'] ?? 'Unknown Customer';
+        $customer_name = $customer_data['username'] ?? $customer_data['email'] ?? 'Unknown Customer';
     }
 }
 
@@ -122,12 +132,11 @@ try {
             if (!empty($existing)) {
                 // Update quantity
                 $newQuantity = intval($existing[0]['quantity']) + intval($data['quantity']);
-                $result = $api->update('cart', ['quantity' => $newQuantity], ['id' => $existing[0]['id']]);
-                
-                if ($result !== false) {
+                try {
+                    $api->update('cart', ['quantity' => $newQuantity], ['id' => $existing[0]['id']]);
                     echo json_encode(['success' => true, 'message' => 'Cart updated']);
-                } else {
-                    throw new Exception('Failed to update cart');
+                } catch (Exception $e) {
+                    throw new Exception('Failed to update cart: ' . $e->getMessage());
                 }
             } else {
                 // Get product name for the cart entry
@@ -160,20 +169,19 @@ try {
                 exit();
             }
 
-            if (intval($data['quantity']) <= 0) {
-                // If quantity is 0 or less, delete the item
-                $result = $api->delete('cart', ['id' => $data['cart_id']]);
-            } else {
-                $result = $api->update('cart', 
-                    ['quantity' => intval($data['quantity'])], 
-                    ['id' => $data['cart_id'], 'customer_name' => $customer_name]
-                );
-            }
-
-            if ($result) {
+            try {
+                if (intval($data['quantity']) <= 0) {
+                    // If quantity is 0 or less, delete the item
+                    $api->delete('cart', ['id' => $data['cart_id']]);
+                } else {
+                    $api->update('cart', 
+                        ['quantity' => intval($data['quantity'])], 
+                        ['id' => $data['cart_id'], 'customer_name' => $customer_name]
+                    );
+                }
                 echo json_encode(['success' => true, 'message' => 'Cart updated']);
-            } else {
-                throw new Exception('Failed to update cart');
+            } catch (Exception $e) {
+                throw new Exception('Failed to update cart: ' . $e->getMessage());
             }
             break;
 

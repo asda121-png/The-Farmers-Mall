@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // --- PAYMENT METHOD TOGGLE ---
   const paymentRadios = document.querySelectorAll('input[name="payment"]');
   const cardInfo = document.getElementById('card-info');
@@ -9,11 +9,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // --- LOAD ORDER SUMMARY FROM CART ---
+  // --- LOAD ORDER SUMMARY FROM DATABASE ---
   const orderItemsContainer = document.getElementById('orderItems');
   const subtotalEl = document.getElementById('subtotal');
   const totalEl = document.getElementById('total');
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  
+  let cart = [];
+  
+  try {
+    // Fetch cart items from database
+    const response = await fetch('../api/cart.php');
+    const data = await response.json();
+    
+    if (data.success && Array.isArray(data.items)) {
+      cart = data.items;
+      // Update localStorage for consistency
+      localStorage.setItem('cart', JSON.stringify(cart));
+    } else {
+      // Fallback to localStorage if API fails
+      cart = JSON.parse(localStorage.getItem('cart')) || [];
+    }
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    // Fallback to localStorage
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+  }
 
   orderItemsContainer.innerHTML = '';
 
@@ -28,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="flex items-center gap-3">
           <img src="${item.image || 'images/products/img.png'}" class="w-12 h-12 rounded-lg object-cover">
           <div>
-            <span class="text-sm font-medium">${item.name}</span>
+            <span class="text-sm font-medium">${item.name || item.product_name}</span>
             <p class="text-xs text-gray-500">Qty: ${item.quantity || 1}</p>
           </div>
         </div>
@@ -44,49 +64,52 @@ document.addEventListener('DOMContentLoaded', () => {
   totalEl.textContent = `₱${subtotal.toFixed(2)}`;
 
   // --- HANDLE PLACING THE ORDER ---
-  document.getElementById('placeOrderBtn').addEventListener('click', () => {
+  document.getElementById('placeOrderBtn').addEventListener('click', async () => {
     if (cart.length === 0) {
       alert("Your cart is empty. Cannot place order.");
       return;
     }
 
-    const total = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-    const orderId = `FM-${Date.now().toString().slice(-6)}`;
+    // Disable button to prevent double submission
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    placeOrderBtn.disabled = true;
+    placeOrderBtn.textContent = 'Processing...';
 
-    // Create a notification for the new order
-    const newNotification = {
-      id: Date.now(),
-      type: 'order_placed',
-      title: `Order #${orderId} Placed Successfully!`,
-      message: `Your order for ${cart.length} item(s) with a total of ₱${total.toFixed(2)} has been confirmed.`,
-      timestamp: new Date().toISOString(),
-      read: false
-    };
+    try {
+      // Get selected payment method
+      const selectedPayment = document.querySelector('input[name="payment"]:checked');
+      const paymentMethod = selectedPayment ? selectedPayment.value : 'card';
 
-    // Save notification to localStorage
-    let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-    notifications.unshift(newNotification); // Add to the top
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-    
-    // Create and save the order for the seller dashboard
-    const newSellerOrder = {
-      id: orderId,
-      customerName: 'Piodos De Blanco', // Assuming a logged-in user
-      total: total,
-      status: 'Pending',
-      timestamp: new Date().toISOString()
-    };
+      // Place order via API
+      const response = await fetch('../api/order.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'place_order',
+          payment_method: paymentMethod
+        })
+      });
 
-    let sellerOrders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
-    sellerOrders.unshift(newSellerOrder);
-    // Keep only the last 10 orders for the dashboard view
-    if (sellerOrders.length > 10) sellerOrders.pop();
-    localStorage.setItem('sellerOrders', JSON.stringify(sellerOrders));
+      const result = await response.json();
 
-    // Clear the cart
-    localStorage.removeItem('cart');
-
-    // Redirect to success page
-    window.location.href = 'ordersuccessfull.php';
+      if (result.success) {
+        // Clear localStorage cart
+        localStorage.removeItem('cart');
+        
+        // Redirect to success page with order ID
+        window.location.href = `ordersuccessfull.php?order_id=${result.order_id}`;
+      } else {
+        alert('Error placing order: ' + (result.message || 'Unknown error'));
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.textContent = 'Place Order';
+      }
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Error placing order. Please try again.');
+      placeOrderBtn.disabled = false;
+      placeOrderBtn.textContent = 'Place Order';
+    }
   });
 });

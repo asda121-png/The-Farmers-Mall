@@ -52,6 +52,8 @@ CREATE TABLE products (
 CREATE TABLE orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     customer_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    customer_name VARCHAR(255),
+    customer_email VARCHAR(255),
     retailer_id UUID REFERENCES retailers(id) ON DELETE SET NULL,
     total_amount DECIMAL(10,2) NOT NULL,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled')),
@@ -68,6 +70,8 @@ CREATE TABLE order_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
     product_id UUID REFERENCES products(id) ON DELETE SET NULL,
+    product_name VARCHAR(255),
+    product_image_url TEXT,
     quantity INTEGER NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     subtotal DECIMAL(10,2) NOT NULL,

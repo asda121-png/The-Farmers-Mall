@@ -4,8 +4,18 @@ session_start();
 
 // Destroy all session data
 session_destroy();
-
-// Redirect to login page with a logout message
-header("Location: login.php?logout=success");
-exit();
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logging out...</title>
+</head>
+<body>
+    <script>
+        // Clear localStorage cart data on logout
+        localStorage.removeItem('cart');
+        // Redirect to login page
+        window.location.href = 'login.php?logout=success';
+    </script>
+</body>
+</html>
