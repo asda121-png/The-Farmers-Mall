@@ -1,3 +1,26 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: ../auth/login.php');
+    exit();
+}
+
+// Get user data from session
+$user_id = $_SESSION['user_id'] ?? null;
+
+// Fetch profile picture from database
+$profile_picture = '';
+if ($user_id) {
+    require_once __DIR__ . '/../config/supabase-api.php';
+    $api = getSupabaseAPI();
+    $users = $api->select('users', ['id' => $user_id]);
+    if (!empty($users)) {
+        $profile_picture = $users[0]['profile_picture'] ?? '';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,9 +65,13 @@
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.php">
-          <div id="headerProfilePic" class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-            <i class="fas fa-user text-white text-sm"></i>
-          </div>
+          <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+            <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">
+          <?php else: ?>
+            <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+              <i class="fas fa-user text-white text-sm"></i>
+            </div>
+          <?php endif; ?>
         </a>
       </div>
     </div>
@@ -203,40 +230,6 @@
   </footer>
 
   <script src="../assets/js/paymentmethod.js"></script>
-  <script>
-    // Load User Profile Data
-    function loadUserProfile() {
-      const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-      const headerProfilePic = document.getElementById('headerProfilePic');
-      
-      if (headerProfilePic) {
-        if (userProfile && userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
-          // Has uploaded image
-          headerProfilePic.innerHTML = `<img src="${userProfile.profilePic}" alt="User" class="w-full h-full rounded-full object-cover">`;
-          headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer';
-        } else {
-          // Show icon
-          headerProfilePic.innerHTML = '<i class="fas fa-user text-white text-sm"></i>';
-          headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center';
-        }
-      }
-    }
-
-    // Load profile on page load
-    loadUserProfile();
-
-    // Listen for profile updates
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'userProfile') {
-        loadUserProfile();
-      }
-    });
-
-    // Listen for profile updates in same tab
-    window.addEventListener('profileUpdated', () => {
-      loadUserProfile();
-    });
-  </script>
 
 </body>
 </html>

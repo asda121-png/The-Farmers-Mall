@@ -1,3 +1,26 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: ../auth/login.php');
+    exit();
+}
+
+// Get user data from session
+$user_id = $_SESSION['user_id'] ?? null;
+
+// Fetch profile picture from database
+$profile_picture = '';
+if ($user_id) {
+    require_once __DIR__ . '/../config/supabase-api.php';
+    $api = getSupabaseAPI();
+    $users = $api->select('users', ['id' => $user_id]);
+    if (!empty($users)) {
+        $profile_picture = $users[0]['profile_picture'] ?? '';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,11 +71,18 @@
       </div>
 
       <div class="flex items-center space-x-6">
+         <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
         <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
         <a href="cart.php" class="text-gray-600"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="profile.php">
-          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+          <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+            <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">
+          <?php else: ?>
+            <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+              <i class="fas fa-user text-white text-sm"></i>
+            </div>
+          <?php endif; ?>
         </a>
       </div>
     </div>
