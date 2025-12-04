@@ -1257,6 +1257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     const sendVerificationBtn = document.getElementById('sendVerificationBtn');
     const verificationMessage = document.getElementById('verificationMessage');
     let verificationCodeSent = false;
+    let actualVerificationCode = null;  // Store the code for validation
 
     if (sendVerificationBtn) {
       sendVerificationBtn.addEventListener('click', function() {
@@ -1292,19 +1293,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         .then(data => {
           if (data.success) {
             verificationCodeSent = true;
-            verificationMessage.textContent = '✅ Code sent! Check your email.';
-            verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
+            
+            // Show message
             verificationMessage.classList.remove('hidden');
             sendVerificationBtn.textContent = 'Code Sent ✓';
             sendVerificationBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            showToast(data.message, 'success');
             
-            // Clear OTP field and error for new code entry
+            // Show user-friendly message
+            verificationMessage.textContent = '✅ ' + data.message;
+            verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
+            
+            // Do NOT auto-fill the code - user must enter it manually
             const otpInput = document.getElementById('otp');
             if (otpInput) {
-              otpInput.value = '';
+              otpInput.value = '';  // Clear field for manual entry
+              otpInput.focus();     // Focus on the field
               clearFieldError('otp');
             }
+            
+            showToast(data.message, 'success');
+            
+            // Keep Next button disabled until user enters correct code
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
           } else {
             showToast(data.message || 'Failed to send verification code', 'error');
             sendVerificationBtn.disabled = false;
@@ -1345,34 +1356,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
           return false;
         }
 
-        // Client-side format validation passed
-        // Server will verify the actual code on registration submission
+        // Strict check: Code must match exactly
+        if (!actualVerificationCode) {
+          setFieldError('otp', 'Unable to verify - no code on file');
+          showToast("Verification code not found. Please request a new code.", "error");
+          return false;
+        }
+
+        // Case-sensitive exact match
+        if (otp !== actualVerificationCode) {
+          verificationAttempts++;
+          const remaining = Math.max(0, 3 - verificationAttempts);
+          let errorMsg = 'Verification code does not match. Please check and try again.';
+          
+          if (remaining > 0) {
+            errorMsg += ` (${remaining} attempts remaining)`;
+          }
+          
+          setFieldError('otp', 'Invalid verification code');
+          showToast(errorMsg, "error");
+          return false;
+        }
+
+        // Code matches - verification successful!
         clearFieldError('otp');
+        showToast("Email verified successfully!", "success");
         return true;
       }
 
       return originalValidateStep(stepIndex);
     };
 
-    // Add real-time OTP validation listener for format only
+    // Add real-time OTP validation listener with immediate feedback
     const otpInputField = document.getElementById('otp');
     if (otpInputField) {
       otpInputField.addEventListener('input', () => {
         const otp = otpInputField.value.trim();
         
-        // Real-time format validation only
+        // Real-time format validation
         if (otp && !validationPatterns.otp.test(otp)) {
           setFieldError('otp', 'Code must be 4-6 digits');
-        } else {
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          return;
+        }
+
+        // If code is correct length and matches, enable Next button
+        if (otp && validationPatterns.otp.test(otp) && verificationCodeSent && actualVerificationCode) {
+          if (otp === actualVerificationCode) {
+            clearFieldError('otp');
+            // Enable Next button when code matches
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            // Show inline success indicator
+            const errorSpan = document.getElementById('otp-error');
+            if (errorSpan) {
+              errorSpan.textContent = 'Code verified!';
+              errorSpan.className = 'error-message text-green-600';
+              errorSpan.classList.remove('hidden');
+            }
+          } else {
+            // Code doesn't match but is valid format
+            setFieldError('otp', 'Code does not match');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+        } else if (!otp) {
           clearFieldError('otp');
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
       });
 
       // Blur event for final validation
       otpInputField.addEventListener('blur', () => {
         const otp = otpInputField.value.trim();
-        if (otp && !validationPatterns.otp.test(otp)) {
-          setFieldError('otp', 'Code must be 4-6 digits');
+        if (otp) {
+          if (!validationPatterns.otp.test(otp)) {
+            setFieldError('otp', 'Code must be 4-6 digits');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          } else if (verificationCodeSent && actualVerificationCode && otp !== actualVerificationCode) {
+            setFieldError('otp', 'Code does not match');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          } else if (verificationCodeSent && actualVerificationCode && otp === actualVerificationCode) {
+            clearFieldError('otp');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          }
+        } else {
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
       });
     }
