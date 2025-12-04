@@ -46,22 +46,31 @@ try {
         @file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] ✅ Email sent successfully\n", FILE_APPEND);
         $response['success'] = true;
         $response['message'] = "A 6-digit code has been sent to $email. It expires in 5 minutes.";
-        // Code is stored server-side, not sent to frontend
+        // Return the code for frontend validation (development mode)
+        if (file_exists(__DIR__ . '/../.development')) {
+            $response['code'] = $verification_code;
+        }
     } else {
         @file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] ❌ Email send failed - enabling fallback mode\n", FILE_APPEND);
         
         // FALLBACK FOR DEVELOPMENT: If email fails, still allow code to be used in session
         $response['success'] = true;
         $response['message'] = "Verification code generated. Check your email for the code.";
-        // Code is stored server-side for validation
+        // Return code for development/fallback
+        if (file_exists(__DIR__ . '/../.development')) {
+            $response['code'] = $verification_code;
+        }
     }
 } catch (Exception $e) {
     @file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] ❌ Exception: " . $e->getMessage() . "\n", FILE_APPEND);
     
-    // Still allow testing with the code (silently stored in session)
+    // Still allow testing with the code (stored in session)
     $response['success'] = true;
     $response['message'] = "Verification code generated. Check your email for the code.";
-    // Code is stored server-side for validation
+    // Return code for development/fallback
+    if (file_exists(__DIR__ . '/../.development')) {
+        $response['code'] = $verification_code;
+    }
 }
 
 echo json_encode($response);
