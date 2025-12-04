@@ -191,26 +191,42 @@
         const div = document.createElement('div');
         div.className = 'bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-md transition-shadow gap-4';
         div.innerHTML = `
-          <div class="flex items-center gap-4 flex-1">
-        <img src="${itemImage}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-800 text-lg">${escapeHtml(item.name)}</h3>
+          <div class="flex items-start gap-4 flex-1 w-full">
+            <img src="${itemImage}" class="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold text-gray-800 text-base md:text-lg">${escapeHtml(item.name)}</h3>
               <p class="text-green-700 font-medium text-sm">₱${item.price.toFixed(2)} each</p>
-              ${item.description ? `<p class="text-gray-500 text-xs mt-1 line-clamp-2">${escapeHtml(item.description)}</p>` : ''}
+              ${item.description ? `<p class="text-gray-500 text-xs mt-1 line-clamp-1 md:line-clamp-2">${escapeHtml(item.description)}</p>` : ''}
+              <div class="flex items-center gap-2 mt-2 md:hidden">
+                <div class="flex items-center gap-2 border rounded-lg px-2 py-1 bg-gray-50">
+                  <button class="quantity-btn text-gray-600 hover:text-green-600 font-bold text-base w-7 h-7 flex items-center justify-center rounded hover:bg-white transition" data-action="decrease">−</button>
+                  <span class="quantity text-base font-semibold min-w-[1.5rem] text-center">${item.quantity || 1}</span>
+                  <button class="quantity-btn text-gray-600 hover:text-green-600 font-bold text-base w-7 h-7 flex items-center justify-center rounded hover:bg-white transition" data-action="increase">+</button>
+                </div>
+                <p class="text-green-700 font-bold text-base item-total">₱${itemTotal}</p>
+              </div>
             </div>
           </div>
-          <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-            <div class="flex items-center gap-3 border rounded-lg px-2 py-1 bg-gray-50">
+          <div class="hidden md:flex items-center gap-3">
+            <div class="flex items-center gap-2 border rounded-lg px-2 py-1 bg-gray-50">
               <button class="quantity-btn text-gray-600 hover:text-green-600 font-bold text-lg w-8 h-8 flex items-center justify-center rounded hover:bg-white transition" data-action="decrease">−</button>
               <span class="quantity text-lg font-semibold min-w-[2rem] text-center">${item.quantity || 1}</span>
               <button class="quantity-btn text-gray-600 hover:text-green-600 font-bold text-lg w-8 h-8 flex items-center justify-center rounded hover:bg-white transition" data-action="increase">+</button>
             </div>
             <p class="text-green-700 font-bold text-lg w-24 text-right item-total">₱${itemTotal}</p>
             <button class="wishlist text-gray-400 hover:text-red-500 transition-colors" title="Add to wishlist">
-              <i class="far fa-heart text-xl"></i>
+              <i class="far fa-heart text-lg"></i>
             </button>
-            <button class="remove-item text-red-500 hover:text-red-700 text-xl transition-colors" title="Remove item">
-              <i class="fa-solid fa-trash"></i>
+            <button class="remove-item text-red-500 hover:text-red-700 transition-colors" title="Remove item">
+              <i class="fa-solid fa-trash text-lg"></i>
+            </button>
+          </div>
+          <div class="flex md:hidden gap-2 w-full justify-end">
+            <button class="wishlist text-gray-400 hover:text-red-500 transition-colors p-2" title="Add to wishlist">
+              <i class="far fa-heart text-lg"></i>
+            </button>
+            <button class="remove-item text-red-500 hover:text-red-700 transition-colors p-2" title="Remove item">
+              <i class="fa-solid fa-trash text-lg"></i>
             </button>
           </div>
         `;

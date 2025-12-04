@@ -368,7 +368,7 @@ if ($user_id) {
       let badge = cartIcon.querySelector('.cart-badge');
       if (!badge) {
         badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center';
+        badge.className = 'cart-badge absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center';
         cartIcon.classList.add('relative', 'inline-block');
         cartIcon.appendChild(badge);
       }

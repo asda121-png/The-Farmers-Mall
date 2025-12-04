@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Verify Products in Database
  * This script displays all products currently stored in the database
@@ -148,7 +148,7 @@ foreach ($products as $product) {
                                 <?php if (strlen($product['description'] ?? '') > 100) echo '...'; ?>
                             </td>
                             <td class="px-4 py-3 text-green-700 font-semibold">
-                                ₱<?php echo number_format($product['price'], 2); ?>
+                                â‚±<?php echo number_format($product['price'], 2); ?>
                             </td>
                             <td class="px-4 py-3">
                                 <span class="<?php echo ($product['stock_quantity'] ?? 0) > 0 ? 'text-green-600' : 'text-red-600'; ?>">
@@ -215,7 +215,7 @@ foreach ($products as $product) {
                     <div class="text-gray-600 mt-2">Total Stock</div>
                 </div>
                 <div class="bg-yellow-100 rounded-lg p-6 text-center">
-                    <div class="text-3xl font-bold text-yellow-700">₱<?php echo number_format($totalValue, 2); ?></div>
+                    <div class="text-3xl font-bold text-yellow-700">â‚±<?php echo number_format($totalValue, 2); ?></div>
                     <div class="text-gray-600 mt-2">Total Inventory Value</div>
                 </div>
             </div>
