@@ -455,6 +455,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <button type="button" id="togglePassword" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye text-lg"></i>
+                  </button>
                 </div>
                 <span id="password-error" class="error-message hidden"></span>
                 <!-- Password Strength Meter -->
@@ -472,6 +475,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="confirm" name="confirm" required placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <button type="button" id="toggleConfirm" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye text-lg"></i>
+                  </button>
                 </div>
                 <span id="confirm-error" class="error-message hidden"></span>
               </div>
@@ -487,6 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <span id="email-error" class="error-message hidden"></span>
               </div>
               <button type="button" id="sendVerificationBtn" class="w-full text-center text-sm text-green-600 hover:underline font-medium">Send Verification Code</button>
+              <button type="button" id="resendVerificationBtn" class="w-full text-center text-sm text-blue-600 hover:underline font-medium hidden">Resend Code</button>
               <div id="verificationMessage" class="text-sm text-center hidden"></div>
               <div>
                 <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
@@ -1306,6 +1313,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             sendVerificationBtn.textContent = 'Code Sent ✓';
             sendVerificationBtn.classList.add('opacity-50', 'cursor-not-allowed');
             
+            // Show resend button
+            const resendBtn = document.getElementById('resendVerificationBtn');
+            if (resendBtn) {
+              resendBtn.classList.remove('hidden');
+            }
+            
             // Show user-friendly message
             verificationMessage.textContent = '✅ ' + data.message;
             verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
@@ -1336,6 +1349,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
           sendVerificationBtn.disabled = false;
           sendVerificationBtn.textContent = 'Send Verification Code';
         });
+      });
+    }
+
+    // Resend Verification Code Button Handler
+    const resendVerificationBtn = document.getElementById('resendVerificationBtn');
+    if (resendVerificationBtn) {
+      resendVerificationBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Trigger the send verification button click to resend
+        if (sendVerificationBtn) {
+          sendVerificationBtn.click();
+          showToast('Sending new verification code...', 'success');
+        }
+      });
+    }
+
+    // Password Eye Toggle Handler
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    if (togglePasswordBtn && passwordInput) {
+      togglePasswordBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const icon = togglePasswordBtn.querySelector('i');
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          passwordInput.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    }
+
+    // Confirm Password Eye Toggle Handler
+    const toggleConfirmBtn = document.getElementById('toggleConfirm');
+    const confirmInput = document.getElementById('confirm');
+    if (toggleConfirmBtn && confirmInput) {
+      toggleConfirmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const icon = toggleConfirmBtn.querySelector('i');
+        if (confirmInput.type === 'password') {
+          confirmInput.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          confirmInput.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    }
+
+    // Email Duplicate Check Handler
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+      emailInput.addEventListener('blur', async function() {
+        const email = this.value.trim();
+        
+        if (!email) {
+          clearFieldError('email');
+          return;
+        }
+
+        if (!validationPatterns.email.test(email)) {
+          setFieldError('email', 'Invalid email format');
+          return;
+        }
+
+        // Check if email already exists
+        try {
+          const response = await fetch('check-email.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+          });
+
+          const data = await response.json();
+          
+          if (data.exists) {
+            setFieldError('email', '⚠️ This email is already registered. Please use a different email or try logging in.');
+            showToast('Email already in use', 'error');
+            emailInput.focus();
+          } else {
+            clearFieldError('email');
+          }
+        } catch (error) {
+          console.error('Error checking email:', error);
+        }
       });
     }
 
