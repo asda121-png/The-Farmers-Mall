@@ -195,8 +195,6 @@ $notifications = [
 
       <!-- Right Header Icons -->
       <div class="flex items-center gap-4 ml-auto">
-        <i class="fa-solid fa-chart-column text-xl text-gray-500 hover:text-green-600 cursor-pointer hidden sm:block"></i>
-        
         <!-- Notification Dropdown -->
         <div class="relative">
             <button id="notification-btn" class="relative" title="View Notifications">
@@ -230,11 +228,28 @@ $notifications = [
         </div>
 
         <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
-          <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-        </a>
-
-
+        <!-- User Dropdown -->
+        <div class="relative">
+            <button id="user-menu-btn" class="flex items-center gap-2 cursor-pointer">
+                <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
+            </button>
+            <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+                <div class="p-3 border-b">
+                    <p class="text-sm font-semibold text-gray-800"><?php echo $admin_name; ?></p>
+                    <p class="text-xs text-gray-500"><?php echo $admin_email; ?></p>
+                </div>
+                <nav class="p-2">
+                    <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                        <i class="fa-solid fa-user-cog w-5 text-gray-500"></i>
+                        <span>Profile & Settings</span>
+                    </a>
+                    <button id="logoutButtonDropdown" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                        <i class="fa-solid fa-sign-out-alt w-5 text-gray-500"></i>
+                        <span>Logout</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
       </div>
     </header>
     
@@ -382,7 +397,7 @@ $notifications = [
         <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-semibold text-lg text-gray-900">Recent Orders</h3>
-                <a href="#" class="text-sm text-green-600 hover:text-green-800 font-medium">View All</a>
+                <a href="admin-orders.php" class="text-sm text-green-600 hover:text-green-800 font-medium">View All</a>
             </div>
             
             <div class="overflow-x-auto">
@@ -421,6 +436,7 @@ $notifications = [
                                 <p class="text-sm font-medium">Banana Box</p>
                             </td>
                             <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Michelle Data</td>
+                            <td class="py-3 px-2 text-sm text-gray-500">#245788</td>
                             <td class="py-3 px-2 text-sm text-gray-500">26 Jun 2024</td>
                             <td class="py-3 px-2">
                                 <span class="flex items-center gap-1 text-red-600 text-xs font-semibold">
@@ -542,6 +558,8 @@ $notifications = [
       // --- Notification Dropdown Logic ---
       const notificationBtn = document.getElementById('notification-btn');
       const notificationDropdown = document.getElementById('notification-dropdown');
+      const userMenuBtn = document.getElementById('user-menu-btn');
+      const userMenuDropdown = document.getElementById('user-menu-dropdown');
       const viewAllBtn = document.getElementById('view-all-notifications-btn');
 
       notificationBtn.addEventListener('click', (e) => {
@@ -551,11 +569,24 @@ $notifications = [
 
       // Close dropdown if clicked outside
       window.addEventListener('click', (e) => {
-        if (!notificationDropdown.classList.contains('hidden')) {
-          if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+        // Close notification dropdown
+        if (!notificationDropdown.classList.contains('hidden') && !notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
             notificationDropdown.classList.add('hidden');
-          }
         }
+        // Close user menu dropdown
+        if (!userMenuDropdown.classList.contains('hidden') && !userMenuBtn.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+            userMenuDropdown.classList.add('hidden');
+        }
+      });
+
+      // --- User Menu Dropdown ---
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenuDropdown.classList.toggle('hidden');
+      });
+      document.getElementById('logoutButtonDropdown').addEventListener('click', function() {
+        logoutModal.classList.remove('hidden');
+        logoutModal.classList.add('flex');
       });
 
       // Expand notifications list

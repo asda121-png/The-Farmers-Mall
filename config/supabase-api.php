@@ -18,6 +18,37 @@ class SupabaseAPI {
     private $apiKey;
     
     private function __construct() {
+        // Check if cURL extension is enabled
+        if (!function_exists('curl_init')) {
+            die('
+                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; border: 2px solid #dc3545; border-radius: 10px; background-color: #f8d7da;">
+                    <h2 style="color: #721c24;">❌ cURL Extension Not Enabled</h2>
+                    <p style="color: #721c24; font-size: 16px;">The PHP cURL extension is required but not enabled on your system.</p>
+                    
+                    <h3 style="color: #721c24;">To fix this in XAMPP:</h3>
+                    <ol style="color: #721c24; font-size: 14px; line-height: 1.8;">
+                        <li>Open <strong>php.ini</strong> file:
+                            <ul>
+                                <li>Click on XAMPP Control Panel</li>
+                                <li>Click "Config" button next to Apache</li>
+                                <li>Select "PHP (php.ini)"</li>
+                            </ul>
+                        </li>
+                        <li>Find this line: <code>;extension=curl</code></li>
+                        <li>Remove the semicolon to uncomment it: <code>extension=curl</code></li>
+                        <li>Save the file</li>
+                        <li>Restart Apache in XAMPP Control Panel</li>
+                        <li>Refresh this page</li>
+                    </ol>
+                    
+                    <h3 style="color: #721c24;">Alternative location (older XAMPP versions):</h3>
+                    <p style="color: #721c24; font-size: 14px;">Look for: <code>;extension=php_curl.dll</code> and change to <code>extension=php_curl.dll</code></p>
+                    
+                    <p style="color: #721c24; font-size: 14px; margin-top: 20px;"><strong>File location:</strong> <code>C:\xampp\php\php.ini</code></p>
+                </div>
+            ');
+        }
+        
         $this->url = getenv('SUPABASE_URL');
         $this->apiKey = getenv('SUPABASE_ANON_KEY');
     }
