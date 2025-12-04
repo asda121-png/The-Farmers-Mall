@@ -106,7 +106,7 @@ foreach ($products as $filename => $data) {
         $failed++;
     }
     
-    imagedestroy($image);
+    // imagedestroy() is deprecated in PHP 8+, resources are auto-freed
 }
 
 echo "<hr><h2>Creation Complete!</h2>";
