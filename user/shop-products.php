@@ -62,45 +62,78 @@ if ($shop_name) {
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-  <!-- Navbar -->
-  <header class="bg-white shadow-sm">
+<header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-leaf text-white text-lg"></i>
-        </div>
-        <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
-      </div>
-
-      <div class="flex-1 mx-6">
-        <input 
-          id="globalSearch"
-          type="text" 
-          placeholder="Search products..." 
-          class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-green-600"
-        />
-      </div>
-
-      <div class="flex items-center gap-4">
-        <a href="user-homepage.php" class="text-gray-600"><i class="fa-solid fa-home"></i></a>
-        <a href="cart.php" class="text-gray-600 relative" id="cartIcon">
-          <i class="fa-solid fa-cart-shopping"></i>
-          <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+        <!-- Logo -->
+        <a href="user-homepage.php" class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-leaf text-white text-lg"></i>
+            </div>
+            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
         </a>
-        <a href="notifications.php" class="text-gray-600"><i class="fa-solid fa-bell"></i></a>
-        <?php if (!empty($profile_picture)): ?>
-          <a href="account.php">
-            <img src="<?php echo htmlspecialchars(strpos($profile_picture, 'http') === 0 ? $profile_picture : '../' . $profile_picture); ?>" 
-                 alt="Profile" 
-                 class="w-10 h-10 rounded-full object-cover border-2 border-green-600"
-                 onerror="this.src='../images/profile.png'">
-          </a>
-        <?php else: ?>
-          <a href="account.php" class="text-gray-600"><i class="fa-solid fa-user"></i></a>
-        <?php endif; ?>
-      </div>
+
+        <!-- Search -->
+        <div class="flex-1 mx-6">
+            <form action="products.php" method="GET">
+                <input 
+                    type="text" 
+                    name="search"
+                    placeholder="Search for fresh produce, dairy, and more..."
+                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+                />
+            </form>
+        </div>
+
+        <!-- Icons & Profile Dropdown -->
+        <div class="flex items-center space-x-6">
+            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+            <a href="cart.php" class="text-gray-600 relative">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+
+            <!-- Profile Dropdown -->
+            <div class="relative inline-block text-left">
+                <button id="profileDropdownBtn" class="flex items-center">
+                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
+                             alt="Profile" 
+                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
+                    <?php else: ?>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    <?php endif; ?>
+                </button>
+
+                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
+                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                </div>
+            </div>
+            <!-- End Profile Dropdown -->
+
+        </div>
     </div>
-  </header>
+</header>
+
+<!-- Dropdown JS -->
+<script>
+    const btn = document.getElementById('profileDropdownBtn');
+    const menu = document.getElementById('profileDropdown');
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+        menu.classList.add('hidden');
+    });
+</script>
+
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
