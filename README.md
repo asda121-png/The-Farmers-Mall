@@ -4,6 +4,13 @@ An e-commerce platform connecting farmers/retailers with customers.
 
 ## 🚀 Quick Start for Team Members
 
+### ⚠️ Getting an Error? Check Your System First!
+Visit: **`http://localhost:3000/system-check.php`** to diagnose issues.
+
+Common error: `Call to undefined function curl_init()` → See [ENABLE_CURL.md](ENABLE_CURL.md)
+
+---
+
 ### Option 1: Automated Setup (Recommended) 🎯
 ```powershell
 git pull
@@ -23,6 +30,7 @@ php config/test-database.php
 ## 📖 Documentation
 
 - **[TEAM_SETUP.md](TEAM_SETUP.md)** - Quick setup guide with code examples
+- **[ENABLE_CURL.md](ENABLE_CURL.md)** - How to enable cURL extension (REQUIRED!)
 - **[DATABASE_SETUP.md](DATABASE_SETUP.md)** - Detailed database documentation
 - **[CONVERSION_SUMMARY.md](CONVERSION_SUMMARY.md)** - Project conversion notes
 

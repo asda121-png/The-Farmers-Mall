@@ -1,0 +1,8 @@
+DEVELOPMENT MODE ENABLED
+This file enables development mode for the Farmers Mall application.
+When present, the following features are enabled:
+- Verification codes displayed on screen
+- Detailed error messages
+- Debug logging
+
+Last enabled: 2025-12-05

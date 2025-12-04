@@ -1,5 +1,23 @@
 # 🚀 Quick Setup for Team Members
 
+## ⚠️ CRITICAL: Enable cURL Extension First!
+
+**If you see error: `Call to undefined function curl_init()`**
+
+### Quick Fix (Takes 2 minutes):
+1. Open **XAMPP Control Panel**
+2. Click **"Config"** button next to Apache
+3. Select **"PHP (php.ini)"**
+4. Find: `;extension=curl` (use Ctrl+F)
+5. Remove semicolon: `extension=curl`
+6. Save file (Ctrl+S)
+7. **Restart Apache**
+8. Refresh browser
+
+**📖 Detailed instructions:** See [ENABLE_CURL.md](ENABLE_CURL.md)
+
+---
+
 ## Automated Setup (Recommended)
 
 ### Method 1: Double-Click Setup (Easiest)
