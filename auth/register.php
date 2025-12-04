@@ -41,45 +41,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         
         $errors = [];
 
-        // 3. Server-Side Validation
-        if (empty($firstName)) {
-            $errors[] = "First name is required.";
+        // 3. Server-Side Validation (Existing checks omitted for brevity)
+        if (empty($firstName)) { $errors[] = "First name is required."; }
+        if (empty($lastName)) { $errors[] = "Last name is required."; }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors[] = "Invalid email format."; }
+        if (empty($username)) { $errors[] = "Username is required."; }
+        if (!preg_match('/^(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).{6,}$/', $password)) { $errors[] = "Password must be 6+ characters with at least one number and symbol (!@#$%^&* etc)."; }
+        if ($password !== $confirm) { $errors[] = "Passwords do not match."; }
+        if (!preg_match('/^09\d{9}$/', $phone)) { $errors[] = "Invalid phone number format (must be 09XXXXXXXXX)."; }
+        if (!$terms) { $errors[] = "You must agree to the Terms and Privacy Policy."; }
+        
+        // Check if email already exists (Re-enabling this check)
+        if (empty($errors)) {
+             try {
+                 $existingUser = $api->select('users', ['email' => $email]);
+                 if (!empty($existingUser)) {
+                     $errors[] = "Email already registered. Please use a different email.";
+                 }
+             } catch (Exception $e) {
+                 // Continue if table check fails
+             }
         }
-        if (empty($lastName)) {
-            $errors[] = "Last name is required.";
-        }
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email format.";
-        }
-        if (empty($username)) {
-            $errors[] = "Username is required.";
-        }
-        // Password must be 6+ characters with at least one number and one symbol
-        if (!preg_match('/^(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).{6,}$/', $password)) {
-            $errors[] = "Password must be 6+ characters with at least one number and symbol (!@#$%^&* etc).";
-        }
-        if ($password !== $confirm) {
-            $errors[] = "Passwords do not match.";
-        }
-        if (!preg_match('/^09\d{9}$/', $phone)) {
-            $errors[] = "Invalid phone number format (must be 09XXXXXXXXX).";
-        }
-        if (!$terms) {
-            $errors[] = "You must agree to the Terms and Privacy Policy.";
+
+        // --- NEW: Server-Side OTP Validation (Inserted Here) ---
+        $otp = trim($_POST['otp'] ?? '');
+        
+        // 1. Basic validation for the OTP field
+        if (empty($otp)) {
+            $errors[] = "Verification code is required.";
+        } else if (!preg_match('/^\d{4,6}$/', $otp)) {
+             $errors[] = "Verification code format is invalid (must be 4-6 digits).";
         }
         
-        // Check if email already exists
+        // 2. Check verification against session variables
         if (empty($errors)) {
-            try {
-                $existingUser = $api->select('users', ['email' => $email]);
-                if (!empty($existingUser)) {
-                    $errors[] = "Email already registered. Please use a different email.";
-                }
-            } catch (Exception $e) {
-                // Continue if table check fails
+            // Check if code was even generated and is in session
+            if (!isset($_SESSION['verification_code']) || !isset($_SESSION['code_email']) || !isset($_SESSION['code_expires'])) {
+                $errors[] = "No valid verification code found. Please request a new code.";
+            } 
+            // Check if the code has expired (5 minutes)
+            else if ($_SESSION['code_expires'] < time()) {
+                $errors[] = "Verification code has expired. Please request a new code.";
+                // Clear expired session data
+                unset($_SESSION['verification_code']);
+                unset($_SESSION['code_email']);
+                unset($_SESSION['code_expires']);
+            }
+            // Check if the email used for registration matches the email used for OTP
+            else if ($_SESSION['code_email'] !== $email) {
+                // Clear session data if email mismatch occurs
+                unset($_SESSION['verification_code']);
+                unset($_SESSION['code_email']);
+                unset($_SESSION['code_expires']);
+                $errors[] = "The submitted email does not match the email used for verification. Please request a new code.";
+            }
+            // Check if the submitted OTP matches the stored code
+            else if ($_SESSION['verification_code'] !== $otp) {
+                $errors[] = "Verification code does not match.";
+            } else {
+                // ✅ OTP SUCCESS: Clear session data immediately after successful use
+                unset($_SESSION['verification_code']);
+                unset($_SESSION['code_email']);
+                unset($_SESSION['code_expires']);
             }
         }
+        // -----------------------------------------------------------------
         
+        // Continue to database insertion only if all checks, including OTP, passed.
         if (empty($errors)) {
             // 4. Set static role as customer
             $role = 'customer';
@@ -102,7 +130,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                     'full_name' => $fullName,
                     'phone' => $phone,
                     'user_type' => $role,
-                    'status' => 'active'
+                    'status' => 'active',
+                    // Note: 'is_verified' is not strictly needed here if the OTP check 
+                    // is sufficient proof of verification, but you can set it if needed.
+                    // 'is_verified' => 1 
                 ];
                 
                 // Add username and address if provided (will be ignored if columns don't exist)
@@ -1226,8 +1257,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     const sendVerificationBtn = document.getElementById('sendVerificationBtn');
     const verificationMessage = document.getElementById('verificationMessage');
     let verificationCodeSent = false;
-    let actualVerificationCode = '';
-    let verificationAttempts = 0;
 
     if (sendVerificationBtn) {
       sendVerificationBtn.addEventListener('click', function() {
@@ -1251,7 +1280,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         // Disable button and show loading
         sendVerificationBtn.disabled = true;
         sendVerificationBtn.textContent = 'Sending...';
-        verificationAttempts = 0; // Reset attempts when sending new code
 
         fetch('verify-email.php', {
           method: 'POST',
@@ -1264,14 +1292,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         .then(data => {
           if (data.success) {
             verificationCodeSent = true;
-            if (data.dev_code) {
-              actualVerificationCode = data.dev_code;
-              verificationMessage.textContent = '✅ ' + data.message;
-              verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
-            } else {
-              verificationMessage.textContent = '✅ Code sent! Check your email.';
-              verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
-            }
+            verificationMessage.textContent = '✅ Code sent! Check your email.';
+            verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
             verificationMessage.classList.remove('hidden');
             sendVerificationBtn.textContent = 'Code Sent ✓';
             sendVerificationBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -1323,65 +1345,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
           return false;
         }
 
-        // Strict check: Code must match exactly
-        if (!actualVerificationCode) {
-          setFieldError('otp', 'Unable to verify - no code on file');
-          showToast("Verification code not found. Please request a new code.", "error");
-          return false;
-        }
-
-        // Case-sensitive exact match
-        if (otp !== actualVerificationCode) {
-          verificationAttempts++;
-          const remaining = Math.max(0, 3 - verificationAttempts);
-          let errorMsg = 'Verification code does not match. Please check and try again.';
-          
-          if (remaining > 0) {
-            errorMsg += ` (${remaining} attempts remaining)`;
-          }
-          
-          setFieldError('otp', 'Invalid verification code');
-          showToast(errorMsg, "error");
-          return false;
-        }
-
-        // Code matches - verification successful!
+        // Client-side format validation passed
+        // Server will verify the actual code on registration submission
         clearFieldError('otp');
-        showToast("Email verified successfully!", "success");
         return true;
       }
 
       return originalValidateStep(stepIndex);
     };
 
-    // Add real-time OTP validation listener with immediate feedback
+    // Add real-time OTP validation listener for format only
     const otpInputField = document.getElementById('otp');
     if (otpInputField) {
       otpInputField.addEventListener('input', () => {
         const otp = otpInputField.value.trim();
         
-        // Real-time format validation
+        // Real-time format validation only
         if (otp && !validationPatterns.otp.test(otp)) {
           setFieldError('otp', 'Code must be 4-6 digits');
-          return;
-        }
-
-        // If code is correct length and matches, show success immediately
-        if (otp && validationPatterns.otp.test(otp) && verificationCodeSent && actualVerificationCode) {
-          if (otp === actualVerificationCode) {
-            clearFieldError('otp');
-            // Show inline success indicator
-            const errorSpan = document.getElementById('otp-error');
-            if (errorSpan) {
-              errorSpan.textContent = 'Code verified!';
-              errorSpan.className = 'error-message text-green-600';
-              errorSpan.classList.remove('hidden');
-            }
-          } else {
-            // Code doesn't match but is valid format
-            setFieldError('otp', 'Code does not match');
-          }
-        } else if (!otp) {
+        } else {
           clearFieldError('otp');
         }
       });
@@ -1389,12 +1371,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       // Blur event for final validation
       otpInputField.addEventListener('blur', () => {
         const otp = otpInputField.value.trim();
-        if (otp) {
-          if (!validationPatterns.otp.test(otp)) {
-            setFieldError('otp', 'Code must be 4-6 digits');
-          } else if (verificationCodeSent && actualVerificationCode && otp !== actualVerificationCode) {
-            setFieldError('otp', 'Code does not match');
-          }
+        if (otp && !validationPatterns.otp.test(otp)) {
+          setFieldError('otp', 'Code must be 4-6 digits');
         }
       });
     }
