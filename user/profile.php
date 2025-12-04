@@ -439,86 +439,77 @@ try {
 
   <!-- Navbar -->
 
-  <header class="bg-white shadow-sm" id="header">
-
+<header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="user-homepage.php" class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-leaf text-white text-lg"></i>
+            </div>
+            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
+        </a>
 
-      <!-- Logo -->
-
-      <a href="user-homepage.php" class="flex items-center gap-2 hover:opacity-80 transition">
-
-        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-
-          <i class="fas fa-leaf text-white text-lg"></i>
-
+        <!-- Search -->
+        <div class="flex-1 mx-6">
+            <form action="products.php" method="GET">
+                <input 
+                    type="text" 
+                    name="search"
+                    placeholder="Search for fresh produce, dairy, and more..."
+                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+                />
+            </form>
         </div>
 
-        <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
+        <!-- Icons & Profile Dropdown -->
+        <div class="flex items-center space-x-6">
+            <a href="user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+            <a href="cart.php" class="text-gray-600 relative">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+            </a>
 
-      </a>
+            <!-- Profile Dropdown -->
+            <div class="relative inline-block text-left">
+                <button id="profileDropdownBtn" class="flex items-center">
+                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
+                             alt="Profile" 
+                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
+                    <?php else: ?>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    <?php endif; ?>
+                </button>
 
-
-
-      <!-- Search -->
-
-      <div class="flex-1 mx-6">
-
-        <form id="searchForm" action="products.php" method="get">
-
-          <input type="text" name="search" id="searchInput" placeholder="Search for fresh produce..."
-
-                 class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none">
-
-        </form>
-
-      </div>
-
-
-
-      <!-- Icons -->
-
-      <div class="flex items-center space-x-6">
-
-         <a href="user-homepage.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house"></i></a>
-
-        <a href="message.php" class="text-gray-600 hover:text-green-600 transition" title="Messages"><i class="fa-regular fa-comment"></i></a>
-
-        <a href="notification.php" class="text-gray-600 hover:text-green-600 transition" title="Notifications"><i class="fa-regular fa-bell"></i></a>
-
-        <a href="cart.php" class="text-gray-600 hover:text-green-600 transition relative" title="Cart">
-
-          <i class="fa-solid fa-cart-shopping"></i>
-
-          <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-
-        </a>
-
-        <a href="profile.php">
-
-          <!-- Active state shown with a ring -->
-
-          <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-
-            <img id="navProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">
-
-          <?php else: ?>
-
-            <div id="navProfilePic" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 bg-green-600 flex items-center justify-center">
-
-              <i class="fas fa-user text-white text-sm"></i>
-
+                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
+                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                </div>
             </div>
+            <!-- End Profile Dropdown -->
 
-          <?php endif; ?>
-
-        </a>
-
-      </div>
-
+        </div>
     </div>
+</header>
+<!-- Dropdown JS -->
+<script>
+    const btn = document.getElementById('profileDropdownBtn');
+    const menu = document.getElementById('profileDropdown');
 
-  </header>
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+    });
 
+    document.addEventListener('click', () => {
+        menu.classList.add('hidden');
+    });
+</script>
 
 
   <!-- Main Layout -->
@@ -1513,7 +1504,7 @@ try {
 
         <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
 
-        <a href="../auth/logout.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+        <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
 
       </div>
 

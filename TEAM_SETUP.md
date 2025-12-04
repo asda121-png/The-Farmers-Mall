@@ -169,10 +169,52 @@ All these tables are ready to use:
 
 ## 🎯 Next Steps
 
-1. Pull the latest code: `git pull`
+1. Pull the latest code: `git pull origin main`
 2. Create `.env` file: `Copy-Item config\.env.example config\.env`
 3. Test connection: `php config/test-database.php`
-4. Start building your features!
+4. **Verify images loaded**: Check that `images/products/` has 82+ files
+5. Start building your features!
+
+---
+
+## 📸 Product Images & Folders (Added Dec 5, 2025)
+
+### ✅ What Was Fixed
+
+**Problem:** Team members weren't seeing product images because only 28 out of 82+ images were tracked in Git.  
+**Solution:** All 82+ product images are now committed and pushed to the repository!
+
+### What's Now in Git:
+
+- ✅ **82+ product images** in `images/products/` (bananas, tomatoes, milk, bread, etc.)
+- ✅ **Folder structure** with `.gitkeep` files:
+  - `uploads/profile/` - User profile pictures (legacy)
+  - `uploads/profiles/` - User profile pictures (current)
+  - `uploads/products/` - Retailer uploaded products
+- ✅ **Documentation** in `images/README.md`
+
+### After Pulling, Verify:
+
+```powershell
+# Check product images (should show 80+ files)
+Get-ChildItem images/products/*.png | Measure-Object
+Get-ChildItem images/products/*.jpg | Measure-Object
+
+# Check folders exist
+Test-Path uploads/profile
+Test-Path uploads/profiles
+Test-Path uploads/products
+```
+
+### If Images Still Missing:
+
+```powershell
+# Force pull latest
+git fetch origin
+git reset --hard origin/main
+```
+
+See `images/README.md` for complete troubleshooting guide.
 
 ---
 

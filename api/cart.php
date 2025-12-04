@@ -43,6 +43,9 @@ if (!empty($customer)) {
     }
 }
 
+// Log for debugging (remove in production)
+error_log("Cart API - Method: $method, User ID: $user_id, Customer Name: $customer_name");
+
 try {
     switch ($method) {
         case 'GET':

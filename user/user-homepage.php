@@ -351,9 +351,9 @@ if ($user_id) {
                 <i class="fa-regular fa-bell"></i>
             </a>
 
-            <a href="cart.php" class="text-gray-600 relative">
+            <a href="cart.php" class="text-gray-600 relative inline-block">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                <span id="cartBadge" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center hidden">0</span>
             </a>
 
             <!-- ************ PROFILE DROPDOWN START ************ -->
@@ -374,7 +374,7 @@ if ($user_id) {
                      class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- ************ PROFILE DROPDOWN END ************ -->
@@ -487,7 +487,7 @@ if ($user_id) {
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="45.00" data-img="../images/products/Fresh Vegetable Box.png">
-        <img src="../images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover">
+        <img src="../images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Vegetable Box</h3>
           <p class="text-green-600 font-bold text-sm">₱45.00</p>
@@ -497,8 +497,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="30.00" data-img="../images/products/Organic Lettuce.png">
-        <img src="../images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="30.00" data-img="../images/products/organic lettuce.png">
+        <img src="../images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Organic Lettuce</h3>
           <p class="text-green-600 font-bold text-sm">₱30.00</p>
@@ -508,8 +508,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="50.00" data-img="../images/products/Fresh Milk.png">
-        <img src="../images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="50.00" data-img="../images/products/fresh milk.jpeg">
+        <img src="../images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
           <p class="text-green-600 font-bold text-sm">₱50.00</p>
@@ -520,7 +520,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="80.00" data-img="../images/products/tilapia.jpg">
-        <img src="../images/products/tilapia.jpg" alt="Aged Cheddar" class="w-full h-32 object-cover">
+        <img src="../images/products/tilapia.jpg" alt="Tilapia" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Tilapia</h3>
           <p class="text-green-600 font-bold text-sm">₱80.00</p>
@@ -531,7 +531,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="60.00" data-img="../images/products/fresh eggs.jpeg">
-        <img src="../images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover">
+        <img src="../images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Farm Eggs</h3>
           <p class="text-green-600 font-bold text-sm">₱60.00</p>
@@ -551,7 +551,7 @@ if ($user_id) {
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Emsaymada" data-price="₱25.00" data-img="../images/products/Emsaymada.jpg">
-        <img src="../images/products/Emsaymada.jpg" alt="Baby Carrots" class="w-full h-32 object-cover">
+        <img src="../images/products/Emsaymada.jpg" alt="Emsaymada" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Emsaymada</h3>
           <p class="text-green-600 font-bold text-sm">₱25.00</p>
@@ -562,7 +562,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Butter Spread" data-price="₱70.00" data-img="../images/products/Butter Spread.jpg">
-        <img src="../images/products/Butter Spread.jpg" alt="Artisan Bread" class="w-full h-32 object-cover">
+        <img src="../images/products/Butter Spread.jpg" alt="Butter Spread" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Butter Spread</h3>
           <p class="text-green-600 font-bold text-sm">₱70.00</p>
@@ -573,7 +573,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Bangus" data-price="₱140.00" data-img="../images/products/Bangus.jpg">
-        <img src="../images/products/Bangus.jpg" alt="Banana" class="w-full h-32 object-cover">
+        <img src="../images/products/Bangus.jpg" alt="Bangus" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
           <p class="text-green-600 font-bold text-sm">₱170.00 per kg</p>
@@ -584,7 +584,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Pork Liempo" data-price="₱180.00" data-img="../images/products/fresh pork liempo.jpg">
-        <img src="../images/products/fresh pork liempo.jpg" alt="Cheddar" class="w-full h-32 object-cover">
+        <img src="../images/products/fresh pork liempo.jpg" alt="Fresh Pork Liempo" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Pork Liempo</h3>
           <p class="text-green-600 font-bold text-sm">₱180.00 per kg</p>
@@ -595,7 +595,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Avocado" data-price="₱50.00" data-img="../images/products/fresh avocado.jpg">
-        <img src="../images/products/fresh avocado.jpg" alt="Fresh Milk" class="w-full h-32 object-cover">
+        <img src="../images/products/fresh avocado.jpg" alt="Fresh Avocado" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Avocado</h3>
           <p class="text-green-600 font-bold text-sm">₱50.00 per kg</p>
@@ -606,7 +606,7 @@ if ($user_id) {
       </a>
 
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Native Tomatoes" data-price="₱30.00" data-img="../images/products/Native tomato.jpg">
-        <img src="../images/products/Native tomato.jpg" alt="Organic Lettuce" class="w-full h-32 object-cover">
+        <img src="../images/products/Native tomato.jpg" alt="Native Tomatoes" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Native Tomatoes per kg</h3>
           <p class="text-green-600 font-bold text-sm">₱30.00</p>

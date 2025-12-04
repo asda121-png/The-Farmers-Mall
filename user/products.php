@@ -49,6 +49,7 @@ if ($user_id) {
         <div class="flex-1 mx-6">
             <form action="products.php" method="GET">
                 <input 
+                    id="globalSearch"
                     type="text" 
                     name="search"
                     placeholder="Search for fresh produce, dairy, and more..."
@@ -62,8 +63,9 @@ if ($user_id) {
             <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
             <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
             <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-            <a href="cart.php" class="text-gray-600 relative">
+            <a href="cart.php" class="text-gray-600 hover:text-green-600 relative inline-block">
                 <i class="fa-solid fa-cart-shopping"></i>
+                <!-- Cart badge will be added by JavaScript -->
             </a>
 
             <!-- Profile Dropdown -->
@@ -83,7 +85,7 @@ if ($user_id) {
                 <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- End Profile Dropdown -->
