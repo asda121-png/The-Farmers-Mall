@@ -50,7 +50,9 @@ class SupabaseAPI {
         }
         
         $this->url = getenv('SUPABASE_URL');
-        $this->apiKey = getenv('SUPABASE_ANON_KEY');
+        // Use service key for server-side operations if available, otherwise anon key
+        $serviceKey = getenv('SUPABASE_SERVICE_KEY');
+        $this->apiKey = !empty($serviceKey) ? $serviceKey : getenv('SUPABASE_ANON_KEY');
     }
     
     public static function getInstance() {
