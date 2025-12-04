@@ -351,9 +351,9 @@ if ($user_id) {
                 <i class="fa-regular fa-bell"></i>
             </a>
 
-            <a href="cart.php" class="text-gray-600 relative">
+            <a href="cart.php" class="text-gray-600 relative inline-block">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                <span id="cartBadge" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center hidden">0</span>
             </a>
 
             <!-- ************ PROFILE DROPDOWN START ************ -->

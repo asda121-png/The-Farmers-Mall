@@ -6,16 +6,24 @@
     const subtotalEl = document.getElementById('subtotal');
     const totalEl = document.getElementById('total');
 
+    if (!cartContainer) {
+      console.error('Cart container not found! #cartItems element is missing.');
+    }
+
     let cart = [];
 
     // Load cart from database
     async function loadCartFromDB() {
       try {
+        console.log('Loading cart from database...');
         const response = await fetch('../api/cart.php');
         const data = await response.json();
+        console.log('Cart data received:', data);
         
         if (data.success) {
           cart = data.items || [];
+          console.log('Cart items:', cart);
+          console.log('Cart count:', cart.length);
           renderCart();
           updateCartIcon();
         } else {
@@ -145,6 +153,7 @@
     }
 
     function renderCart() {
+      console.log('Rendering cart with', cart.length, 'items');
       cartContainer.innerHTML = '';
       
       // Update cart count in header
@@ -154,6 +163,7 @@
       }
       
       if(cart.length === 0){
+        console.log('Cart is empty, showing empty state');
         cartContainer.innerHTML = `
           <div class="text-center py-16 col-span-2">
             <i class="fas fa-shopping-cart text-gray-300 text-6xl mb-4"></i>
@@ -176,11 +186,13 @@
 
       cart.forEach((item, index) => {
         const itemTotal = (item.price * (item.quantity || 1)).toFixed(2);
+        const itemImage = item.image || item.image_url || '../images/products/Fresh Vegetable Box.png';
+        console.log('Rendering item:', item.name, 'Image:', itemImage);
         const div = document.createElement('div');
         div.className = 'bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-md transition-shadow gap-4';
         div.innerHTML = `
           <div class="flex items-center gap-4 flex-1">
-        <img src="${item.image || '../images/products/Fresh Vegetable Box.png'}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+        <img src="${itemImage}" class="w-20 h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0">
             <div class="flex-1">
               <h3 class="font-semibold text-gray-800 text-lg">${escapeHtml(item.name)}</h3>
               <p class="text-green-700 font-medium text-sm">₱${item.price.toFixed(2)} each</p>
@@ -462,3 +474,24 @@
 
     // Load cart from database on page load
     loadCartFromDB();
+
+    // Auto-reload cart when products are added from other pages
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'cartUpdated') {
+        console.log('Cart updated from another tab, reloading...');
+        loadCartFromDB();
+        localStorage.removeItem('cartUpdated'); // Clear flag
+      }
+    });
+
+    // Also check for cart updates every 2 seconds when on cart page
+    let lastCartCount = cart.length;
+    setInterval(async () => {
+      const response = await fetch('../api/cart.php');
+      const data = await response.json();
+      if (data.success && data.items && data.items.length !== lastCartCount) {
+        console.log('Cart count changed, reloading...');
+        lastCartCount = data.items.length;
+        await loadCartFromDB();
+      }
+    }, 2000);

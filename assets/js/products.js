@@ -19,6 +19,12 @@
   const globalSearch = $('#globalSearch');
   const loadMoreBtn = $('#loadMore');
 
+  // Check if required elements exist
+  if (!productsGrid) {
+    console.error('Products grid not found');
+    return;
+  }
+
   const params = new URLSearchParams(window.location.search);
   const initialCategory = params.get('category'); // may be comma separated
   const initialSearch = params.get('search');
@@ -161,6 +167,7 @@
   function createProductCard(product) {
     const div = document.createElement('div');
     div.className = 'product-card bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition';
+    div.setAttribute('data-id', product.id || '');
     div.setAttribute('data-category', product.category);
     div.setAttribute('data-price', product.price);
     div.setAttribute('data-organic', product.organic ? 'true' : 'false');
@@ -168,7 +175,7 @@
     div.setAttribute('data-description', product.description || 'Fresh and high-quality product from local farms.');
 
     div.innerHTML = `
-      <img src="${product.img}" alt="${escapeHtml(product.name)}" class="w-full h-40 object-cover">
+      <img src="../${product.img}" alt="${escapeHtml(product.name)}" class="w-full h-40 object-cover">
       <div class="p-4">
         <h3 class="font-medium text-gray-800">${escapeHtml(product.name)}</h3>
         <p class="text-sm text-gray-500">${escapeHtml(product.unit)}</p>
@@ -251,30 +258,38 @@
   // Update cart icon with item count
   async function updateCartIcon() {
     const cartIcon = document.querySelector('a[href*="cart"]');
-    if (!cartIcon) return;
+    console.log('Cart icon element:', cartIcon);
+    
+    if (!cartIcon) {
+      console.error('Cart icon not found!');
+      return;
+    }
 
     // Create or update a badge for the count
     let badge = cartIcon.querySelector('.cart-badge');
     if (!badge) {
       badge = document.createElement('span');
-      badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1 min-w-[0.75rem] text-center z-10';
-      cartIcon.classList.add('relative');
+      badge.className = 'cart-badge absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center';
+      cartIcon.classList.add('relative', 'inline-block');
       cartIcon.appendChild(badge);
+      console.log('Created new cart badge');
     }
 
     try {
       // Try to fetch from database first
       const response = await fetch('../api/cart.php');
       const data = await response.json();
+      console.log('Cart data from API:', data);
       
       if (data.success && data.items) {
         const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
         badge.textContent = totalItems;
         badge.style.display = totalItems > 0 ? 'block' : 'none';
+        console.log('Updated cart badge to:', totalItems);
         return;
       }
     } catch (error) {
-      console.log('Database cart not available, using localStorage');
+      console.log('Database cart not available, using localStorage:', error);
     }
 
     // Fallback to localStorage
@@ -282,6 +297,7 @@
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     badge.textContent = totalItems;
     badge.style.display = totalItems > 0 ? 'block' : 'none';
+    console.log('Updated cart badge from localStorage to:', totalItems);
   }
 
   // Add to cart functionality
@@ -312,10 +328,15 @@
         body: JSON.stringify(payload)
       });
       
+      console.log('Cart API response status:', response.status);
       const data = await response.json();
+      console.log('Cart API response data:', data);
+      
       if (data.success) {
         updateCartIcon();
         showNotification(`${product.name} added to cart!`);
+        // Signal to cart page to refresh
+        localStorage.setItem('cartUpdated', Date.now().toString());
       } else {
         showNotification(data.message || 'Failed to add to cart', 'error');
       }
@@ -354,12 +375,15 @@
   // Handle add to cart button clicks
   function handleAddToCart(card) {
     const product = {
+      id: card.dataset.id || null,
       name: card.dataset.name,
       price: card.dataset.price,
       image: card.querySelector('img')?.getAttribute('src') || '',
       description: card.dataset.description || '',
       category: card.dataset.category || 'other'
     };
+    
+    console.log('Adding to cart:', product);
     addToCart(product);
   }
 

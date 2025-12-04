@@ -49,6 +49,7 @@ if ($user_id) {
         <div class="flex-1 mx-6">
             <form action="products.php" method="GET">
                 <input 
+                    id="globalSearch"
                     type="text" 
                     name="search"
                     placeholder="Search for fresh produce, dairy, and more..."
@@ -62,8 +63,9 @@ if ($user_id) {
             <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
             <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
             <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-            <a href="cart.php" class="text-gray-600 relative">
+            <a href="cart.php" class="text-gray-600 hover:text-green-600 relative inline-block">
                 <i class="fa-solid fa-cart-shopping"></i>
+                <!-- Cart badge will be added by JavaScript -->
             </a>
 
             <!-- Profile Dropdown -->
