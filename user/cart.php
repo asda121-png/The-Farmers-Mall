@@ -324,8 +324,7 @@ if ($user_id) {
   <script src="../assets/js/cart.js"></script>
   <script>
     // Update cart icon with item count
-    function updateCartIcon() {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    async function updateCartIcon() {
       const cartIcon = document.querySelector('a[href*="cart"]');
       if (!cartIcon) return;
       // Create or update a badge for the count
@@ -336,9 +335,25 @@ if ($user_id) {
         cartIcon.classList.add('relative');
         cartIcon.appendChild(badge);
       }
-      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      badge.textContent = totalItems;
-      badge.style.display = totalItems > 0 ? 'block' : 'none';
+      
+      try {
+        // Fetch from database
+        const response = await fetch('../api/cart.php');
+        const data = await response.json();
+        
+        if (data.success && data.items) {
+          const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+          badge.textContent = totalItems;
+          badge.style.display = totalItems > 0 ? 'block' : 'none';
+          return;
+        }
+      } catch (error) {
+        console.log('Error loading cart count:', error);
+      }
+      
+      // Fallback
+      badge.textContent = '0';
+      badge.style.display = 'none';
     }
 
     // Dynamically load footer.php

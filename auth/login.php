@@ -367,6 +367,7 @@ $registration_type = $_GET['type'] ?? 'customer';
         if (status === 'success') {
             // Clear any existing profile data from localStorage for fresh login
             localStorage.removeItem('userProfile');
+            // Note: We don't clear cart here - users should keep their cart items
             
             // Initialize empty profile for new users
             const newProfile = {

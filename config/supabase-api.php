@@ -4,6 +4,12 @@
  * Use this if direct PostgreSQL connection doesn't work due to network issues
  */
 
+// Guard against multiple includes
+if (defined('SUPABASE_API_LOADED')) {
+    return;
+}
+define('SUPABASE_API_LOADED', true);
+
 require_once __DIR__ . '/env.php';
 
 class SupabaseAPI {
@@ -72,11 +78,8 @@ class SupabaseAPI {
         
         if (curl_errno($ch)) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new Exception("API Error: " . $error);
         }
-        
-        curl_close($ch);
         
         if ($httpCode >= 400) {
             throw new Exception("API Error: " . $response);

@@ -141,9 +141,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             file_put_contents($log_file, "User ID: " . $user_id . "\n", FILE_APPEND);
             
             // Correct parameter order: update($table, $data, $filters)
-            $result = $api->update('users', $updateData, ['id' => $user_id]);
-            
-            file_put_contents($log_file, "Database update result: " . json_encode($result) . "\n", FILE_APPEND);
+            try {
+                $api->update('users', $updateData, ['id' => $user_id]);
+                file_put_contents($log_file, "Database update successful\n", FILE_APPEND);
+            } catch (Exception $e) {
+                file_put_contents($log_file, "Database update error: " . $e->getMessage() . "\n", FILE_APPEND);
+                throw $e;
+            }
             
             // Update session
             $_SESSION['full_name'] = $updateData['full_name'];
@@ -1297,6 +1301,23 @@ try {
       }
 
       // --- Cart Badge Functionality ---
+      async function syncCartFromDatabase() {
+        try {
+          const response = await fetch('../api/cart.php');
+          const data = await response.json();
+          
+          if (data.success && Array.isArray(data.items)) {
+            // Update localStorage with database cart
+            localStorage.setItem('cart', JSON.stringify(data.items));
+            updateCartIcon();
+          }
+        } catch (error) {
+          console.error('Error syncing cart:', error);
+          // If sync fails, just use localStorage
+          updateCartIcon();
+        }
+      }
+
       function updateCartIcon() {
         const cartBadge = document.getElementById('cartBadge');
         if (!cartBadge) return;
@@ -1308,8 +1329,8 @@ try {
         cartBadge.classList.toggle('hidden', totalItems === 0);
       }
 
-      // Update cart icon on load
-      updateCartIcon();
+      // Sync cart from database on load, then update icon
+      syncCartFromDatabase();
 
       // Listen for cart updates from other pages/tabs
       window.addEventListener('storage', (e) => {
