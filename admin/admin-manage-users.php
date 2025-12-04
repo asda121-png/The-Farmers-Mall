@@ -1,50 +1,87 @@
 <?php
 require_once __DIR__ . '/../config/supabase-api.php';
 
+// Initialize Supabase API
+$api = getSupabaseAPI();
+
+$customers = [];
+$sellers = [];
 try {
-    $api = getSupabaseAPI();
+    // Fetch all users (customers and other non-retailers)
+    $allUsers = $api->select('users');
 
-    // Fetch all users
-    $allUsers = $api->select('users'); // This returns an array of user records
-
-    // Separate customers and sellers
-    $customers = [];
-    $sellers = [];
+    $customers = []; // initialize customers array
 
     foreach ($allUsers as $user) {
-        if (($user['user_type'] ?? '') === 'customer') {
+        if ($user['user_type'] === 'customer') {
             $customers[] = [
-                'id' => $user['id'] ?? '',
-                'name' => $user['full_name'] ?? '',
-                'email' => $user['email'] ?? '',
-                'phone' => $user['phone'] ?? '',
-                'status' => $user['status'] ?? 'Active',
-                'joined' => isset($user['created_at']) ? date('M d, Y', strtotime($user['created_at'])) : '',
-                'total_orders' => $user['total_orders'] ?? 0,
-                'avatar' => $user['avatar'] ?? 'https://randomuser.me/api/portraits/lego/1.jpg'
-            ];
-        } elseif (($user['user_type'] ?? '') === 'seller') {
-            $sellers[] = [
-                'id' => $user['id'] ?? '',
-                'name' => $user['full_name'] ?? '',
-                'store_name' => $user['store_name'] ?? 'My Store',
-                'email' => $user['email'] ?? '',
-                'phone' => $user['phone'] ?? '',
-                'location' => $user['location'] ?? 'Unknown',
-                'sales' => $user['total_sales'] ?? '₱0',
-                'status' => $user['status'] ?? 'Pending',
-                'joined' => isset($user['created_at']) ? date('M d, Y', strtotime($user['created_at'])) : '',
-                'avatar' => $user['avatar'] ?? 'https://randomuser.me/api/portraits/lego/2.jpg'
+                "id" => $user['id'],
+                "name" => $user['full_name'],
+                "email" => $user['email'],
+                "phone" => $user['phone'] ?? 'N/A',
+                "status" => $user['status'] ?? 'inactive',
+                "joined" => $user['created_at'] ?? 'N/A',
+                "avatar" => !empty($user['profile_picture']) && file_exists(__DIR__ . '/../' . $user['profile_picture'])
+                    ? '../' . $user['profile_picture']
+                    : 'https://randomuser.me/api/portraits/lego/1.jpg',
+                "total_orders" => $user['total_orders'] ?? 0,
+                "address" => $user['address'] ?? 'N/A',
             ];
         }
     }
 
+    // Count totals
+    $totalUsers = count($allUsers);
+    $totalCustomers = count($customers);
+
+    
+
 } catch (Exception $e) {
-    echo "❌ Error fetching users from Supabase: " . $e->getMessage();
+    echo "❌ Error fetching users: " . $e->getMessage();
     $customers = [];
+}
+
+try {
+    // Fetch all retailers
+    $allRetailers = $api->select('retailers');
+
+    foreach ($allRetailers as $retailer) {
+        // Skip if user_id is null/empty
+        if (empty($retailer['user_id'])) continue;
+
+        // Fetch the linked user info
+        $user = $api->select('users', ['id' => $retailer['user_id']]);
+        if (!$user) continue; // skip if user not found
+
+        $user = $user[0]; // select the first (and should be only) user
+
+        $sellers[] = [
+            "id" => $retailer['id'],
+            "name" => $user['full_name'],
+            "email" => $user['email'],
+            "phone" => $user['phone'] ?? 'N/A',
+            "status" => $user['status'] ?? 'inactive',
+            "joined" => $retailer['created_at'] ?? 'N/A',
+            "avatar" => !empty($user['profile_picture']) && file_exists(__DIR__ . '/../' . $user['profile_picture'])
+                ? '../' . $user['profile_picture']
+                : 'https://randomuser.me/api/portraits/lego/1.jpg',
+            "store_name" => $retailer['shop_name'] ?? 'N/A',
+            "sales" => $retailer['total_sales'] ?? 0,
+            "address" => $retailer['business_address'] ?? 'N/A',
+            "verification_status" => $retailer['verification_status'] ?? 'pending',
+            "rating" => $retailer['rating'] ?? 0.0,
+        ];
+    }
+} catch (Exception $e) {
+    echo "❌ Error fetching retailers: " . $e->getMessage();
     $sellers = [];
 }
+
+
+// $customers and $sellers are ready to use in HTML
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -219,7 +256,7 @@ try {
             <button data-tab="customers" class="tab-btn active whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm flex items-center gap-2">
                 <i class="fa-solid fa-user"></i>
                 Customers (Buyers)
-                <span class="bg-green-100 text-green-800 py-0.5 px-2.5 rounded-full text-xs ml-2">1,204</span>
+                <span class="bg-green-100 text-green-800 py-0.5 px-2.5 rounded-full text-xs ml-2"><?php echo "$totalCustomers"; ?></span>
             </button>
             <button data-tab="sellers" class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 text-gray-500 hover:text-green-600 hover:border-green-300">
                 <i class="fa-solid fa-store"></i>
@@ -293,6 +330,14 @@ try {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <div class="flex justify-end mt-4">
+    <nav class="pagination flex gap-2" id="customers-pagination"></nav>
+</div>
+
+<div class="flex justify-end mt-4">
+    <nav class="pagination flex gap-2" id="sellers-pagination"></nav>
+</div>
+
             </div>
         </div>
     </div>
@@ -336,7 +381,7 @@ try {
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-gray-800"><?php echo $s['store_name']; ?></div>
-                                <div class="text-xs text-gray-500"><i class="fa-solid fa-location-dot"></i> <?php echo $s['location']; ?></div>
+                                
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-semibold text-gray-900"><?php echo $s['sales']; ?></div>
@@ -478,6 +523,7 @@ try {
 
   </div> 
   <script>
+    
     // --- Main Application State ---
     const app = {
         activeTab: 'customers',
@@ -485,6 +531,9 @@ try {
         currentRowElement: null,
         currentUserId: null,
         elements: {},
+        pageSize: 15,
+currentPage: { customers: 1, sellers: 1 },
+
 
         // --- Initialization ---
         init() {
