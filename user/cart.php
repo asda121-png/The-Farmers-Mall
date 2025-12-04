@@ -368,8 +368,8 @@ if ($user_id) {
       let badge = cartIcon.querySelector('.cart-badge');
       if (!badge) {
         badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[0.75rem] text-center z-10';
-        cartIcon.classList.add('relative');
+        badge.className = 'cart-badge absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center';
+        cartIcon.classList.add('relative', 'inline-block');
         cartIcon.appendChild(badge);
       }
       
@@ -381,7 +381,7 @@ if ($user_id) {
         if (data.success && data.items) {
           const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
           badge.textContent = totalItems;
-          badge.style.display = totalItems > 0 ? 'block' : 'none';
+          badge.style.display = totalItems > 0 ? 'flex' : 'none';
           return;
         }
       } catch (error) {

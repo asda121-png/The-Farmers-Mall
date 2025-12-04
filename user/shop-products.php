@@ -86,11 +86,12 @@ if ($shop_name) {
 
         <!-- Icons & Profile Dropdown -->
         <div class="flex items-center space-x-6">
-            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+            <a href="user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
             <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
             <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
             <a href="cart.php" class="text-gray-600 relative">
                 <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
             </a>
 
             <!-- Profile Dropdown -->
@@ -110,7 +111,7 @@ if ($shop_name) {
                 <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="../auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- End Profile Dropdown -->
@@ -206,10 +207,11 @@ if ($shop_name) {
             <a href="product-details.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="block">
               <div class="relative">
                 <?php if (!empty($product['image_url'])): ?>
-                  <img src="<?php echo htmlspecialchars($product['image_url']); ?>" 
+                  <img src="<?php echo htmlspecialchars('../' . $product['image_url']); ?>" 
                        alt="<?php echo htmlspecialchars($product['name']); ?>" 
                        class="w-full h-48 object-cover"
-                       onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'">
+                       onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
+                       loading="lazy">
                 <?php else: ?>
                   <img src="https://via.placeholder.com/300x200?text=Product+Image" 
                        alt="<?php echo htmlspecialchars($product['name']); ?>" 
