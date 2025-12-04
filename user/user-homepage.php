@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Load configuration for consistent image URLs
+require_once __DIR__ . '/../config/config.php';
+
 // Check if user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: ../auth/login.php');
@@ -349,7 +352,7 @@ if ($user_id) {
         </a>
         <a href="profile.php">
           <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-            <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">
+            <img src="<?php echo htmlspecialchars(getProfileImageUrl($profile_picture)); ?>" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover" loading="lazy">
           <?php else: ?>
             <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
               <i class="fas fa-user text-white text-sm"></i>
@@ -447,8 +450,8 @@ if ($user_id) {
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="45.00" data-img="../images/products/Fresh Vegetable Box.png">
-        <img src="../images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="45.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Fresh Vegetable Box.png">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Vegetable Box</h3>
           <p class="text-green-600 font-bold text-sm">₱45.00</p>
@@ -458,8 +461,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="30.00" data-img="../images/products/Organic Lettuce.png">
-        <img src="../images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="30.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Organic Lettuce.png">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Organic Lettuce</h3>
           <p class="text-green-600 font-bold text-sm">₱30.00</p>
@@ -469,8 +472,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="50.00" data-img="../images/products/Fresh Milk.png">
-        <img src="../images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="50.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Fresh Milk.png">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
           <p class="text-green-600 font-bold text-sm">₱50.00</p>
@@ -480,8 +483,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="80.00" data-img="../images/products/tilapia.jpg">
-        <img src="../images/products/tilapia.jpg" alt="Aged Cheddar" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="80.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/tilapia.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/tilapia.jpg" alt="Tilapia" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Tilapia</h3>
           <p class="text-green-600 font-bold text-sm">₱80.00</p>
@@ -491,8 +494,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="60.00" data-img="../images/products/fresh eggs.jpeg">
-        <img src="../images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="60.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/fresh eggs.jpeg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Farm Eggs</h3>
           <p class="text-green-600 font-bold text-sm">₱60.00</p>
@@ -511,8 +514,8 @@ if ($user_id) {
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Emsaymada" data-price="₱25.00" data-img="../images/products/Emsaymada.jpg">
-        <img src="../images/products/Emsaymada.jpg" alt="Baby Carrots" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Emsaymada" data-price="₱25.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Emsaymada.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Emsaymada.jpg" alt="Emsaymada" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Emsaymada</h3>
           <p class="text-green-600 font-bold text-sm">₱25.00</p>
@@ -522,8 +525,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Butter Spread" data-price="₱70.00" data-img="../images/products/Butter Spread.jpg">
-        <img src="../images/products/Butter Spread.jpg" alt="Artisan Bread" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Butter Spread" data-price="₱70.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Butter Spread.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Butter Spread.jpg" alt="Butter Spread" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Butter Spread</h3>
           <p class="text-green-600 font-bold text-sm">₱70.00</p>
@@ -533,8 +536,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Bangus" data-price="₱140.00" data-img="../images/products/Bangus.jpg">
-        <img src="../images/products/Bangus.jpg" alt="Banana" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Bangus" data-price="₱140.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Bangus.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Bangus.jpg" alt="Bangus" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
           <p class="text-green-600 font-bold text-sm">₱140.00 per kg</p>
@@ -544,8 +547,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Pork Liempo" data-price="₱180.00" data-img="../images/products/fresh pork liempo.jpg">
-        <img src="../images/products/fresh pork liempo.jpg" alt="Cheddar" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Pork Liempo" data-price="₱180.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/fresh pork liempo.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/fresh pork liempo.jpg" alt="Fresh Pork Liempo" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Pork Liempo</h3>
           <p class="text-green-600 font-bold text-sm">₱180.00 per kg</p>
@@ -555,8 +558,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Avocado" data-price="₱50.00" data-img="../images/products/fresh avocado.jpg">
-        <img src="../images/products/fresh avocado.jpg" alt="Fresh Milk" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Avocado" data-price="₱50.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/fresh avocado.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/fresh avocado.jpg" alt="Fresh Avocado" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Fresh Avocado</h3>
           <p class="text-green-600 font-bold text-sm">₱50.00 per kg</p>
@@ -566,8 +569,8 @@ if ($user_id) {
         </button>
       </a>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Native Tomatoes" data-price="₱30.00" data-img="../images/products/Native tomato.jpg">
-        <img src="../images/products/Native tomato.jpg" alt="Organic Lettuce" class="w-full h-32 object-cover">
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Native Tomatoes" data-price="₱30.00" data-img="<?php echo PRODUCTS_IMAGES_URL; ?>/Native tomato.jpg">
+        <img src="<?php echo PRODUCTS_IMAGES_URL; ?>/Native tomato.jpg" alt="Native Tomatoes" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Native Tomatoes per kg</h3>
           <p class="text-green-600 font-bold text-sm">₱30.00</p>

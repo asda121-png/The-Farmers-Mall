@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Load configuration for consistent image URLs
+require_once __DIR__ . '/../config/config.php';
+
 // Check if user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: ../auth/login.php');
@@ -90,10 +93,10 @@ if ($shop_name) {
         <a href="notifications.php" class="text-gray-600"><i class="fa-solid fa-bell"></i></a>
         <?php if (!empty($profile_picture)): ?>
           <a href="account.php">
-            <img src="<?php echo htmlspecialchars(strpos($profile_picture, 'http') === 0 ? $profile_picture : '../' . $profile_picture); ?>" 
+            <img src="<?php echo htmlspecialchars(getProfileImageUrl($profile_picture)); ?>" 
                  alt="Profile" 
                  class="w-10 h-10 rounded-full object-cover border-2 border-green-600"
-                 onerror="this.src='../images/profile.png'">
+                 onerror="this.src='<?php echo IMAGES_URL; ?>/default-profile.png'">
           </a>
         <?php else: ?>
           <a href="account.php" class="text-gray-600"><i class="fa-solid fa-user"></i></a>
@@ -173,10 +176,11 @@ if ($shop_name) {
             <a href="product-details.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="block">
               <div class="relative">
                 <?php if (!empty($product['image_url'])): ?>
-                  <img src="<?php echo htmlspecialchars($product['image_url']); ?>" 
+                  <img src="<?php echo htmlspecialchars(getProductImageUrl($product['image_url'])); ?>" 
                        alt="<?php echo htmlspecialchars($product['name']); ?>" 
                        class="w-full h-48 object-cover"
-                       onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'">
+                       onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
+                       loading="lazy">
                 <?php else: ?>
                   <img src="https://via.placeholder.com/300x200?text=Product+Image" 
                        alt="<?php echo htmlspecialchars($product['name']); ?>" 
