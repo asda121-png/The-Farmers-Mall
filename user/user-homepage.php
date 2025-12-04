@@ -576,7 +576,7 @@ if ($user_id) {
         <img src="../images/products/Bangus.jpg" alt="Banana" class="w-full h-32 object-cover">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
-          <p class="text-green-600 font-bold text-sm">₱140.00 per kg</p>
+          <p class="text-green-600 font-bold text-sm">₱170.00 per kg</p>
         </div>
         <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
           <i class="fa-solid fa-plus"></i>
