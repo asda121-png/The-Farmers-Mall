@@ -140,7 +140,7 @@ foreach ($products as $filename => $data) {
         echo "<div class='error'>❌ Failed: {$name}</div>";
     }
     
-    imagedestroy($image);
+    // imagedestroy() is deprecated in PHP 8+, resources are auto-freed
 }
 
 echo "<hr>

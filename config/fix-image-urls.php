@@ -72,16 +72,15 @@ try {
         if (isset($imageMap[$productName])) {
             $newImageUrl = $imageMap[$productName];
             
-            $result = $api->update('products', 
-                ['image_url' => $newImageUrl],
-                ['id' => $product['id']]
-            );
-            
-            if ($result) {
+            try {
+                $api->update('products', 
+                    ['image_url' => $newImageUrl],
+                    ['id' => $product['id']]
+                );
                 echo "<p class='success'>✓ Updated: $productName</p>";
                 $updated++;
-            } else {
-                echo "<p class='error'>✗ Failed: $productName</p>";
+            } catch (Exception $e) {
+                echo "<p class='error'>✗ Failed: $productName - " . htmlspecialchars($e->getMessage()) . "</p>";
                 $failed++;
             }
         }
