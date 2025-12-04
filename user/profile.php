@@ -171,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             // Validate file - use simple extension check
 
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', ];
 
             $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
