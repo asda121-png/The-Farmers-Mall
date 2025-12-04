@@ -455,6 +455,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <button type="button" id="togglePassword" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye text-lg"></i>
+                  </button>
                 </div>
                 <span id="password-error" class="error-message hidden"></span>
                 <!-- Password Strength Meter -->
@@ -472,6 +475,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                 <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
                   <input type="password" id="confirm" name="confirm" required placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <button type="button" id="toggleConfirm" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye text-lg"></i>
+                  </button>
                 </div>
                 <span id="confirm-error" class="error-message hidden"></span>
               </div>
@@ -487,6 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
                 <span id="email-error" class="error-message hidden"></span>
               </div>
               <button type="button" id="sendVerificationBtn" class="w-full text-center text-sm text-green-600 hover:underline font-medium">Send Verification Code</button>
+              <button type="button" id="resendVerificationBtn" class="w-full text-center text-sm text-blue-600 hover:underline font-medium hidden">Resend Code</button>
               <div id="verificationMessage" class="text-sm text-center hidden"></div>
               <div>
                 <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
@@ -1257,7 +1264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     const sendVerificationBtn = document.getElementById('sendVerificationBtn');
     const verificationMessage = document.getElementById('verificationMessage');
     let verificationCodeSent = false;
-    let actualVerificationCode = null;  // Store the code for validation
+    let sentVerificationCode = null;  // Store the code sent to user
 
     if (sendVerificationBtn) {
       sendVerificationBtn.addEventListener('click', function() {
@@ -1291,19 +1298,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         })
         .then(response => response.json())
         .then(data => {
+          console.log('Verification response received:', data);
           if (data.success) {
             verificationCodeSent = true;
+            
+            // Store the code if provided (for development/testing)
+            if (data.code) {
+              sentVerificationCode = data.code;
+              console.log('📌 Code stored for validation:', sentVerificationCode);
+            }
             
             // Show message
             verificationMessage.classList.remove('hidden');
             sendVerificationBtn.textContent = 'Code Sent ✓';
             sendVerificationBtn.classList.add('opacity-50', 'cursor-not-allowed');
             
+            // Show resend button
+            const resendBtn = document.getElementById('resendVerificationBtn');
+            if (resendBtn) {
+              resendBtn.classList.remove('hidden');
+            }
+            
             // Show user-friendly message
             verificationMessage.textContent = '✅ ' + data.message;
             verificationMessage.className = 'text-sm text-center text-green-600 font-medium';
             
-            // Do NOT auto-fill the code - user must enter it manually
+            // Clear OTP field for manual entry
             const otpInput = document.getElementById('otp');
             if (otpInput) {
               otpInput.value = '';  // Clear field for manual entry
@@ -1317,6 +1337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
             nextBtn.disabled = true;
             nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
           } else {
+            console.error('Verification failed:', data.message);
             showToast(data.message || 'Failed to send verification code', 'error');
             sendVerificationBtn.disabled = false;
             sendVerificationBtn.textContent = 'Send Verification Code';
@@ -1328,6 +1349,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
           sendVerificationBtn.disabled = false;
           sendVerificationBtn.textContent = 'Send Verification Code';
         });
+      });
+    }
+
+    // Resend Verification Code Button Handler
+    const resendVerificationBtn = document.getElementById('resendVerificationBtn');
+    if (resendVerificationBtn) {
+      resendVerificationBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Trigger the send verification button click to resend
+        if (sendVerificationBtn) {
+          sendVerificationBtn.click();
+          showToast('Sending new verification code...', 'success');
+        }
+      });
+    }
+
+    // Password Eye Toggle Handler
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    if (togglePasswordBtn && passwordInput) {
+      togglePasswordBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const icon = togglePasswordBtn.querySelector('i');
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          passwordInput.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    }
+
+    // Confirm Password Eye Toggle Handler
+    const toggleConfirmBtn = document.getElementById('toggleConfirm');
+    const confirmInput = document.getElementById('confirm');
+    if (toggleConfirmBtn && confirmInput) {
+      toggleConfirmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const icon = toggleConfirmBtn.querySelector('i');
+        if (confirmInput.type === 'password') {
+          confirmInput.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          confirmInput.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    }
+
+    // Email Duplicate Check Handler
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+      emailInput.addEventListener('blur', async function() {
+        const email = this.value.trim();
+        
+        if (!email) {
+          clearFieldError('email');
+          return;
+        }
+
+        if (!validationPatterns.email.test(email)) {
+          setFieldError('email', 'Invalid email format');
+          return;
+        }
+
+        // Check if email already exists
+        try {
+          const response = await fetch('check-email.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+          });
+
+          const data = await response.json();
+          
+          if (data.exists) {
+            setFieldError('email', '⚠️ This email is already registered. Please use a different email or try logging in.');
+            showToast('Email already in use', 'error');
+            emailInput.focus();
+          } else {
+            clearFieldError('email');
+          }
+        } catch (error) {
+          console.error('Error checking email:', error);
+        }
       });
     }
 
@@ -1356,32 +1467,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
           return false;
         }
 
-        // Strict check: Code must match exactly
-        if (!actualVerificationCode) {
-          setFieldError('otp', 'Unable to verify - no code on file');
-          showToast("Verification code not found. Please request a new code.", "error");
-          return false;
-        }
-
-        // Case-sensitive exact match
-        if (otp !== actualVerificationCode) {
-          verificationAttempts++;
-          const remaining = Math.max(0, 3 - verificationAttempts);
-          let errorMsg = 'Verification code does not match. Please check and try again.';
-          
-          if (remaining > 0) {
-            errorMsg += ` (${remaining} attempts remaining)`;
+        // If we have a stored code, validate it matches exactly
+        if (sentVerificationCode) {
+          // Case-sensitive exact match
+          if (otp !== sentVerificationCode) {
+            verificationAttempts++;
+            const remaining = Math.max(0, 3 - verificationAttempts);
+            let errorMsg = 'Verification code does not match. Please check and try again.';
+            
+            if (remaining > 0) {
+              errorMsg += ` (${remaining} attempts remaining)`;
+            }
+            
+            setFieldError('otp', 'Invalid verification code');
+            showToast(errorMsg, "error");
+            return false;
           }
           
-          setFieldError('otp', 'Invalid verification code');
-          showToast(errorMsg, "error");
-          return false;
+          // Code matches - verification successful!
+          clearFieldError('otp');
+          showToast("Email verified successfully!", "success");
+          return true;
+        } else {
+          // Production mode: no code to verify against, allow proceeding
+          // Server will validate on form submission
+          clearFieldError('otp');
+          console.log('✅ Production mode validation passed - server will verify');
+          return true;
         }
-
-        // Code matches - verification successful!
-        clearFieldError('otp');
-        showToast("Email verified successfully!", "success");
-        return true;
       }
 
       return originalValidateStep(stepIndex);
@@ -1392,37 +1505,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
     if (otpInputField) {
       otpInputField.addEventListener('input', () => {
         const otp = otpInputField.value.trim();
+        console.log('OTP Input Event:', { otp, verificationCodeSent, sentVerificationCode });
         
+        // If empty, disable button
+        if (!otp) {
+          console.log('Empty code');
+          clearFieldError('otp');
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          return;
+        }
+
         // Real-time format validation
-        if (otp && !validationPatterns.otp.test(otp)) {
+        if (!validationPatterns.otp.test(otp)) {
+          console.log('Format invalid:', otp);
           setFieldError('otp', 'Code must be 4-6 digits');
           nextBtn.disabled = true;
           nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
           return;
         }
 
-        // If code is correct length and matches, enable Next button
-        if (otp && validationPatterns.otp.test(otp) && verificationCodeSent && actualVerificationCode) {
-          if (otp === actualVerificationCode) {
-            clearFieldError('otp');
-            // Enable Next button when code matches
-            nextBtn.disabled = false;
-            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            // Show inline success indicator
-            const errorSpan = document.getElementById('otp-error');
-            if (errorSpan) {
-              errorSpan.textContent = 'Code verified!';
-              errorSpan.className = 'error-message text-green-600';
-              errorSpan.classList.remove('hidden');
+        // At this point: format is valid and code is not empty
+        if (verificationCodeSent) {
+          // Verification email was sent
+          if (sentVerificationCode) {
+            // We have the code to compare - validate it matches
+            if (otp === sentVerificationCode) {
+              console.log('✅ CODE MATCHES!');
+              clearFieldError('otp');
+              nextBtn.disabled = false;
+              nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+              const errorSpan = document.getElementById('otp-error');
+              if (errorSpan) {
+                errorSpan.textContent = '✅ Code verified!';
+                errorSpan.className = 'error-message text-green-600';
+                errorSpan.classList.remove('hidden');
+              }
+            } else {
+              console.log('❌ Code does not match:', { entered: otp, expected: sentVerificationCode });
+              setFieldError('otp', 'Code does not match. Please check your email.');
+              nextBtn.disabled = true;
+              nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
             }
           } else {
-            // Code doesn't match but is valid format
-            setFieldError('otp', 'Code does not match');
-            nextBtn.disabled = true;
-            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            // No code stored - we're in production mode
+            // Allow proceeding with valid format (server will validate)
+            console.log('✅ Production mode: format valid, allowing submit');
+            clearFieldError('otp');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
           }
-        } else if (!otp) {
-          clearFieldError('otp');
+        } else {
+          // Verification not sent yet
+          console.log('Verification not sent yet');
+          setFieldError('otp', 'Please send verification code first');
           nextBtn.disabled = true;
           nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
@@ -1431,21 +1567,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
       // Blur event for final validation
       otpInputField.addEventListener('blur', () => {
         const otp = otpInputField.value.trim();
-        if (otp) {
-          if (!validationPatterns.otp.test(otp)) {
-            setFieldError('otp', 'Code must be 4-6 digits');
-            nextBtn.disabled = true;
-            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-          } else if (verificationCodeSent && actualVerificationCode && otp !== actualVerificationCode) {
-            setFieldError('otp', 'Code does not match');
-            nextBtn.disabled = true;
-            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-          } else if (verificationCodeSent && actualVerificationCode && otp === actualVerificationCode) {
+        console.log('OTP Blur Event:', { otp, verificationCodeSent, sentVerificationCode });
+        
+        if (!otp) {
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          return;
+        }
+
+        // Format check
+        if (!validationPatterns.otp.test(otp)) {
+          setFieldError('otp', 'Code must be 4-6 digits');
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          return;
+        }
+
+        // Format is valid
+        if (verificationCodeSent) {
+          if (sentVerificationCode) {
+            // We have code to verify against
+            if (otp === sentVerificationCode) {
+              console.log('✅ BLUR: CODE MATCHES!');
+              clearFieldError('otp');
+              nextBtn.disabled = false;
+              nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+              console.log('❌ BLUR: Code does not match');
+              setFieldError('otp', 'Code does not match. Check your email.');
+              nextBtn.disabled = true;
+              nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+          } else {
+            // Production mode
+            console.log('✅ BLUR: Production mode - allowing');
             clearFieldError('otp');
             nextBtn.disabled = false;
             nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
           }
         } else {
+          setFieldError('otp', 'Please send verification code first');
           nextBtn.disabled = true;
           nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
