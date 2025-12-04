@@ -75,9 +75,21 @@ try {
             break;
 
         case 'POST':
-            // Add item to cart
+            // Handle different POST actions
             $data = json_decode(file_get_contents('php://input'), true);
             
+            // Check if this is a count request
+            if (isset($data['action']) && $data['action'] === 'count') {
+                $cartItems = $api->select('cart', ['customer_name' => $customer_name]);
+                $totalCount = 0;
+                foreach ($cartItems as $item) {
+                    $totalCount += intval($item['quantity'] ?? 0);
+                }
+                echo json_encode(['success' => true, 'count' => $totalCount]);
+                exit();
+            }
+            
+            // Add item to cart
             if (!isset($data['quantity'])) {
                 http_response_code(400);
                 echo json_encode(['success' => false, 'message' => 'Missing required field: quantity']);

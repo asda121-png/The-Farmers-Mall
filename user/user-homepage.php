@@ -648,41 +648,41 @@ if ($user_id) {
   <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
     <h2 class="section-heading text-2xl font-bold mb-6">Explore Other Shops</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+      <a href="shop-products.php?shop=Mesa Farm" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="../images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Mesa Farm</h3>
           <p class="text-sm text-gray-600">Organic vegetables & herbs</p>
           <p class="text-green-600 mt-2">★ 4.8</p>
         </div>
-      </div>
+      </a>
 
-      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="../images/img2.png" alt="Taco Bell" class="w-full h-40 object-cover">
+      <a href="shop-products.php?shop=Taco Bell" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+        <img src="../images/img3.png" alt="Taco Bell" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Taco Bell</h3>
           <p class="text-sm text-gray-600">Fresh Mexican ingredients</p>
           <p class="text-green-600 mt-2">★ 4.5</p>
         </div>
-      </div>
+      </a>
 
-      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="../images/img3.png" alt="Jay's Artisan" class="w-full h-40 object-cover">
+      <a href="shop-products.php?shop=Jay's Artisan" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+        <img src="../images/img2.png" alt="Jay's Artisan" class="w-full h-40 object-cover">
         <div class="p-4">
-          <h3 class="font-bold">Jay’s Artisan</h3>
+          <h3 class="font-bold">Jay's Artisan</h3>
           <p class="text-sm text-gray-600">Coffees and bread</p>
           <p class="text-green-600 mt-2">★ 4.9</p>
         </div>
-      </div>
+      </a>
 
-      <div class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+      <a href="shop-products.php?shop=Ocean Fresh" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="../images/img4.png" alt="Ocean Fresh" class="w-full h-40 object-cover">
         <div class="p-4">
           <h3 class="font-bold">Ocean Fresh</h3>
           <p class="text-sm text-gray-600">Daily catch seafood</p>
           <p class="text-green-600 mt-2">★ 4.7</p>
         </div>
-      </div>
+      </a>
     </div>
   </section>
 
