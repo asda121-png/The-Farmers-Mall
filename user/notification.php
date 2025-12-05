@@ -233,6 +233,7 @@ if ($user_id) {
       });
     });
   </script>
+  <script src="../assets/js/profile-sync.js"></script>
 
 </body>
 </html>

@@ -385,6 +385,7 @@ if ($user_id) {
   </footer>
 
   <script src="../assets/js/products.js"></script>
+  <script src="../assets/js/profile-sync.js"></script>
 
 </body>
 </html>

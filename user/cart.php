@@ -358,6 +358,7 @@ if ($user_id) {
   </div>
 
   <!-- JavaScript -->
+  <script src="../assets/js/profile-sync.js"></script>
   <script src="../assets/js/cart.js"></script>
   <script>
     // Update cart icon with item count

@@ -611,185 +611,84 @@ try {
 </script>
 
 
-  <!-- Main Layout -->
-
-  <main class="max-w-7xl mx-auto px-6 py-10 flex gap-8 mb-96">
-
-
+  <!-- Main Layout with Modern Design -->
+  <main class="max-w-7xl mx-auto px-6 py-8 flex gap-6 mb-20">
 
     <!-- Sidebar -->
-
-    <aside class="w-72 bg-white rounded-lg shadow p-6">
-
-      <!-- Profile Info -->
-
-      <div class="flex flex-col items-center text-center mb-6">
-
-        <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-
-          <img id="sidebarProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">
-
-        <?php else: ?>
-
-          <div id="sidebarProfilePic" class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
-
-            <i class="fas fa-user text-white text-3xl"></i>
-
-          </div>
-
-        <?php endif; ?>
-
-        <h2 class="font-semibold"><?php echo htmlspecialchars($full_name); ?></h2>
-
-        <p class="text-gray-500 text-sm"><?php echo htmlspecialchars($email); ?></p>
-
-      </div>
-
-
-
-      <!-- Navigation -->
-
-      <nav class="space-y-2">
-
-        <a href="#my-profile" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 text-green-700 font-medium">
-
-          <i class="fas fa-user"></i> My Profile
-
-        </a>
-
-        <a href="#order-history" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-
-          <i class="fas fa-box"></i> Order History
-
-        </a>
-
-        <a href="#my-address" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-
-          <i class="fas fa-map-marker-alt"></i> My Address
-
-        </a>
-
-        <a href="#payment-methods" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-
-          <i class="fas fa-credit-card"></i> Payment Methods
-
-        </a>
-
-        <a href="#settings" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-
-          <i class="fas fa-cog"></i> Settings
-
-        </a>
-
-        <a href="#help-support" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-
-          <i class="fas fa-question-circle"></i> Help & Support
-
-        </a>
-
-        <!-- Logout Button -->
-
-        <div class="border-t pt-2 mt-2">
-
-          <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium">
-
-            <i class="fas fa-sign-out-alt"></i> Logout
-
+    <aside class="w-72">
+      <div class="bg-white rounded-lg shadow p-6">
+        <!-- Navigation -->
+        <nav class="space-y-2">
+          <a href="#my-profile" class="sidebar-link active flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-user"></i> My Profile
           </a>
-
-        </div>
-
-      </nav>
-
+          <a href="#order-history" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-box"></i> Order History
+          </a>
+          <a href="#my-address" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-map-marker-alt"></i> My Address
+          </a>
+          <a href="#payment-methods" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-credit-card"></i> Payment Methods
+          </a>
+          <a href="#settings" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-cog"></i> Settings
+          </a>
+          <a href="#help-support" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-question-circle"></i> Help & Support
+          </a>
+          <div class="border-t mt-2 pt-2">
+            <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </div>
+        </nav>
+      </div>
     </aside>
 
 
-
-    <!-- Order History Section -->
-
+    <!-- Main Content -->
     <div class="flex-1">
 
       <!-- My Profile Section -->
-
       <section id="my-profile" class="content-section bg-white rounded-lg shadow p-6">
-
         <div class="flex justify-between items-center mb-6">
-
-          <h2 class="font-semibold text-lg">My Profile</h2>
-
+          <h2 class="text-xl font-semibold text-gray-800">My Profile</h2>
           <button id="editProfileBtn" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-
             <i class="fas fa-pen"></i> Edit Profile
-
           </button>
-
         </div>
 
-
-
-        <!-- Profile Display Mode -->
-
-        <div id="profileDisplay" class="space-y-6">
-
-          <!-- Profile Picture & Basic Info -->
-
-          <div class="flex items-start gap-6 pb-6 border-b">
-
-            <div class="relative">
-
-              <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-
-                <img id="displayProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">
-
-              <?php else: ?>
-
-                <div id="displayProfilePic" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
-
-                  <i class="fas fa-user text-white text-5xl"></i>
-
-                </div>
-
-              <?php endif; ?>
-
-              <div class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white">
-
-                <i class="fas fa-camera text-sm"></i>
-
+          <!-- Profile Display Mode -->
+          <div id="profileDisplay" class="space-y-6">
+            <!-- Profile Picture & Basic Info -->
+            <div class="flex items-start gap-6 pb-6 border-b">
+              <div class="relative">
+                <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                  <img id="displayProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">
+                <?php else: ?>
+                  <div id="displayProfilePic" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                    <i class="fas fa-user text-white text-4xl"></i>
+                  </div>
+                <?php endif; ?>
               </div>
-
+              <div class="flex-1">
+                <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($full_name); ?></h3>
+                <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
+                <p id="displayBio" class="text-gray-600 text-sm italic"><?php echo htmlspecialchars($bio ?: 'Welcome to Farmers Mall!'); ?></p>
+              </div>
             </div>
 
-            <div class="flex-1">
 
-              <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($full_name); ?></h3>
-
-              <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
-
-              <p id="displayBio" class="text-gray-600 text-sm italic"><?php echo htmlspecialchars($bio ?: 'Welcome to Farmers Mall!'); ?></p>
-
-            </div>
-
-          </div>
-
-
-
-          <!-- Personal Information Grid -->
-
-          <div class="grid md:grid-cols-2 gap-6">
-
-            <div class="bg-gray-50 p-4 rounded-lg">
-
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-
-              <p id="displayPhone" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p>
-
-            </div>
-
-            <div class="bg-gray-50 p-4 rounded-lg">
-
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Date of Birth</label>
-
-              <p id="displayDob" class="text-gray-800 font-medium mt-1">
+            <!-- Personal Information -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
+                <p id="displayPhone" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Date of Birth</label>
+                <p id="displayDob" class="text-gray-800 font-medium mt-1">
 
                 <?php 
 
@@ -804,24 +703,15 @@ try {
                   }
 
                 ?>
-
-              </p>
-
-            </div>
-
-            <div class="bg-gray-50 p-4 rounded-lg">
-
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Gender</label>
-
-              <p id="displayGender" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($gender ?: 'Not specified'); ?></p>
-
-            </div>
-
-            <div class="bg-gray-50 p-4 rounded-lg">
-
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
-
-              <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
+                </p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Gender</label>
+                <p id="displayGender" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($gender ?: 'Not specified'); ?></p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
+                <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
 
                 <?php 
 
@@ -836,57 +726,33 @@ try {
                   }
 
                 ?>
-
-              </p>
-
+                </p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Address</label>
+                <p id="displayAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($address ?: 'Not provided'); ?></p>
+              </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
-
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Address</label>
-
-              <p id="displayAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($address ?: 'Not provided'); ?></p>
-
+            <!-- Account Statistics -->
+            <div class="pt-6 border-t">
+              <h4 class="font-semibold mb-4 text-gray-700">Account Statistics</h4>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                  <p class="text-2xl font-bold text-green-600"><?php echo $total_orders; ?></p>
+                  <p class="text-sm text-gray-600 mt-1">Total Orders</p>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                  <p class="text-2xl font-bold text-green-600">₱<?php echo number_format($total_spent, 2); ?></p>
+                  <p class="text-sm text-gray-600 mt-1">Total Spent</p>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                  <p class="text-2xl font-bold text-green-600"><?php echo $saved_items; ?></p>
+                  <p class="text-sm text-gray-600 mt-1">Saved Items</p>
+                </div>
+              </div>
             </div>
-
           </div>
-
-
-
-          <!-- Account Statistics -->
-
-          <div class="pt-6 border-t">
-
-            <h4 class="font-semibold mb-4 text-gray-700">Account Statistics</h4>
-
-            <div class="grid grid-cols-3 gap-4">
-
-              <div class="text-center p-4 bg-green-50 rounded-lg">
-
-                <p class="text-2xl font-bold text-green-600"><?php echo $total_orders; ?></p>
-
-                <p class="text-sm text-gray-600 mt-1">Total Orders</p>
-
-              </div>
-
-              <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <p class="text-2xl font-bold text-blue-600">₱<?php echo number_format($total_spent, 2); ?></p>
-                <p class="text-sm text-gray-600 mt-1">Total Spent</p>
-              </div>
-
-              <div class="text-center p-4 bg-purple-50 rounded-lg">
-
-                <p class="text-2xl font-bold text-purple-600"><?php echo $saved_items; ?></p>
-
-                <p class="text-sm text-gray-600 mt-1">Saved Items</p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
 
 
 
@@ -943,101 +809,53 @@ try {
 
 
           <!-- Personal Information -->
-
           <div class="grid md:grid-cols-2 gap-4">
-
             <div>
-
               <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-
               <input type="text" id="editFullName" name="full_name" value="<?php echo htmlspecialchars($full_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
-
             </div>
-
             <div>
-
               <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-
               <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
-
             </div>
-
             <div>
-
               <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-
               <input type="tel" id="editPhone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX" pattern="09[0-9]{9}">
-
             </div>
-
             <div>
-
               <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-
               <input type="date" id="editDob" name="date_of_birth" value="<?php echo htmlspecialchars($date_of_birth); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
-
             </div>
-
             <div>
-
               <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-
               <select id="editGender" name="gender" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
-
                 <option value="">Select Gender</option>
-
                 <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male</option>
-
                 <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
-
                 <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>Other</option>
-
                 <option value="Prefer not to say" <?php echo ($gender === 'Prefer not to say') ? 'selected' : ''; ?>>Prefer not to say</option>
-
               </select>
-
             </div>
-
             <div>
-
               <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-
               <input type="text" id="editAddress" name="address" value="<?php echo htmlspecialchars($address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Full address">
-
             </div>
-
           </div>
-
-
 
           <!-- Bio -->
-
           <div>
-
             <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-
             <textarea id="editBio" name="bio" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Tell us about yourself..."><?php echo htmlspecialchars($bio); ?></textarea>
-
           </div>
 
-
-
           <!-- Action Buttons -->
-
           <div class="flex justify-end gap-3 pt-4 border-t">
-
             <button type="button" id="cancelEditProfile" class="px-6 py-2 border rounded-lg text-sm font-medium hover:bg-gray-50">
-
               Cancel
-
             </button>
-
             <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
-
               <i class="fas fa-save mr-1"></i> Save Changes
-
             </button>
-
           </div>
 
         </form>
@@ -1047,251 +865,120 @@ try {
 
 
       <section id="order-history" class="content-section bg-white rounded-lg shadow p-6 hidden">
-
-        <!-- Header -->
-
         <div class="flex justify-between items-center mb-6">
-
-          <h2 class="font-semibold text-lg">Order History</h2>
-
+          <h2 class="text-xl font-semibold text-gray-800">Order History</h2>
           <div class="flex items-center gap-3">
-
             <select class="border rounded-lg px-3 py-2 text-sm">
-
               <option>Last 3 months</option>
-
               <option>Last 6 months</option>
-
               <option>Last year</option>
-
             </select>
-
             <button class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-
               <i class="fas fa-download"></i> Export
-
             </button>
-
           </div>
-
         </div>
-
-
-
-        <!-- Order List Container -->
-
         <div id="orderList" class="space-y-4">
-
-          <!-- Orders will be dynamically inserted here -->
-
           <div id="noOrdersPlaceholder" class="text-center text-gray-500 py-10 border-2 border-dashed rounded-lg">
-
             <i class="fas fa-receipt text-3xl mb-3"></i>
-
             <p>You haven't placed any orders yet.</p>
-
             <a href="products.php" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-
               Start Shopping
-
             </a>
-
           </div>
 
         </div>
-
       </section>
 
-
-
-      <!-- Saved Addresses Section (Hidden by default) -->
-
+      <!-- Saved Addresses Section -->
       <section id="my-address" class="content-section bg-white rounded-lg shadow p-6 hidden">
-
         <div class="flex justify-between items-center mb-6">
-
-            <h2 class="font-semibold text-lg">My Delivery Address</h2>
-
-            <button id="editAddressBtn" class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-
-              <i class="fas fa-pen mr-1"></i> Edit
-
-            </button>
-
-        </div>
-
-        <div id="addressDisplay" class="text-gray-600 leading-relaxed">
-
-          <!-- Address will be dynamically inserted here -->
-
-          <div id="noAddressPlaceholder" class="text-center text-gray-500 py-10 border-2 border-dashed rounded-lg">
-
-            <i class="fas fa-map-marker-alt text-3xl mb-3"></i>
-
-            <p>No saved addresses yet.</p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- Payment Methods Section (Hidden by default) -->
-
-      <section id="payment-methods" class="content-section bg-white rounded-lg shadow p-6 hidden">
-
-        <div class="flex justify-between items-center mb-6">
-
-          <h2 class="font-semibold text-lg">Payment Methods</h2>
-
-          <button id="addPaymentBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-
-            <i class="fas fa-plus mr-1"></i> Add New Card
-
+          <h2 class="text-xl font-semibold text-gray-800">My Delivery Address</h2>
+          <button id="editAddressBtn" class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
+            <i class="fas fa-pen mr-1"></i> Edit
           </button>
-
         </div>
+        <div id="addressDisplay" class="text-gray-600 leading-relaxed">
+          <div id="noAddressPlaceholder" class="text-center text-gray-500 py-10 border-2 border-dashed rounded-lg">
+            <i class="fas fa-map-marker-alt text-3xl mb-3"></i>
+            <p>No saved addresses yet.</p>
+          </div>
+        </div>
+      </section>
 
+      <!-- Payment Methods Section -->
+      <section id="payment-methods" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-800">Payment Methods</h2>
+          <button id="addPaymentBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+            <i class="fas fa-plus mr-1"></i> Add New Card
+          </button>
+        </div>
         <div id="paymentList" class="space-y-4">
-
-          <!-- Payment methods will be dynamically inserted here -->
-
           <div id="noPaymentPlaceholder" class="text-center text-gray-500 py-10">
-
             <i class="fas fa-credit-card text-3xl mb-3"></i>
-
             <p>No payment methods saved.</p>
-
           </div>
-
         </div>
-
       </section>
 
-
-
-      <!-- Settings Section (Hidden by default) -->
-
+      <!-- Settings Section -->
       <section id="settings" class="content-section bg-white rounded-lg shadow p-6 hidden">
-
-        <h2 class="font-semibold text-lg mb-6">Settings</h2>
-
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Settings</h2>
         <div class="space-y-6">
-
           <div>
-
             <h3 class="font-medium text-md mb-3">Email Notifications</h3>
-
             <div class="space-y-3">
-
               <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-
                 <div>
-
                   <p class="font-medium text-sm">Order Updates</p>
-
                   <p class="text-xs text-gray-500">Receive updates on your order status.</p>
-
                 </div>
-
                 <input type="checkbox" class="toggle-switch" data-setting="orderUpdates" checked>
-
               </label>
-
               <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-
                 <div>
-
                   <p class="font-medium text-sm">Promotions & News</p>
-
                   <p class="text-xs text-gray-500">Get notified about sales and new products.</p>
-
                 </div>
-
                 <input type="checkbox" class="toggle-switch" data-setting="promotions" checked>
-
               </label>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
 
-
-
-      <!-- Help & Support Section (Hidden by default) -->
-
+      <!-- Help & Support Section -->
       <section id="help-support" class="content-section bg-white rounded-lg shadow p-6 hidden">
-
-        <h2 class="font-semibold text-lg mb-6">Help & Support</h2>
-
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Help & Support</h2>
         <div class="space-y-3" id="faqAccordion">
-
-          <!-- FAQ Item 1 -->
-
           <div class="border rounded-lg">
-
             <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
-
               <span>How do I track my order?</span>
-
               <i class="fas fa-chevron-down transition-transform"></i>
-
             </button>
-
             <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
-
               You can track your order from the "Order History" section. Click on "Track Order" for any item that is in transit.
-
             </div>
-
           </div>
-
-          <!-- FAQ Item 2 -->
-
           <div class="border rounded-lg">
-
             <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
-
               <span>What is your return policy?</span>
-
               <i class="fas fa-chevron-down transition-transform"></i>
-
             </button>
-
             <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
-
               Due to the nature of fresh produce, we only accept returns for damaged or incorrect items reported within 24 hours of delivery. Please contact our support team with a photo of the issue.
-
             </div>
-
           </div>
-
-          <!-- FAQ Item 3 -->
-
           <div class="border rounded-lg">
-
             <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
-
               <span>How do I change my delivery address?</span>
-
               <i class="fas fa-chevron-down transition-transform"></i>
-
             </button>
-
             <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
-
               You can manage your delivery locations in the "Saved Addresses" section. You can add, edit, or delete addresses there.
-
             </div>
-
           </div>
-
         </div>
 
       </section>
@@ -1693,6 +1380,14 @@ try {
       function showLoadingModal() {
 
         loadingModal.classList.remove('hidden');
+
+      }
+
+      
+
+      function hideLoadingModal() {
+
+        loadingModal.classList.add('hidden');
 
       }
 
@@ -2264,65 +1959,83 @@ try {
 
       // Switch to edit mode
 
-      editProfileBtn.addEventListener('click', () => {
+      if (editProfileBtn) {
 
-        profileDisplay.classList.add('hidden');
+        editProfileBtn.addEventListener('click', () => {
 
-        profileEditForm.classList.remove('hidden');
+          profileDisplay.classList.add('hidden');
 
-        editProfileBtn.classList.add('hidden');
+          profileEditForm.classList.remove('hidden');
 
-      });
+          editProfileBtn.classList.add('hidden');
+
+        });
+
+      }
 
 
 
       // Cancel editing
 
-      cancelEditProfile.addEventListener('click', () => {
+      if (cancelEditProfile) {
 
-        profileDisplay.classList.remove('hidden');
+        cancelEditProfile.addEventListener('click', () => {
 
-        profileEditForm.classList.add('hidden');
+          profileDisplay.classList.remove('hidden');
 
-        editProfileBtn.classList.remove('hidden');
+          profileEditForm.classList.add('hidden');
 
-        // Reset form to original values from page load
+          editProfileBtn.classList.remove('hidden');
 
-        location.reload();
+          // Reset form to original values from page load
 
-      });
+          location.reload();
+
+        });
+
+      }
 
 
 
       // Handle profile picture upload
 
-      profilePicInput.addEventListener('change', (e) => {
+      if (profilePicInput) {
 
-        const file = e.target.files[0];
+        profilePicInput.addEventListener('change', (e) => {
 
-        if (file) {
+          const file = e.target.files[0];
 
-          // Show preview only - don't upload yet
+          if (file) {
 
-          const reader = new FileReader();
+            // Show preview only - don't upload yet
 
-          reader.onload = (event) => {
+            const reader = new FileReader();
 
-            const editPicEl = document.getElementById('editProfilePicPreview');
+            reader.onload = (event) => {
 
-            editPicEl.innerHTML = `<img src="${event.target.result}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+              const editPicEl = document.getElementById('editProfilePicPreview');
 
-            editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
+              if (editPicEl) {
 
-            document.getElementById('removeProfilePic').classList.remove('hidden');
+                editPicEl.innerHTML = `<img src="${event.target.result}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
 
-          };
+                editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
 
-          reader.readAsDataURL(file);
+                const removeBtn = document.getElementById('removeProfilePic');
 
-        }
+                if (removeBtn) removeBtn.classList.remove('hidden');
 
-      });
+              }
+
+            };
+
+            reader.readAsDataURL(file);
+
+          }
+
+        });
+
+      }
 
 
 
@@ -2336,169 +2049,189 @@ try {
 
 
 
-      removeProfilePic.addEventListener('click', () => {
+      if (removeProfilePic && removePictureModal) {
 
-        removePictureModal.classList.remove('hidden');
+        removeProfilePic.addEventListener('click', () => {
 
-      });
+          removePictureModal.classList.remove('hidden');
+
+        });
+
+      }
 
 
 
-      cancelRemovePicture.addEventListener('click', () => {
+      if (cancelRemovePicture && removePictureModal) {
 
-        removePictureModal.classList.add('hidden');
+        cancelRemovePicture.addEventListener('click', () => {
 
-      });
+          removePictureModal.classList.add('hidden');
+
+        });
+
+      }
 
 
 
       // Close modal when clicking outside
 
-      removePictureModal.addEventListener('click', (e) => {
+      if (removePictureModal) {
 
-        if (e.target === removePictureModal) {
+        removePictureModal.addEventListener('click', (e) => {
 
-          removePictureModal.classList.add('hidden');
+          if (e.target === removePictureModal) {
 
-        }
+            removePictureModal.classList.add('hidden');
 
-      });
+          }
+
+        });
+
+      }
 
 
 
       // Confirm remove profile picture
 
-      confirmRemovePicture.addEventListener('click', async () => {
+      if (confirmRemovePicture && removePictureModal) {
 
-        removePictureModal.classList.add('hidden');
+        confirmRemovePicture.addEventListener('click', async () => {
 
-        showLoadingModal();
+          removePictureModal.classList.add('hidden');
 
-
-
-        try {
-
-          const formData = new FormData();
-
-          formData.append('action', 'remove_profile_picture');
+          showLoadingModal();
 
 
-
-          const response = await fetch('profile.php', {
-
-            method: 'POST',
-
-            body: formData
-
-          });
-
-          
-
-          // Check if response is ok
-
-          if (!response.ok) {
-
-            throw new Error(`HTTP error! status: ${response.status}`);
-
-          }
-
-          
-
-          const responseText = await response.text();
-
-          console.log('Server response:', responseText);
-
-          
-
-          // Try to parse JSON with better error handling
-
-          let result;
 
           try {
 
-            result = JSON.parse(responseText);
+            const formData = new FormData();
 
-          } catch (parseError) {
-
-            console.error('JSON parse error:', parseError);
-
-            console.error('Response text:', responseText);
-
-            throw new Error('Invalid server response');
-
-          }
+            formData.append('action', 'remove_profile_picture');
 
 
 
-          if (result.status === 'success') {
+            const response = await fetch('profile.php', {
 
-            showSuccessModal('Profile picture removed successfully!');
+              method: 'POST',
 
-            
-
-            // Update UI immediately
-
-            const defaultAvatar = `<div class="w-32 h-32 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-
-              ${result.data.initials || '<?php echo strtoupper(substr($full_name, 0, 1)); ?>'}
-
-            </div>`;
-
-            
-
-            document.getElementById('displayProfilePic').innerHTML = defaultAvatar;
-
-            document.getElementById('editProfilePic').innerHTML = defaultAvatar;
-
-            
-
-            // Hide remove button
-
-            removeProfilePic.classList.add('hidden');
-
-            
-
-            // Update all profile pictures in header
-
-            document.querySelectorAll('img[alt="Profile"]').forEach(img => {
-
-              const parent = img.parentElement;
-
-              img.remove();
-
-              parent.innerHTML = `<div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-
-                <i class="fas fa-user text-white text-sm"></i>
-
-              </div>`;
+              body: formData
 
             });
 
             
 
-            setTimeout(() => {
+            // Check if response is ok
 
-              closeSuccessModal();
+            if (!response.ok) {
 
-              location.reload();
+              throw new Error(`HTTP error! status: ${response.status}`);
 
-            }, 1500);
+            }
 
-          } else {
+            
 
-            showErrorModal(result.message || 'Failed to remove profile picture');
+            const responseText = await response.text();
+
+            console.log('Server response:', responseText);
+
+            
+
+            // Try to parse JSON with better error handling
+
+            let result;
+
+            try {
+
+              result = JSON.parse(responseText);
+
+            } catch (parseError) {
+
+              console.error('JSON parse error:', parseError);
+
+              console.error('Response text:', responseText);
+
+              throw new Error('Invalid server response');
+
+            }
+
+
+
+            if (result.status === 'success') {
+
+              showSuccessModal('Profile picture removed successfully!');
+
+              
+
+              // Update UI immediately
+
+              const defaultAvatar = `<div class="w-32 h-32 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+
+                ${result.data.initials || '<?php echo strtoupper(substr($full_name, 0, 1)); ?>'}
+
+              </div>`;
+
+              
+
+              const displayPic = document.getElementById('displayProfilePic');
+
+              const editPic = document.getElementById('editProfilePic');
+
+              if (displayPic) displayPic.innerHTML = defaultAvatar;
+
+              if (editPic) editPic.innerHTML = defaultAvatar;
+
+              
+
+              // Hide remove button
+
+              if (removeProfilePic) removeProfilePic.classList.add('hidden');
+
+              
+
+              // Update all profile pictures in header
+
+              document.querySelectorAll('img[alt="Profile"]').forEach(img => {
+
+                const parent = img.parentElement;
+
+                img.remove();
+
+                parent.innerHTML = `<div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+
+                  <i class="fas fa-user text-white text-sm"></i>
+
+                </div>`;
+
+              });
+
+              
+
+              setTimeout(() => {
+
+                closeSuccessModal();
+
+                location.reload();
+
+              }, 1500);
+
+            } else {
+
+              showErrorModal(result.message || 'Failed to remove profile picture');
+
+            }
+
+          } catch (error) {
+
+            console.error('Remove error:', error);
+
+            showErrorModal('An error occurred. Please try again.');
 
           }
 
-        } catch (error) {
+        });
 
-          console.error('Remove error:', error);
-
-          showErrorModal('An error occurred. Please try again.');
-
-        }
-
-      });
+      }
 
 
 
@@ -2546,6 +2279,8 @@ try {
 
           formData.append('profile_picture', profilePicFile);
 
+          console.log('📸 Uploading profile picture:', profilePicFile.name, 'Size:', profilePicFile.size, 'bytes');
+
         }
 
 
@@ -2554,7 +2289,7 @@ try {
 
         try {
 
-          console.log('Submitting form with file:', profilePicFile ? profilePicFile.name : 'no file');
+          console.log('🔄 Submitting profile update...');
 
           
 
@@ -2565,6 +2300,10 @@ try {
             body: formData
 
           });
+
+          
+
+          console.log('📡 Response status:', response.status, response.statusText);
 
           
 
@@ -2580,7 +2319,7 @@ try {
 
           const responseText = await response.text();
 
-          console.log('Server response:', responseText);
+          console.log('📦 Raw server response:', responseText.substring(0, 500)); // Log first 500 chars
 
           
 
@@ -2590,15 +2329,33 @@ try {
 
           try {
 
-            result = JSON.parse(responseText);
+            // Try to extract JSON from response (in case there's HTML before/after)
+
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+
+            if (jsonMatch) {
+
+              result = JSON.parse(jsonMatch[0]);
+
+              console.log('✅ Parsed JSON:', result);
+
+            } else {
+
+              throw new Error('No JSON found in response');
+
+            }
 
           } catch (parseError) {
 
-            console.error('JSON parse error:', parseError);
+            console.error('❌ JSON parse error:', parseError);
 
-            console.error('Response text:', responseText);
+            console.error('Full response:', responseText);
 
-            throw new Error('Invalid server response');
+            hideLoadingModal();
+
+            showErrorModal('Server returned invalid response. Check console for details.');
+
+            return;
 
           }
 
@@ -2606,161 +2363,55 @@ try {
 
           if (result.status === 'success') {
 
-            // Show success modal instead of alert
+            console.log('✅ Profile updated successfully!');
+
+            
+
+            // Hide loading modal
+
+            hideLoadingModal();
+
+            
+
+            // Show success modal with reload option
 
             showSuccessModal(result.message || 'Profile updated successfully!');
 
             
 
-            // Update all display elements with fresh data from database
+            // Update sessionStorage for cross-page sync
 
-            if (result.data) {
+            if (result.data && result.data.profile_picture) {
 
-              const data = result.data;
+              const picPath = '../' + result.data.profile_picture;
 
-              
+              sessionStorage.setItem('profile_picture', picPath);
 
-              // Update display mode
+              sessionStorage.setItem('profile_updated', Date.now().toString());
 
-              document.getElementById('displayFullName').textContent = data.full_name;
-
-              document.getElementById('displayEmail').textContent = data.email;
-
-              document.getElementById('displayPhone').textContent = data.phone || 'Not provided';
-
-              document.getElementById('displayBio').textContent = data.bio || 'Welcome to Farmers Mall!';
-
-              document.getElementById('displayAddress').textContent = data.address || 'Not provided';
-
-              
-
-              // Format and display date of birth
-
-              if (data.date_of_birth) {
-
-                const dobDate = new Date(data.date_of_birth);
-
-                const formattedDob = dobDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-                document.getElementById('displayDob').textContent = formattedDob;
-
-              } else {
-
-                document.getElementById('displayDob').textContent = 'Not provided';
-
-              }
-
-              
-
-              document.getElementById('displayGender').textContent = data.gender || 'Not specified';
-
-              
-
-              // Format member since
-
-              if (data.created_at) {
-
-                const createdDate = new Date(data.created_at);
-
-                const formattedDate = createdDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-
-                document.getElementById('displayMemberSince').textContent = formattedDate;
-
-              }
-
-              
-
-              // Update profile pictures in all locations
-
-              if (data.profile_picture) {
-
-                const picPath = '../' + data.profile_picture;
-
-                
-
-                // Display mode profile picture
-
-                const displayPicEl = document.getElementById('displayProfilePic');
-
-                displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
-
-                
-
-                // Sidebar profile picture
-
-                const sidebarPicEl = document.getElementById('sidebarProfilePic');
-
-                sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
-
-                
-
-                // Navbar profile picture
-
-                const navPicEl = document.getElementById('navProfilePic');
-
-                navPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">`;
-
-                
-
-                // Edit mode preview
-
-                const editPicEl = document.getElementById('editProfilePicPreview');
-
-                editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
-
-                
-
-                document.getElementById('removeProfilePic').classList.remove('hidden');
-
-              }
-
-              
-
-              // Update sidebar name and email
-
-              document.querySelector('aside h2').textContent = data.full_name;
-
-              document.querySelector('aside p').textContent = data.email;
-
-              
-
-              // Update edit form with fresh data
-
-              document.getElementById('editFullName').value = data.full_name;
-
-              document.getElementById('editEmail').value = data.email;
-
-              document.getElementById('editPhone').value = data.phone || '';
-
-              document.getElementById('editDob').value = data.date_of_birth || '';
-
-              document.getElementById('editGender').value = data.gender || '';
-
-              document.getElementById('editBio').value = data.bio || '';
-
-              document.getElementById('editAddress').value = data.address || '';
+              console.log('💾 Profile picture saved to sessionStorage:', picPath);
 
             }
 
             
 
-            // Switch back to display mode
+            // Reload page after 1.5 seconds to show fresh data
 
-            profileDisplay.classList.remove('hidden');
+            setTimeout(() => {
 
-            profileEditForm.classList.add('hidden');
+              console.log('🔄 Reloading page to reflect changes...');
 
-            editProfileBtn.classList.remove('hidden');
+              window.location.reload();
+
+            }, 1500);
 
             
 
-            // Clear the file input
-
-            profilePicInput.value = '';
-
           } else {
 
-            // Show error modal instead of alert
+            console.error('❌ Update failed:', result.message);
+
+            hideLoadingModal();
 
             showErrorModal(result.message || 'Failed to update profile. Please try again.');
 
@@ -2768,9 +2419,9 @@ try {
 
         } catch (error) {
 
-          console.error('Profile update error:', error);
+          console.error('💥 Profile update error:', error);
 
-          // Show error modal instead of alert
+          hideLoadingModal();
 
           showErrorModal('An error occurred while updating your profile. Please try again.');
 
@@ -2961,10 +2612,16 @@ try {
       // Listen for cart updates within the same page
 
       window.addEventListener('cartUpdated', updateCartIcon);
-
+      
+      // Initialize profile picture in sessionStorage on page load
+      <?php if (!empty($profile_picture)): ?>
+        sessionStorage.setItem('profile_picture', '../<?php echo addslashes($profile_picture); ?>');
+        sessionStorage.setItem('profile_updated', Date.now().toString());
+      <?php endif; ?>
     });
 
   </script>
+  <script src="../assets/js/profile-sync.js"></script>
 
 </body>
 
