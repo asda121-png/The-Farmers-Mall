@@ -1,6 +1,3 @@
-    // Update cart icon badge on load
-    updateCartIcon();
-
     // CART FUNCTIONALITY
     const cartContainer = document.getElementById('cartItems');
     const subtotalEl = document.getElementById('subtotal');
@@ -15,23 +12,25 @@
     // Load cart from database
     async function loadCartFromDB() {
       try {
-        console.log('Loading cart from database...');
+        console.log('🔄 Loading cart from database...');
         const response = await fetch('../api/cart.php');
+        console.log('📡 Response status:', response.status);
+        
         const data = await response.json();
-        console.log('Cart data received:', data);
+        console.log('📦 Cart data received:', data);
         
         if (data.success) {
           cart = data.items || [];
-          console.log('Cart items:', cart);
-          console.log('Cart count:', cart.length);
+          console.log('✅ Cart items loaded successfully:', cart.length, 'items');
+          console.log('🛒 Cart contents:', cart);
           renderCart();
           updateCartIcon();
         } else {
-          console.error('Failed to load cart:', data.message);
+          console.error('❌ Failed to load cart:', data.message);
           showNotification('Failed to load cart', 'error');
         }
       } catch (error) {
-        console.error('Error loading cart:', error);
+        console.error('💥 Error loading cart:', error);
         showNotification('Error loading cart', 'error');
       }
     }
@@ -153,7 +152,7 @@
     }
 
     function renderCart() {
-      console.log('Rendering cart with', cart.length, 'items');
+      console.log('🎨 Rendering cart with', cart.length, 'items');
       cartContainer.innerHTML = '';
       
       // Update cart count in header
@@ -163,7 +162,7 @@
       }
       
       if(cart.length === 0){
-        console.log('Cart is empty, showing empty state');
+        console.log('📭 Cart is empty, showing empty state');
         cartContainer.innerHTML = `
           <div class="text-center py-16 col-span-2">
             <i class="fas fa-shopping-cart text-gray-300 text-6xl mb-4"></i>
@@ -184,10 +183,11 @@
         return;
       }
 
+      console.log('🔨 Building cart items HTML...');
       cart.forEach((item, index) => {
         const itemTotal = (item.price * (item.quantity || 1)).toFixed(2);
         const itemImage = item.image || item.image_url || '../images/products/Fresh Vegetable Box.png';
-        console.log('Rendering item:', item.name, 'Image:', itemImage);
+        console.log(`  📦 Item ${index + 1}:`, item.name, '| Price:', item.price, '| Qty:', item.quantity, '| Image:', itemImage);
         const div = document.createElement('div');
         div.className = 'bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-md transition-shadow gap-4';
         div.innerHTML = `
@@ -305,13 +305,13 @@
       let badge = cartIcon.querySelector('.cart-badge');
       if (!badge) {
         badge = document.createElement('span');
-      badge.className = 'cart-badge absolute -top-1 -right-1 bg-red-600 text-white text-sm font-semibold rounded-full px-2 min-w-[1.5rem] text-center z-10';
+        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
         cartIcon.classList.add('relative');
         cartIcon.appendChild(badge);
       }
       const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
       badge.textContent = totalItems;
-      badge.style.display = totalItems > 0 ? 'block' : 'none';
+      badge.style.display = totalItems > 0 ? 'flex' : 'none';
     }
 
     function showNotification(message, type = 'success') {
@@ -489,12 +489,13 @@
     }
 
     // Load cart from database on page load
+    console.log('🚀 Initializing cart page...');
     loadCartFromDB();
 
     // Auto-reload cart when products are added from other pages
     window.addEventListener('storage', (e) => {
       if (e.key === 'cartUpdated') {
-        console.log('Cart updated from another tab, reloading...');
+        console.log('🔄 Cart updated from another tab, reloading...');
         loadCartFromDB();
         localStorage.removeItem('cartUpdated'); // Clear flag
       }
@@ -503,11 +504,15 @@
     // Also check for cart updates every 2 seconds when on cart page
     let lastCartCount = cart.length;
     setInterval(async () => {
-      const response = await fetch('../api/cart.php');
-      const data = await response.json();
-      if (data.success && data.items && data.items.length !== lastCartCount) {
-        console.log('Cart count changed, reloading...');
-        lastCartCount = data.items.length;
-        await loadCartFromDB();
+      try {
+        const response = await fetch('../api/cart.php');
+        const data = await response.json();
+        if (data.success && data.items && data.items.length !== lastCartCount) {
+          console.log('🔄 Cart count changed from', lastCartCount, 'to', data.items.length, '- reloading...');
+          lastCartCount = data.items.length;
+          await loadCartFromDB();
+        }
+      } catch (error) {
+        console.error('⚠️ Error checking for cart updates:', error);
       }
     }, 2000);

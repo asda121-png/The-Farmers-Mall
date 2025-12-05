@@ -567,7 +567,7 @@ try {
             <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
             <a href="cart.php" class="text-gray-600 relative">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
             </a>
 
             <!-- Profile Dropdown -->
@@ -2904,19 +2904,31 @@ try {
 
 
 
-      function updateCartIcon() {
+      async function updateCartIcon() {
 
         const cartBadge = document.getElementById('cartBadge');
 
         if (!cartBadge) return;
 
+        try {
+          // Fetch from database
+          const response = await fetch('../api/cart.php');
+          const data = await response.json();
+          
+          if (data.success && data.items) {
+            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            cartBadge.textContent = totalItems;
+            cartBadge.classList.toggle('hidden', totalItems === 0);
+            return;
+          }
+        } catch (error) {
+          console.log('Error loading cart count:', error);
+        }
 
-
+        // Fallback to localStorage
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
         const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
-
 
         cartBadge.textContent = totalItems;
 

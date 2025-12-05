@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Badge Test - Visual Comparison</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">Cart Badge Visual Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6 text-green-600">✅ New Uniform Badge (All Pages)</h2>
+            <div class="flex flex-wrap gap-8 items-start justify-center">
+                <!-- New Uniform Badge -->
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-3">Uniform Badge</p>
+                    <a href="#" class="text-gray-600 relative inline-block text-4xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center">3</span>
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2">Standard size</p>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-3">With 10+ items</p>
+                    <a href="#" class="text-gray-600 relative inline-block text-4xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center">12</span>
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2">Auto-expands</p>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-3">Single digit</p>
+                    <a href="#" class="text-gray-600 relative inline-block text-4xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center">1</span>
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2">Centered</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-200 rounded-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6 text-red-600">❌ Old Inconsistent Badges (Before Fix)</h2>
+            <div class="flex flex-wrap gap-8 items-start justify-center">
+                <!-- Old cart.php badge (too small) -->
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-3">Old cart.php</p>
+                    <a href="#" class="text-gray-600 relative inline-block text-4xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2">Too small</p>
+                </div>
+                
+                <!-- Old products.js badge (tiny) -->
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-3">Old products.js</p>
+                    <a href="#" class="text-gray-600 relative inline-block text-4xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">3</span>
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2">Tiny</p>
+                </div>
+                
+                <!-- Old user-homepage badge -->
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-3">Old homepage</p>
+                    <a href="#" class="text-gray-600 relative inline-block text-4xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">3</span>
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2">Inconsistent</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-semibold mb-4">Specifications</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-green-600 mb-2">✅ New Uniform Badge</h3>
+                    <ul class="text-sm space-y-1 text-gray-700">
+                        <li>• Position: <code class="bg-gray-100 px-1">-top-2 -right-2</code></li>
+                        <li>• Color: <code class="bg-gray-100 px-1">bg-red-600</code></li>
+                        <li>• Text: <code class="bg-gray-100 px-1">text-xs font-semibold</code></li>
+                        <li>• Size: <code class="bg-gray-100 px-1">min-w-[1.125rem] h-[1.125rem]</code></li>
+                        <li>• Padding: <code class="bg-gray-100 px-1">px-1.5</code></li>
+                        <li>• Display: <code class="bg-gray-100 px-1">flex items-center justify-center</code></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-red-600 mb-2">❌ Old Inconsistent Badges</h3>
+                    <ul class="text-sm space-y-1 text-gray-700">
+                        <li>• Cart.php: <code class="bg-gray-100 px-1">text-[10px] h-4 w-4</code></li>
+                        <li>• Products: <code class="bg-gray-100 px-1">text-[9px] h-3.5 w-3.5</code></li>
+                        <li>• Homepage: <code class="bg-gray-100 px-1">text-[9px] h-3.5 w-3.5</code></li>
+                        <li>• Mixed colors: <code class="bg-gray-100 px-1">red-500 / red-600</code></li>
+                        <li>• Mixed positioning</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="font-semibold text-blue-800 mb-2">✨ Improvements Applied</h3>
+            <ul class="text-sm space-y-2 text-blue-900">
+                <li><strong>1. Uniform Size:</strong> All badges are now exactly the same size across all pages</li>
+                <li><strong>2. Consistent Color:</strong> All badges use bg-red-600 (darker, more visible)</li>
+                <li><strong>3. Better Text:</strong> Larger font (text-xs vs text-[9px] or text-[10px])</li>
+                <li><strong>4. Flexible Width:</strong> Badge expands automatically for double-digit numbers</li>
+                <li><strong>5. Centered Content:</strong> Uses flexbox for perfect centering</li>
+                <li><strong>6. Database Integration:</strong> All pages now fetch real cart count from database</li>
+            </ul>
+        </div>
+
+        <div class="mt-8 text-center text-gray-500 text-sm">
+            <p>Files Updated: cart.php, notification.php, message.php, productdetails.php, user-homepage.php, profile.php</p>
+            <p>JS Files Updated: cart.js, products.js, productdetails.js</p>
+        </div>
+    </div>
+</body>
+</html>
