@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿<?php
 // Start output buffering at the very beginning
 ob_start();
@@ -8,16 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     ini_set('display_errors', '0');
 }
 
+=======
+
+<?php
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 session_start();
 
-
-
-// Check if user is logged in
-
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-
     header('Location: ../auth/login.php');
-
     exit();
 
 }
@@ -25,13 +24,149 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 
 // Load Supabase API
-
 require_once __DIR__ . '/../config/supabase-api.php';
 
+// --- Function Definitions ---
 
+/**
+ * Handles profile picture upload, validation, and storage.
+ *
+ * @param array $file The $_FILES['profile_picture'] array.
+ * @param string $userId The ID of the current user.
+ * @param string $oldProfilePicture The path to the old profile picture to be deleted.
+ * @return string|null The new profile picture path on success, null on failure.
+ * @throws Exception If validation or file move fails.
+ */
+function handleProfilePictureUpload(array $file, string $userId, string $oldProfilePicture): ?string
+{
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        // No file uploaded or an error occurred, but not a fatal one for the whole process.
+        return null;
+    }
+
+    // Validate file size (5MB limit)
+    if ($file['size'] > 5 * 1024 * 1024) {
+        throw new Exception('File size must be less than 5MB');
+    }
+
+    // More secure MIME type validation
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime_type = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+
+    $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!in_array($mime_type, $allowed_mime_types)) {
+        throw new Exception('Invalid file type. Only JPG, PNG, and GIF are allowed.');
+    }
+
+    // Create uploads/profiles directory if it doesn't exist
+    $upload_dir = __DIR__ . '/../assets/profiles/';
+    if (!is_dir($upload_dir)) {
+        if (!mkdir($upload_dir, 0755, true)) {
+            throw new Exception('Failed to create upload directory.');
+        }
+    }
+
+    // Generate unique filename
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = 'profile_' . $userId . '_' . time() . '.' . $extension;
+    $filepath = $upload_dir . $filename;
+
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        // Delete old profile picture if it exists
+        if (!empty($oldProfilePicture) && file_exists(__DIR__ . '/../' . $oldProfilePicture)) {
+            @unlink(__DIR__ . '/../' . $oldProfilePicture);
+        }
+        return 'assets/profiles/' . $filename;
+    } else {
+        throw new Exception('Failed to move uploaded file.');
+    }
+}
+
+/**
+ * Handles the entire profile update process.
+ */
+function handleProfileUpdate()
+{
+    header('Content-Type: application/json');
+    $api = getSupabaseAPI();
+    $user_id = $_SESSION['user_id'] ?? null;
+
+    if (!$user_id) {
+        echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
+        exit();
+    }
+
+    try {
+        // Combine first and last name to full_name
+        $first_name = trim($_POST['first_name'] ?? '');
+        $last_name = trim($_POST['last_name'] ?? '');
+        $full_name = trim("$first_name $last_name");
+
+        $updateData = [
+            'full_name' => $full_name,
+            'phone' => trim($_POST['phone'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'date_of_birth' => trim($_POST['date_of_birth'] ?? null),
+            'gender' => trim($_POST['gender'] ?? ''),
+            'bio' => trim($_POST['bio'] ?? ''),
+            'address' => trim($_POST['address'] ?? '')
+        ];
+
+        // If date is empty, it should be set to null in the DB
+        if (empty($updateData['date_of_birth'])) {
+            $updateData['date_of_birth'] = null;
+        }
+
+        // Handle profile picture upload
+        if (isset($_FILES['profile_picture'])) {
+            $oldProfilePicture = ($_SESSION['profile_picture'] ?? '');
+            $newProfilePicPath = handleProfilePictureUpload($_FILES['profile_picture'], $user_id, $oldProfilePicture);
+            if ($newProfilePicPath) {
+                $updateData['profile_picture'] = $newProfilePicPath;
+            }
+        } elseif (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
+            // Handle picture removal request from the client
+            $updateData['profile_picture'] = null;
+            if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/../' . $_SESSION['profile_picture'])) {
+                @unlink(__DIR__ . '/../' . $_SESSION['profile_picture']);
+            }
+        }
+
+        // Update database
+        $api->update('users', $updateData, ['id' => $user_id]);
+
+        // Update session with new data
+        $_SESSION['full_name'] = $updateData['full_name'];
+        $_SESSION['username'] = $updateData['full_name']; // Assuming username is full_name
+        if (isset($updateData['profile_picture'])) {
+            $_SESSION['profile_picture'] = $updateData['profile_picture'];
+        }
+
+        // Fetch updated data to return to client
+        $updatedUser = $api->select('users', ['id' => $user_id]);
+        $userData = !empty($updatedUser) ? $updatedUser[0] : [];
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Profile updated successfully!',
+            'data' => $userData
+        ]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// --- Main Logic ---
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
+    handleProfileUpdate();
+}
 
 $user_id = $_SESSION['user_id'] ?? null;
-
 $api = getSupabaseAPI();
 
 
@@ -129,46 +264,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 
 // Fetch user data from Supabase
-
 $userData = [];
-
 if ($user_id) {
-
     $users = $api->select('users', ['id' => $user_id]);
-
     if (!empty($users)) {
-
         $userData = $users[0];
-
     }
-
 }
 
 
 
 // Set default values
-
 $email = $userData['email'] ?? $_SESSION['email'] ?? 'user@email.com';
-
 $full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest User';
+$name_parts = explode(' ', $full_name, 2);
+$first_name = $name_parts[0];
+$last_name = $name_parts[1] ?? '';
 
+
+
+$address_parts = explode(', ', $userData['address'] ?? '');
+$street = $address_parts[0] ?? '';
+$barangay = $address_parts[1] ?? '';
 $phone = $userData['phone'] ?? '';
-
 $username = $userData['username'] ?? '';
-
-$profile_picture = $userData['profile_picture'] ?? '';
-
+$profile_picture = $userData['profile_picture'] ?? $_SESSION['profile_picture'] ?? '';
 $date_of_birth = $userData['date_of_birth'] ?? '';
-
 $gender = $userData['gender'] ?? '';
-
 $bio = $userData['bio'] ?? '';
-
 $address = $userData['address'] ?? '';
+<<<<<<< HEAD
+=======
+$city = 'Mati City'; // As per registration form
+$province = 'Davao Oriental'; // As per registration form
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 $created_at = $userData['created_at'] ?? '';
 
 
 
+<<<<<<< HEAD
 // Handle profile update via AJAX
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
@@ -470,74 +604,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 
 
+=======
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 // Get order statistics
-
 $total_orders = 0;
-
 $total_spent = 0;
-
 try {
+<<<<<<< HEAD
 
     $orders = $api->select('orders', ['customer_id' => $user_id]);
 
+=======
+    $orders = $api->select('orders', ['user_id' => $user_id]);
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
     $total_orders = count($orders);
-
     foreach ($orders as $order) {
-
         $total_spent += floatval($order['total_amount'] ?? 0);
-
     }
-
 } catch (Exception $e) {
-
     // Silent fail
-
 }
 
 
 
 // Get saved items count (cart items)
-
 $saved_items = 0;
-
 try {
-
     $cart_items = $api->select('cart', ['user_id' => $user_id]);
-
     $saved_items = count($cart_items);
-
 } catch (Exception $e) {
-
     // Silent fail
-
 }
-
 ?>
-
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Profile - Farmers Mall</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 </head>
-
 <body class="bg-gray-50 font-sans">
 
 
 
   <!-- Navbar -->
-
 <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <!-- Logo -->
@@ -572,7 +684,7 @@ try {
 
             <!-- Profile Dropdown -->
             <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
+                <button id="profileDropdownBtn" class="flex items-center" data-userid="<?php echo htmlspecialchars($user_id ?? ''); ?>">
                     <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
                         <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
                              alt="Profile" 
@@ -615,12 +727,92 @@ try {
   <main class="max-w-7xl mx-auto px-6 py-8 flex gap-6 mb-20">
 
     <!-- Sidebar -->
+<<<<<<< HEAD
     <aside class="w-72">
       <div class="bg-white rounded-lg shadow p-6">
         <!-- Navigation -->
         <nav class="space-y-2">
           <a href="#my-profile" class="sidebar-link active flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
             <i class="fas fa-user"></i> My Profile
+=======
+
+    <aside class="w-72 bg-white rounded-lg shadow p-6">
+
+      <!-- Profile Info -->
+
+      <div class="flex flex-col items-center text-center mb-6">
+
+        <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+
+          <img id="sidebarProfilePic" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">
+
+        <?php else: ?>
+
+          <div id="sidebarProfilePic" class="w-20 h-20 rounded-full mb-3 bg-green-600 flex items-center justify-center">
+
+            <i class="fas fa-user text-white text-3xl"></i>
+
+          </div>
+
+        <?php endif; ?>
+
+        <h2 class="font-semibold"><?php echo htmlspecialchars($full_name); ?></h2>
+
+        <p class="text-gray-500 text-sm"><?php echo htmlspecialchars($email); ?></p>
+
+      </div>
+
+
+
+      <!-- Navigation -->
+
+      <nav class="space-y-2">
+
+        <a href="#my-profile" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 text-green-700 font-medium">
+
+          <i class="fas fa-user"></i> My Profile
+
+        </a>
+
+        <a href="#order-history" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+
+          <i class="fas fa-box"></i> Order History
+
+        </a>
+
+        <a href="#my-address" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+
+          <i class="fas fa-map-marker-alt"></i> My Address
+
+        </a>
+
+        <a href="#payment-methods" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+
+          <i class="fas fa-credit-card"></i> Payment Methods`
+
+        </a>
+
+        <a href="#settings" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+
+          <i class="fas fa-cog"></i> Settings
+
+        </a>
+
+        <a href="#help-support" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
+
+          <i class="fas fa-question-circle"></i> Help & Support
+
+        </a>
+
+        <!-- Logout Button -->
+
+        <div class="border-t pt-2 mt-2">
+
+          <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium">
+
+            <i class="fas fa-sign-out-alt"></i> Logout
+
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
           </a>
           <a href="#order-history" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
             <i class="fas fa-box"></i> Order History
@@ -680,6 +872,7 @@ try {
             </div>
 
 
+<<<<<<< HEAD
             <!-- Personal Information -->
             <div class="grid md:grid-cols-2 gap-4">
               <div class="bg-gray-50 p-4 rounded-lg">
@@ -755,6 +948,79 @@ try {
           </div>
 
 
+=======
+              <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($full_name); ?></h3>
+
+              <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
+
+              <p id="displayBio" class="text-gray-600 text-sm italic"><?php echo htmlspecialchars($bio ?: 'Welcome to Farmers Mall!'); ?></p>
+
+            </div>
+
+          </div>
+
+
+          <!-- Accordion Sections -->
+          <div class="pt-6">
+          <div>
+            <!-- Tab Navigation -->
+            <div class="border-b border-gray-200">
+              <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                <button data-tab-target="#personal-info-content" class="info-tab-btn active-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-green-600 border-green-600">
+                  Personal Info
+                </button>
+                <button data-tab-target="#account-details-content" class="info-tab-btn inactive-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                  Account Details
+                </button>
+              </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="py-6">
+              <!-- Personal Info Content -->
+              <div id="personal-info-content" class="info-tab-content">
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">First Name</label><p id="displayFirstName" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($first_name); ?></p></div>
+                  <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Last Name</label><p id="displayLastName" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($last_name); ?></p></div>
+                  <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Middle Name</label><p class="text-gray-800 font-medium mt-1 text-gray-400 italic">Not provided</p></div>
+                  <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Suffix</label><p class="text-gray-800 font-medium mt-1 text-gray-400 italic">Not provided</p></div>
+                </div>
+              </div>
+
+<<<<<<< HEAD
+              <div class="text-center p-4 bg-blue-50 rounded-lg">
+                <p class="text-2xl font-bold text-blue-600">₱<?php echo number_format($total_spent, 2); ?></p>
+                <p class="text-sm text-gray-600 mt-1">Total Spent</p>
+=======
+              <!-- Account Details Content -->
+              <div id="account-details-content" class="info-tab-content hidden">
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Username</label><p id="displayUsername" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($username ?: 'Not set'); ?></p></div>
+                    <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label><p id="displayPhone" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p></div>
+                    <div class="bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Password</label><p class="text-gray-800 font-medium mt-1">••••••••</p></div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
+                      <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
+                        <?php 
+                          if (!empty($created_at)) {
+                            echo date('F Y', strtotime($created_at));
+                          } else {
+                            echo 'Recently';
+                          }
+                        ?>
+                      </p>
+                    </div>
+                  </div>
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
 
         <!-- Profile Edit Mode (Hidden by default) -->
 
@@ -809,11 +1075,26 @@ try {
 
 
           <!-- Personal Information -->
+<<<<<<< HEAD
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
               <input type="text" id="editFullName" name="full_name" value="<?php echo htmlspecialchars($full_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
+=======
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label for="editFirstName" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+              <input type="text" id="editFirstName" name="first_name" value="<?php echo htmlspecialchars($first_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+            </div>
+            <div>
+              <label for="editLastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+              <input type="text" id="editLastName" name="last_name" value="<?php echo htmlspecialchars($last_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6">
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
               <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
@@ -835,10 +1116,15 @@ try {
                 <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>Other</option>
                 <option value="Prefer not to say" <?php echo ($gender === 'Prefer not to say') ? 'selected' : ''; ?>>Prefer not to say</option>
               </select>
+<<<<<<< HEAD
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
               <input type="text" id="editAddress" name="address" value="<?php echo htmlspecialchars($address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Full address">
+=======
+
+
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
             </div>
           </div>
 
@@ -1412,6 +1698,26 @@ try {
       document.getElementById('closeSuccessModal').addEventListener('click', closeSuccessModal);
 
       document.getElementById('closeErrorModal').addEventListener('click', closeErrorModal);
+      
+      // --- Tab Switching Logic for Personal Info / Account Details ---
+      const infoTabBtns = document.querySelectorAll('.info-tab-btn');
+      const infoTabContents = document.querySelectorAll('.info-tab-content');
+
+      infoTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = document.querySelector(btn.dataset.tabTarget);
+
+          infoTabContents.forEach(content => content.classList.add('hidden'));
+          target.classList.remove('hidden');
+
+          infoTabBtns.forEach(b => {
+            b.classList.remove('active-tab', 'text-green-600', 'border-green-600');
+            b.classList.add('inactive-tab', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+          });
+          btn.classList.add('active-tab', 'text-green-600', 'border-green-600');
+          btn.classList.remove('inactive-tab', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+        });
+      });
 
       
 
@@ -1516,12 +1822,9 @@ try {
       // --- Modal Management ---
 
       const addressModal = document.getElementById('addressModal');
-
-      const paymentModal = document.getElementById('paymentModal');
-
       const editAddressBtn = document.getElementById('editAddressBtn');
-
-      const addPaymentBtn = document.getElementById('addPaymentBtn');
+      const addressDisplay = document.getElementById('addressDisplay');
+      const addressEdit = document.getElementById('addressEdit');
 
       const closeModalBtns = document.querySelectorAll('.modal-close');
 
@@ -1530,228 +1833,20 @@ try {
       const openModal = (modal) => modal.classList.remove('hidden');
 
       const closeModal = (modal) => modal.classList.add('hidden');
-
-
-
-      editAddressBtn.addEventListener('click', () => openModal(addressModal));
-
-      addPaymentBtn.addEventListener('click', () => openModal(paymentModal));
+      
+      editAddressBtn.addEventListener('click', () => {
+        addressDisplay.classList.add('hidden');
+        addressEdit.classList.remove('hidden');
+      });
 
       closeModalBtns.forEach(btn => {
 
         btn.addEventListener('click', () => {
 
           closeModal(addressModal);
-
-          closeModal(paymentModal);
-
         });
 
       });
-
-
-
-      // --- Saved Addresses Logic ---
-
-      const addressForm = document.getElementById('addressForm');
-
-      const addressDisplay = document.getElementById('addressDisplay');
-
-      const noAddressPlaceholder = document.getElementById('noAddressPlaceholder');
-
-      let userAddress = JSON.parse(localStorage.getItem('userAddress')) || null;
-
-
-
-      function renderAddress() {
-
-        addressDisplay.innerHTML = ''; // Clear current content
-
-        if (!userAddress || !userAddress.name) {
-
-          addressDisplay.appendChild(noAddressPlaceholder);
-
-          noAddressPlaceholder.style.display = 'block';
-
-        } else {
-
-          noAddressPlaceholder.style.display = 'none';
-
-          addressDisplay.innerHTML = `
-
-            <p class="font-medium">${userAddress.name}</p>
-
-            <p>${userAddress.street}</p>
-
-            <p>${userAddress.city}, ${userAddress.province}</p>
-
-          `;
-
-        }
-
-        // Pre-fill the modal form when it's opened
-
-        document.getElementById('address-name').value = userAddress?.name || '';
-
-        document.getElementById('address-street').value = userAddress?.street || '';
-
-        document.getElementById('address-city').value = userAddress?.city || '';
-
-        document.getElementById('address-province').value = userAddress?.province || '';
-
-      }
-
-
-
-      addressForm.addEventListener('submit', (e) => {
-
-        e.preventDefault();
-
-        userAddress = {
-
-          name: document.getElementById('address-name').value,
-
-          street: document.getElementById('address-street').value,
-
-          city: document.getElementById('address-city').value,
-
-          province: document.getElementById('address-province').value,
-
-        };
-
-        localStorage.setItem('userAddress', JSON.stringify(userAddress));
-
-        renderAddress();
-
-        addressForm.reset();
-
-        closeModal(addressModal);
-
-      });
-
-
-
-      // --- Payment Methods Logic ---
-
-      const paymentForm = document.getElementById('paymentForm');
-
-      const paymentList = document.getElementById('paymentList');
-
-      const noPaymentPlaceholder = document.getElementById('noPaymentPlaceholder');
-
-      let payments = JSON.parse(localStorage.getItem('userPayments')) || [];
-
-
-
-      function getCardType(number) {
-
-        if (/^4/.test(number)) return { type: 'Visa', icon: 'fa-cc-visa', color: 'text-blue-700' };
-
-        if (/^5[1-5]/.test(number)) return { type: 'Mastercard', icon: 'fa-cc-mastercard', color: 'text-red-600' };
-
-        return { type: 'Card', icon: 'fa-credit-card', color: 'text-gray-500' };
-
-      }
-
-
-
-      function renderPayments() {
-
-        paymentList.innerHTML = '';
-
-        if (payments.length === 0) {
-
-          paymentList.appendChild(noPaymentPlaceholder);
-
-          noPaymentPlaceholder.style.display = 'block';
-
-        } else {
-
-          noPaymentPlaceholder.style.display = 'none';
-
-          payments.forEach((pay, index) => {
-
-            const cardInfo = getCardType(pay.number);
-
-            const div = document.createElement('div');
-
-            div.className = 'p-4 border rounded-lg flex justify-between items-center';
-
-            div.innerHTML = `
-
-              <div class="flex items-center gap-3">
-
-                <i class="fab ${cardInfo.icon} ${cardInfo.color} text-2xl"></i>
-
-                <div>
-
-                  <p class="font-medium">${cardInfo.type} ending in ${pay.number.slice(-4)}</p>
-
-                  <p class="text-sm text-gray-500">Expires ${pay.expiry}</p>
-
-                </div>
-
-              </div>
-
-              <button class="delete-payment-btn text-red-500 hover:text-red-700 text-sm" data-index="${index}"><i class="fas fa-trash"></i></button>
-
-            `;
-
-            paymentList.appendChild(div);
-
-          });
-
-        }
-
-      }
-
-
-
-      paymentForm.addEventListener('submit', (e) => {
-
-        e.preventDefault();
-
-        const newPayment = {
-
-          number: document.getElementById('card-number').value,
-
-          name: document.getElementById('card-name').value,
-
-          expiry: document.getElementById('card-expiry').value,
-
-        };
-
-        payments.push(newPayment);
-
-        localStorage.setItem('userPayments', JSON.stringify(payments));
-
-        renderPayments();
-
-        paymentForm.reset();
-
-        closeModal(paymentModal);
-
-      });
-
-
-
-      paymentList.addEventListener('click', (e) => {
-
-        if (e.target.closest('.delete-payment-btn')) {
-
-          const index = e.target.closest('.delete-payment-btn').dataset.index;
-
-          payments.splice(index, 1);
-
-          localStorage.setItem('userPayments', JSON.stringify(payments));
-
-          renderPayments();
-
-        }
-
-      });
-
-
 
       // --- Settings Logic ---
 
@@ -1788,32 +1883,6 @@ try {
         });
 
       });
-
-
-
-      // --- FAQ Accordion Logic ---
-
-      const faqQuestions = document.querySelectorAll('.faq-question');
-
-      faqQuestions.forEach(question => {
-
-        question.addEventListener('click', () => {
-
-          const answer = question.nextElementSibling;
-
-          const icon = question.querySelector('i');
-
-          
-
-          answer.classList.toggle('hidden');
-
-          icon.classList.toggle('rotate-180');
-
-        });
-
-      });
-
-
 
       // --- Order History Logic ---
 
@@ -1930,10 +1999,6 @@ try {
       // --- Initial Render on Load ---
 
       renderOrders();
-
-      renderAddress();
-
-      renderPayments();
 
       applySettings();
 
@@ -2103,6 +2168,53 @@ try {
 
 
 
+<<<<<<< HEAD
+=======
+        try {
+
+          const formData = new FormData();
+<<<<<<< HEAD
+
+          formData.append('action', 'remove_profile_picture');
+=======
+          formData.append('action', 'update_profile');
+          // Send minimal data, just enough to trigger the right action
+          formData.append('profile_picture', 'remove'); // Signal to backend to remove picture
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
+
+
+
+          const response = await fetch('profile.php', {
+
+            method: 'POST',
+
+            body: formData
+
+          });
+
+          
+
+          // Check if response is ok
+
+          if (!response.ok) {
+
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+          }
+
+          
+
+          const responseText = await response.text();
+
+          console.log('Server response:', responseText);
+
+          
+
+          // Try to parse JSON with better error handling
+
+          let result;
+
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
           try {
 
             const formData = new FormData();
@@ -2288,11 +2400,14 @@ try {
         // Save to database via AJAX
 
         try {
+<<<<<<< HEAD
 
           console.log('🔄 Submitting profile update...');
 
           
 
+=======
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
           const response = await fetch('profile.php', {
 
             method: 'POST',
@@ -2300,6 +2415,7 @@ try {
             body: formData
 
           });
+<<<<<<< HEAD
 
           
 
@@ -2360,6 +2476,9 @@ try {
           }
 
           
+=======
+          const result = await response.json();
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 
           if (result.status === 'success') {
 
@@ -2387,9 +2506,100 @@ try {
 
               sessionStorage.setItem('profile_picture', picPath);
 
+<<<<<<< HEAD
               sessionStorage.setItem('profile_updated', Date.now().toString());
 
               console.log('💾 Profile picture saved to sessionStorage:', picPath);
+=======
+              // Update display mode
+              const nameParts = (data.full_name || '').split(' ');
+              const newFirstName = nameParts.shift();
+              const newLastName = nameParts.join(' ');
+
+              document.getElementById('displayFirstName').textContent = newFirstName;
+              document.getElementById('displayLastName').textContent = newLastName;
+              document.getElementById('displayFullName').textContent = data.full_name;
+
+              document.getElementById('displayEmail').textContent = data.email;
+
+              document.getElementById('displayPhone').textContent = data.phone || 'Not provided';
+
+              document.getElementById('displayUsername').textContent = data.username || 'Not set';
+              document.getElementById('displayBio').textContent = data.bio || 'Welcome to Farmers Mall!';
+
+              // Format member since
+
+              if (data.created_at) {
+
+                const createdDate = new Date(data.created_at);
+
+                const formattedDate = createdDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+                document.getElementById('displayMemberSince').textContent = formattedDate;
+
+              }
+
+              
+
+              // Update profile pictures in all locations
+
+              if (data.profile_picture) {
+                const picPath = '../' + data.profile_picture + '?t=' + new Date().getTime(); // Cache-busting
+
+                
+
+                // Display mode profile picture
+
+                const displayPicEl = document.getElementById('displayProfilePic');
+
+                displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`; 
+
+                
+
+                // Sidebar profile picture
+
+                const sidebarPicEl = document.getElementById('sidebarProfilePic');
+
+                sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`; 
+
+                
+
+                // Navbar profile picture
+
+                const navPicBtn = document.getElementById('profileDropdownBtn');
+                navPicBtn.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">`;
+
+                
+
+                // Edit mode preview
+
+                const editPicEl = document.getElementById('editProfilePicPreview');
+
+                editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`; 
+
+                
+
+                document.getElementById('removeProfilePic').classList.remove('hidden');
+
+              }
+
+              
+
+              // Update sidebar name and email
+
+              document.querySelector('aside h2').textContent = data.full_name;
+
+              document.querySelector('aside p').textContent = data.email;
+
+              
+
+              // Update edit form with fresh data
+              document.getElementById('editFirstName').value = newFirstName; 
+              document.getElementById('editLastName').value = newLastName; 
+              document.getElementById('editEmail').value = data.email;
+              document.getElementById('editPhone').value = data.phone || '';
+              document.getElementById('editBio').value = data.bio || '';
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
 
             }
 
@@ -2417,7 +2627,7 @@ try {
 
           }
 
-        } catch (error) {
+        } catch (error) { 
 
           console.error('💥 Profile update error:', error);
 
@@ -2426,130 +2636,47 @@ try {
           showErrorModal('An error occurred while updating your profile. Please try again.');
 
         }
-
       });
 
+      // --- My Address Edit Logic ---
+      const cancelAddressEdit = document.getElementById('cancelAddressEdit');
+      const saveAddress = document.getElementById('saveAddress');
 
+      cancelAddressEdit.addEventListener('click', () => {
+        addressDisplay.classList.remove('hidden');
+        addressEdit.classList.add('hidden');
+      });
 
-      // --- Logout Modal Logic ---
+      saveAddress.addEventListener('click', async () => {
+        const newAddress = document.getElementById('editAddress').value;
+        const formData = new FormData();
+        formData.append('action', 'update_profile');
+        formData.append('address', newAddress);
+        // Include names to prevent them from being wiped out
+        formData.append('first_name', '<?php echo addslashes($first_name); ?>');
+        formData.append('last_name', '<?php echo addslashes($last_name); ?>');
 
-      const logoutButton = document.getElementById('logoutButton');
-
-      const logoutModal = document.getElementById('logoutModal');
-
-      const cancelLogoutBtn = document.getElementById('cancelLogout');
-
-  
-
-      if (logoutButton && logoutModal && cancelLogoutBtn) {
-
-        logoutButton.addEventListener('click', (e) => {
-
-          e.preventDefault(); // Prevent the link from navigating immediately
-
-          logoutModal.classList.remove('hidden');
-
-        });
-
-  
-
-        cancelLogoutBtn.addEventListener('click', () => {
-
-          logoutModal.classList.add('hidden');
-
-        });
-
-  
-
-        // Also close modal if user clicks on the background overlay
-
-        logoutModal.addEventListener('click', (e) => {
-
-          if (e.target === logoutModal) logoutModal.classList.add('hidden');
-
-        });
-
-      }
-
-
-
-      // --- Search Functionality ---
-
-      const searchForm = document.getElementById('searchForm');
-
-      const searchInput = document.getElementById('searchInput');
-
-
-
-      if (searchForm && searchInput) {
-
-        searchForm.addEventListener('submit', (e) => {
-
-          const searchTerm = searchInput.value.trim();
-
-          if (searchTerm) {
-
-            // Redirect to products page with search query
-
-            window.location.href = `products.php?search=${encodeURIComponent(searchTerm)}`;
-
-          }
-
-          e.preventDefault();
-
-        });
-
-
-
-        // Also trigger search on Enter key
-
-        searchInput.addEventListener('keypress', (e) => {
-
-          if (e.key === 'Enter') {
-
-            e.preventDefault();
-
-            searchForm.dispatchEvent(new Event('submit'));
-
-          }
-
-        });
-
-      }
-
-
-
-      // --- Cart Badge Functionality ---
-
-      async function syncCartFromDatabase() {
+        showLoadingModal();
 
         try {
+          const response = await fetch('profile.php', {
+            method: 'POST',
+            body: formData
+          });
+          const result = await response.json();
 
-          const response = await fetch('../api/cart.php');
-
-          const data = await response.json();
-
-          
-
-          if (data.success && Array.isArray(data.items)) {
-
-            // Update localStorage with database cart
-
-            localStorage.setItem('cart', JSON.stringify(data.items));
-
-            updateCartIcon();
-
+          if (result.status === 'success') {
+            showSuccessModal('Address updated successfully!');
+            // Use a brief timeout to allow the user to see the success message
+            setTimeout(() => location.reload(), 1500);
+          } else {
+            showErrorModal(result.message || 'Failed to update address.');
           }
-
         } catch (error) {
-
-          console.error('Error syncing cart:', error);
-
-          // If sync fails, just use localStorage
-
-          updateCartIcon();
-
+          console.error('Address update error:', error);
+          showErrorModal('An error occurred while updating your address.');
         }
+<<<<<<< HEAD
 
       }
 
@@ -2605,10 +2732,13 @@ try {
 
         }
 
+=======
+>>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
       });
 
 
 
+<<<<<<< HEAD
       // Listen for cart updates within the same page
 
       window.addEventListener('cartUpdated', updateCartIcon);
@@ -2618,6 +2748,9 @@ try {
         sessionStorage.setItem('profile_picture', '../<?php echo addslashes($profile_picture); ?>');
         sessionStorage.setItem('profile_updated', Date.now().toString());
       <?php endif; ?>
+=======
+
+>>>>>>> ce446b5a03fe1c162b8319f07e877ba0232ef4d7
     });
 
   </script>
