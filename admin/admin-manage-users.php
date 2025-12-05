@@ -7,10 +7,10 @@ $api = getSupabaseAPI();
 $customers = [];
 $sellers = [];
 try {
-    // Fetch all users (customers and other non-retailers)
+    // Fetch all users
     $allUsers = $api->select('users');
 
-    $customers = []; // initialize customers array
+    $customers = []; 
 
     foreach ($allUsers as $user) {
         if ($user['user_type'] === 'customer') {
@@ -34,8 +34,6 @@ try {
     $totalUsers = count($allUsers);
     $totalCustomers = count($customers);
 
-    
-
 } catch (Exception $e) {
     echo "❌ Error fetching users: " . $e->getMessage();
     $customers = [];
@@ -46,14 +44,12 @@ try {
     $allRetailers = $api->select('retailers');
 
     foreach ($allRetailers as $retailer) {
-        // Skip if user_id is null/empty
         if (empty($retailer['user_id'])) continue;
 
-        // Fetch the linked user info
         $user = $api->select('users', ['id' => $retailer['user_id']]);
-        if (!$user) continue; // skip if user not found
+        if (!$user) continue; 
 
-        $user = $user[0]; // select the first (and should be only) user
+        $user = $user[0]; 
 
         $sellers[] = [
             "id" => $retailer['id'],
@@ -76,12 +72,7 @@ try {
     echo "❌ Error fetching retailers: " . $e->getMessage();
     $sellers = [];
 }
-
-
-// $customers and $sellers are ready to use in HTML
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -139,12 +130,35 @@ try {
         color: white;
         border-color: #15803d;
     }
+    
+    /* Pagination Styles */
+    .pagination-btn {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        background-color: white;
+        color: #374151;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+    }
+    .pagination-btn:hover {
+        background-color: #f3f4f6;
+    }
+    .pagination-btn.active {
+        background-color: #15803d;
+        color: white;
+        border-color: #15803d;
+    }
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
   </style>
 </head>
 
 <body class="flex min-h-screen bg-gray-50 text-gray-800">
 
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 sticky top-0 h-screen overflow-y-auto">
     <div>
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
         <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
@@ -186,8 +200,6 @@ try {
           <span>Manage Users</span>
         </a>
       </nav>
-
-      
     </div>
 
     <div class="mt-8 pt-4 border-t border-green-800">
@@ -208,7 +220,6 @@ try {
       </div>
 
       <div class="flex items-center gap-4 ml-auto">
-        <!-- Notification Dropdown -->
         <div class="relative">
             <button id="notification-btn" class="relative" title="View Notifications">
                 <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
@@ -219,7 +230,7 @@ try {
                     <h4 class="font-bold text-gray-800">Notifications</h4>
                 </div>
                 <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
-                    <?php foreach($notifications as $notif): ?>
+                    <?php if(isset($notifications)): foreach($notifications as $notif): ?>
                     <a href="#" class="flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>">
                         <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
                             <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
@@ -227,7 +238,7 @@ try {
                         <div class="flex-1"><p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p><p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p></div>
                         <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
                     </a>
-                    <?php endforeach; ?>
+                    <?php endforeach; endif; ?>
                 </div>
                 <div class="p-2 border-t"><a href="#" id="view-all-notifications-btn" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
             </div>
@@ -330,14 +341,9 @@ try {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                <div class="flex justify-end mt-4">
-    <nav class="pagination flex gap-2" id="customers-pagination"></nav>
-</div>
-
-<div class="flex justify-end mt-4">
-    <nav class="pagination flex gap-2" id="sellers-pagination"></nav>
-</div>
-
+                <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                    <nav class="pagination flex gap-2" id="customers-pagination"></nav>
+                </div>
             </div>
         </div>
     </div>
@@ -411,12 +417,14 @@ try {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                    <nav class="pagination flex gap-2" id="sellers-pagination"></nav>
+                </div>
             </div>
         </div>
     </div>
 
 
-    <!-- Add User Modal -->
     <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
         <h3 class="font-bold text-xl mb-4 text-gray-900">Add New User</h3>
@@ -442,14 +450,13 @@ try {
                 <button type="button" class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
                 <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Add User</button>
             </div>
-        </form> <!-- This was missing the closing tag -->
+        </form>
       </div>
     </div>
 
         </div>
     </div>
 
-    <!-- Edit User Modal (Generic for both Customers and Sellers) -->
     <div id="edit-user-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
         <h3 class="font-bold text-xl mb-4 text-gray-900">Edit User Details</h3>
@@ -477,7 +484,6 @@ try {
       </div>
     </div>
 
-    <!-- Generic Confirmation Modal (Delete/Suspend) -->
     <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
             <div class="text-red-500 text-5xl mb-4 mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-red-100">
@@ -495,12 +501,6 @@ try {
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
@@ -520,36 +520,33 @@ try {
       </div>
     </div>
 
-
   </div> 
+
   <script>
-    
-    // --- Main Application State ---
     const app = {
         activeTab: 'customers',
         currentAction: null,
         currentRowElement: null,
         currentUserId: null,
         elements: {},
-        pageSize: 15,
-currentPage: { customers: 1, sellers: 1 },
+        pageSize: 10, // LIMIT 10 USERS PER ROW/PAGE
+        currentPage: { customers: 1, sellers: 1 },
 
-
-        // --- Initialization ---
         init() {
             this.cacheDOMElements();
             this.bindEvents();
-            this.applyFilters(); // Initial filter on page load
+            this.applyFilters(false); 
         },
 
-        // --- Cache DOM Elements for performance ---
         cacheDOMElements() {
             this.elements = {
                 searchInput: document.getElementById('search-input'),
                 customerFilter: document.getElementById('customer-status-filter'),
                 sellerFilter: document.getElementById('seller-status-filter'),
                 customersTableBody: document.getElementById('customers-table-body'),
-                sellersTableBody: document.getElementById('sellers-table-body'),                
+                sellersTableBody: document.getElementById('sellers-table-body'),
+                customersPagination: document.getElementById('customers-pagination'),
+                sellersPagination: document.getElementById('sellers-pagination'),                
                 exportBtn: document.getElementById('export-btn'),
                 editUserModal: document.getElementById('edit-user-modal'),
                 editUserForm: document.getElementById('edit-user-form'),
@@ -570,12 +567,11 @@ currentPage: { customers: 1, sellers: 1 },
             };
         },
 
-        // --- Bind all event listeners ---
         bindEvents() {
             this.elements.tabsContainer.addEventListener('click', this.handleTabSwitch.bind(this));
-            this.elements.searchInput.addEventListener('input', this.applyFilters.bind(this));
-            this.elements.customerFilter.addEventListener('change', this.applyFilters.bind(this));
-            this.elements.sellerFilter.addEventListener('change', this.applyFilters.bind(this));
+            this.elements.searchInput.addEventListener('input', () => this.applyFilters(true));
+            this.elements.customerFilter.addEventListener('change', () => this.applyFilters(true));
+            this.elements.sellerFilter.addEventListener('change', () => this.applyFilters(true));
             this.elements.exportBtn.addEventListener('click', this.handleExport.bind(this));
             this.elements.editUserForm.addEventListener('submit', this.handleFormSubmit.bind(this));
             this.elements.cancelActionBtn.addEventListener('click', () => this.hideModal(this.elements.confirmationModal));
@@ -597,9 +593,12 @@ currentPage: { customers: 1, sellers: 1 },
             this.elements.notificationBtn.addEventListener('click', this.toggleNotificationDropdown.bind(this));
             this.elements.viewAllNotificationsBtn.addEventListener('click', this.expandNotifications.bind(this));
             window.addEventListener('click', this.closeNotificationDropdown.bind(this));
+            
+            // Pagination listeners
+            this.elements.customersPagination.addEventListener('click', (e) => this.handlePaginationClick(e, 'customers'));
+            this.elements.sellersPagination.addEventListener('click', (e) => this.handlePaginationClick(e, 'sellers'));
         },
 
-        // --- Event Handlers ---
         handleTabSwitch(e) {
             const tabButton = e.target.closest('.tab-btn');
             if (!tabButton) return;
@@ -612,22 +611,83 @@ currentPage: { customers: 1, sellers: 1 },
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`tab-${this.activeTab}`).classList.add('active');
 
-            this.applyFilters();
+            this.renderPage(this.activeTab);
         },
 
-        applyFilters() {
+        applyFilters(resetPage = false) {
             const searchTerm = this.elements.searchInput.value.toLowerCase();
-            const isCustomers = this.activeTab === 'customers';
-            const status = isCustomers ? this.elements.customerFilter.value : this.elements.sellerFilter.value;
-            const tableBody = isCustomers ? this.elements.customersTableBody : this.elements.sellersTableBody;
-            const rows = tableBody.querySelectorAll('tr');
+            
+            ['customers', 'sellers'].forEach(type => {
+                const isCustomers = type === 'customers';
+                const status = isCustomers ? this.elements.customerFilter.value : this.elements.sellerFilter.value;
+                const tableBody = isCustomers ? this.elements.customersTableBody : this.elements.sellersTableBody;
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
 
-            rows.forEach(row => {
-                const rowText = row.textContent.toLowerCase();
-                const statusMatch = status === 'All Statuses' || row.dataset.status === status;
-                const searchMatch = rowText.includes(searchTerm);
-                row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+                rows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    const statusMatch = status === 'All Statuses' || row.dataset.status === status;
+                    const searchMatch = rowText.includes(searchTerm);
+                    
+                    if (statusMatch && searchMatch) {
+                        row.classList.add('filter-match');
+                        row.classList.remove('filter-no-match');
+                    } else {
+                        row.classList.remove('filter-match');
+                        row.classList.add('filter-no-match');
+                        row.style.display = 'none';
+                    }
+                });
+                
+                if(resetPage) this.currentPage[type] = 1;
+                this.renderPage(type);
             });
+        },
+        
+        renderPage(type) {
+            const tableBody = type === 'customers' ? this.elements.customersTableBody : this.elements.sellersTableBody;
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+            const matchedRows = rows.filter(r => r.classList.contains('filter-match'));
+            
+            const totalItems = matchedRows.length;
+            const totalPages = Math.ceil(totalItems / this.pageSize);
+            
+            if (this.currentPage[type] > totalPages) this.currentPage[type] = totalPages || 1;
+            
+            const startIndex = (this.currentPage[type] - 1) * this.pageSize;
+            const endIndex = startIndex + this.pageSize;
+            
+            // Hide all first
+            rows.forEach(r => r.style.display = 'none');
+            // Show slice
+            matchedRows.slice(startIndex, endIndex).forEach(r => r.style.display = '');
+            
+            this.updatePaginationControls(type, totalPages);
+        },
+        
+        updatePaginationControls(type, totalPages) {
+            const container = type === 'customers' ? this.elements.customersPagination : this.elements.sellersPagination;
+            const current = this.currentPage[type];
+            let html = '';
+            
+            if (totalPages > 1) {
+                html += `<button class="pagination-btn" data-page="${current - 1}" ${current === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+                        html += `<button class="pagination-btn ${i === current ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                    } else if (i === current - 2 || i === current + 2) {
+                        html += `<span class="px-2">...</span>`;
+                    }
+                }
+                html += `<button class="pagination-btn" data-page="${current + 1}" ${current === totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button>`;
+            }
+            container.innerHTML = html;
+        },
+        
+        handlePaginationClick(e, type) {
+            const btn = e.target.closest('.pagination-btn');
+            if (!btn || btn.disabled) return;
+            this.currentPage[type] = parseInt(btn.dataset.page);
+            this.renderPage(type);
         },
 
         handleTableAction(e) {
@@ -639,15 +699,9 @@ currentPage: { customers: 1, sellers: 1 },
             this.currentRowElement = btn.closest('tr');
 
             if (this.currentAction === 'edit') {
-                // Use more specific selectors to reliably get user data
                 const name = this.currentRowElement.querySelector('.text-sm.font-medium.text-gray-900')?.textContent || '';
                 const email = this.currentRowElement.querySelector('.text-xs.text-gray-500, .text-sm.text-gray-900')?.textContent || '';
-                
-                // Different phone selectors for customer vs seller
-                let phone = this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')?.textContent || ''; // Customer phone
-                if (!phone) {
-                    phone = this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')?.textContent || ''; // Seller phone
-                }
+                let phone = this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')?.textContent || '';
                 
                 this.elements.editUserNameInput.value = name;
                 this.elements.editUserEmailInput.value = email;
@@ -665,12 +719,8 @@ currentPage: { customers: 1, sellers: 1 },
             e.preventDefault();
             const form = e.target;
             if (form.id === 'edit-user-form' && this.currentRowElement) {
-                // Logic to update UI after edit
                 this.currentRowElement.querySelector('.text-sm.font-medium.text-gray-900').textContent = this.elements.editUserNameInput.value;
                 this.currentRowElement.querySelector('td:nth-child(2) .text-sm, td:nth-child(1) .text-xs.text-gray-500').textContent = this.elements.editUserEmailInput.value;
-                if (this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500')) {
-                    this.currentRowElement.querySelector('td:nth-child(2) .text-xs.text-gray-500').textContent = this.elements.editUserPhoneInput.value;
-                }
                 this.hideModal(this.elements.editUserModal);
             }
             form.reset();
@@ -679,13 +729,12 @@ currentPage: { customers: 1, sellers: 1 },
         handleConfirmAction() {
             if (this.currentAction === 'delete') {
                 this.currentRowElement.remove();
+                this.applyFilters(false); 
             } else if (this.currentAction === 'suspend') {
                 const statusCell = this.currentRowElement.querySelector('td:nth-child(4) span');
                 statusCell.textContent = 'Suspended';
                 statusCell.className = 'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200';
                 this.currentRowElement.dataset.status = 'Suspended';
-                
-                // Remove the suspend button after action
                 const suspendButton = this.currentRowElement.querySelector('button[data-action="suspend"]');
                 if (suspendButton) suspendButton.remove();
             }
@@ -693,10 +742,9 @@ currentPage: { customers: 1, sellers: 1 },
         },
 
         handleExport() {
-            // This function remains largely the same, just integrated here
             const isCustomers = this.activeTab === 'customers';
             const tableBody = isCustomers ? this.elements.customersTableBody : this.elements.sellersTableBody;
-            const rows = [...tableBody.querySelectorAll('tr')].filter(row => row.style.display !== 'none');
+            const rows = [...tableBody.querySelectorAll('tr')].filter(row => row.classList.contains('filter-match'));
             let data, headers, filename;
 
             if (isCustomers) {
@@ -734,7 +782,6 @@ currentPage: { customers: 1, sellers: 1 },
             this.downloadCSV(headers, data, filename);
         },
 
-        // --- Utility Functions ---
         showModal(modal) { modal?.classList.replace('hidden', 'flex'); },
         hideModal(modal) { modal?.classList.replace('flex', 'hidden'); },
         toggleNotificationDropdown(e) { e.stopPropagation(); this.elements.notificationDropdown.classList.toggle('hidden'); },
@@ -757,7 +804,6 @@ currentPage: { customers: 1, sellers: 1 },
         }
     };
 
-    // --- Entry Point ---
     document.addEventListener('DOMContentLoaded', () => app.init());
   </script>
   <script src="admin-theme.js"></script>
