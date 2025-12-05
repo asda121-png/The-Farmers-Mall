@@ -80,12 +80,7 @@ include '../retailer/retailerheader.php';
         <div>
           <label for="productCategory" class="block text-sm font-medium text-gray-700">Category</label>
           <select id="productCategory" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none bg-white">
-            <option>Vegetables</option>
-            <option>Fruits</option>
-            <option>Dairy</option>
-            <option>Meat</option>
-            <option>Seafood</option>
-            <option>Bakery</option>
+            <!-- Options will be populated by JS -->
           </select>
         </div>
         <div class="grid grid-cols-2 gap-4">
@@ -217,6 +212,15 @@ include '../retailer/retailerheader.php';
 
       const inventoryTableBody = document.getElementById('inventoryTableBody');
       const paginationContainer = document.getElementById('paginationContainer');
+
+      const allCategories = [
+        'Vegetables',
+        'Fruits',
+        'Dairy',
+        'Meat',
+        'Seafood',
+        'Bakery'
+      ];
 
       const initialProducts = [
         { id: 1, name: 'Red Onions', category: 'Vegetables', price: 55, unit: 'kg', stock: 5, img: 'seller/red-onion.png', lastUpdated: '2023-10-28T10:00:00Z' },
@@ -423,9 +427,8 @@ include '../retailer/retailerheader.php';
       // Category Filter Logic
       const populateCategoryFilter = () => {
         const container = document.getElementById('categoryFilterContainer');
-        const categories = [...new Set(allProducts.map(p => p.category))];
         container.innerHTML = '';
-        categories.forEach(cat => {
+        allCategories.forEach(cat => {
           const label = document.createElement('label');
           label.className = 'flex items-center';
           label.innerHTML = `<input type="checkbox" value="${cat}" class="accent-green-600 mr-2"> ${cat}`;
@@ -433,6 +436,16 @@ include '../retailer/retailerheader.php';
         });
       };
 
+      const populateCategoryDropdown = () => {
+        const select = document.getElementById('productCategory');
+        select.innerHTML = '';
+        allCategories.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          select.appendChild(option);
+        });
+      };
       applyCategoryFilters.addEventListener('click', () => {
         applyFiltersAndSearch();
         closeModal(filterModal);
@@ -449,6 +462,7 @@ include '../retailer/retailerheader.php';
       // Initial render
       renderInventory();
       populateCategoryFilter();
+      populateCategoryDropdown();
     });
   </script>
 </body>
