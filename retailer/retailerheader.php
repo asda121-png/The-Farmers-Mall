@@ -50,13 +50,44 @@
       <div class="flex items-center space-x-6">
         <a href="retailerdashboard.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
         <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-        <a href="retailernotifications.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-        <a href="retailerprofile.php">
-          <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer">
+        <a href="retailernotifications.php" class="text-gray-600 relative">
+          <i class="fa-regular fa-bell"></i>
+          <!-- Notification badge can be added here if needed -->
         </a>
+
+        <!-- Profile Dropdown -->
+        <div class="relative inline-block text-left">
+          <button id="profileDropdownBtn" class="flex items-center">
+            <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer object-cover">
+          </button>
+
+          <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
+            <a href="retailerprofile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+            <a href="retailerprofile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+            <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+          </div>
+        </div>
+        <!-- End Profile Dropdown -->
       </div>
     </div>
   </header>
+
+  <!-- Dropdown JS -->
+  <script>
+    const btn = document.getElementById('profileDropdownBtn');
+    const menu = document.getElementById('profileDropdown');
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+        if (!menu.classList.contains('hidden')) {
+            menu.classList.add('hidden');
+        }
+    });
+  </script>
 </body>
 
 </html>

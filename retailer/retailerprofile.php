@@ -15,45 +15,40 @@
   <?php include 'retailerheader.php'; ?>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-6 py-10 flex gap-8 flex-grow mb-40">
+  <main class="w-full">
+    <div class="max-w-7xl mx-auto px-6 py-8 flex gap-6 pb-12" style="min-height: calc(100vh - 140px);">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-white rounded-xl shadow p-6">
-      <!-- Profile Info -->
-      <div class="flex flex-col items-center text-center mb-6">
-        <img id="sidebarProfilePic" src="https://randomuser.me/api/portraits/men/32.jpg" class="w-20 h-20 rounded-full mb-3 object-cover" alt="Profile">
-        <h2 id="sidebarShopName" class="font-semibold">Shop Name</h2>
-        <p id="sidebarEmail" class="text-gray-500 text-sm">email@example.com</p>
+    <aside class="w-72">
+      <div class="bg-white rounded-lg shadow p-6">
+        <!-- Navigation: Profile-focused items -->
+        <nav class="space-y-2 text-sm">
+          <a href="#profile-overview" class="sidebar-link active flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-user"></i> Profile Overview
+          </a>
+          <a href="#account-details" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-id-card"></i> Account Details
+          </a>
+          <a href="#shop-settings" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-cog"></i> Shop Settings
+          </a>
+          <a href="#business-permit-section" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-file-contract"></i> Business Permit
+          </a>
+          <a href="#payment-details" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-credit-card"></i> Payment Details
+          </a>
+          <a href="#change-password" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700">
+            <i class="fas fa-key"></i> Change Password
+          </a>
+          
+        </nav>
       </div>
-
-      <!-- Navigation -->
-      <nav class="space-y-2 text-sm font-medium">
-        <a href="retailerprofile.php" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 text-green-700">
-          <i class="fas fa-user"></i> My Profile
-        </a>
-        <a href="retailerorders.php" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-          <i class="fas fa-box"></i> Orders
-        </a>
-        <a href="retailerproducts.php" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-          <i class="fas fa-tag"></i> Products
-        </a>
-        <a href="retailerinventory.php" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-          <i class="fas fa-warehouse"></i> Inventory
-        </a>
-      
-
-        <!-- Logout Button -->
-        <div class="border-t pt-2 mt-2">
-          <button id="logoutBtn" class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </button>
-        </div>
-      </nav>
     </aside>
 
     <!-- Main Profile Form -->
     <div class="flex-1">
-      <section id="my-profile" class="bg-white rounded-lg shadow p-6">
+      <section id="profile-overview" class="content-section bg-white rounded-lg shadow p-6">
         <div class="flex justify-between items-center mb-6">
           <h2 class="font-semibold text-lg">My Profile</h2>
           <button id="editProfileBtn" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
@@ -74,7 +69,7 @@
                 <input type="file" id="imageUpload" class="hidden" accept="image/png, image/jpeg, image/gif" disabled/>
               </div>
               <div class="flex-1 space-y-2">
-                <input type="text" id="shopName" placeholder="Example Farm" class="text-2xl font-bold bg-transparent border-none p-0 focus:ring-0 w-full placeholder-gray-400" disabled>
+                <input type="text" id="shopName" placeholder="Green Valley Organics" class="text-2xl font-bold bg-transparent border-none p-0 focus:ring-0 w-full placeholder-black" disabled>
                 <input type="text" id="shopAddress" placeholder="Mati, Davao Oriental" class="text-sm text-gray-500 bg-transparent border-none p-0 focus:ring-0 w-full placeholder-gray-400" disabled>
               </div>
             </div>
@@ -123,6 +118,41 @@
         </div>
 
       </section>
+
+      <!-- Other sections (hidden by default) -->
+      <section id="account-details" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg">Account Details</h2>
+        <p class="mt-4 text-gray-600">This section will contain account details management.</p>
+        <!-- Content from retaileraccount.php would go here -->
+      </section>
+
+      <section id="shop-settings" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg">Shop Settings</h2>
+        <p class="mt-4 text-gray-600">This section will contain shop settings.</p>
+        <!-- Content from retailersettings.php would go here -->
+      </section>
+
+      <section id="business-permit-section" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg">Business Permit</h2>
+        <p class="mt-4 text-gray-600">This section will show business permit details.</p>
+        <div class="mt-4">
+            <button type="button" id="seePermitBtn2" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed">See Business Permit</button>
+        </div>
+      </section>
+
+      <section id="payment-details" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg">Payment Details</h2>
+        <p class="mt-4 text-gray-600">This section will contain payment details management.</p>
+        <!-- Content from retailerpayments.php would go here -->
+      </section>
+
+      <section id="change-password" class="content-section bg-white rounded-lg shadow p-6 hidden">
+        <h2 class="font-semibold text-lg">Change Password</h2>
+        <p class="mt-4 text-gray-600">This section will contain the change password form.</p>
+        <!-- Content from retailerchangepassword.php would go here -->
+      </section>
+
+
     </div>
   </main>
 
@@ -167,8 +197,53 @@
   </div>
 
   <script src="../assets/js/retailerprofile.js"></script>
-  <!-- Footer -->
-  <footer class="text-white py-12" style="background-color: #1B5E20;">
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      function updateContent(hash) {
+        const targetHash = hash || '#profile-overview';
+
+        // Hide all sections
+        contentSections.forEach(section => {
+          section.classList.add('hidden');
+        });
+
+        // Show the target section
+        const targetSection = document.querySelector(targetHash);
+        if (targetSection) {
+          targetSection.classList.remove('hidden');
+        }
+
+        // Update active link style
+        sidebarLinks.forEach(link => {
+          if (link.getAttribute('href') === targetHash) {
+            link.classList.add('bg-green-50', 'text-green-700');
+            link.classList.remove('hover:bg-gray-100');
+          } else {
+            link.classList.remove('bg-green-50', 'text-green-700');
+            link.classList.add('hover:bg-gray-100');
+          }
+        });
+      }
+
+      // Handle clicks on sidebar links
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault(); // Prevent default link behavior
+          const newHash = link.hash;
+          history.pushState(null, '', newHash); // Update URL without reloading
+          updateContent(newHash);
+        });
+      });
+
+      // Show content based on initial URL hash, or default to the first one
+      updateContent(window.location.hash);
+    });
+  </script>
+  <!-- Footer (static position) -->
+  <footer class="text-white py-6" style="background-color: #1B5E20; margin-top: 1.5rem;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       
       <!-- Logo/About -->

@@ -128,13 +128,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- Logout Modal Logic ---
 
-  logoutBtn.addEventListener('click', () => {
-    logoutModal.classList.remove('hidden');
-  });
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      if (logoutModal) logoutModal.classList.remove('hidden');
+    });
+  }
 
-  cancelLogout.addEventListener('click', () => {
-    logoutModal.classList.add('hidden');
-  });
+  if (cancelLogout) {
+    cancelLogout.addEventListener('click', () => {
+      if (logoutModal) logoutModal.classList.add('hidden');
+    });
+  }
 
   // The confirmLogout button is an <a> tag, so it will navigate automatically.
   // If you needed to do something before logging out (like an API call),
@@ -145,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // });
 
   // --- Business Permit Modal Logic ---
-
   seePermitBtn.addEventListener('click', () => {
     // In a real application, you would fetch the permit URL from the user's data.
     // For this example, we'll use a placeholder image.
@@ -212,7 +215,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('displayEmail').textContent = userData.email;
 
     // Enable or disable permit button
-    document.getElementById('seePermitBtn').disabled = !userData.hasPermit;
+    // The button is now always enabled to allow the click handler to show a loading/error state.
+    // You can re-introduce this line if you want to disable the button when no permit URL is available from the backend.
+    document.getElementById('seePermitBtn').disabled = false;
   };
 
   loadInitialData();
