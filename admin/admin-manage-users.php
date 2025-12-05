@@ -1,126 +1,51 @@
 <?php
-// admin-manage-users.php
+require_once __DIR__ . '/../config/supabase-api.php';
 
-// Mock notifications for the dropdown
-$notifications = [
-    [
-        "id" => "N001",
-        "type" => "New User",
-        "icon" => "fa-user-plus",
-        "color" => "green",
-        "title" => "New Customer Registered",
-        "message" => "Alex Reyes has created an account.",
-        "time" => "15m ago",
-        "read" => false
-    ],
-    [
-        "id" => "N002",
-        "type" => "New Order",
-        "icon" => "fa-receipt",
-        "color" => "blue",
-        "title" => "New Order #ORD-006",
-        "message" => "An order amounting to ₱1,250 has been placed.",
-        "time" => "1h ago",
-        "read" => false
-    ],
-    [
-        "id" => "N003",
-        "type" => "Low Stock",
-        "icon" => "fa-box-open",
-        "color" => "yellow",
-        "title" => "Low Stock Warning",
-        "message" => "'Organic Apples' are running low.",
-        "time" => "3h ago",
-        "read" => true
-    ],
-    [
-        "id" => "N004",
-        "type" => "System Alert",
-        "icon" => "fa-shield-halved",
-        "color" => "red",
-        "title" => "System Maintenance Scheduled",
-        "message" => "A system-wide maintenance is scheduled for tonight.",
-        "time" => "1d ago",
-        "read" => true
-    ],
-];
-// Mock Data
+try {
+    $api = getSupabaseAPI();
 
-$customers = [
-    [
-        "id" => "USR-001",
-        "name" => "Sarah Johnson",
-        "email" => "sarah.j@gmail.com",
-        "phone" => "0917-111-2222",
-        "location" => "Makati City",
-        "total_orders" => 15,
-        "status" => "Active",
-        "joined" => "Nov 10, 2023",
-        "avatar" => "https://randomuser.me/api/portraits/women/44.jpg"
-    ],
-    [
-        "id" => "USR-002",
-        "name" => "Mike Ross",
-        "email" => "mike.ross@yahoo.com",
-        "phone" => "0918-333-4444",
-        "location" => "Taguig City",
-        "total_orders" => 3,
-        "status" => "Inactive",
-        "joined" => "Oct 05, 2023",
-        "avatar" => "https://randomuser.me/api/portraits/men/32.jpg"
-    ],
-    [
-        "id" => "USR-003",
-        "name" => "Emily Chen",
-        "email" => "emily.c@gmail.com",
-        "phone" => "0920-555-6666",
-        "location" => "Pasig City",
-        "total_orders" => 22,
-        "status" => "Active",
-        "joined" => "Sep 12, 2023",
-        "avatar" => "https://randomuser.me/api/portraits/women/65.jpg"
-    ]
-];
+    // Fetch all users
+    $allUsers = $api->select('users'); // This returns an array of user records
 
-$sellers = [
-    [
-        "id" => "SLR-101",
-        "name" => "Juan Dela Cruz",
-        "store_name" => "Juan's Fresh Farm",
-        "email" => "juan.farm@email.com",
-        "phone" => "0917-999-8888",
-        "location" => "Batangas",
-        "sales" => "₱45,200",
-        "status" => "Verified",
-        "joined" => "Aug 20, 2023",
-        "avatar" => "https://randomuser.me/api/portraits/men/85.jpg"
-    ],
-    [
-        "id" => "SLR-102",
-        "name" => "Maria Clara",
-        "store_name" => "Clara's Organic Goods",
-        "email" => "maria.c@email.com",
-        "phone" => "0919-777-6666",
-        "location" => "Laguna",
-        "sales" => "₱12,500",
-        "status" => "Pending",
-        "joined" => "Nov 15, 2023",
-        "avatar" => "https://randomuser.me/api/portraits/women/22.jpg"
-    ],
-    [
-        "id" => "SLR-103",
-        "name" => "Pedro Penduko",
-        "store_name" => "Pedro's Poultry",
-        "email" => "pedro.p@email.com",
-        "phone" => "0921-555-4321",
-        "location" => "Bulacan",
-        "sales" => "₱0",
-        "status" => "Suspended",
-        "joined" => "Jul 01, 2023",
-        "avatar" => "https://randomuser.me/api/portraits/men/12.jpg"
-    ]
-];
+    // Separate customers and sellers
+    $customers = [];
+    $sellers = [];
+
+    foreach ($allUsers as $user) {
+        if (($user['user_type'] ?? '') === 'customer') {
+            $customers[] = [
+                'id' => $user['id'] ?? '',
+                'name' => $user['full_name'] ?? '',
+                'email' => $user['email'] ?? '',
+                'phone' => $user['phone'] ?? '',
+                'status' => $user['status'] ?? 'Active',
+                'joined' => isset($user['created_at']) ? date('M d, Y', strtotime($user['created_at'])) : '',
+                'total_orders' => $user['total_orders'] ?? 0,
+                'avatar' => $user['avatar'] ?? 'https://randomuser.me/api/portraits/lego/1.jpg'
+            ];
+        } elseif (($user['user_type'] ?? '') === 'seller') {
+            $sellers[] = [
+                'id' => $user['id'] ?? '',
+                'name' => $user['full_name'] ?? '',
+                'store_name' => $user['store_name'] ?? 'My Store',
+                'email' => $user['email'] ?? '',
+                'phone' => $user['phone'] ?? '',
+                'location' => $user['location'] ?? 'Unknown',
+                'sales' => $user['total_sales'] ?? '₱0',
+                'status' => $user['status'] ?? 'Pending',
+                'joined' => isset($user['created_at']) ? date('M d, Y', strtotime($user['created_at'])) : '',
+                'avatar' => $user['avatar'] ?? 'https://randomuser.me/api/portraits/lego/2.jpg'
+            ];
+        }
+    }
+
+} catch (Exception $e) {
+    echo "❌ Error fetching users from Supabase: " . $e->getMessage();
+    $customers = [];
+    $sellers = [];
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

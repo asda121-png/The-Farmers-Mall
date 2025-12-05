@@ -57,6 +57,21 @@ try {
             foreach ($cartItems as $cartItem) {
                 $product = $api->select('products', ['id' => $cartItem['product_id']]);
                 if (!empty($product)) {
+                    // Fix image path - don't add ../ if already present
+                    $imagePath = $product[0]['image_url'] ?? '';
+                    if (!empty($imagePath)) {
+                        // If path already starts with ../, use as is, otherwise add ../
+                        if (strpos($imagePath, '../') === 0) {
+                            $finalImagePath = $imagePath;
+                        } else if (strpos($imagePath, 'images/') === 0) {
+                            $finalImagePath = '../' . $imagePath;
+                        } else {
+                            $finalImagePath = $imagePath;
+                        }
+                    } else {
+                        $finalImagePath = '../images/products/Fresh Vegetable Box.png';
+                    }
+                    
                     $items[] = [
                         'cart_id' => $cartItem['id'],
                         'product_id' => $cartItem['product_id'],
@@ -65,7 +80,8 @@ try {
                         'name' => $product[0]['name'],
                         'price' => floatval($product[0]['price']),
                         'description' => $product[0]['description'] ?? '',
-                        'image' => $product[0]['image_url'] ?? '',
+                        'image' => $finalImagePath,
+                        'image_url' => $finalImagePath,
                         'quantity' => intval($cartItem['quantity']),
                         'stock_quantity' => intval($product[0]['stock_quantity']),
                         'category' => $product[0]['category'] ?? '',

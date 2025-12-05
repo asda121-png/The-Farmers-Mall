@@ -108,7 +108,7 @@ if ($user_id) {
                 <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- End Profile Dropdown -->
@@ -358,6 +358,7 @@ if ($user_id) {
   </div>
 
   <!-- JavaScript -->
+  <script src="../assets/js/profile-sync.js"></script>
   <script src="../assets/js/cart.js"></script>
   <script>
     // Update cart icon with item count
@@ -368,7 +369,7 @@ if ($user_id) {
       let badge = cartIcon.querySelector('.cart-badge');
       if (!badge) {
         badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center';
+        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
         cartIcon.classList.add('relative', 'inline-block');
         cartIcon.appendChild(badge);
       }

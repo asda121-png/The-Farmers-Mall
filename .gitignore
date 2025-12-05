@@ -11,6 +11,9 @@ config/.env
 # Ignore uploads and user-generated content
 uploads/*
 !uploads/.gitkeep
+<<<<<<< HEAD
+!uploads/profiles/**
+=======
 !uploads/products/
 uploads/products/*
 !uploads/products/.gitkeep
@@ -21,6 +24,7 @@ uploads/profile/*
 uploads/profiles/*
 !uploads/profiles/.gitkeep
 
+>>>>>>> 465fe2f704ccd22c6c433a8ac13772e07860f85b
 images/products/*
 !images/products/.gitkeep
 

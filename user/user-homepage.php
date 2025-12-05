@@ -353,7 +353,7 @@ if ($user_id) {
 
             <a href="cart.php" class="text-gray-600 relative inline-block">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center hidden">0</span>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
             </a>
 
             <!-- ************ PROFILE DROPDOWN START ************ -->
@@ -374,7 +374,7 @@ if ($user_id) {
                      class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="/The-Farmers-Mall/The-Farmers-Mall/auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="..\auth\login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- ************ PROFILE DROPDOWN END ************ -->
@@ -576,7 +576,7 @@ if ($user_id) {
         <img src="../images/products/Bangus.jpg" alt="Bangus" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
           <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
-          <p class="text-green-600 font-bold text-sm">₱140.00 per kg</p>
+          <p class="text-green-600 font-bold text-sm">₱170.00 per kg</p>
         </div>
         <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
           <i class="fa-solid fa-plus"></i>
@@ -972,5 +972,6 @@ if ($user_id) {
       });
     });
   </script>
+  <script src="../assets/js/profile-sync.js"></script>
 </body>
 </html>

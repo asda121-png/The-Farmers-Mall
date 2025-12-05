@@ -78,7 +78,7 @@ $failed = 0;
 
 try {
     // Get all products
-    $products = $api->select('products');
+    $products = $api->select('products', []);
     
     echo "<div class='info'>Found " . count($products) . " products to update.</div>";
     
