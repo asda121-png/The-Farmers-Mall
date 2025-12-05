@@ -169,18 +169,11 @@ $user_settings = [
     <div class="pt-6">
         <!-- Profile Tab -->
         <div id="tab-profile" class="tab-content active">
-            <div class="bg-white p-6 rounded-xl card-shadow">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-gray-900">Personal Information</h3>
-                    <div id="profile-actions" class="flex gap-2">
-                         <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
-                         <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 text-center">
+            <div class="bg-white p-6 rounded-xl card-shadow">                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-3 text-center">
                         <div class="relative w-32 h-32 rounded-full mx-auto border-4 border-gray-100 overflow-hidden bg-gray-200 group">
-                            <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-full h-full object-cover" alt="Profile">
+                            <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-full h-full object-cover" alt="Profile" id="profile-image">
                             <label for="profileUpload" class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                                 <i class="fa-solid fa-camera text-white text-2xl"></i>
                             </label>
@@ -189,7 +182,15 @@ $user_settings = [
                         <h3 class="text-xl font-bold text-gray-900 mt-4"><?php echo $user_settings['name']; ?></h3>
                         <p class="text-sm text-gray-500"><?php echo $user_settings['role']; ?></p>
                     </div>
-                    <form id="profile-form" class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="lg:col-span-9">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-900">Personal Information</h3>
+                            <div id="profile-actions" class="flex gap-2">
+                                <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
+                                <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
+                            </div>
+                        </div>
+                        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                             <input type="text" value="<?php echo $user_settings['name']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
@@ -210,7 +211,8 @@ $user_settings = [
                             <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
                             <textarea rows="3" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" placeholder="Tell us a little about yourself..." readonly></textarea>
                         </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
