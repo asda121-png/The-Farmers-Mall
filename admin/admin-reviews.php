@@ -128,14 +128,12 @@ function renderStars($rating) {
           <i class="fa-solid fa-tachometer-alt w-5"></i>
           <span>Dashboard</span>
         </a>
-        <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-box w-5"></i>
-          <span>Products</span>
+       <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
+        <a href="admin-riders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-motorcycle w-5"></i>
+          <span>Riders</span>
         </a>
-        <a href="admin-inventory.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-truck-ramp-box w-5"></i>
-          <span>Inventory</span>
-        </a>
+      </nav>
        
         <a href="admin-reviews.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
           <i class="fa-solid fa-star w-5 text-green-200"></i>

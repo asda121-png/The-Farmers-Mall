@@ -141,13 +141,13 @@ $products = [
   </style>
 </head>
 
-<body class="flex min-h-screen bg-gray-50 text-gray-800">
+<body class="flex min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
 
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 dark:bg-gray-950">
     <div>
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
         <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
-          <i class="fas fa-leaf text-green-700 text-lg"></i>
+          <i class="fas fa-leaf text-green-700 text-lg dark:text-green-600"></i>
         </div>
         <h1 class="text-xl font-bold">Farmers Mall</h1>
       </div>
@@ -155,33 +155,34 @@ $products = [
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest mb-2 px-2">GENERAL</p>
       <nav class="space-y-1">
         <a href="admin-dashboard.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-            <i class="fa-solid fa-tachometer-alt w-5 "></i>
+            <i class="fa-solid fa-tachometer-alt w-5 dark:hover:bg-gray-800"></i>
             <span>Dashboard</span>
         </a>
 
-        <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
-            <i class="fa-solid fa-box w-5 text-green-200"></i>
-            <span>Products</span>
-        </a>
-
-        <a href="admin-inventory.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-            <i class="fa-solid fa-truck-ramp-box w-5"></i>
-            <span>Inventory</span>
-        </a>
-
-     
-        
-
-        <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+        <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300 dark:hover:bg-gray-800">
             <i class="fa-solid fa-receipt w-5"></i>
             <span>Orders</span>
         </a>
-        </nav>
+        
+        <a href="admin-riders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300 dark:hover:bg-gray-800">
+          <i class="fa-solid fa-motorcycle w-5"></i> 
+          <span>Riders</span>
+        </a>
+      </nav>
+
+      <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">MANAGEMENT</p>
+      <nav class="space-y-1">
+        <!-- Active link for Products -->
+        <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow dark:bg-green-600">
+          <i class="fa-solid fa-boxes-stacked w-5 text-green-200"></i>
+          <span>Products</span>
+        </a>
+      </nav>
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
       <nav class="space-y-1">
-        <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-cog w-5"></i>
+        <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300 dark:hover:bg-gray-800">
+          <i class="fa-solid fa-cog w-5"></i> 
           <span>Settings</span>
         </a>
         
@@ -194,20 +195,19 @@ $products = [
     </div>
 
     <div class="mt-8 pt-4 border-t border-green-800">
-      <button id="logoutButton" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-colors duration-200 text-gray-300">
+      <button id="logoutButton" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-colors duration-200 text-gray-300 dark:hover:bg-red-700">
         <i class="fa-solid fa-sign-out-alt w-5"></i>
         <span>Logout</span>
       </button>
     </div>
   </aside>
 
-  <div class="flex-1 p-6 space-y-6 custom-scrollbar">
+  <div class="flex-1 p-6 space-y-6 custom-scrollbar dark:bg-gray-900">
 
-    <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
+    <header class="bg-white dark:bg-gray-800 p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
       <div class="relative w-full max-w-lg hidden md:block"> 
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i> 
-        <input type="text" id="search-input" placeholder="Search products by name or ID..."
-          class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
+        <input type="text" id="search-input" placeholder="Search products by name or ID..." class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-400">
       </div>
 
       <div class="flex items-center gap-4 ml-auto">
@@ -217,7 +217,7 @@ $products = [
                 <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
                 <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             </button>
-            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20 dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-4 border-b">
                     <h4 class="font-bold text-gray-800">Notifications</h4>
                 </div>
@@ -244,11 +244,11 @@ $products = [
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h2 class="text-3xl font-bold text-gray-900">Products</h2>
-            <p class="text-sm text-gray-500">Manage your product catalog and inventory</p>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Products</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Manage your product catalog and inventory</p>
         </div>
         <div class="flex gap-3">
-             <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+             <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
                 <i class="fa-solid fa-file-export"></i> Export
             </button>
             <button id="add-product-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
@@ -257,10 +257,10 @@ $products = [
         </div>
     </div>
 
-    <div class="bg-white p-4 rounded-xl card-shadow flex flex-wrap gap-4 items-center">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl card-shadow flex flex-wrap gap-4 items-center">
         <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 w-full md:w-auto md:min-w-[200px]">
             <i class="fa-solid fa-filter text-gray-400"></i>
-            <select id="category-filter" class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
+            <select id="category-filter" class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer dark:bg-gray-800 dark:text-gray-300">
                 <option value="">All Categories</option>
                 <option value="Vegetables">Vegetables</option>
                 <option value="Fruits">Fruits</option>
@@ -271,7 +271,7 @@ $products = [
         
         <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 w-full md:w-auto md:min-w-[200px]">
              <i class="fa-solid fa-layer-group text-gray-400"></i>
-            <select id="status-filter" class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer">
+            <select id="status-filter" class="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer dark:bg-gray-800 dark:text-gray-300">
                 <option value="">Status</option>
                 <option value="In Stock">In Stock</option>
                 <option value="Low Stock">Low Stock</option>
@@ -280,9 +280,9 @@ $products = [
         </div>
     </div>
 
-    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3">
@@ -295,10 +295,10 @@ $products = [
                         <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Sold</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
-                </thead>
-                <tbody id="products-table-body" class="bg-white divide-y divide-gray-200">
+                </thead> 
+                <tbody id="products-table-body" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                     <?php foreach ($products as $product): ?>
-                    <tr class="product-row hover:bg-gray-50 transition-colors" data-category="<?php echo $product['category']; ?>" data-status="<?php echo $product['status']; ?>">
+                    <tr class="product-row hover:bg-gray-50 transition-colors dark:hover:bg-gray-700">
                         <td class="px-6 py-4">
                             <input type="checkbox" class="product-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-id="<?php echo $product['id']; ?>">
                         </td>
@@ -307,17 +307,17 @@ $products = [
                                 <div class="flex-shrink-0 h-10 w-10">
                                     <img class="h-10 w-10 rounded-lg object-cover border border-gray-100" src="<?php echo $product['image']; ?>" alt="">
                                 </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900"><?php echo $product['name']; ?></div>
-                                    <div class="text-xs text-gray-500">ID: #<?php echo $product['id']; ?></div>
+                                <div class="ml-4 dark:text-gray-200">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-200"><?php echo $product['name']; ?></div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">ID: #<?php echo $product['id']; ?></div>
                                 </div>
                             </div>
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md"><?php echo $product['category']; ?></span>
+                            <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md dark:bg-gray-700 dark:text-gray-300"><?php echo $product['category']; ?></span>
                         </td>
-                        
+
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-semibold text-gray-900">₱<?php echo number_format($product['price'], 2); ?></div>
                         </td>
@@ -333,17 +333,17 @@ $products = [
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit <?php echo $statusClass; ?>">
                                     <?php echo $product['status']; ?>
                                 </span>
-                                <span class="text-xs text-gray-500"><?php echo $product['stock']; ?> items left</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400"><?php echo $product['stock']; ?> items left</span>
                             </div>
                         </td>
                         
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             <?php echo $product['sold']; ?>
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="relative inline-block text-left">
-                                <button type="button" class="action-dropdown-btn inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-id="<?php echo $product['id']; ?>">
+                                <button type="button" class="action-dropdown-btn inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" data-id="<?php echo $product['id']; ?>">
                                     Actions
                                     <i class="fa-solid fa-chevron-down -mr-1 ml-2 h-5 w-5"></i>
                                 </button>
@@ -389,10 +389,10 @@ $products = [
         </div>
     </div>
 
-    <!-- Export Options Modal -->
-    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-md text-center">
-        <div class="text-green-500 text-4xl mb-4">
+    <!-- Export Options Modal --> 
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4 dark:bg-opacity-50">
+      <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-8 w-full max-w-md text-center">
+        <div class="text-green-500 text-4xl mb-4 dark:text-green-400">
           <i class="fa-solid fa-file-csv"></i>
         </div>
         <h3 class="font-bold text-xl mb-2 text-gray-900">Export Product Data</h3>
@@ -408,24 +408,24 @@ $products = [
             Export All Products
           </button>
         </div>
-        <button id="cancelExport" class="mt-6 text-sm text-gray-500 hover:underline">Cancel</button>
+        <button id="cancelExport" class="mt-6 text-sm text-gray-500 hover:underline dark:text-gray-400 dark:hover:text-gray-300">Cancel</button>
       </div>
     </div>
 
-    <!-- Add/Edit Product Modal -->
-    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
-        <h3 id="modalTitle" class="font-bold text-xl mb-4 text-gray-900 border-b pb-2">Add New Product</h3>
+    <!-- Add/Edit Product Modal --> 
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4 dark:bg-opacity-50">
+      <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 w-full max-w-lg">
+        <h3 id="modalTitle" class="font-bold text-xl mb-4 text-gray-900 border-b pb-2 dark:text-white dark:border-gray-700">Add New Product</h3>
         <form id="productForm" class="space-y-4">
             <input type="hidden" id="productId" name="productId">
             <div>
-                <label for="productName" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                <input type="text" id="productName" name="productName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                <label for="productName" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Product Name</label>
+                <input type="text" id="productName" name="productName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select id="productCategory" name="productCategory" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                    <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Category</label>
+                    <select id="productCategory" name="productCategory" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                         <option>Vegetables</option>
                         <option>Fruits</option>
                         <option>Meat</option>
@@ -433,31 +433,31 @@ $products = [
                         <option>Grains</option>
                     </select>
                 </div>
-                <div>
-                    <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1">Price (₱)</label>
-                    <input type="number" id="productPrice" name="productPrice" step="0.01" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                <div class="dark:text-gray-300">
+                    <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Price (₱)</label>
+                    <input type="number" id="productPrice" name="productPrice" step="0.01" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                 </div>
             </div>
             <div>
-                <label for="productStock" class="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
-                <input type="number" id="productStock" name="productStock" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500">
+                <label for="productStock" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Stock Quantity</label>
+                <input type="number" id="productStock" name="productStock" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
             </div>
             <div class="flex justify-end gap-3 pt-4">
-                <button type="button" id="cancelProductModal" class="px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button type="button" id="cancelProductModal" class="px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</button>
                 <button type="submit" class="px-5 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">Save Product</button>
             </div>
         </form>
       </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
-        <div class="text-red-500 text-4xl mb-4">
+    <!-- Delete Confirmation Modal --> 
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4 dark:bg-opacity-50">
+      <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-8 w-full max-w-sm text-center">
+        <div class="text-red-500 text-4xl mb-4 dark:text-red-400">
           <i class="fa-solid fa-trash-can"></i>
         </div>
-        <h3 class="font-bold text-xl mb-2 text-gray-900">Confirm Deletion</h3>
-        <p class="text-gray-600 text-sm mb-6">Are you sure you want to delete "<span id="deleteProductName" class="font-bold"></span>"? This action cannot be undone.</p>
+        <h3 class="font-bold text-xl mb-2 text-gray-900 dark:text-white">Confirm Deletion</h3>
+        <p class="text-gray-600 text-sm mb-6 dark:text-gray-400">Are you sure you want to delete "<span id="deleteProductName" class="font-bold"></span>"? This action cannot be undone.</p>
         <div class="flex justify-center gap-4">
           <button id="cancelDelete" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
           <button id="confirmDelete" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Delete</button>
@@ -465,26 +465,35 @@ $products = [
       </div>
     </div>
 
-    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
-        <div class="text-red-500 text-4xl mb-4">
+    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4 dark:bg-opacity-50">
+      <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-8 w-full max-w-sm text-center">
+        <div class="text-red-500 text-4xl mb-4 dark:text-red-400">
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
-        <h3 class="font-bold text-xl mb-2 text-gray-900">Confirm Logout</h3>
-        <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out of the Farmers Mall Admin Panel?</p>
+        <h3 class="font-bold text-xl mb-2 text-gray-900 dark:text-white">Confirm Logout</h3>
+        <p class="text-gray-600 text-sm mb-6 dark:text-gray-400">Are you sure you want to log out of the Farmers Mall Admin Panel?</p>
         <div class="flex justify-center gap-4">
-          <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
             Cancel
           </button>
-          <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+          <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors dark:bg-red-700 dark:hover:bg-red-800">
             Logout
           </a>
         </div>
       </div>
     </div>
 
-  </div> <script src="admin-theme.js"></script>
+  </div> 
+  <script src="admin-theme.js"></script>
   <script>
+    // --- Theme Switcher Logic (Reads from 'adminTheme' set in admin-settings.php) ---
+    const theme = localStorage.getItem('adminTheme');
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       // Logout Logic
       // Mock product data for JS

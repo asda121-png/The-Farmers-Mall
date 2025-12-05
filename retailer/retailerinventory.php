@@ -70,48 +70,59 @@ include '../retailer/retailerheader.php';
     </div>
   </main>
 
-  <!-- Add/Edit Product Modal (same as sellerproducts.html) -->
-  <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-      <h3 id="modalTitle" class="font-semibold text-lg mb-4">Add New Product</h3>
-      <form id="productForm" class="space-y-4">
-        <input type="hidden" id="productId">
+<!-- Add/Edit Product Modal (same as sellerproducts.html) -->
+<div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+    <h3 id="modalTitle" class="font-semibold text-lg mb-4">Add New Product</h3>
+    <form id="productForm" class="space-y-4" enctype="multipart/form-data">
+      <input type="hidden" id="productId">
+      
+      <div>
+        <label for="productName" class="block text-sm font-medium text-gray-700">Product Name</label>
+        <input type="text" id="productName" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+      </div>
+
+      <div>
+        <label for="productCategory" class="block text-sm font-medium text-gray-700">Category</label>
+        <select id="productCategory" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none bg-white">
+          <option>Vegetables</option>
+          <option>Fruits</option>
+          <option>Dairy</option>
+          <option>Meat</option>
+          <option>Seafood</option>
+          <option>Bakery</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
         <div>
-          <label for="productName" class="block text-sm font-medium text-gray-700">Product Name</label>
-          <input type="text" id="productName" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-        </div>
-        <div>
-          <label for="productCategory" class="block text-sm font-medium text-gray-700">Category</label>
-          <select id="productCategory" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none bg-white">
-            <option>Vegetables</option>
-            <option>Fruits</option>
-            <option>Dairy</option>
-            <option>Meat</option>
-            <option>Seafood</option>
-            <option>Bakery</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label for="productPrice" class="block text-sm font-medium text-gray-700">Price (per unit)</label>
-            <input type="number" id="productPrice" step="0.01" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-          </div>
-          <div>
-            <label for="productUnit" class="block text-sm font-medium text-gray-700">Unit (e.g., kg)</label>
-            <input type="text" id="productUnit" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-          </div>
+          <label for="productPrice" class="block text-sm font-medium text-gray-700">Price (per unit)</label>
+          <input type="number" id="productPrice" step="0.01" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div>
-          <label for="productStock" class="block text-sm font-medium text-gray-700">Stock</label>
-          <input type="number" id="productStock" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+          <label for="productUnit" class="block text-sm font-medium text-gray-700">Unit (e.g., kg)</label>
+          <input type="text" id="productUnit" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <button type="button" id="closeProductModal" class="px-4 py-2 border rounded-md text-sm">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Product</button>
-        </div>
-      </form>
-    </div>
+      </div>
+
+      <div>
+        <label for="productImage" class="block text-sm font-medium text-gray-700">Product Image</label>
+        <input type="file" id="productImage" accept="image/*" class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+      </div>
+
+      <div>
+        <label for="productStock" class="block text-sm font-medium text-gray-700">Stock</label>
+        <input type="number" id="productStock" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button type="button" id="closeProductModal" class="px-4 py-2 border rounded-md text-sm">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Product</button>
+      </div>
+    </form>
   </div>
+</div>
+
 
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
