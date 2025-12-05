@@ -114,7 +114,7 @@
     </nav>
 
     <div class="flex gap-3 mr-[96px]">
-      <a href="<?php echo $base; ?>auth/login.php" class="px-4 py-2 border-2 border-green-600 text-green-600 font-semibold rounded-full hover:bg-green-600 hover:text-white transition">
+      <a href="auth/login.php" class="px-4 py-2 border-2 border-green-600 text-green-600 font-semibold rounded-full hover:bg-green-600 hover:text-white transition">
         Login
       </a>
       <a href="<?php echo $base; ?>retailer/startselling.php" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition">

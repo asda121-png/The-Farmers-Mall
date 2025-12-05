@@ -337,8 +337,8 @@ if ($user_id) {
 
       </div>
 
-      <div class="flex justify-center mt-10">
-        <button id="loadMore" class="bg-green-700 text-white px-6 py-2 rounded-md hover:bg-green-800">Load More Products</button>
+      <div id="loadMoreContainer" class="flex justify-center mt-10 hidden">
+        <button id="loadMore" class="bg-green-700 text-white px-6 py-2 rounded-md hover:bg-green-800">Load More</button>
       </div>
 
     </section>

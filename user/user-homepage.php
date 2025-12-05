@@ -344,11 +344,12 @@ if ($user_id) {
         <div class="flex items-center space-x-6">
 
             <a href="message.php" class="text-gray-600">
-                <i class="fa-regular fa-comment"></i>
+                <i class="fa-regular fa-comment"></i> 
             </a>
 
-            <a href="notification.php" class="text-gray-600">
+            <a href="notification.php" class="text-gray-600 relative">
                 <i class="fa-regular fa-bell"></i>
+                <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
             </a>
 
             <a href="cart.php" class="text-gray-600 relative inline-block">
@@ -373,8 +374,8 @@ if ($user_id) {
                 <div id="profileDropdown"
                      class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="..\auth\login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a> 
+                    <a href="..\auth\login.php" id="logoutLink" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- ************ PROFILE DROPDOWN END ************ -->
@@ -385,16 +386,41 @@ if ($user_id) {
 
 <!-- JS for dropdown -->
 <script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        const profileMenu = document.getElementById('profileDropdown');
+        const logoutLink = document.getElementById('logoutLink');
 
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('hidden');
+            });
+        }
 
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    window.location.href = logoutLink.href;
+                }
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (profileMenu && !profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        // --- Notification Badge Logic ---
+        const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+        const unreadCount = notifications.filter(n => !n.read).length;
+        const badge = document.getElementById('notificationBadge');
+        if (badge && unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.classList.remove('hidden');
+        }
     });
 </script>
 

@@ -6,6 +6,34 @@
   <title>Order Details – The Farmer’s Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    @media print {
+      body > header,
+      body > footer,
+      .no-print {
+        display: none !important;
+      }
+      main {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .print-container {
+        margin-bottom: 0 !important;
+      }
+      @page {
+        size: auto;
+        margin: 0; /* Removes browser-default headers and footers */
+      }
+      body {
+        margin: 0.5in; /* Adds margin to the content on the printed page */
+      }
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -16,10 +44,16 @@ include '../retailer/retailerheader.php';
 
   <!-- Main Content -->
   <main class="flex-grow">
-    <div class="max-w-4xl mx-auto px-6 py-8 mb-80">
+    <div class="max-w-4xl mx-auto px-6 py-8 mb-80 print-container">
+      <!-- Print-only Header -->
+      <div class="print-only hidden mb-6 text-center">
+        <h1 class="text-2xl font-bold">Order Receipt</h1>
+        <p id="printOrderIdDate" class="text-sm text-gray-600"></p>
+      </div>
+
       <!-- Back & Title -->
       <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 no-print">
           <button onclick="window.location.href='retailerorders.php'" class="text-gray-600 hover:text-black">
             <i class="fa-solid fa-arrow-left text-lg"></i>
           </button>
@@ -28,8 +62,8 @@ include '../retailer/retailerheader.php';
             <p id="orderIdDate" class="text-sm text-gray-500"></p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button class="border px-3 py-1.5 rounded-md text-gray-700 text-sm flex items-center gap-1 hover:bg-gray-100">
+        <div class="flex items-center gap-2 no-print">
+          <button id="printBtn" class="border px-3 py-1.5 rounded-md text-gray-700 text-sm flex items-center gap-1 hover:bg-gray-100">
             <i class="fa-solid fa-print"></i> Print
           </button>
           <div class="relative">
@@ -109,6 +143,7 @@ include '../retailer/retailerheader.php';
 
       // Populate header
       document.getElementById('orderIdDate').textContent = `Order ${order.id} · ${new Date(order.timestamp).toLocaleDateString()}`;
+      document.getElementById('printOrderIdDate').textContent = `Order ID: ${order.id} | Date: ${new Date(order.timestamp).toLocaleDateString()}`;
 
       // Populate customer and shipping
       document.getElementById('customerName').textContent = order.customerName;
@@ -151,6 +186,12 @@ include '../retailer/retailerheader.php';
       const actionDropdown = document.getElementById('actionDropdown');
       actionBtn.addEventListener('click', () => {
         actionDropdown.classList.toggle('hidden');
+      });
+
+      // Print button logic
+      const printBtn = document.getElementById('printBtn');
+      printBtn.addEventListener('click', () => {
+        window.print();
       });
 
       actionDropdown.addEventListener('click', (e) => {

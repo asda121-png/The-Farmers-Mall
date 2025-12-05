@@ -16,11 +16,20 @@
 
 <?php
 // Include the header
-include '../retailer/retailerheader.php';
+include 'retailerheader.php';
 ?>
 
   <!-- Dashboard Content -->
   <main class="max-w-6xl mx-auto px-6 py-6 space-y-6 flex-grow w-full mb-20">
+
+    <!-- Banner -->
+    <div class="relative bg-cover bg-center h-64 rounded-lg overflow-hidden" style="background-image: url('../images/mesafarm.jpg');">
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute left-6 top-1/2 transform -translate-y-1/2 text-white">
+        <h1 class="text-5xl font-bold mb-2">Mesa Farm</h1>
+        <p class="text-lg">Fresh, organic produce straight from our farm to your table.</p>
+      </div>
+    </div>
 
     <!-- Title -->
     <div>
@@ -63,11 +72,17 @@ include '../retailer/retailerheader.php';
 </div>
 
     <!-- Main Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Left Side -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-7 flex flex-col gap-6">
+        <!-- Sales Chart -->
+        <div class="bg-white shadow-sm rounded-lg p-5 flex-1">
+          <h3 class="font-semibold text-lg mb-4">Sales This Week</h3>
+          <canvas id="salesChart"></canvas>
+        </div>
+
         <!-- Recent Orders -->
-        <div class="bg-white shadow-sm rounded-lg p-5">
+        <div class="bg-white shadow-sm rounded-lg p-5 flex-1">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-lg">Recent Orders</h3>
             <a href="retailerorders.php" class="text-green-600 text-sm font-medium">View All</a>
@@ -75,24 +90,18 @@ include '../retailer/retailerheader.php';
 
           <div id="recentOrdersContainer" class="space-y-3"></div>
         </div>
-
-        <!-- Sales Chart -->
-        <div class="bg-white shadow-sm rounded-lg p-5">
-          <h3 class="font-semibold text-lg mb-4">Sales This Week</h3>
-          <canvas id="salesChart"></canvas>
-        </div>
       </div>
 
       <!-- Right Side -->
-      <div class="space-y-6">
+      <div class="lg:col-span-5 flex flex-col gap-6">
         <!-- Inventory Status -->
-        <div class="bg-white shadow-sm rounded-lg p-5">
+        <div class="bg-white shadow-sm rounded-lg p-5 flex-1">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-lg">Inventory Status</h3>
             <a href="retailerinventory.php" class="text-green-600 text-sm font-medium">Manage</a>
           </div>
 
-          <div class="space-y-4">
+          <div class="space-y-4 flex-1">
             <!-- Red Onions -->
             <div class="flex justify-between items-center">
               <div class="flex items-center space-x-3">
@@ -132,13 +141,13 @@ include '../retailer/retailerheader.php';
         </div>
 
         <!-- Top Products -->
-        <div class="bg-white shadow-sm rounded-lg p-5">
+        <div class="bg-white shadow-sm rounded-lg p-5 flex-1">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-lg">Top Products</h3>
             <a href="retailerproducts.php" class="text-green-600 text-sm font-medium">View All</a>
           </div>
 
-          <div class="space-y-4">
+          <div class="space-y-4 flex-1">
             <!-- Carrots -->
             <div class="flex justify-between items-center">
               <div class="flex items-center space-x-3">
