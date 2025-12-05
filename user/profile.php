@@ -1,17 +1,12 @@
-
-<?php
+﻿<?php
+// Start output buffering at the very beginning
+ob_start();
 
 // Suppress all warnings and errors when handling AJAX requests
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-
     error_reporting(0);
-
     ini_set('display_errors', '0');
-
 }
-
-
 
 session_start();
 
@@ -38,6 +33,98 @@ require_once __DIR__ . '/../config/supabase-api.php';
 $user_id = $_SESSION['user_id'] ?? null;
 
 $api = getSupabaseAPI();
+
+
+
+// Handle AJAX requests FIRST before any output
+
+// Handle remove profile picture via AJAX
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove_profile_picture') {
+
+    header('Content-Type: application/json');
+
+    
+
+    try {
+
+        if ($user_id) {
+
+            // Get current profile picture
+
+            $users = $api->select('users', ['id' => $user_id]);
+
+            if (!empty($users)) {
+
+                $currentPic = $users[0]['profile_picture'] ?? '';
+
+                $full_name = $users[0]['full_name'] ?? 'User';
+
+                
+
+                // Delete physical file if exists
+
+                if (!empty($currentPic) && file_exists(__DIR__ . '/../' . $currentPic)) {
+
+                    @unlink(__DIR__ . '/../' . $currentPic);
+
+                }
+
+            } else {
+
+                $full_name = 'User';
+
+            }
+
+            
+
+            // Update database to remove profile picture
+
+            $api->update('users', ['profile_picture' => ''], ['id' => $user_id]);
+
+            
+
+            // Update session
+
+            $_SESSION['profile_picture'] = '';
+
+            
+
+            // Get user initials for response
+
+            $initials = strtoupper(substr($full_name, 0, 1));
+
+            
+
+            echo json_encode([
+
+                'status' => 'success',
+
+                'message' => 'Profile picture removed successfully!',
+
+                'data' => [
+
+                    'initials' => $initials
+
+                ]
+
+            ]);
+
+        } else {
+
+            echo json_encode(['status' => 'error', 'message' => 'User not found']);
+
+        }
+
+    } catch (Exception $e) {
+
+        echo json_encode(['status' => 'error', 'message' => 'Failed to remove picture: ' . $e->getMessage()]);
+
+    }
+
+    exit();
+
+}
 
 
 
@@ -78,7 +165,6 @@ $gender = $userData['gender'] ?? '';
 $bio = $userData['bio'] ?? '';
 
 $address = $userData['address'] ?? '';
-
 $created_at = $userData['created_at'] ?? '';
 
 
@@ -95,7 +181,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     
 
+    if (ob_get_level()) ob_end_clean(); // End and clean any output buffer
+
     header('Content-Type: application/json');
+
+    // Fetch current user data for defaults
+    $userData = [];
+    $profile_picture = '';
+    if ($user_id) {
+        $users = $api->select('users', ['id' => $user_id]);
+        if (!empty($users)) {
+            $userData = $users[0];
+            $profile_picture = $userData['profile_picture'] ?? '';
+        }
+    }
 
     
 
@@ -131,11 +230,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $updateData = [
 
-            'full_name' => trim($_POST['full_name'] ?? $full_name),
+            'full_name' => trim($_POST['full_name'] ?? ''),
 
-            'phone' => trim($_POST['phone'] ?? $phone),
+            'phone' => trim($_POST['phone'] ?? ''),
 
-            'email' => trim($_POST['email'] ?? $email),
+            'email' => trim($_POST['email'] ?? ''),
 
             'date_of_birth' => trim($_POST['date_of_birth'] ?? ''),
 
@@ -379,7 +478,7 @@ $total_spent = 0;
 
 try {
 
-    $orders = $api->select('orders', ['user_id' => $user_id]);
+    $orders = $api->select('orders', ['customer_id' => $user_id]);
 
     $total_orders = count($orders);
 
@@ -468,7 +567,7 @@ try {
             <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
             <a href="cart.php" class="text-gray-600 relative">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
             </a>
 
             <!-- Profile Dropdown -->
@@ -771,11 +870,8 @@ try {
               </div>
 
               <div class="text-center p-4 bg-blue-50 rounded-lg">
-
                 <p class="text-2xl font-bold text-blue-600">₱<?php echo number_format($total_spent, 2); ?></p>
-
                 <p class="text-sm text-gray-600 mt-1">Total Spent</p>
-
               </div>
 
               <div class="text-center p-4 bg-purple-50 rounded-lg">
@@ -1374,7 +1470,7 @@ try {
 
           <label class="block text-sm font-medium text-gray-700">Card Number</label>
 
-          <input type="text" id="card-number" placeholder="•••• •••• •••• ••••" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+          <input type="text" id="card-number" placeholder="€¢€¢€¢€¢ €¢€¢€¢€¢ €¢€¢€¢€¢ €¢€¢€¢€¢" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
 
         </div>
 
@@ -1390,7 +1486,7 @@ try {
 
           <div><label class="block text-sm font-medium text-gray-700">Expiry (MM/YY)</label><input type="text" id="card-expiry" placeholder="MM/YY" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
 
-          <div><label class="block text-sm font-medium text-gray-700">CVV</label><input type="text" id="card-cvv" placeholder="•••" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+          <div><label class="block text-sm font-medium text-gray-700">CVV</label><input type="text" id="card-cvv" placeholder="€¢€¢€¢" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
 
         </div>
 
@@ -1481,6 +1577,44 @@ try {
         Close
 
       </button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Remove Picture Confirmation Modal -->
+
+  <div id="removePictureModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md text-center transform transition-all">
+
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+
+        <i class="fas fa-trash-alt text-red-600 text-3xl"></i>
+
+      </div>
+
+      <h3 class="font-semibold text-xl mb-2 text-gray-900">Remove Profile Picture</h3>
+
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to remove your profile picture? This action cannot be undone.</p>
+
+      <div class="flex justify-center gap-3">
+
+        <button id="cancelRemovePicture" class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+
+          Cancel
+
+        </button>
+
+        <button id="confirmRemovePicture" class="px-6 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+
+          <i class="fas fa-trash-alt mr-1"></i> Remove
+
+        </button>
+
+      </div>
 
     </div>
 
@@ -2070,7 +2204,7 @@ try {
 
               <div class="text-right">
 
-                <p class="font-semibold">₱${order.total.toFixed(2)}</p>
+                <p class="font-semibold">‚±${order.total.toFixed(2)}</p>
 
                 <span class="${statusInfo.class} text-xs font-medium">${statusInfo.text}</span>
 
@@ -2192,11 +2326,53 @@ try {
 
 
 
-      // Remove profile picture
+      // Remove profile picture modal handling
 
-      removeProfilePic.addEventListener('click', async () => {
+      const removePictureModal = document.getElementById('removePictureModal');
 
-        if (!confirm('Are you sure you want to remove your profile picture?')) return;
+      const cancelRemovePicture = document.getElementById('cancelRemovePicture');
+
+      const confirmRemovePicture = document.getElementById('confirmRemovePicture');
+
+
+
+      removeProfilePic.addEventListener('click', () => {
+
+        removePictureModal.classList.remove('hidden');
+
+      });
+
+
+
+      cancelRemovePicture.addEventListener('click', () => {
+
+        removePictureModal.classList.add('hidden');
+
+      });
+
+
+
+      // Close modal when clicking outside
+
+      removePictureModal.addEventListener('click', (e) => {
+
+        if (e.target === removePictureModal) {
+
+          removePictureModal.classList.add('hidden');
+
+        }
+
+      });
+
+
+
+      // Confirm remove profile picture
+
+      confirmRemovePicture.addEventListener('click', async () => {
+
+        removePictureModal.classList.add('hidden');
+
+        showLoadingModal();
 
 
 
@@ -2204,15 +2380,7 @@ try {
 
           const formData = new FormData();
 
-          formData.append('action', 'update_profile');
-
-          formData.append('full_name', '<?php echo addslashes($full_name); ?>');
-
-          formData.append('email', '<?php echo addslashes($email); ?>');
-
-          formData.append('phone', '<?php echo addslashes($phone); ?>');
-
-          formData.append('profile_picture', ''); // Remove picture
+          formData.append('action', 'remove_profile_picture');
 
 
 
@@ -2224,9 +2392,41 @@ try {
 
           });
 
+          
 
+          // Check if response is ok
 
-          const result = await response.json();
+          if (!response.ok) {
+
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+          }
+
+          
+
+          const responseText = await response.text();
+
+          console.log('Server response:', responseText);
+
+          
+
+          // Try to parse JSON with better error handling
+
+          let result;
+
+          try {
+
+            result = JSON.parse(responseText);
+
+          } catch (parseError) {
+
+            console.error('JSON parse error:', parseError);
+
+            console.error('Response text:', responseText);
+
+            throw new Error('Invalid server response');
+
+          }
 
 
 
@@ -2234,7 +2434,55 @@ try {
 
             showSuccessModal('Profile picture removed successfully!');
 
-            setTimeout(() => location.reload(), 1500);
+            
+
+            // Update UI immediately
+
+            const defaultAvatar = `<div class="w-32 h-32 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+
+              ${result.data.initials || '<?php echo strtoupper(substr($full_name, 0, 1)); ?>'}
+
+            </div>`;
+
+            
+
+            document.getElementById('displayProfilePic').innerHTML = defaultAvatar;
+
+            document.getElementById('editProfilePic').innerHTML = defaultAvatar;
+
+            
+
+            // Hide remove button
+
+            removeProfilePic.classList.add('hidden');
+
+            
+
+            // Update all profile pictures in header
+
+            document.querySelectorAll('img[alt="Profile"]').forEach(img => {
+
+              const parent = img.parentElement;
+
+              img.remove();
+
+              parent.innerHTML = `<div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+
+                <i class="fas fa-user text-white text-sm"></i>
+
+              </div>`;
+
+            });
+
+            
+
+            setTimeout(() => {
+
+              closeSuccessModal();
+
+              location.reload();
+
+            }, 1500);
 
           } else {
 
@@ -2320,13 +2568,39 @@ try {
 
           
 
+          // Check if response is ok
+
+          if (!response.ok) {
+
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+          }
+
+          
+
           const responseText = await response.text();
 
           console.log('Server response:', responseText);
 
           
 
-          const result = JSON.parse(responseText);
+          // Try to parse JSON with better error handling
+
+          let result;
+
+          try {
+
+            result = JSON.parse(responseText);
+
+          } catch (parseError) {
+
+            console.error('JSON parse error:', parseError);
+
+            console.error('Response text:', responseText);
+
+            throw new Error('Invalid server response');
+
+          }
 
           
 
@@ -2630,19 +2904,31 @@ try {
 
 
 
-      function updateCartIcon() {
+      async function updateCartIcon() {
 
         const cartBadge = document.getElementById('cartBadge');
 
         if (!cartBadge) return;
 
+        try {
+          // Fetch from database
+          const response = await fetch('../api/cart.php');
+          const data = await response.json();
+          
+          if (data.success && data.items) {
+            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            cartBadge.textContent = totalItems;
+            cartBadge.classList.toggle('hidden', totalItems === 0);
+            return;
+          }
+        } catch (error) {
+          console.log('Error loading cart count:', error);
+        }
 
-
+        // Fallback to localStorage
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
         const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
-
 
         cartBadge.textContent = totalItems;
 

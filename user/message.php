@@ -229,7 +229,7 @@ if ($user_id) {
       let badge = cartIcon.querySelector('.cart-badge');
       if (!badge) {
         badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[0.75rem] text-center z-10';
+        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
         cartIcon.appendChild(badge);
       }
       const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);

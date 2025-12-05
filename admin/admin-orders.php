@@ -152,7 +152,7 @@ $orders = [
 
 <body class="flex min-h-screen bg-gray-50 text-gray-800">
 
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 sticky top-0 h-screen overflow-y-auto">
     <div>
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
         <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
@@ -167,21 +167,20 @@ $orders = [
           <i class="fa-solid fa-tachometer-alt w-5"></i>
           <span>Dashboard</span>
         </a>
-        <a href="admin-products.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-box w-5"></i>
-          <span>Products</span>
-        </a>
-        <a href="admin-inventory.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-truck-ramp-box w-5"></i>
-          <span>Inventory</span>
-        </a>
-     
-        
+
         <a href="admin-orders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
           <i class="fa-solid fa-receipt w-5 text-green-200"></i>
           <span>Orders</span>
         </a>
+        </nav>
+        
+        <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
+        <a href="admin-riders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-motorcycle w-5"></i>
+          <span>Riders</span>
+        </a>
       </nav>
+      
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
       <nav class="space-y-1">
@@ -215,7 +214,6 @@ $orders = [
       </div>
 
       <div class="flex items-center gap-4 ml-auto">
-        <!-- Notification Dropdown -->
         <div class="relative">
             <button id="notification-btn" class="relative" title="View Notifications">
                 <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
@@ -413,7 +411,6 @@ $orders = [
         </div>
     </div>
 
-    <!-- Order Details Modal -->
     <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-2xl">
         <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -421,15 +418,13 @@ $orders = [
             <button class="modal-close-btn text-gray-400 hover:text-gray-600">&times;</button>
         </div>
         <div id="modal-content" class="space-y-4">
-            <!-- Dynamic content will be injected here -->
-        </div>
+            </div>
         <div class="flex justify-end gap-3 pt-6">
             <button class="modal-close-btn px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Close</button>
         </div>
       </div>
     </div>
 
-    <!-- Create Order Modal -->
     <div id="create-order-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
         <h3 class="font-bold text-xl mb-4 text-gray-900">Create New Order</h3>
@@ -540,7 +535,7 @@ $orders = [
       // --- Filtering and Pagination State ---
       let state = {
         currentPage: 1,
-        rowsPerPage: 5,
+        rowsPerPage: 10, // UPDATED: Changed limit to 10
         searchTerm: '',
         statusFilter: 'all',
       };
