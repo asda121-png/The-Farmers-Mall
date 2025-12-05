@@ -99,6 +99,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await response.json();
 
       if (result.success) {
+        // Create a notification for the successful order
+        const newNotification = {
+          id: Date.now(),
+          type: 'order_success',
+          title: 'Order Placed Successfully!',
+          message: `Your order #${result.order_id} has been confirmed.`,
+          time: new Date().toISOString(),
+          read: false,
+          link: `ordersuccessfull.php?order_id=${result.order_id}`
+        };
+        const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+        notifications.unshift(newNotification); // Add to the beginning
+        localStorage.setItem('userNotifications', JSON.stringify(notifications));
+
         // Clear localStorage cart
         localStorage.removeItem('cart');
         
