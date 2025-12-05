@@ -253,9 +253,7 @@ $orders = [
              <button id="export-btn" class="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-file-invoice"></i> Export Report
             </button>
-            <button id="create-order-btn" class="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors shadow-lg shadow-green-700/30">
-                <i class="fa-solid fa-plus"></i> Create Order
-            </button>
+           
         </div>
     </div>
     
