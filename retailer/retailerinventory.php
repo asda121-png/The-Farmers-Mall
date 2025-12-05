@@ -36,9 +36,6 @@ include '../retailer/retailerheader.php';
             <i class="fa-solid fa-sort"></i> Sort
           </button>
         </div>
-        <button id="addInventoryBtn" class="bg-green-700 text-white px-4 py-2 rounded-md hover:bg-green-800 flex items-center gap-2">
-          <i class="fa-solid fa-plus"></i> Add Inventory
-        </button>
       </div>
 
       <!-- Filter Tabs -->
@@ -113,6 +110,42 @@ include '../retailer/retailerheader.php';
     </div>
   </div>
 
+  <!-- Sort Modal -->
+  <div id="sortModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+      <h3 class="font-semibold text-lg mb-4">Sort Inventory By</h3>
+      <div class="space-y-2">
+        <label class="flex items-center"><input type="radio" name="sort" value="name-asc" class="accent-green-600 mr-2" checked> Name (A-Z)</label>
+        <label class="flex items-center"><input type="radio" name="sort" value="name-desc" class="accent-green-600 mr-2"> Name (Z-A)</label>
+        <label class="flex items-center"><input type="radio" name="sort" value="stock-asc" class="accent-green-600 mr-2"> Stock (Low to High)</label>
+        <label class="flex items-center"><input type="radio" name="sort" value="stock-desc" class="accent-green-600 mr-2"> Stock (High to Low)</label>
+        <label class="flex items-center"><input type="radio" name="sort" value="updated-desc" class="accent-green-600 mr-2"> Last Updated (Newest)</label>
+        <label class="flex items-center"><input type="radio" name="sort" value="updated-asc" class="accent-green-600 mr-2"> Last Updated (Oldest)</label>
+      </div>
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="closeSortModal" class="px-4 py-2 border rounded-md text-sm">Cancel</button>
+        <button id="applySort" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Modal -->
+  <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+      <h3 class="font-semibold text-lg mb-4">Filter by Category</h3>
+      <div id="categoryFilterContainer" class="space-y-2 max-h-60 overflow-y-auto">
+        <!-- Categories will be populated by JS -->
+      </div>
+      <div class="mt-6 flex justify-between">
+        <button id="clearCategoryFilters" class="px-4 py-2 border rounded-md text-sm text-gray-700">Clear</button>
+        <div class="flex gap-3">
+          <button id="closeFilterModal" class="px-4 py-2 border rounded-md text-sm">Cancel</button>
+          <button id="applyCategoryFilters" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       
@@ -165,12 +198,18 @@ include '../retailer/retailerheader.php';
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const addInventoryBtn = document.getElementById('addInventoryBtn');
       const productModal = document.getElementById('productModal');
       const closeProductModal = document.getElementById('closeProductModal');
       const productForm = document.getElementById('productForm');
       const modalTitle = document.getElementById('modalTitle');
 
+      const sortModal = document.getElementById('sortModal');
+      const filterModal = document.getElementById('filterModal');
+      const closeSortModal = document.getElementById('closeSortModal');
+      const closeFilterModal = document.getElementById('closeFilterModal');
+      const applySort = document.getElementById('applySort');
+      const applyCategoryFilters = document.getElementById('applyCategoryFilters');
+      const clearCategoryFilters = document.getElementById('clearCategoryFilters');
       const sortBtn = document.getElementById('sortBtn');
       const filterBtn = document.getElementById('filterBtn');
       const filterTabs = document.getElementById('filterTabs');
@@ -194,6 +233,7 @@ include '../retailer/retailerheader.php';
       }
 
       let displayedProducts = [...allProducts];
+      let currentSort = 'name-asc';
       let currentPage = 1;
       const itemsPerPage = 6;
 
@@ -254,12 +294,40 @@ include '../retailer/retailerheader.php';
         const activeFilter = document.querySelector('.filter-tab.bg-green-600').dataset.filter;
         const searchTerm = searchInput.value.toLowerCase();
 
+        // Get selected categories from the filter modal
+        const categoryCheckboxes = document.querySelectorAll('#categoryFilterContainer input[type="checkbox"]');
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
         let filtered = allProducts.filter(p => {
           const statusMatch = activeFilter === 'All' || getStatus(p.stock) === activeFilter;
           const searchMatch = p.name.toLowerCase().includes(searchTerm);
-          return statusMatch && searchMatch;
+          const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(p.category);
+          return statusMatch && searchMatch && categoryMatch;
         });
 
+        // Apply sorting
+        switch (currentSort) {
+            case 'name-asc':
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'name-desc':
+                filtered.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            case 'stock-asc':
+                filtered.sort((a, b) => a.stock - b.stock);
+                break;
+            case 'stock-desc':
+                filtered.sort((a, b) => b.stock - a.stock);
+                break;
+            case 'updated-desc':
+                filtered.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+                break;
+            case 'updated-asc':
+                filtered.sort((a, b) => new Date(a.lastUpdated) - new Date(b.lastUpdated));
+                break;
+        }
         displayedProducts = filtered;
         currentPage = 1;
         renderInventory();
@@ -269,14 +337,15 @@ include '../retailer/retailerheader.php';
       const openModal = (modal) => modal.classList.remove('hidden');
       const closeModal = (modal) => modal.classList.add('hidden');
 
-      addInventoryBtn.addEventListener('click', () => {
-        modalTitle.textContent = 'Add New Product';
-        productForm.reset();
-        document.getElementById('productId').value = '';
-        openModal(productModal);
-      });
-
       closeProductModal.addEventListener('click', () => closeModal(productModal));
+      
+      // Sort and Filter Modal Listeners
+      sortBtn.addEventListener('click', () => openModal(sortModal));
+      closeSortModal.addEventListener('click', () => closeModal(sortModal));
+      filterBtn.addEventListener('click', () => openModal(filterModal));
+      closeFilterModal.addEventListener('click', () => closeModal(filterModal));
+
+
 
       // Form submission
       productForm.addEventListener('submit', (e) => {
@@ -344,8 +413,42 @@ include '../retailer/retailerheader.php';
         applyFiltersAndSearch();
       });
 
+      // Sort Logic
+      applySort.addEventListener('click', () => {
+        currentSort = document.querySelector('input[name="sort"]:checked').value;
+        applyFiltersAndSearch();
+        closeModal(sortModal);
+      });
+
+      // Category Filter Logic
+      const populateCategoryFilter = () => {
+        const container = document.getElementById('categoryFilterContainer');
+        const categories = [...new Set(allProducts.map(p => p.category))];
+        container.innerHTML = '';
+        categories.forEach(cat => {
+          const label = document.createElement('label');
+          label.className = 'flex items-center';
+          label.innerHTML = `<input type="checkbox" value="${cat}" class="accent-green-600 mr-2"> ${cat}`;
+          container.appendChild(label);
+        });
+      };
+
+      applyCategoryFilters.addEventListener('click', () => {
+        applyFiltersAndSearch();
+        closeModal(filterModal);
+      });
+
+      clearCategoryFilters.addEventListener('click', () => {
+        document.querySelectorAll('#categoryFilterContainer input[type="checkbox"]').forEach(cb => {
+          cb.checked = false;
+        });
+        applyFiltersAndSearch();
+        closeModal(filterModal);
+      });
+
       // Initial render
       renderInventory();
+      populateCategoryFilter();
     });
   </script>
 </body>
