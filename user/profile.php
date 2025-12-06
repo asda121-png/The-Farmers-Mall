@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿<?php
+<?php
 // Start output buffering at the very beginning
 ob_start();
 
@@ -9,10 +8,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     ini_set('display_errors', '0');
 }
 
-=======
-
-<?php
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -49,10 +44,8 @@ function handleProfilePictureUpload(array $file, string $userId, string $oldProf
         throw new Exception('File size must be less than 5MB');
     }
 
-    // More secure MIME type validation
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime_type = finfo_file($finfo, $file['tmp_name']);
-    finfo_close($finfo);
+    // More secure MIME type validation using mime_content_type
+    $mime_type = mime_content_type($file['tmp_name']);
 
     $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
     if (!in_array($mime_type, $allowed_mime_types)) {
@@ -293,16 +286,8 @@ $date_of_birth = $userData['date_of_birth'] ?? '';
 $gender = $userData['gender'] ?? '';
 $bio = $userData['bio'] ?? '';
 $address = $userData['address'] ?? '';
-<<<<<<< HEAD
-=======
-$city = 'Mati City'; // As per registration form
-$province = 'Davao Oriental'; // As per registration form
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 $created_at = $userData['created_at'] ?? '';
 
-
-
-<<<<<<< HEAD
 // Handle profile update via AJAX
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
@@ -602,21 +587,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 }
 
-
-
-=======
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 // Get order statistics
 $total_orders = 0;
 $total_spent = 0;
 try {
-<<<<<<< HEAD
-
     $orders = $api->select('orders', ['customer_id' => $user_id]);
-
-=======
-    $orders = $api->select('orders', ['user_id' => $user_id]);
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
     $total_orders = count($orders);
     foreach ($orders as $order) {
         $total_spent += floatval($order['total_amount'] ?? 0);
@@ -2550,64 +2525,6 @@ try {
           console.error('Address update error:', error);
           showErrorModal('An error occurred while updating your address.');
         }
-<<<<<<< HEAD
-
-      }
-
-
-
-      async function updateCartIcon() {
-
-        const cartBadge = document.getElementById('cartBadge');
-
-        if (!cartBadge) return;
-
-        try {
-          // Fetch from database
-          const response = await fetch('../api/cart.php');
-          const data = await response.json();
-          
-          if (data.success && data.items) {
-            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.toggle('hidden', totalItems === 0);
-            return;
-          }
-        } catch (error) {
-          console.log('Error loading cart count:', error);
-        }
-
-        // Fallback to localStorage
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-        const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
-        cartBadge.textContent = totalItems;
-
-        cartBadge.classList.toggle('hidden', totalItems === 0);
-
-      }
-
-
-
-      // Sync cart from database on load, then update icon
-
-      syncCartFromDatabase();
-
-
-
-      // Listen for cart updates from other pages/tabs
-
-      window.addEventListener('storage', (e) => {
-
-        if (e.key === 'cart') {
-
-          updateCartIcon();
-
-        }
-
-=======
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
       });
 
 
