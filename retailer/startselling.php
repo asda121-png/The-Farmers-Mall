@@ -212,15 +212,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         /* Custom style for file input */
         .form-input[type="file"] { padding: 0.5rem; }
         .form-input.error { border-color: #dc2626; } /* red-600 */
+        /* Disable browser's default password reveal button */
+        .form-input[type="password"]::-ms-reveal,
+        .form-input[type="password"]::-ms-clear {
+          display: none;
+        }
+        .form-input[type="password"]::-webkit-credentials-auto-fill-button,
+        .form-input[type="password"]::-webkit-contacts-auto-fill-button {
+          visibility: hidden;
+          pointer-events: none;
+          position: absolute;
+          right: 0;
+        }
+        /* Add padding to password fields for eye icon */
+        .password-field-container .form-input[type="password"],
+        .password-field-container .form-input[type="text"] {
+          padding-right: 2.5rem;
+        }
         /* Style for terms and conditions */
         .terms-box { border: 1px solid #d1d5db; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; color: #4b5563; background-color: #f9fafb; margin-bottom: 1rem; }
         
         /* Customer registration style for input focus and errors */
-        .input-focus:focus-within {
-            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
-            border-color: #15803d;
-        }
-        .input-focus.error {
+        .input-error {
             border-color: #dc2626 !important;
         }
         .error-message {
@@ -235,27 +248,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         }
         
         /* Hide eye icon when input is empty and position it inside the field */
-        .form-input:placeholder-shown + .password-toggle-btn {
+        .password-toggle-btn {
           opacity: 0;
           pointer-events: none;
           position: absolute;
-          right: 10px;
+          right: 0.75rem; /* 12px */
           top: 50%;
           transform: translateY(-50%);
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: opacity 0.2s;
         }
         .form-input:not(:placeholder-shown) + .password-toggle-btn {
           opacity: 1;
           pointer-events: auto;
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
         }
         /* Container for password field with relative positioning */
         .password-field-container {
           position: relative;
-          display: inline-block;
-          width: 100%;
+        }
+        /* Remove input margin to prevent container stretching and fix icon alignment */
+        .password-field-container .form-input {
+            margin-bottom: 0;
         }
 
         /* NEW: Styles for fixed-height form */
@@ -301,19 +317,28 @@ include '../includes/header1.php';
           <!-- Step 1: Shop Info -->
           <div class="form-step active" data-step="1">
             <div class="step-content">
-              <input type="text" name="shop_name" id="shop_name" placeholder="Shop / Farm Name" class="form-input" required>
-              <select name="shop_category" id="shop_category" class="form-input" required>
-                <option value="">Select Shop Category</option>
-                <option value="vegetables">Vegetables</option>
-                <option value="fruits">Fruits</option>
-                <option value="dairy">Dairy Products</option>
-                <option value="meat">Meat & Poultry</option>
-                <option value="grains">Grains & Cereals</option>
-                <option value="processed">Processed Foods</option>
-                <option value="organic">Organic Products</option>
-                <option value="mixed">Mixed Farm Products</option>
-              </select>
-              <input type="text" name="phone" id="phone" placeholder="Mobile Number (09XXXXXXXXX)" class="form-input" pattern="09[0-9]{9}" required>
+              <div class="mb-4">
+                <input type="text" name="shop_name" id="shop_name" placeholder="Shop / Farm Name" class="form-input" required>
+                <span id="shop_name-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <select name="shop_category" id="shop_category" class="form-input" required>
+                  <option value="">Select Shop Category</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="dairy">Dairy Products</option>
+                  <option value="meat">Meat & Poultry</option>
+                  <option value="grains">Grains & Cereals</option>
+                  <option value="processed">Processed Foods</option>
+                  <option value="organic">Organic Products</option>
+                  <option value="mixed">Mixed Farm Products</option>
+                </select>
+                <span id="shop_category-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <input type="text" name="phone" id="phone" placeholder="Mobile Number (09XXXXXXXXX)" class="form-input" pattern="09[0-9]{9}" required>
+                <span id="phone-error" class="error-message hidden"></span>
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="nextStep()" class="w-full bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
@@ -323,13 +348,23 @@ include '../includes/header1.php';
           <!-- Step 2: Shop Details -->
           <div class="form-step" data-step="2">
             <div class="step-content">
-              <input type="text" name="street" id="street" placeholder="Street Address" class="form-input" required>
-              <select name="barangay" id="barangay" class="form-input" required>
-                <option value="">Select Barangay</option>
-                <!-- Options will be populated by JavaScript -->
-              </select>
-              <input type="text" name="city" id="city" value="Mati City" readonly class="form-input bg-gray-100">
-              <input type="text" name="province" id="province" value="Davao Oriental" readonly class="form-input bg-gray-100">
+              <div class="mb-4">
+                <input type="text" name="street" id="street" placeholder="Street Address" class="form-input" required>
+                <span id="street-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <select name="barangay" id="barangay" class="form-input" required>
+                  <option value="">Select Barangay</option>
+                  <!-- Options will be populated by JavaScript -->
+                </select>
+                <span id="barangay-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <input type="text" name="city" id="city" value="Mati City" readonly class="form-input bg-gray-100">
+              </div>
+              <div class="mb-4">
+                <input type="text" name="province" id="province" value="Davao Oriental" readonly class="form-input bg-gray-100">
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -340,9 +375,15 @@ include '../includes/header1.php';
           <!-- Step 3: Email Verification -->
           <div class="form-step" data-step="3">
             <div class="step-content">
-              <input type="email" name="email" id="email" placeholder="Email Address" class="form-input" required>
+              <div class="mb-4">
+                <input type="email" name="email" id="email" placeholder="Email Address" class="form-input" required>
+                <span id="email-error" class="error-message hidden"></span>
+              </div>
               <button type="button" class="w-full text-center text-sm text-green-600 hover:underline font-medium mb-4">Send Verification Code</button>
-              <input type="text" name="verification_code" id="verification_code" placeholder="Enter Verification Code" class="form-input" required>
+              <div class="mb-4">
+                <input type="text" name="verification_code" id="verification_code" placeholder="Enter Verification Code" class="form-input" required>
+                <span id="verification_code-error" class="error-message hidden"></span>
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -372,14 +413,14 @@ include '../includes/header1.php';
                   <p class="text-xs text-gray-600">Requires: uppercase, lowercase, numbers, 8+ characters</p>
                 </div>
               </div>
-              <div>
+              <div class="mb-4">
                 <div class="password-field-container">
                   <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-input" minlength="8" required>
                   <button type="button" onclick="togglePassword('confirm_password')" class="password-toggle-btn text-gray-500 hover:text-gray-700">
                     <i class="fas fa-eye" id="confirm-password-toggle"></i>
                   </button>
                 </div>
-                <span id="confirm-password-error" class="error-message hidden"></span>
+                <span id="confirm_password-error" class="error-message hidden"></span>
               </div>
             </div>
             <div class="flex gap-4">
@@ -398,7 +439,10 @@ include '../includes/header1.php';
                 <p class="mb-2"><strong>4. Fees and Payments</strong><br>Listing products is free. Farmers Mall will charge a commission fee on each completed sale. This fee is subject to change upon prior notification. Payments will be processed according to our payment schedule.</p>
                 <p class="mb-2"><strong>5. Termination</strong><br>Farmers Mall reserves the right to terminate or suspend your seller account at any time for conduct that violates these Terms and Conditions or is harmful to other users of the platform.</p>
               </div>
-              <label class="flex items-center mb-4"><input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2" required> I agree to the Terms and Conditions</label>
+              <div class="mb-4">
+                <label class="flex items-center"><input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2" required> I agree to the Terms and Conditions</label>
+                <span id="terms-error" class="error-message hidden"></span>
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -597,6 +641,53 @@ include '../includes/header1.php';
       }
     }
 
+    // ====== VALIDATION PATTERNS AND ERROR MESSAGES ======
+    const validationPatterns = {
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      phone: /^09\d{9}$/,
+      password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+    };
+
+    const errorMessages = {
+      shop_name: 'Shop name is required',
+      shop_category: 'Shop category is required',
+      phone: 'Invalid phone number. Must be 09XXXXXXXXX',
+      street: 'Street address is required',
+      barangay: 'Barangay is required',
+      email: 'Invalid email format',
+      verification_code: 'Verification code is required',
+      password: 'Password must be at least 8 characters with uppercase, lowercase, and number',
+      confirm_password: 'Passwords do not match',
+      terms: 'You must agree to the Terms and Conditions'
+    };
+
+    // ====== FIELD ERROR FUNCTIONS ======
+    function setFieldError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      
+      if (field) {
+        field.classList.add('input-error');
+      }
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+      }
+    }
+
+    function clearFieldError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      
+      if (field) {
+        field.classList.remove('input-error');
+      }
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.classList.add('hidden');
+      }
+    }
+
     // ====== PASSWORD STRENGTH METER ======
     function calculatePasswordStrength(password) {
       let strength = 0;
@@ -679,69 +770,120 @@ include '../includes/header1.php';
       strengthText.style.color = strength.color;
     }
 
-    function setFieldError(fieldId, message) {
+    // ====== REAL-TIME VALIDATION FUNCTIONS ======
+    function validateField(fieldId) {
       const field = document.getElementById(fieldId);
-      const errorSpan = document.getElementById(fieldId + '-error');
-      const inputFocus = field.closest('.input-focus');
+      if (!field) return true;
       
-      if (field && errorSpan) {
-        errorSpan.textContent = message;
-        errorSpan.classList.remove('hidden');
-        if (inputFocus) {
-          inputFocus.classList.add('error');
+      const value = field.value.trim();
+      
+      // Check if empty
+      if (!value && field.hasAttribute('required')) {
+        setFieldError(fieldId, errorMessages[fieldId] || 'This field is required');
+        return false;
+      }
+      
+      // Validate specific fields
+      if (fieldId === 'phone' && value) {
+        if (!validationPatterns.phone.test(value)) {
+          setFieldError(fieldId, errorMessages.phone);
+          return false;
         }
       }
-    }
-
-    function clearFieldError(fieldId) {
-      const field = document.getElementById(fieldId);
-      const errorSpan = document.getElementById(fieldId + '-error');
-      const inputFocus = field.closest('.input-focus');
       
-      if (field && errorSpan) {
-        errorSpan.textContent = '';
-        errorSpan.classList.add('hidden');
-        if (inputFocus) {
-          inputFocus.classList.remove('error');
+      if (fieldId === 'email' && value) {
+        if (!validationPatterns.email.test(value)) {
+          setFieldError(fieldId, errorMessages.email);
+          return false;
         }
       }
+      
+      if (fieldId === 'password' && value) {
+        if (!validationPatterns.password.test(value)) {
+          setFieldError(fieldId, errorMessages.password);
+          return false;
+        }
+      }
+      
+      if (fieldId === 'confirm_password' && value) {
+        const password = document.getElementById('password').value;
+        if (value !== password) {
+          setFieldError(fieldId, errorMessages.confirm_password);
+          return false;
+        }
+      }
+      
+      if (fieldId === 'shop_category' && !value) {
+        setFieldError(fieldId, errorMessages.shop_category);
+        return false;
+      }
+      
+      if (fieldId === 'barangay' && !value) {
+        setFieldError(fieldId, errorMessages.barangay);
+        return false;
+      }
+      
+      clearFieldError(fieldId);
+      return true;
     }
 
-    // Initialize barangays when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      populateBarangays();
+    // ====== ATTACH INPUT LISTENERS ======
+    function initializeValidation() {
+      const fieldsToValidate = [
+        'shop_name', 'shop_category', 'phone', 'street', 'barangay',
+        'email', 'verification_code', 'password', 'confirm_password'
+      ];
       
-      // Add real-time password strength validation
-      const passwordField = document.getElementById('password');
-      if (passwordField) {
-        passwordField.addEventListener('input', () => {
-          updatePasswordStrength(passwordField.value);
-          // Validate confirm field if it has a value
-          const confirmField = document.getElementById('confirm_password');
-          if (confirmField && confirmField.value) {
-            validatePasswordMatch();
+      fieldsToValidate.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+          // Clear error on input
+          element.addEventListener('input', () => {
+            clearFieldError(fieldId);
+            
+            // Update password strength
+            if (fieldId === 'password') {
+              updatePasswordStrength(element.value);
+              // Validate confirm password if it has a value
+              const confirmField = document.getElementById('confirm_password');
+              if (confirmField && confirmField.value) {
+                validateField('confirm_password');
+              }
+            }
+            
+            // Validate confirm password on input
+            if (fieldId === 'confirm_password') {
+              validateField('confirm_password');
+            }
+          });
+          
+          // Validate on blur
+          element.addEventListener('blur', () => {
+            if (element.value.trim()) {
+              validateField(fieldId);
+            }
+          });
+        }
+      });
+      
+      // Special handling for barangay select
+      const barangaySelect = document.getElementById('barangay');
+      if (barangaySelect) {
+        barangaySelect.addEventListener('change', () => {
+          if (barangaySelect.value) {
+            clearFieldError('barangay');
           }
         });
       }
-      
-      // Add real-time confirm password validation
-      const confirmField = document.getElementById('confirm_password');
-      if (confirmField) {
-        confirmField.addEventListener('input', validatePasswordMatch);
-      }
-    });
-
-    function validatePasswordMatch() {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm_password').value;
-      
-      if (confirmPassword && password !== confirmPassword) {
-        setFieldError('confirm_password', 'Passwords do not match');
-      } else {
-        clearFieldError('confirm_password');
-      }
     }
 
+    // Initialize barangays and validation when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      populateBarangays();
+      initializeValidation();
+    });
+
+    // ====== MULTI-STEP FORM NAVIGATION ======
     let currentStep = 1;
     const totalSteps = 5;
     const stepIndicator = document.getElementById('step-indicator');
@@ -766,161 +908,18 @@ include '../includes/header1.php';
       const currentStepElement = document.querySelector(`.form-step[data-step="${step}"]`);
       let isValid = true;
 
-      // Clear all previous error messages
-      currentStepElement.querySelectorAll('.error-message').forEach(msg => {
-        if (msg.id && msg.id.endsWith('-error')) {
-          msg.classList.add('hidden');
-          msg.textContent = '';
-        } else if (!msg.closest('.password-field-container')) {
-          msg.remove();
-        }
-      });
-
       // Get all inputs within the current step
       const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], select');
       
       inputs.forEach(input => {
-        input.classList.remove('error');
-        if (input.value.trim() === '') {
-          isValid = false;
-          input.classList.add('error');
-          showError(input, 'This field is required');
+        if (input.hasAttribute('required') || input.value.trim()) {
+          if (!validateField(input.id)) {
+            isValid = false;
+          }
         }
       });
 
-      // Step 1: Validate shop name, shop category and phone number
-      if (step === 1) {
-        const shopName = document.getElementById('shop_name');
-        const shopCategory = document.getElementById('shop_category');
-        const phone = document.getElementById('phone');
-        
-        if (shopName.value.trim() === '') {
-          isValid = false;
-          shopName.classList.add('error');
-          showError(shopName, 'This field is required');
-        }
-        
-        if (shopCategory.value === '') {
-          isValid = false;
-          shopCategory.classList.add('error');
-          showError(shopCategory, 'This field is required');
-        }
-        
-        if (phone.value.trim() === '') {
-          isValid = false;
-          phone.classList.add('error');
-          showError(phone, 'This field is required');
-        } else if (!/^09\d{9}$/.test(phone.value)) {
-          isValid = false;
-          phone.classList.add('error');
-          showError(phone, 'This field is required');
-        }
-      }
-
-      // Step 2: Validate address fields only
-      if (step === 2) {
-        const street = document.getElementById('street');
-        const barangay = document.getElementById('barangay');
-        
-        if (street.value.trim() === '') {
-          isValid = false;
-          street.classList.add('error');
-          showError(street, 'This field is required');
-        }
-        
-        if (barangay.value === '') {
-          isValid = false;
-          barangay.classList.add('error');
-          showError(barangay, 'This field is required');
-        }
-      }
-
-      // Step 3: Validate email and verification code
-      if (step === 3) {
-        const email = document.getElementById('email');
-        const verificationCode = document.getElementById('verification_code');
-        
-        if (email.value.trim() === '') {
-          isValid = false;
-          email.classList.add('error');
-          showError(email, 'This field is required');
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-          isValid = false;
-          email.classList.add('error');
-          showError(email, 'This field is required');
-        }
-        
-        if (verificationCode.value.trim() === '') {
-          isValid = false;
-          verificationCode.classList.add('error');
-          showError(verificationCode, 'This field is required');
-        }
-      }
-
-      // Step 4: Password confirmation
-      if (step === 4) {
-        const password = document.getElementById('password');
-        const confirmPassword = document.getElementById('confirm_password');
-        
-        if (password.value.trim() === '') {
-          isValid = false;
-          password.classList.add('error');
-          showError(password, 'This field is required');
-        } else if (password.value.length < 8) {
-          isValid = false;
-          password.classList.add('error');
-          showError(password, 'This field is required');
-        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password.value)) {
-          isValid = false;
-          password.classList.add('error');
-          if (!/(?=.*[a-z])/.test(password.value)) {
-            showError(password, 'This field is required');
-          } else if (!/(?=.*[A-Z])/.test(password.value)) {
-            showError(password, 'This field is required');
-          } else if (!/(?=.*\d)/.test(password.value)) {
-            showError(password, 'This field is required');
-          } else {
-            showError(password, 'This field is required');
-          }
-        }
-        
-        if (confirmPassword.value.trim() === '') {
-          isValid = false;
-          confirmPassword.classList.add('error');
-          showError(confirmPassword, 'This field is required');
-        } else if (password.value !== confirmPassword.value) {
-          isValid = false;
-          password.classList.add('error');
-          confirmPassword.classList.add('error');
-          showError(confirmPassword, 'This field is required');
-        }
-      }
-
       return isValid;
-    }
-
-    function showError(input, message) {
-      // For password fields, find the error span that's already in the HTML
-      if (input.type === 'password') {
-        const errorSpan = document.getElementById(input.id + '-error');
-        if (errorSpan) {
-          errorSpan.textContent = message;
-          errorSpan.classList.remove('hidden');
-          return;
-        }
-      }
-      
-      // For non-password fields, remove any existing error message and create new one
-      const existingError = input.parentNode.querySelector('.error-message');
-      if (existingError) {
-        existingError.remove();
-      }
-      
-      // Create and add new error message for non-password fields
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message text-red-500 text-xs mt-1';
-      errorDiv.textContent = message;
-      input.parentNode.appendChild(errorDiv);
     }
 
     function nextStep() {
@@ -961,17 +960,10 @@ include '../includes/header1.php';
         const termsCheckbox = document.getElementById('terms-checkbox');
         if (!termsCheckbox.checked) {
           event.preventDefault();
-          // Show error message below the checkbox
-          const existingError = termsCheckbox.parentNode.querySelector('.error-message');
-          if (existingError) {
-            existingError.remove();
-          }
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'error-message text-red-500 text-xs mt-1';
-          errorDiv.textContent = 'You must agree to the Terms and Conditions to create an account.';
-          termsCheckbox.parentNode.appendChild(errorDiv);
+          setFieldError('terms', errorMessages.terms);
           return false;
         }
+        clearFieldError('terms');
         // Form will submit normally to PHP
       } else {
         event.preventDefault();
