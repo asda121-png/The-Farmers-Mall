@@ -160,7 +160,7 @@ try {
 
 <body class="flex min-h-screen bg-gray-50 text-gray-800">
 
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 sticky top-0 h-screen overflow-y-auto">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300">
     <div>
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
         <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
@@ -180,6 +180,10 @@ try {
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
+        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
+          <i class="fa-solid fa-user-gear w-5 text-green-200"></i>
+          <span>Manage Users</span>
+        </a>
       </nav>
 
        <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
@@ -193,10 +197,7 @@ try {
           <span>Settings</span>
         </a>
       
-        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-green-700 font-semibold card-shadow">
-          <i class="fa-solid fa-user-gear w-5 text-green-200"></i>
-          <span>Manage Users</span>
-        </a>
+        
       </nav>
     </div>
 
@@ -272,13 +273,7 @@ try {
                 Sellers (Retailers)
                 <span class="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2">48</span>
             </button>
-            <button data-tab="riders" 
-    class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 text-gray-500 hover:text-green-600 hover:border-green-300">
-    <i class="fa-solid fa-motorcycle"></i>
-    Riders
-    <span class="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2">
-        <?php echo "$totalRiders"; ?>
-    </span>
+           
 </button>
 
         </nav>
@@ -354,94 +349,6 @@ try {
             </div>
         </div>
     </div>
-<div id="tab-riders" class="tab-content">
-    <div class="bg-white rounded-xl card-shadow overflow-hidden">
-        
-        <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-            <h3 class="font-bold text-gray-700">Rider List</h3>
-            <div class="flex gap-2">
-                <select id="rider-status-filter" 
-                        class="filter-dropdown text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
-                    <option>All Statuses</option>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                    <option>Suspended</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rider</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Vehicle</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deliveries</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
-                    </tr>
-                </thead>
-
-                <tbody id="riders-table-body" class="bg-white divide-y divide-gray-200">
-                    <?php foreach ($riders as $r): ?>
-                    <tr class="rider-row hover:bg-gray-50" data-status="<?php echo $r['status']; ?>">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <img class="h-10 w-10 rounded-full object-cover"
-                                     src="<?php echo $r['avatar']; ?>" alt="">
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900"><?php echo $r['name']; ?></div>
-                                    <div class="text-xs text-gray-500"><?php echo $r['phone']; ?> • <?php echo $r['email']; ?></div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">
-                                <?php echo $r['vehicle']; ?>
-                            </div>
-                            <div class="text-xs text-gray-500">
-                                Plate: <?php echo $r['plate']; ?>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                <?php echo $r['deliveries']; ?> Completed
-                            </span>
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <?php 
-                                $statusColor = $r['status'] == 'Active'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-gray-100 text-gray-800';
-                            ?>
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $statusColor; ?>">
-                                <?php echo $r['status']; ?>
-                            </span>
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <?php echo $r['joined']; ?>
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-green-600 hover:text-green-800 mr-2"><i class="fa-solid fa-pen"></i></button>
-                            <button class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>   
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-
-            <div class="flex justify-end mt-4">
-                <nav class="pagination flex gap-2" id="riders-pagination"></nav>
-            </div>
-        </div>
-    </div>
-</div>
 
     <div id="tab-sellers" class="tab-content">
         <div class="bg-white rounded-xl card-shadow overflow-hidden">
