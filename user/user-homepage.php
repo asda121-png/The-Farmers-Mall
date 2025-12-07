@@ -323,7 +323,7 @@ if ($user_id) {
         position: absolute;
         top: 100%;
         right: 0;
-        mt: 8px;
+        margin-top: 8px;
         width: 320px;
         background: white;
         border-radius: 8px;
@@ -386,7 +386,10 @@ if ($user_id) {
         font-size: 12px;
         color: #2E7D32;
         cursor: pointer;
-        hover: color #4CAF50;
+    }
+
+    .notification-clear-btn:hover {
+        color: #4CAF50;
     }
   
   </style>
