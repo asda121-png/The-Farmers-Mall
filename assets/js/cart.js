@@ -264,6 +264,15 @@
               div.classList.remove('bg-green-50', 'border-l-4', 'border-l-green-600');
             }
             updateCheckoutButtonState();
+            // Update Select All checkbox state (checked / indeterminate)
+            const selectAll = document.getElementById('selectAllCheckbox');
+            if (selectAll) {
+              const allCheckboxesNow = document.querySelectorAll('.item-checkbox');
+              const allCheckedNow = allCheckboxesNow.length > 0 && Array.from(allCheckboxesNow).every(cb => cb.checked);
+              const someCheckedNow = Array.from(allCheckboxesNow).some(cb => cb.checked);
+              selectAll.checked = allCheckedNow;
+              selectAll.indeterminate = false;
+            }
           });
         }
 
@@ -293,6 +302,33 @@
 
       updateTotals();
       updateCheckoutButtonState();
+
+      // Wire the top Select All checkbox to toggle item checkboxes
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      if (selectAllCheckbox) {
+        const allCheckboxes = document.querySelectorAll('.item-checkbox');
+        // Initialize state
+        if (allCheckboxes.length === 0) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+          const someChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+          selectAllCheckbox.checked = allChecked;
+          selectAllCheckbox.indeterminate = false;
+        }
+
+        // Remove previous listeners by replacing the node, then add a fresh listener
+        const newSelect = selectAllCheckbox.cloneNode(true);
+        selectAllCheckbox.parentNode.replaceChild(newSelect, selectAllCheckbox);
+        newSelect.addEventListener('change', (e) => {
+          const isChecked = e.target.checked;
+          allCheckboxes.forEach(cb => {
+            cb.checked = isChecked;
+            cb.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+        });
+      }
     }
 
     function escapeHtml(text) {
@@ -309,6 +345,9 @@
       let total = subtotal + tax;
       
       subtotalEl.textContent = `₱${subtotal.toFixed(2)}`;
+      // Update tax display
+      const taxDisplayEl = document.getElementById('tax');
+      if (taxDisplayEl) taxDisplayEl.textContent = `₱${tax.toFixed(2)}`;
       totalEl.textContent = `₱${total.toFixed(2)}`;
       
       const itemCountEl = document.getElementById('itemCount');
@@ -316,7 +355,6 @@
       const totalItems = selectedItemsArray.reduce((sum, item) => sum + (item.quantity || 1), 0);
       
       if (itemCountEl) itemCountEl.textContent = totalItems;
-      updateTotals();
     }
 
     function updateCheckoutButtonState() {
