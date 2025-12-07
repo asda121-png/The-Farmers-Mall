@@ -52,11 +52,12 @@ if ($shop_name) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     .product-card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 2px solid transparent;
+      transition: all 0.6s ease;
     }
     .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      border-color: #2E7D32;
+      transition: all 0.6s ease;
     }
   </style>
 </head>

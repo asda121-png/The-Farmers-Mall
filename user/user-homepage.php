@@ -110,6 +110,43 @@ if ($user_id) {
         position: relative;
     }
 
+    /* Make product cards vertical rectangles: taller image and card height */
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 20rem;
+      border: 2px solid transparent;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      border-color: #2E7D32;
+    }
+
+    .product-card > img {
+      height: 12rem;
+      width: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .product-card > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1rem;
+    }
+
+    .product-card > div > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
     .product-card h3,
     .product-card p {
         position: relative;
@@ -680,7 +717,6 @@ if ($user_id) {
   <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold">Top Products</h2>
-      <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
     <?php
     // Fetch products from Supabase
@@ -729,13 +765,17 @@ if ($user_id) {
       ?>
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
         <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
-          <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+        <div>
+          <div>
+            <div>
+              <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
+              <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+            </div>
+            <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
         </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
       </a>
       <?php endforeach; ?>
     </div>
@@ -745,7 +785,6 @@ if ($user_id) {
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold">All Products</h2>
-      <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -759,13 +798,17 @@ if ($user_id) {
       ?>
       <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
         <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
-          <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+        <div>
+          <div>
+            <div>
+              <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
+              <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+            </div>
+            <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
         </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
       </a>
       <?php endforeach; ?>
     </div>

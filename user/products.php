@@ -32,6 +32,48 @@ if ($user_id) {
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="../assets/css/productdetails.css">
+  <style>
+    /* Product card vertical rectangle styling */
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 20rem;
+      border: 2px solid transparent;
+      border-radius: 0.5rem;
+      transition: all 0.6s ease;
+    }
+
+    .product-card:hover {
+      border-color: #2E7D32;
+      transition: all 0.6s ease;
+    }
+
+    .product-card img {
+      height: 12rem;
+      width: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .product-card > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1rem;
+    }
+
+    .product-card .product-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .product-card .add-btn {
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -209,13 +251,15 @@ if ($user_id) {
             $id = htmlspecialchars($prod['id'] ?? '');
             $organic = isset($prod['is_organic']) && $prod['is_organic'] ? 'true' : 'false';
         ?>
-        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition" data-category="<?php echo $category; ?>" data-price="<?php echo $priceVal; ?>" data-organic="<?php echo $organic; ?>" data-name="<?php echo $name; ?>" data-description="<?php echo $desc; ?>" data-id="<?php echo $id; ?>">
+        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden" data-category="<?php echo $category; ?>" data-price="<?php echo $priceVal; ?>" data-organic="<?php echo $organic; ?>" data-name="<?php echo $name; ?>" data-description="<?php echo $desc; ?>" data-id="<?php echo $id; ?>">
           <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-40 object-cover">
-          <div class="p-4">
-            <h3 class="font-medium text-gray-800"><?php echo $name; ?></h3>
-            <p class="text-sm text-gray-500">Per unit</p>
-            <div class="flex justify-between items-center mt-2">
-              <p class="font-semibold text-green-700">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+          <div>
+            <div class="product-info">
+              <div>
+                <h3 class="font-medium text-gray-800"><?php echo $name; ?></h3>
+                <p class="text-sm text-gray-500">Per unit</p>
+                <p class="font-semibold text-green-700 mt-1">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+              </div>
               <button class="add-btn bg-white text-green-600 border border-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
             </div>
           </div>
