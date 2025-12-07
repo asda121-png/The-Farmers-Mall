@@ -284,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
   <!-- Header -->
 <?php
 // Include the header
-include '../includes/header1.php';
+include '../includes/header.php';
 ?>
 
   <!-- Hero / Sign Up Section -->
