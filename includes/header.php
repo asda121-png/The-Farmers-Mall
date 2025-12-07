@@ -104,10 +104,12 @@
     <nav>
       <ul class="flex gap-6"> <!-- Removed default text color, script will handle it -->
         <!-- ✅ CHANGED: Updated links to work from any page -->
-        <?php 
+        <?php
           $base = '';
           $current_dir = basename(dirname($_SERVER['PHP_SELF']));
-          if ($current_dir === 'public') {
+          // List of directories where the header is included, that are one level deep
+          $subdirectories = ['public', 'retailer', 'auth', 'admin', 'user', 'seller', 'rider'];
+          if (in_array($current_dir, $subdirectories)) {
               $base = '../';
           }
         ?>

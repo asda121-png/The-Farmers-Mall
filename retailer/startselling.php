@@ -8,33 +8,49 @@ require_once __DIR__ . '/../config/supabase-api.php';
 $registration_status = '';
 $registration_message = '';
 
+// Clear any previous error messages on fresh page load (not POST submission)
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Clear session variables
+    unset($_SESSION['registration_error']);
+    unset($_SESSION['registration_status']);
+    unset($_SESSION['registration_message']);
+    
+    // Ensure local variables are empty
+    $registration_status = '';
+    $registration_message = '';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
     try {
         $api = getSupabaseAPI();
         
         // Collect form data
-        $firstName = trim($_POST['firstname'] ?? '');
-        $lastName = trim($_POST['lastname'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
-        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
         $shopName = trim($_POST['shop_name'] ?? '');
-        $shopAddress = trim($_POST['shop_address'] ?? '');
-        $username = trim($_POST['username'] ?? '');
+        $street = trim($_POST['street'] ?? '');
+        $barangay = trim($_POST['barangay'] ?? '');
+        $city = trim($_POST['city'] ?? '');
+        $province = trim($_POST['province'] ?? '');
+        $shopCategory = trim($_POST['shop_category'] ?? '');
+        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+        $verificationCode = trim($_POST['verification_code'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
         $terms = isset($_POST['terms']);
         
+        // Combine address fields
+        $shopAddress = $street . ', ' . $barangay . ', ' . $city . ', ' . $province;
+        
         $errors = [];
         
         // Validation
-        if (empty($firstName)) $errors[] = "First name is required.";
-        if (empty($lastName)) $errors[] = "Last name is required.";
-        if (!preg_match('/^09\d{9}$/', $phone)) $errors[] = "Invalid phone number (must be 09XXXXXXXXX).";
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
         if (empty($shopName)) $errors[] = "Shop name is required.";
+        if (!preg_match('/^09\d{9}$/', $phone)) $errors[] = "Invalid phone number (must be 09XXXXXXXXX).";
+        if (empty($shopCategory)) $errors[] = "Shop category is required.";
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
         if (empty($shopAddress)) $errors[] = "Shop address is required.";
-        if (empty($username)) $errors[] = "Username is required.";
-        if (strlen($password) < 6) $errors[] = "Password must be at least 6 characters.";
+        if (empty($verificationCode)) $errors[] = "Verification code is required.";
+        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', $password)) $errors[] = "Password must be at least 8 characters with uppercase, lowercase, and number.";
         if ($password !== $confirmPassword) $errors[] = "Passwords do not match.";
         if (!$terms) $errors[] = "You must agree to the Terms and Conditions.";
         
@@ -44,24 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
             if (!empty($existingUser)) {
                 $errors[] = "Email already registered.";
             }
-            
-            // Check if username already exists
-            $existingUsername = $api->select('users', ['username' => $username]);
-            if (!empty($existingUsername)) {
-                $errors[] = "Username already taken.";
-            }
         }
         
         if (empty($errors)) {
             // Create user account
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $fullName = $firstName . ' ' . $lastName;
             
             $newUser = $api->insert('users', [
                 'email' => $email,
-                'username' => $username,
                 'password_hash' => $hashedPassword,
-                'full_name' => $fullName,
+                'full_name' => $shopName,
                 'phone' => $phone,
                 'user_type' => 'retailer',
                 'status' => 'active'
@@ -75,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
                     'user_id' => $userId,
                     'shop_name' => $shopName,
                     'business_address' => $shopAddress,
+                    'shop_category' => $shopCategory,
                     'verification_status' => 'pending',
                     'rating' => 0.00,
                     'total_sales' => 0.00
@@ -203,8 +212,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         /* Custom style for file input */
         .form-input[type="file"] { padding: 0.5rem; }
         .form-input.error { border-color: #dc2626; } /* red-600 */
+        /* Disable browser's default password reveal button */
+        .form-input[type="password"]::-ms-reveal,
+        .form-input[type="password"]::-ms-clear {
+          display: none;
+        }
+        .form-input[type="password"]::-webkit-credentials-auto-fill-button,
+        .form-input[type="password"]::-webkit-contacts-auto-fill-button {
+          visibility: hidden;
+          pointer-events: none;
+          position: absolute;
+          right: 0;
+        }
+        /* Add padding to password fields for eye icon */
+        .password-field-container .form-input[type="password"],
+        .password-field-container .form-input[type="text"] {
+          padding-right: 2.5rem;
+        }
         /* Style for terms and conditions */
-        .terms-box { height: 100px; overflow-y: auto; border: 1px solid #d1d5db; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; color: #4b5563; background-color: #f9fafb; margin-bottom: 1rem; }
+        .terms-box { border: 1px solid #d1d5db; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; color: #4b5563; background-color: #f9fafb; margin-bottom: 1rem; }
+        
+        /* Customer registration style for input focus and errors */
+        .input-error {
+            border-color: #dc2626 !important;
+        }
+        .error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+            min-height: 1.25rem;
+        }
+        .error-message.hidden {
+            display: none;
+        }
+        
+        /* Hide eye icon when input is empty and position it inside the field */
+        .password-toggle-btn {
+          opacity: 0;
+          pointer-events: none;
+          position: absolute;
+          right: 0.75rem; /* 12px */
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: opacity 0.2s;
+        }
+        .form-input:not(:placeholder-shown) + .password-toggle-btn {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        /* Container for password field with relative positioning */
+        .password-field-container {
+          position: relative;
+        }
+        /* Remove input margin to prevent container stretching and fix icon alignment */
+        .password-field-container .form-input {
+            margin-bottom: 0;
+        }
 
         /* NEW: Styles for fixed-height form */
         .form-step.active { display: flex; flex-direction: column; flex-grow: 1; }
@@ -216,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
   <!-- Header -->
 <?php
 // Include the header
-include '../includes/header1.php';
+include '../includes/header.php';
 ?>
 
   <!-- Hero / Sign Up Section -->
@@ -233,37 +301,70 @@ include '../includes/header1.php';
     </div>
     <div class="md:w-2/5 bg-white p-8 rounded-lg shadow-lg mt-10 md:mt-0 w-full">
       <!-- Error/Success Messages -->
-      <?php if ($registration_status === 'error'): ?>
+      <?php if ($registration_status === 'error' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])): ?>
       <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
         <p class="text-red-700 text-sm"><?= htmlspecialchars($registration_message) ?></p>
       </div>
       <?php endif; ?>
       
       <!-- UPDATED: Added flex classes and a fixed height -->
-      <form id="retailer-signup-form" method="POST" class="flex flex-col h-[480px]">
+      <form id="retailer-signup-form" method="POST" class="flex flex-col h-auto">
         <input type="hidden" name="retailer_signup" value="1">
         <h4 class="text-xl font-semibold mb-1">Become a Seller</h4>
-        <p id="step-indicator" class="text-sm text-gray-500 mb-6">Step 1 of 5: Personal Info</p>
+        <p id="step-indicator" class="text-sm text-gray-500 mb-6">Step 1 of 5: Shop Info</p>
 
         <div class="flex-grow">
-          <!-- Step 1: Personal Info -->
+          <!-- Step 1: Shop Info -->
           <div class="form-step active" data-step="1">
             <div class="step-content">
-              <div class="flex gap-4 mb-4">
-                <input type="text" name="firstname" id="firstname" placeholder="First Name" class="form-input !mb-0" required>
-                <input type="text" name="lastname" id="lastname" placeholder="Last Name" class="form-input !mb-0" required>
+              <div class="mb-4">
+                <input type="text" name="shop_name" id="shop_name" placeholder="Shop / Farm Name" class="form-input" required>
+                <span id="shop_name-error" class="error-message hidden"></span>
               </div>
-              <input type="text" name="phone" id="phone" placeholder="Mobile Number (09XXXXXXXXX)" class="form-input" pattern="09[0-9]{9}" required>
-              <input type="email" name="email" id="email" placeholder="Email Address" class="form-input" required>
+              <div class="mb-4">
+                <select name="shop_category" id="shop_category" class="form-input" required>
+                  <option value="">Select Shop Category</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="dairy">Dairy Products</option>
+                  <option value="meat">Meat & Poultry</option>
+                  <option value="grains">Grains & Cereals</option>
+                  <option value="processed">Processed Foods</option>
+                  <option value="organic">Organic Products</option>
+                  <option value="mixed">Mixed Farm Products</option>
+                </select>
+                <span id="shop_category-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <input type="text" name="phone" id="phone" placeholder="Mobile Number (09XXXXXXXXX)" class="form-input" pattern="09[0-9]{9}" required>
+                <span id="phone-error" class="error-message hidden"></span>
+              </div>
             </div>
-            <button type="button" onclick="nextStep()" class="w-full bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
+            <div class="flex gap-4">
+              <button type="button" onclick="nextStep()" class="w-full bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
+            </div>
           </div>
 
           <!-- Step 2: Shop Details -->
           <div class="form-step" data-step="2">
             <div class="step-content">
-              <input type="text" name="shop_name" id="shop_name" placeholder="Shop / Farm Name" class="form-input" required>
-              <input type="text" name="shop_address" id="shop_address" placeholder="Shop Address" class="form-input" required>
+              <div class="mb-4">
+                <input type="text" name="street" id="street" placeholder="Street Address" class="form-input" required>
+                <span id="street-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <select name="barangay" id="barangay" class="form-input" required>
+                  <option value="">Select Barangay</option>
+                  <!-- Options will be populated by JavaScript -->
+                </select>
+                <span id="barangay-error" class="error-message hidden"></span>
+              </div>
+              <div class="mb-4">
+                <input type="text" name="city" id="city" value="Mati City" readonly class="form-input bg-gray-100">
+              </div>
+              <div class="mb-4">
+                <input type="text" name="province" id="province" value="Davao Oriental" readonly class="form-input bg-gray-100">
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -271,12 +372,18 @@ include '../includes/header1.php';
             </div>
           </div>
 
-          <!-- Step 3: Upload Permit -->
+          <!-- Step 3: Email Verification -->
           <div class="form-step" data-step="3">
             <div class="step-content">
-              <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-              <input type="text" name="username" id="username" placeholder="Choose a username" class="form-input" required>
-              <p class="text-xs text-gray-500 mb-4">This will be your unique identifier on the platform.</p>
+              <div class="mb-4">
+                <input type="email" name="email" id="email" placeholder="Email Address" class="form-input" required>
+                <span id="email-error" class="error-message hidden"></span>
+              </div>
+              <button type="button" class="w-full text-center text-sm text-green-600 hover:underline font-medium mb-4">Send Verification Code</button>
+              <div class="mb-4">
+                <input type="text" name="verification_code" id="verification_code" placeholder="Enter Verification Code" class="form-input" required>
+                <span id="verification_code-error" class="error-message hidden"></span>
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -287,8 +394,34 @@ include '../includes/header1.php';
           <!-- Step 4: Create Account -->
           <div class="form-step" data-step="4">
             <div class="step-content">
-              <input type="password" name="password" id="password" placeholder="Create Password" class="form-input" minlength="6" required>
-              <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-input" minlength="6" required>
+              <div class="mb-4">
+                <div class="password-field-container">
+                  <input type="password" name="password" id="password" placeholder="Create Password" class="form-input" minlength="8" required>
+                  <button type="button" onclick="togglePassword('password')" class="password-toggle-btn text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-eye" id="password-toggle"></i>
+                  </button>
+                </div>
+                <span id="password-error" class="error-message hidden"></span>
+                <!-- Password Strength Meter -->
+                <div id="password-strength" class="mt-2 hidden">
+                  <div class="flex items-center gap-2 mb-1">
+                    <div class="flex-grow h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div id="strength-bar" class="h-full w-0 rounded-full transition-all duration-300" style="background-color: #ef4444;"></div>
+                    </div>
+                    <span id="strength-text" class="text-xs font-semibold text-red-600">Weak</span>
+                  </div>
+                  <p class="text-xs text-gray-600">Requires: uppercase, lowercase, numbers, 8+ characters</p>
+                </div>
+              </div>
+              <div class="mb-4">
+                <div class="password-field-container">
+                  <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-input" minlength="8" required>
+                  <button type="button" onclick="togglePassword('confirm_password')" class="password-toggle-btn text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-eye" id="confirm-password-toggle"></i>
+                  </button>
+                </div>
+                <span id="confirm_password-error" class="error-message hidden"></span>
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -306,7 +439,10 @@ include '../includes/header1.php';
                 <p class="mb-2"><strong>4. Fees and Payments</strong><br>Listing products is free. Farmers Mall will charge a commission fee on each completed sale. This fee is subject to change upon prior notification. Payments will be processed according to our payment schedule.</p>
                 <p class="mb-2"><strong>5. Termination</strong><br>Farmers Mall reserves the right to terminate or suspend your seller account at any time for conduct that violates these Terms and Conditions or is harmful to other users of the platform.</p>
               </div>
-              <label class="flex items-center mb-4"><input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2" required> I agree to the Terms and Conditions</label>
+              <div class="mb-4">
+                <label class="flex items-center"><input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2" required> I agree to the Terms and Conditions</label>
+                <span id="terms-error" class="error-message hidden"></span>
+              </div>
             </div>
             <div class="flex gap-4">
               <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
@@ -484,13 +620,277 @@ include '../includes/header1.php';
   </footer>
 
   <script>
+    // Mati City Barangays
+    const matiBarangays = [
+      "Badas", "Bobon", "Buso", "Cawayanan", "Central", "Dahican", "Danao", "Dawan", "Don Enrique Lopez",
+      "Don Martin Marundan", "Don Salvador Lopez Sr.", "Langka", "Lantawan", "Lawigan", "Libudon", "Luban",
+      "Macambol", "Magsaysay", "Manay", "Matiao", "New Bataan", "New Libudon", "Old Macambol", "Poblacion",
+      "Sainz", "San Isidro", "San Roque", "Tagabakid", "Tagbinonga", "Taguibo", "Tamisan"
+    ];
+
+    function populateBarangays() {
+      const barangaySelect = document.getElementById('barangay');
+      if (barangaySelect) {
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>'; // Clear existing options
+        matiBarangays.sort().forEach(barangay => { // Sort alphabetically
+          const option = document.createElement('option');
+          option.value = barangay;
+          option.textContent = barangay;
+          barangaySelect.appendChild(option);
+        });
+      }
+    }
+
+    // ====== VALIDATION PATTERNS AND ERROR MESSAGES ======
+    const validationPatterns = {
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      phone: /^09\d{9}$/,
+      password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+    };
+
+    const errorMessages = {
+      shop_name: 'Shop name is required',
+      shop_category: 'Shop category is required',
+      phone: 'Invalid phone number. Must be 09XXXXXXXXX',
+      street: 'Street address is required',
+      barangay: 'Barangay is required',
+      email: 'Invalid email format',
+      verification_code: 'Verification code is required',
+      password: 'Password must be at least 8 characters with uppercase, lowercase, and number',
+      confirm_password: 'Passwords do not match',
+      terms: 'You must agree to the Terms and Conditions'
+    };
+
+    // ====== FIELD ERROR FUNCTIONS ======
+    function setFieldError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      
+      if (field) {
+        field.classList.add('input-error');
+      }
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+      }
+    }
+
+    function clearFieldError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      
+      if (field) {
+        field.classList.remove('input-error');
+      }
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.classList.add('hidden');
+      }
+    }
+
+    // ====== PASSWORD STRENGTH METER ======
+    function calculatePasswordStrength(password) {
+      let strength = 0;
+      let feedbackText = '';
+      let color = '';
+      
+      if (!password) {
+        return { strength: 0, text: 'Weak', color: '#ef4444', feedback: [] };
+      }
+
+      const feedback = [];
+      
+      // Check length
+      if (password.length >= 8 && password.length < 12) strength += 1;
+      else if (password.length >= 12 && password.length < 16) strength += 2;
+      else if (password.length >= 16) strength += 3;
+      
+      // Check for numbers
+      if (/\d/.test(password)) {
+        strength += 1;
+      } else {
+        feedback.push('Add numbers');
+      }
+      
+      // Check for lowercase letters
+      if (/[a-z]/.test(password)) {
+        strength += 1;
+      } else {
+        feedback.push('Add lowercase letters');
+      }
+      
+      // Check for uppercase letters
+      if (/[A-Z]/.test(password)) {
+        strength += 1;
+      } else {
+        feedback.push('Add uppercase letters');
+      }
+      
+      // Calculate percentage and set text/color
+      const maxStrength = 6;
+      const percentage = (strength / maxStrength) * 100;
+      
+      if (percentage <= 33) {
+        feedbackText = 'Weak';
+        color = '#ef4444'; // red-500
+      } else if (percentage <= 66) {
+        feedbackText = 'Medium';
+        color = '#f59e0b'; // amber-500
+      } else {
+        feedbackText = 'Strong';
+        color = '#10b981'; // emerald-500
+      }
+      
+      return {
+        strength: percentage,
+        text: feedbackText,
+        color: color,
+        feedback: feedback
+      };
+    }
+
+    function updatePasswordStrength(password) {
+      const strengthDiv = document.getElementById('password-strength');
+      const strengthBar = document.getElementById('strength-bar');
+      const strengthText = document.getElementById('strength-text');
+      
+      if (!strengthDiv) return;
+      
+      const strength = calculatePasswordStrength(password);
+      
+      if (!password) {
+        strengthDiv.classList.add('hidden');
+        return;
+      }
+      
+      strengthDiv.classList.remove('hidden');
+      strengthBar.style.width = strength.strength + '%';
+      strengthBar.style.backgroundColor = strength.color;
+      strengthText.textContent = strength.text;
+      strengthText.style.color = strength.color;
+    }
+
+    // ====== REAL-TIME VALIDATION FUNCTIONS ======
+    function validateField(fieldId) {
+      const field = document.getElementById(fieldId);
+      if (!field) return true;
+      
+      const value = field.value.trim();
+      
+      // Check if empty
+      if (!value && field.hasAttribute('required')) {
+        setFieldError(fieldId, errorMessages[fieldId] || 'This field is required');
+        return false;
+      }
+      
+      // Validate specific fields
+      if (fieldId === 'phone' && value) {
+        if (!validationPatterns.phone.test(value)) {
+          setFieldError(fieldId, errorMessages.phone);
+          return false;
+        }
+      }
+      
+      if (fieldId === 'email' && value) {
+        if (!validationPatterns.email.test(value)) {
+          setFieldError(fieldId, errorMessages.email);
+          return false;
+        }
+      }
+      
+      if (fieldId === 'password' && value) {
+        if (!validationPatterns.password.test(value)) {
+          setFieldError(fieldId, errorMessages.password);
+          return false;
+        }
+      }
+      
+      if (fieldId === 'confirm_password' && value) {
+        const password = document.getElementById('password').value;
+        if (value !== password) {
+          setFieldError(fieldId, errorMessages.confirm_password);
+          return false;
+        }
+      }
+      
+      if (fieldId === 'shop_category' && !value) {
+        setFieldError(fieldId, errorMessages.shop_category);
+        return false;
+      }
+      
+      if (fieldId === 'barangay' && !value) {
+        setFieldError(fieldId, errorMessages.barangay);
+        return false;
+      }
+      
+      clearFieldError(fieldId);
+      return true;
+    }
+
+    // ====== ATTACH INPUT LISTENERS ======
+    function initializeValidation() {
+      const fieldsToValidate = [
+        'shop_name', 'shop_category', 'phone', 'street', 'barangay',
+        'email', 'verification_code', 'password', 'confirm_password'
+      ];
+      
+      fieldsToValidate.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+          // Clear error on input
+          element.addEventListener('input', () => {
+            clearFieldError(fieldId);
+            
+            // Update password strength
+            if (fieldId === 'password') {
+              updatePasswordStrength(element.value);
+              // Validate confirm password if it has a value
+              const confirmField = document.getElementById('confirm_password');
+              if (confirmField && confirmField.value) {
+                validateField('confirm_password');
+              }
+            }
+            
+            // Validate confirm password on input
+            if (fieldId === 'confirm_password') {
+              validateField('confirm_password');
+            }
+          });
+          
+          // Validate on blur
+          element.addEventListener('blur', () => {
+            if (element.value.trim()) {
+              validateField(fieldId);
+            }
+          });
+        }
+      });
+      
+      // Special handling for barangay select
+      const barangaySelect = document.getElementById('barangay');
+      if (barangaySelect) {
+        barangaySelect.addEventListener('change', () => {
+          if (barangaySelect.value) {
+            clearFieldError('barangay');
+          }
+        });
+      }
+    }
+
+    // Initialize barangays and validation when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      populateBarangays();
+      initializeValidation();
+    });
+
+    // ====== MULTI-STEP FORM NAVIGATION ======
     let currentStep = 1;
     const totalSteps = 5;
     const stepIndicator = document.getElementById('step-indicator');
     const stepTitles = [
-      "Step 1 of 5: Personal Info", 
+      "Step 1 of 5: Shop Info", 
       "Step 2 of 5: Shop Details", 
-      "Step 3 of 5: Username", 
+      "Step 3 of 5: Email Verification", 
       "Step 4 of 5: Create Password", 
       "Step 5 of 5: Terms & Conditions"
     ];
@@ -509,51 +909,15 @@ include '../includes/header1.php';
       let isValid = true;
 
       // Get all inputs within the current step
-      const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+      const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], select');
       
       inputs.forEach(input => {
-        input.classList.remove('error');
-        if (input.value.trim() === '') {
-          isValid = false;
-          input.classList.add('error');
+        if (input.hasAttribute('required') || input.value.trim()) {
+          if (!validateField(input.id)) {
+            isValid = false;
+          }
         }
       });
-
-      // Step 1: Validate phone number
-      if (step === 1) {
-        const phone = document.getElementById('phone');
-        if (!/^09\d{9}$/.test(phone.value)) {
-          isValid = false;
-          phone.classList.add('error');
-          alert('Phone number must be in format: 09XXXXXXXXX');
-        }
-        
-        const email = document.getElementById('email');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-          isValid = false;
-          email.classList.add('error');
-          alert('Please enter a valid email address');
-        }
-      }
-
-      // Step 4: Password confirmation
-      if (step === 4) {
-        const password = document.getElementById('password');
-        const confirmPassword = document.getElementById('confirm_password');
-        
-        if (password.value.length < 6) {
-          isValid = false;
-          password.classList.add('error');
-          alert('Password must be at least 6 characters');
-        }
-        
-        if (password.value !== confirmPassword.value) {
-          isValid = false;
-          password.classList.add('error');
-          confirmPassword.classList.add('error');
-          alert('Passwords do not match');
-        }
-      }
 
       return isValid;
     }
@@ -574,15 +938,32 @@ include '../includes/header1.php';
       }
     }
 
+    // Password toggle function
+    function togglePassword(fieldId) {
+      const field = document.getElementById(fieldId);
+      const toggle = document.getElementById(fieldId + '-toggle');
+      
+      if (field.type === 'password') {
+        field.type = 'text';
+        toggle.classList.remove('fa-eye');
+        toggle.classList.add('fa-eye-slash');
+      } else {
+        field.type = 'password';
+        toggle.classList.remove('fa-eye-slash');
+        toggle.classList.add('fa-eye');
+      }
+    }
+
     // Final form submission handler
     document.getElementById('retailer-signup-form').addEventListener('submit', function(event) {
       if (currentStep === totalSteps) {
         const termsCheckbox = document.getElementById('terms-checkbox');
         if (!termsCheckbox.checked) {
           event.preventDefault();
-          alert('You must agree to the Terms and Conditions to create an account.');
+          setFieldError('terms', errorMessages.terms);
           return false;
         }
+        clearFieldError('terms');
         // Form will submit normally to PHP
       } else {
         event.preventDefault();

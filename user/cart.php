@@ -136,14 +136,14 @@ if ($user_id) {
      
   <!-- Main Cart Section -->
   <main class="max-w-7xl mx-auto p-4 md:p-6 mt-6 flex-grow w-full mb-20 md:mb-96">
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-      <div class="flex items-center space-x-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 items-start mb-6 gap-4">
+      <div class="col-span-2 flex items-center space-x-4">
         <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800 transition">
           <i class="fa-solid fa-arrow-left text-xl"></i>
         </button>
         <h2 class="text-xl md:text-2xl font-semibold">Your Shopping Cart (<span id="cartCount">0</span>)</h2>
       </div>
-      <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+      <div class="flex items-center gap-2 md:gap-4 justify-end">
         <a href="products.php" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2">
           <i class="fa-solid fa-plus"></i>
           <span class="hidden sm:inline">Continue Shopping</span>
@@ -158,9 +158,16 @@ if ($user_id) {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
       <!-- LEFT: Cart Items -->
-      <section id="cartItems" class="lg:col-span-2 space-y-4">
-        <!-- Cart items will be dynamically inserted here by cart.js -->
-      </section>
+      <div class="lg:col-span-2">
+        <div class="flex items-center mb-4 pl-4">
+          <input id="selectAllCheckbox" type="checkbox" class="w-5 h-5 rounded border-gray-300 cursor-pointer accent-green-600 mr-2" />
+          <label for="selectAllCheckbox" class="text-green-600 font-medium">Select All</label>
+        </div>
+
+        <section id="cartItems" class="space-y-4">
+          <!-- Cart items will be dynamically inserted here by cart.js -->
+        </section>
+      </div>
 
       <!-- RIGHT: Order Summary -->
       <aside class="bg-white shadow-sm p-4 md:p-6 rounded-xl h-fit sticky top-4">
@@ -186,12 +193,12 @@ if ($user_id) {
           <span id="total" class="text-green-600">₱0.00</span>
         </div>
 
-        <a href="paymentmethod.php" id="checkoutBtn"
-           class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg">
+        <button id="checkoutBtn"
+           class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-600">
           <i class="fa-solid fa-lock mr-2"></i>
-          Proceed to Checkout
+          Select items to checkout
           <i class="fa-solid fa-arrow-right ml-2"></i>
-        </a>
+        </button>
         
         <div class="mt-4 text-center space-y-2">
           <a href="products.php" class="text-sm text-gray-600 hover:text-green-600 transition block md:hidden">

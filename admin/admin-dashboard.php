@@ -144,13 +144,14 @@ $notifications = [
     <i class="fa-solid fa-receipt w-5"></i>
     <span>Orders</span>
   </a>
+  <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-user-gear w-5"></i>
+          <span>Manage Users</span>
+        </a>
 </nav>
 
 <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
-        <a href="admin-riders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-motorcycle w-5"></i>
-          <span>Riders</span>
-        </a>
+        
       </nav>
 
 
@@ -163,10 +164,7 @@ $notifications = [
           <span>Settings</span>
         </a>
         
-        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-user-gear w-5"></i>
-          <span>Manage Users</span>
-        </a>
+        
       </nav>
     </div>
 

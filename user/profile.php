@@ -1,18 +1,17 @@
-<<<<<<< HEAD
-﻿<?php
+<?php
 // Start output buffering at the very beginning
 ob_start();
 
-// Suppress all warnings and errors when handling AJAX requests
+// Enable error logging for debugging
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../debug_profile_errors.log');
+
+// Suppress display but keep logging when handling AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    error_reporting(0);
+    error_reporting(E_ALL);
     ini_set('display_errors', '0');
 }
 
-=======
-
-<?php
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -49,12 +48,20 @@ function handleProfilePictureUpload(array $file, string $userId, string $oldProf
         throw new Exception('File size must be less than 5MB');
     }
 
-    // More secure MIME type validation
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime_type = finfo_file($finfo, $file['tmp_name']);
-    finfo_close($finfo);
-
+    // Validate MIME type - use fileinfo if available, fallback to browser-provided type
     $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
+    
+    if (function_exists('mime_content_type')) {
+        $mime_type = mime_content_type($file['tmp_name']);
+    } elseif (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+    } else {
+        // Fallback to browser-provided MIME type
+        $mime_type = $file['type'];
+    }
+    
     if (!in_array($mime_type, $allowed_mime_types)) {
         throw new Exception('Invalid file type. Only JPG, PNG, and GIF are allowed.');
     }
@@ -93,16 +100,20 @@ function handleProfileUpdate()
     $api = getSupabaseAPI();
     $user_id = $_SESSION['user_id'] ?? null;
 
+    // DEBUG: Log what we received
+    error_log("=== PROFILE UPDATE DEBUG ===");
+    error_log("User ID: " . $user_id);
+    error_log("FILES received: " . print_r($_FILES, true));
+    error_log("POST data: " . print_r($_POST, true));
+
     if (!$user_id) {
         echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
         exit();
     }
 
     try {
-        // Combine first and last name to full_name
-        $first_name = trim($_POST['first_name'] ?? '');
-        $last_name = trim($_POST['last_name'] ?? '');
-        $full_name = trim("$first_name $last_name");
+        // Get full_name from POST data
+        $full_name = trim($_POST['full_name'] ?? '');
 
         $updateData = [
             'full_name' => $full_name,
@@ -121,12 +132,20 @@ function handleProfileUpdate()
 
         // Handle profile picture upload
         if (isset($_FILES['profile_picture'])) {
+            error_log("Profile picture file detected: " . $_FILES['profile_picture']['name']);
             $oldProfilePicture = ($_SESSION['profile_picture'] ?? '');
             $newProfilePicPath = handleProfilePictureUpload($_FILES['profile_picture'], $user_id, $oldProfilePicture);
             if ($newProfilePicPath) {
+                error_log("New profile picture saved to: " . $newProfilePicPath);
                 $updateData['profile_picture'] = $newProfilePicPath;
+            } else {
+                error_log("Profile picture upload returned null (file error or no file selected)");
             }
-        } elseif (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
+        } else {
+            error_log("No profile_picture in FILES array");
+        }
+        
+        if (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
             // Handle picture removal request from the client
             $updateData['profile_picture'] = null;
             if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/../' . $_SESSION['profile_picture'])) {
@@ -169,12 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $user_id = $_SESSION['user_id'] ?? null;
 $api = getSupabaseAPI();
 
-
-
-// Handle AJAX requests FIRST before any output
-
 // Handle remove profile picture via AJAX
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove_profile_picture') {
 
     header('Content-Type: application/json');
@@ -261,8 +275,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 }
 
-
-
 // Fetch user data from Supabase
 $userData = [];
 if ($user_id) {
@@ -272,16 +284,12 @@ if ($user_id) {
     }
 }
 
-
-
 // Set default values
 $email = $userData['email'] ?? $_SESSION['email'] ?? 'user@email.com';
 $full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest User';
 $name_parts = explode(' ', $full_name, 2);
 $first_name = $name_parts[0];
 $last_name = $name_parts[1] ?? '';
-
-
 
 $address_parts = explode(', ', $userData['address'] ?? '');
 $street = $address_parts[0] ?? '';
@@ -293,330 +301,13 @@ $date_of_birth = $userData['date_of_birth'] ?? '';
 $gender = $userData['gender'] ?? '';
 $bio = $userData['bio'] ?? '';
 $address = $userData['address'] ?? '';
-<<<<<<< HEAD
-=======
-$city = 'Mati City'; // As per registration form
-$province = 'Davao Oriental'; // As per registration form
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 $created_at = $userData['created_at'] ?? '';
 
-
-
-<<<<<<< HEAD
-// Handle profile update via AJAX
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
-
-    // Debug logging - use absolute path
-
-    $log_file = 'C:\tools_\The-Farmers-Mall\profile_upload.log';
-
-    file_put_contents($log_file, date('[Y-m-d H:i:s] ') . "Profile Update Request\n", FILE_APPEND);
-
-    
-
-    if (ob_get_level()) ob_end_clean(); // End and clean any output buffer
-
-    header('Content-Type: application/json');
-
-    // Fetch current user data for defaults
-    $userData = [];
-    $profile_picture = '';
-    if ($user_id) {
-        $users = $api->select('users', ['id' => $user_id]);
-        if (!empty($users)) {
-            $userData = $users[0];
-            $profile_picture = $userData['profile_picture'] ?? '';
-        }
-    }
-
-    
-
-    file_put_contents($log_file, "POST: " . json_encode($_POST) . "\n", FILE_APPEND);
-
-    
-
-    $files_info = [];
-
-    if (!empty($_FILES)) {
-
-        foreach ($_FILES as $key => $file) {
-
-            if (is_array($file['name'])) {
-
-                $files_info[$key] = 'multiple files';
-
-            } else {
-
-                $files_info[$key] = ['name' => $file['name'] ?? 'none', 'size' => $file['size'] ?? 0, 'error' => $file['error'] ?? 4];
-
-            }
-
-        }
-
-    }
-
-    file_put_contents($log_file, "FILES: " . json_encode($files_info) . "\n", FILE_APPEND);
-
-    
-
-    try {
-
-        $updateData = [
-
-            'full_name' => trim($_POST['full_name'] ?? ''),
-
-            'phone' => trim($_POST['phone'] ?? ''),
-
-            'email' => trim($_POST['email'] ?? ''),
-
-            'date_of_birth' => trim($_POST['date_of_birth'] ?? ''),
-
-            'gender' => trim($_POST['gender'] ?? ''),
-
-            'bio' => trim($_POST['bio'] ?? ''),
-
-            'address' => trim($_POST['address'] ?? '')
-
-        ];
-
-        
-
-        // Remove empty date_of_birth
-
-        if (empty($updateData['date_of_birth'])) {
-
-            unset($updateData['date_of_birth']);
-
-        }
-
-        
-
-        // Handle profile picture upload if file is provided
-
-        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-
-            file_put_contents($log_file, "Processing file upload...\n", FILE_APPEND);
-
-            $file = $_FILES['profile_picture'];
-
-            
-
-            // Validate file - use simple extension check
-
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', ];
-
-            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-            
-
-            file_put_contents($log_file, "File extension: " . $extension . "\n", FILE_APPEND);
-
-            
-
-            if (!in_array($extension, $allowed_extensions)) {
-
-                file_put_contents($log_file, "Invalid file type\n", FILE_APPEND);
-
-                echo json_encode(['status' => 'error', 'message' => 'Only image files (JPG, PNG, GIF) are allowed']);
-
-                exit();
-
-            }
-
-            
-
-            if ($file['size'] > 5 * 1024 * 1024) { // 5MB
-
-                echo json_encode(['status' => 'error', 'message' => 'File size must be less than 5MB']);
-
-                exit();
-
-            }
-
-            
-
-            // Create uploads/profiles directory if it doesn't exist
-
-            $upload_dir = __DIR__ . '/../assets/profiles/';
-
-            if (!is_dir($upload_dir)) {
-
-                mkdir($upload_dir, 0755, true);
-
-            }
-
-            
-
-            // Generate unique filename
-
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-
-            $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
-
-            $filepath = $upload_dir . $filename;
-
-            
-
-            file_put_contents($log_file, "Attempting to save to: " . $filepath . "\n", FILE_APPEND);
-
-            
-
-            // Move uploaded file
-
-            if (move_uploaded_file($file['tmp_name'], $filepath)) {
-
-                file_put_contents($log_file, "File saved successfully\n", FILE_APPEND);
-
-                // Delete old profile picture if exists
-
-                if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
-
-                    @unlink(__DIR__ . '/../' . $profile_picture);
-
-                }
-
-                
-
-                // Add to update data
-
-                $updateData['profile_picture'] = 'assets/profiles/' . $filename;
-
-                file_put_contents($log_file, "Profile picture path: " . $updateData['profile_picture'] . "\n", FILE_APPEND);
-
-            } else {
-
-                file_put_contents($log_file, "Failed to move uploaded file\n", FILE_APPEND);
-
-            }
-
-        } else {
-
-            if (isset($_FILES['profile_picture'])) {
-
-                file_put_contents($log_file, "File error: " . $_FILES['profile_picture']['error'] . "\n", FILE_APPEND);
-
-            } else {
-
-                file_put_contents($log_file, "No file uploaded\n", FILE_APPEND);
-
-            }
-
-        }
-
-        
-
-        // Update in database
-
-        if ($user_id) {
-
-            file_put_contents($log_file, "Updating database with data: " . json_encode($updateData) . "\n", FILE_APPEND);
-
-            file_put_contents($log_file, "User ID: " . $user_id . "\n", FILE_APPEND);
-
-            
-
-            // Correct parameter order: update($table, $data, $filters)
-
-            try {
-
-                $api->update('users', $updateData, ['id' => $user_id]);
-
-                file_put_contents($log_file, "Database update successful\n", FILE_APPEND);
-
-            } catch (Exception $e) {
-
-                file_put_contents($log_file, "Database update error: " . $e->getMessage() . "\n", FILE_APPEND);
-
-                throw $e;
-
-            }
-
-            
-
-            // Update session
-
-            $_SESSION['full_name'] = $updateData['full_name'];
-
-            $_SESSION['phone'] = $updateData['phone'];
-
-            $_SESSION['email'] = $updateData['email'];
-
-            $_SESSION['username'] = $updateData['full_name'];
-
-            
-
-            // Fetch updated data from database to return to client
-
-            $updatedUser = $api->select('users', ['id' => $user_id]);
-
-            $userData = !empty($updatedUser) ? $updatedUser[0] : [];
-
-            
-
-            echo json_encode([
-
-                'status' => 'success', 
-
-                'message' => 'Profile updated successfully!',
-
-                'data' => [
-
-                    'full_name' => $userData['full_name'] ?? '',
-
-                    'email' => $userData['email'] ?? '',
-
-                    'phone' => $userData['phone'] ?? '',
-
-                    'profile_picture' => $userData['profile_picture'] ?? '',
-
-                    'date_of_birth' => $userData['date_of_birth'] ?? '',
-
-                    'gender' => $userData['gender'] ?? '',
-
-                    'bio' => $userData['bio'] ?? '',
-
-                    'address' => $userData['address'] ?? '',
-
-                    'created_at' => $userData['created_at'] ?? ''
-
-                ]
-
-            ]);
-
-        } else {
-
-            file_put_contents($log_file, "ERROR: User ID not found\n", FILE_APPEND);
-
-            echo json_encode(['status' => 'error', 'message' => 'User ID not found', 'debug' => 'no_user_id']);
-
-        }
-
-    } catch (Exception $e) {
-
-        echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
-
-    }
-
-    exit();
-
-}
-
-
-
-=======
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
 // Get order statistics
 $total_orders = 0;
 $total_spent = 0;
 try {
-<<<<<<< HEAD
-
     $orders = $api->select('orders', ['customer_id' => $user_id]);
-
-=======
-    $orders = $api->select('orders', ['user_id' => $user_id]);
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
     $total_orders = count($orders);
     foreach ($orders as $order) {
         $total_spent += floatval($order['total_amount'] ?? 0);
@@ -644,6 +335,19 @@ try {
   <title>Profile - Farmers Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .notification-dropdown { position: absolute; top: 100%; right: 0; margin-top: 8px; width: 320px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 50; max-height: 400px; overflow-y: auto; }
+    .notification-item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; cursor: pointer; }
+    .notification-item:hover { background-color: #f9f9f9; }
+    .notification-item.unread { background-color: #f0f9f5; border-left: 4px solid #4CAF50; }
+    .notification-item-title { font-weight: 600; color: #333; font-size: 14px; margin-bottom: 4px; }
+    .notification-item-message { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .notification-item-time { font-size: 11px; color: #999; }
+    .notification-empty { padding: 24px 16px; text-align: center; color: #999; font-size: 14px; }
+    .notification-header { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .notification-clear-btn { font-size: 12px; color: #2E7D32; cursor: pointer; background: none; border: none; }
+    .notification-clear-btn:hover { color: #1B5E20; }
+  </style>
 </head>
 <body class="bg-gray-50 font-sans">
 
@@ -676,7 +380,19 @@ try {
         <div class="flex items-center space-x-6">
             <a href="user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
             <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+            <div class="relative inline-block text-left">
+                <button id="notificationDropdownBtn" class="text-gray-600 hover:text-gray-800 relative">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
+                </button>
+                <div id="notificationDropdown" class="hidden notification-dropdown">
+                    <div class="notification-header">
+                        <span>Notifications</span>
+                        <button id="clearNotifications" class="notification-clear-btn">Clear All</button>
+                    </div>
+                    <div id="notificationList" class="notification-empty">No notifications</div>
+                </div>
+            </div>
             <a href="cart.php" class="text-gray-600 relative">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
@@ -709,16 +425,98 @@ try {
 </header>
 <!-- Dropdown JS -->
 <script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        const profileMenu = document.getElementById('profileDropdown');
+        const notificationBtn = document.getElementById('notificationDropdownBtn');
+        const notificationMenu = document.getElementById('notificationDropdown');
+        const notificationList = document.getElementById('notificationList');
+        const notificationBadge = document.getElementById('notificationBadge');
+        const clearNotificationsBtn = document.getElementById('clearNotifications');
 
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('hidden');
+                if (notificationMenu) notificationMenu.classList.add('hidden');
+            });
+        }
 
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
+        if (notificationBtn && notificationMenu) {
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationMenu.classList.toggle('hidden');
+                if (profileMenu) profileMenu.classList.add('hidden');
+                loadNotifications();
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (profileMenu && !profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+            if (notificationMenu && !notificationMenu.contains(e.target) && !notificationBtn.contains(e.target)) {
+                notificationMenu.classList.add('hidden');
+            }
+        });
+
+        function loadNotifications() {
+            const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
+                return;
+            }
+            notificationList.innerHTML = notifications.map((notif, idx) => {
+                const time = new Date(notif.timestamp || Date.now());
+                const timeAgo = getTimeAgo(time);
+                const unreadClass = notif.read ? '' : 'unread';
+                return `
+                    <div class="notification-item ${unreadClass}" onclick="goToNotificationPage(${idx})">
+                        <div class="notification-item-title">${notif.title || 'Notification'}</div>
+                        <div class="notification-item-message">${notif.message || ''}</div>
+                        <div class="notification-item-time">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        window.goToNotificationPage = function(idx) {
+            const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+            if (notifications[idx]) {
+                notifications[idx].read = true;
+                localStorage.setItem('userNotifications', JSON.stringify(notifications));
+                updateNotificationBadge();
+            }
+            window.location.href = 'notification.php';
+        };
+
+        function updateNotificationBadge() {
+            const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (notificationBadge) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.classList.toggle('hidden', unreadCount === 0);
+            }
+        }
+
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('userNotifications');
+                notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
+                updateNotificationBadge();
+            });
+        }
+
+        updateNotificationBadge();
     });
 </script>
 
@@ -800,11 +598,7 @@ try {
 
         <div class="border-t pt-2 mt-2">
 
-          <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium">
-
-            <i class="fas fa-sign-out-alt"></i> Logout
-
-          </a>
+        
 
         </div>
 
@@ -1616,6 +1410,10 @@ try {
 
         successModal.classList.add('hidden');
 
+        // Reload page after modal closes to show updated profile
+
+        location.reload();
+
       }
 
       
@@ -2011,13 +1809,33 @@ try {
 
             reader.onload = (event) => {
 
-              const editPicEl = document.getElementById('editProfilePicPreview');
+              const previewContainer = document.getElementById('editProfilePicPreview').parentElement;
 
-              if (editPicEl) {
+              if (previewContainer) {
 
-                editPicEl.innerHTML = `<img src="${event.target.result}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+                // Replace whatever is there with a new img tag
 
-                editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
+                const newImg = document.createElement('img');
+
+                newImg.id = 'editProfilePicPreview';
+
+                newImg.src = event.target.result;
+
+                newImg.alt = 'Profile';
+
+                newImg.className = 'w-32 h-32 rounded-full border-4 border-green-100 object-cover';
+
+                
+
+                // Remove the old element and add the new one
+
+                const oldEl = document.getElementById('editProfilePicPreview');
+
+                previewContainer.replaceChild(newImg, oldEl);
+
+                
+
+                // Show the remove button
 
                 const removeBtn = document.getElementById('removeProfilePic');
 
@@ -2301,19 +2119,27 @@ try {
 
           
 
+          // Get response text first for debugging
+
+          const responseText = await response.text();
+
+          console.log('📦 Server response status:', response.status);
+
+          console.log('📦 Server response headers:', [...response.headers.entries()]);
+
+          console.log('📦 Raw server response:', responseText.substring(0, 1000));
+
+          
+
           // Check if response is ok
 
           if (!response.ok) {
 
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error('❌ HTTP Error Response:', responseText);
+
+            throw new Error(`HTTP error! status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
 
           }
-
-          
-
-          const responseText = await response.text();
-
-          console.log('📦 Raw server response:', responseText.substring(0, 500)); // Log first 500 chars
 
           
 
@@ -2415,7 +2241,11 @@ try {
 
                 const displayPicEl = document.getElementById('displayProfilePic');
 
-                displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                if (displayPicEl) {
+
+                  displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+
+                }
 
                 
 
@@ -2423,15 +2253,11 @@ try {
 
                 const sidebarPicEl = document.getElementById('sidebarProfilePic');
 
-                sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
+                if (sidebarPicEl) {
 
-                
+                  sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
 
-                // Navbar profile picture
-
-                const navPicEl = document.getElementById('navProfilePic');
-
-                navPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">`;
+                }
 
                 
 
@@ -2439,11 +2265,31 @@ try {
 
                 const editPicEl = document.getElementById('editProfilePicPreview');
 
-                editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                if (editPicEl) {
+
+                  editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+
+                }
 
                 
 
-                document.getElementById('removeProfilePic').classList.remove('hidden');
+                // Update navbar profile picture (find by button with profile image)
+
+                const navProfileBtn = document.getElementById('profileDropdownBtn');
+
+                if (navProfileBtn) {
+
+                  navProfileBtn.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">`;
+
+                }
+
+                
+
+                // Show remove button
+
+                const removeBtn = document.getElementById('removeProfilePic');
+
+                if (removeBtn) removeBtn.classList.remove('hidden');
 
               }
 
@@ -2507,7 +2353,9 @@ try {
 
           hideLoadingModal();
 
-          showErrorModal('An error occurred while updating your profile. Please try again.');
+          showErrorModal('An error occurred while updating your profile: ' + error.message);
+
+         
 
         }
       });
@@ -2550,64 +2398,6 @@ try {
           console.error('Address update error:', error);
           showErrorModal('An error occurred while updating your address.');
         }
-<<<<<<< HEAD
-
-      }
-
-
-
-      async function updateCartIcon() {
-
-        const cartBadge = document.getElementById('cartBadge');
-
-        if (!cartBadge) return;
-
-        try {
-          // Fetch from database
-          const response = await fetch('../api/cart.php');
-          const data = await response.json();
-          
-          if (data.success && data.items) {
-            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.toggle('hidden', totalItems === 0);
-            return;
-          }
-        } catch (error) {
-          console.log('Error loading cart count:', error);
-        }
-
-        // Fallback to localStorage
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-        const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
-        cartBadge.textContent = totalItems;
-
-        cartBadge.classList.toggle('hidden', totalItems === 0);
-
-      }
-
-
-
-      // Sync cart from database on load, then update icon
-
-      syncCartFromDatabase();
-
-
-
-      // Listen for cart updates from other pages/tabs
-
-      window.addEventListener('storage', (e) => {
-
-        if (e.key === 'cart') {
-
-          updateCartIcon();
-
-        }
-
-=======
->>>>>>> 26349651fc647432abab65c84a72b3e99720c97c
       });
 
 
