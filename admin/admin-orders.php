@@ -46,69 +46,79 @@ $notifications = [
 ];
 // Mock Order Data
 $order_stats = [
-    "total_revenue" => 45250.00,
-    "pending_orders" => 12,
-    "processing" => 8,
-    "completed" => 156
+  "total_revenue" => 0.00,
+  "pending_orders" => 0,
+  "processing" => 0,
+  "completed" => 0
 ];
 
-$orders = [
-    [
-        "id" => "#ORD-2023-001",
-        "customer" => "Juan Dela Cruz",
-        "email" => "juan@gmail.com",
-        "items" => "Fresh Carrots (2kg), Brown Rice (5kg)",
-        "total" => 820.00,
-        "date" => "Oct 27, 2023 - 10:30 AM",
-        "payment_method" => "GCash",
-        "payment_status" => "Paid",
-        "status" => "Processing"
-    ],
-    [
-        "id" => "#ORD-2023-002",
-        "customer" => "Maria Santos",
-        "email" => "maria.s@yahoo.com",
-        "items" => "Organic Apples (12pcs)",
-        "total" => 450.00,
-        "date" => "Oct 27, 2023 - 09:15 AM",
-        "payment_method" => "COD",
-        "payment_status" => "Pending",
-        "status" => "Pending"
-    ],
-    [
-        "id" => "#ORD-2023-003",
-        "customer" => "Antonio Reyes",
-        "email" => "tony.reyes@email.com",
-        "items" => "Chicken Breast (3kg)",
-        "total" => 720.00,
-        "date" => "Oct 26, 2023 - 04:45 PM",
-        "payment_method" => "Credit Card",
-        "payment_status" => "Paid",
-        "status" => "Shipped"
-    ],
-    [
-        "id" => "#ORD-2023-004",
-        "customer" => "Elena Gomez",
-        "email" => "elena.g@email.com",
-        "items" => "Fresh Milk (2L), Eggs (1 tray)",
-        "total" => 380.00,
-        "date" => "Oct 26, 2023 - 02:00 PM",
-        "payment_method" => "GCash",
-        "payment_status" => "Paid",
-        "status" => "Delivered"
-    ],
-    [
-        "id" => "#ORD-2023-005",
-        "customer" => "Ricardo Dalisay",
-        "email" => "carding@email.com",
-        "items" => "Broccoli (500g)",
-        "total" => 150.00,
-        "date" => "Oct 25, 2023 - 11:20 AM",
-        "payment_method" => "COD",
-        "payment_status" => "Cancelled",
-        "status" => "Cancelled"
-    ],
-];
+// Fetch orders from Supabase (REST wrapper)
+$orders = [];
+try {
+  require_once __DIR__ . '/../config/supabase-api.php';
+  $api = getSupabaseAPI();
+
+  // Attempt to retrieve all orders. Adjust table name or filters if your orders table uses a different name.
+  $rawOrders = $api->select('orders');
+
+  if (!is_array($rawOrders)) {
+    $rawOrders = [];
+  }
+
+  foreach ($rawOrders as $r) {
+    // Normalize common fields with fallbacks
+    $itemsField = '';
+    if (isset($r['items']) && is_string($r['items'])) {
+      $itemsField = $r['items'];
+    } elseif (isset($r['items']) && is_array($r['items'])) {
+      // If items are stored as an array, try to join names
+      $parts = [];
+      foreach ($r['items'] as $it) {
+        if (is_array($it)) {
+          $parts[] = ($it['name'] ?? $it['title'] ?? '') . (isset($it['qty']) ? ' (' . $it['qty'] . ')' : '');
+        } else {
+          $parts[] = (string)$it;
+        }
+      }
+      $itemsField = implode(', ', array_filter($parts));
+    } else {
+      $itemsField = $r['items_summary'] ?? ($r['summary'] ?? '');
+    }
+
+    $orderId = $r['order_id'] ?? ($r['id'] ?? null);
+    if ($orderId === null) {
+      // last resort: generate an id
+      $orderId = '#ORD-' . ($r['id'] ?? uniqid());
+    }
+
+    $total = isset($r['total']) ? floatval($r['total']) : (isset($r['amount']) ? floatval($r['amount']) : 0.0);
+
+    $orders[] = [
+      'id' => $orderId,
+      'customer' => $r['customer_name'] ?? ($r['name'] ?? ''),
+      'email' => $r['customer_email'] ?? ($r['email'] ?? ''),
+      'items' => $itemsField,
+      'total' => $total,
+      'date' => isset($r['created_at']) ? date('M d, Y - h:i A', strtotime($r['created_at'])) : ($r['date'] ?? ''),
+      'payment_method' => $r['payment_method'] ?? ($r['payment_type'] ?? ''),
+      'payment_status' => $r['payment_status'] ?? ($r['status_payment'] ?? 'Pending'),
+      'status' => $r['status'] ?? ($r['order_status'] ?? 'Pending')
+    ];
+  }
+
+  // Populate summary stats
+  foreach ($orders as $o) {
+    $order_stats['total_revenue'] += floatval($o['total']);
+    $st = strtolower($o['status']);
+    if ($st === 'pending') $order_stats['pending_orders']++;
+    if ($st === 'processing') $order_stats['processing']++;
+    if ($st === 'completed' || $st === 'delivered') $order_stats['completed']++;
+  }
+
+} catch (Exception $e) {
+  // If API fails, leave $orders empty and keep stats at zero. Optionally log $e->getMessage().
+  $orders = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -172,6 +182,10 @@ $orders = [
           <i class="fa-solid fa-receipt w-5 text-green-200"></i>
           <span>Orders</span>
         </a>
+        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-user-gear w-5"></i>
+          <span>Manage Users</span>
+        </a>
         </nav>
         
         <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
@@ -186,10 +200,7 @@ $orders = [
           <span>Settings</span>
         </a>
        
-        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-user-gear w-5"></i>
-          <span>Manage Users</span>
-        </a>
+        
       </nav>
     </div>
 

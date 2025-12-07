@@ -103,6 +103,10 @@ $faqs = [
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
+        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-user-gear w-5"></i>
+          <span>Manage Users</span>
+        </a>
       </nav>
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
@@ -115,10 +119,7 @@ $faqs = [
           <i class="fa-solid fa-circle-info w-5 text-green-200"></i>
           <span>Help</span>
         </a>
-        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-user-gear w-5"></i>
-          <span>Manage Users</span>
-        </a>
+        
       </nav>
     </div>
 
