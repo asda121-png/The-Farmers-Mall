@@ -307,6 +307,19 @@ try {
   <title>Profile - Farmers Mall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .notification-dropdown { position: absolute; top: 100%; right: 0; margin-top: 8px; width: 320px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 50; max-height: 400px; overflow-y: auto; }
+    .notification-item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; cursor: pointer; }
+    .notification-item:hover { background-color: #f9f9f9; }
+    .notification-item.unread { background-color: #f0f9f5; border-left: 4px solid #4CAF50; }
+    .notification-item-title { font-weight: 600; color: #333; font-size: 14px; margin-bottom: 4px; }
+    .notification-item-message { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .notification-item-time { font-size: 11px; color: #999; }
+    .notification-empty { padding: 24px 16px; text-align: center; color: #999; font-size: 14px; }
+    .notification-header { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .notification-clear-btn { font-size: 12px; color: #2E7D32; cursor: pointer; background: none; border: none; }
+    .notification-clear-btn:hover { color: #1B5E20; }
+  </style>
 </head>
 <body class="bg-gray-50 font-sans">
 
@@ -339,7 +352,19 @@ try {
         <div class="flex items-center space-x-6">
             <a href="user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
             <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+            <div class="relative inline-block text-left">
+                <button id="notificationDropdownBtn" class="text-gray-600 hover:text-gray-800 relative">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
+                </button>
+                <div id="notificationDropdown" class="hidden notification-dropdown">
+                    <div class="notification-header">
+                        <span>Notifications</span>
+                        <button id="clearNotifications" class="notification-clear-btn">Clear All</button>
+                    </div>
+                    <div id="notificationList" class="notification-empty">No notifications</div>
+                </div>
+            </div>
             <a href="cart.php" class="text-gray-600 relative">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
@@ -372,16 +397,98 @@ try {
 </header>
 <!-- Dropdown JS -->
 <script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        const profileMenu = document.getElementById('profileDropdown');
+        const notificationBtn = document.getElementById('notificationDropdownBtn');
+        const notificationMenu = document.getElementById('notificationDropdown');
+        const notificationList = document.getElementById('notificationList');
+        const notificationBadge = document.getElementById('notificationBadge');
+        const clearNotificationsBtn = document.getElementById('clearNotifications');
 
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('hidden');
+                if (notificationMenu) notificationMenu.classList.add('hidden');
+            });
+        }
 
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
+        if (notificationBtn && notificationMenu) {
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationMenu.classList.toggle('hidden');
+                if (profileMenu) profileMenu.classList.add('hidden');
+                loadNotifications();
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (profileMenu && !profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+            if (notificationMenu && !notificationMenu.contains(e.target) && !notificationBtn.contains(e.target)) {
+                notificationMenu.classList.add('hidden');
+            }
+        });
+
+        function loadNotifications() {
+            const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
+                return;
+            }
+            notificationList.innerHTML = notifications.map((notif, idx) => {
+                const time = new Date(notif.timestamp || Date.now());
+                const timeAgo = getTimeAgo(time);
+                const unreadClass = notif.read ? '' : 'unread';
+                return `
+                    <div class="notification-item ${unreadClass}" onclick="goToNotificationPage(${idx})">
+                        <div class="notification-item-title">${notif.title || 'Notification'}</div>
+                        <div class="notification-item-message">${notif.message || ''}</div>
+                        <div class="notification-item-time">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        window.goToNotificationPage = function(idx) {
+            const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+            if (notifications[idx]) {
+                notifications[idx].read = true;
+                localStorage.setItem('userNotifications', JSON.stringify(notifications));
+                updateNotificationBadge();
+            }
+            window.location.href = 'notification.php';
+        };
+
+        function updateNotificationBadge() {
+            const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (notificationBadge) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.classList.toggle('hidden', unreadCount === 0);
+            }
+        }
+
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('userNotifications');
+                notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
+                updateNotificationBadge();
+            });
+        }
+
+        updateNotificationBadge();
     });
 </script>
 
