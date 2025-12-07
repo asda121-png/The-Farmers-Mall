@@ -2,9 +2,13 @@
 // Start output buffering at the very beginning
 ob_start();
 
-// Suppress all warnings and errors when handling AJAX requests
+// Enable error logging for debugging
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../debug_profile_errors.log');
+
+// Suppress display but keep logging when handling AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    error_reporting(0);
+    error_reporting(E_ALL);
     ini_set('display_errors', '0');
 }
 
@@ -44,10 +48,20 @@ function handleProfilePictureUpload(array $file, string $userId, string $oldProf
         throw new Exception('File size must be less than 5MB');
     }
 
-    // More secure MIME type validation using mime_content_type
-    $mime_type = mime_content_type($file['tmp_name']);
-
+    // Validate MIME type - use fileinfo if available, fallback to browser-provided type
     $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
+    
+    if (function_exists('mime_content_type')) {
+        $mime_type = mime_content_type($file['tmp_name']);
+    } elseif (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+    } else {
+        // Fallback to browser-provided MIME type
+        $mime_type = $file['type'];
+    }
+    
     if (!in_array($mime_type, $allowed_mime_types)) {
         throw new Exception('Invalid file type. Only JPG, PNG, and GIF are allowed.');
     }
@@ -86,16 +100,20 @@ function handleProfileUpdate()
     $api = getSupabaseAPI();
     $user_id = $_SESSION['user_id'] ?? null;
 
+    // DEBUG: Log what we received
+    error_log("=== PROFILE UPDATE DEBUG ===");
+    error_log("User ID: " . $user_id);
+    error_log("FILES received: " . print_r($_FILES, true));
+    error_log("POST data: " . print_r($_POST, true));
+
     if (!$user_id) {
         echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
         exit();
     }
 
     try {
-        // Combine first and last name to full_name
-        $first_name = trim($_POST['first_name'] ?? '');
-        $last_name = trim($_POST['last_name'] ?? '');
-        $full_name = trim("$first_name $last_name");
+        // Get full_name from POST data
+        $full_name = trim($_POST['full_name'] ?? '');
 
         $updateData = [
             'full_name' => $full_name,
@@ -114,12 +132,20 @@ function handleProfileUpdate()
 
         // Handle profile picture upload
         if (isset($_FILES['profile_picture'])) {
+            error_log("Profile picture file detected: " . $_FILES['profile_picture']['name']);
             $oldProfilePicture = ($_SESSION['profile_picture'] ?? '');
             $newProfilePicPath = handleProfilePictureUpload($_FILES['profile_picture'], $user_id, $oldProfilePicture);
             if ($newProfilePicPath) {
+                error_log("New profile picture saved to: " . $newProfilePicPath);
                 $updateData['profile_picture'] = $newProfilePicPath;
+            } else {
+                error_log("Profile picture upload returned null (file error or no file selected)");
             }
-        } elseif (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
+        } else {
+            error_log("No profile_picture in FILES array");
+        }
+        
+        if (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
             // Handle picture removal request from the client
             $updateData['profile_picture'] = null;
             if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/../' . $_SESSION['profile_picture'])) {
@@ -162,12 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $user_id = $_SESSION['user_id'] ?? null;
 $api = getSupabaseAPI();
 
-
-
-// Handle AJAX requests FIRST before any output
-
 // Handle remove profile picture via AJAX
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove_profile_picture') {
 
     header('Content-Type: application/json');
@@ -254,8 +275,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 }
 
-
-
 // Fetch user data from Supabase
 $userData = [];
 if ($user_id) {
@@ -265,16 +284,12 @@ if ($user_id) {
     }
 }
 
-
-
 // Set default values
 $email = $userData['email'] ?? $_SESSION['email'] ?? 'user@email.com';
 $full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest User';
 $name_parts = explode(' ', $full_name, 2);
 $first_name = $name_parts[0];
 $last_name = $name_parts[1] ?? '';
-
-
 
 $address_parts = explode(', ', $userData['address'] ?? '');
 $street = $address_parts[0] ?? '';
@@ -287,305 +302,6 @@ $gender = $userData['gender'] ?? '';
 $bio = $userData['bio'] ?? '';
 $address = $userData['address'] ?? '';
 $created_at = $userData['created_at'] ?? '';
-
-// Handle profile update via AJAX
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
-
-    // Debug logging - use absolute path
-
-    $log_file = 'C:\tools_\The-Farmers-Mall\profile_upload.log';
-
-    file_put_contents($log_file, date('[Y-m-d H:i:s] ') . "Profile Update Request\n", FILE_APPEND);
-
-    
-
-    if (ob_get_level()) ob_end_clean(); // End and clean any output buffer
-
-    header('Content-Type: application/json');
-
-    // Fetch current user data for defaults
-    $userData = [];
-    $profile_picture = '';
-    if ($user_id) {
-        $users = $api->select('users', ['id' => $user_id]);
-        if (!empty($users)) {
-            $userData = $users[0];
-            $profile_picture = $userData['profile_picture'] ?? '';
-        }
-    }
-
-    
-
-    file_put_contents($log_file, "POST: " . json_encode($_POST) . "\n", FILE_APPEND);
-
-    
-
-    $files_info = [];
-
-    if (!empty($_FILES)) {
-
-        foreach ($_FILES as $key => $file) {
-
-            if (is_array($file['name'])) {
-
-                $files_info[$key] = 'multiple files';
-
-            } else {
-
-                $files_info[$key] = ['name' => $file['name'] ?? 'none', 'size' => $file['size'] ?? 0, 'error' => $file['error'] ?? 4];
-
-            }
-
-        }
-
-    }
-
-    file_put_contents($log_file, "FILES: " . json_encode($files_info) . "\n", FILE_APPEND);
-
-    
-
-    try {
-
-        $updateData = [
-
-            'full_name' => trim($_POST['full_name'] ?? ''),
-
-            'phone' => trim($_POST['phone'] ?? ''),
-
-            'email' => trim($_POST['email'] ?? ''),
-
-            'date_of_birth' => trim($_POST['date_of_birth'] ?? ''),
-
-            'gender' => trim($_POST['gender'] ?? ''),
-
-            'bio' => trim($_POST['bio'] ?? ''),
-
-            'address' => trim($_POST['address'] ?? '')
-
-        ];
-
-        
-
-        // Remove empty date_of_birth
-
-        if (empty($updateData['date_of_birth'])) {
-
-            unset($updateData['date_of_birth']);
-
-        }
-
-        
-
-        // Handle profile picture upload if file is provided
-
-        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-
-            file_put_contents($log_file, "Processing file upload...\n", FILE_APPEND);
-
-            $file = $_FILES['profile_picture'];
-
-            
-
-            // Validate file - use simple extension check
-
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', ];
-
-            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-            
-
-            file_put_contents($log_file, "File extension: " . $extension . "\n", FILE_APPEND);
-
-            
-
-            if (!in_array($extension, $allowed_extensions)) {
-
-                file_put_contents($log_file, "Invalid file type\n", FILE_APPEND);
-
-                echo json_encode(['status' => 'error', 'message' => 'Only image files (JPG, PNG, GIF) are allowed']);
-
-                exit();
-
-            }
-
-            
-
-            if ($file['size'] > 5 * 1024 * 1024) { // 5MB
-
-                echo json_encode(['status' => 'error', 'message' => 'File size must be less than 5MB']);
-
-                exit();
-
-            }
-
-            
-
-            // Create uploads/profiles directory if it doesn't exist
-
-            $upload_dir = __DIR__ . '/../assets/profiles/';
-
-            if (!is_dir($upload_dir)) {
-
-                mkdir($upload_dir, 0755, true);
-
-            }
-
-            
-
-            // Generate unique filename
-
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-
-            $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
-
-            $filepath = $upload_dir . $filename;
-
-            
-
-            file_put_contents($log_file, "Attempting to save to: " . $filepath . "\n", FILE_APPEND);
-
-            
-
-            // Move uploaded file
-
-            if (move_uploaded_file($file['tmp_name'], $filepath)) {
-
-                file_put_contents($log_file, "File saved successfully\n", FILE_APPEND);
-
-                // Delete old profile picture if exists
-
-                if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
-
-                    @unlink(__DIR__ . '/../' . $profile_picture);
-
-                }
-
-                
-
-                // Add to update data
-
-                $updateData['profile_picture'] = 'assets/profiles/' . $filename;
-
-                file_put_contents($log_file, "Profile picture path: " . $updateData['profile_picture'] . "\n", FILE_APPEND);
-
-            } else {
-
-                file_put_contents($log_file, "Failed to move uploaded file\n", FILE_APPEND);
-
-            }
-
-        } else {
-
-            if (isset($_FILES['profile_picture'])) {
-
-                file_put_contents($log_file, "File error: " . $_FILES['profile_picture']['error'] . "\n", FILE_APPEND);
-
-            } else {
-
-                file_put_contents($log_file, "No file uploaded\n", FILE_APPEND);
-
-            }
-
-        }
-
-        
-
-        // Update in database
-
-        if ($user_id) {
-
-            file_put_contents($log_file, "Updating database with data: " . json_encode($updateData) . "\n", FILE_APPEND);
-
-            file_put_contents($log_file, "User ID: " . $user_id . "\n", FILE_APPEND);
-
-            
-
-            // Correct parameter order: update($table, $data, $filters)
-
-            try {
-
-                $api->update('users', $updateData, ['id' => $user_id]);
-
-                file_put_contents($log_file, "Database update successful\n", FILE_APPEND);
-
-            } catch (Exception $e) {
-
-                file_put_contents($log_file, "Database update error: " . $e->getMessage() . "\n", FILE_APPEND);
-
-                throw $e;
-
-            }
-
-            
-
-            // Update session
-
-            $_SESSION['full_name'] = $updateData['full_name'];
-
-            $_SESSION['phone'] = $updateData['phone'];
-
-            $_SESSION['email'] = $updateData['email'];
-
-            $_SESSION['username'] = $updateData['full_name'];
-
-            
-
-            // Fetch updated data from database to return to client
-
-            $updatedUser = $api->select('users', ['id' => $user_id]);
-
-            $userData = !empty($updatedUser) ? $updatedUser[0] : [];
-
-            
-
-            echo json_encode([
-
-                'status' => 'success', 
-
-                'message' => 'Profile updated successfully!',
-
-                'data' => [
-
-                    'full_name' => $userData['full_name'] ?? '',
-
-                    'email' => $userData['email'] ?? '',
-
-                    'phone' => $userData['phone'] ?? '',
-
-                    'profile_picture' => $userData['profile_picture'] ?? '',
-
-                    'date_of_birth' => $userData['date_of_birth'] ?? '',
-
-                    'gender' => $userData['gender'] ?? '',
-
-                    'bio' => $userData['bio'] ?? '',
-
-                    'address' => $userData['address'] ?? '',
-
-                    'created_at' => $userData['created_at'] ?? ''
-
-                ]
-
-            ]);
-
-        } else {
-
-            file_put_contents($log_file, "ERROR: User ID not found\n", FILE_APPEND);
-
-            echo json_encode(['status' => 'error', 'message' => 'User ID not found', 'debug' => 'no_user_id']);
-
-        }
-
-    } catch (Exception $e) {
-
-        echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
-
-    }
-
-    exit();
-
-}
 
 // Get order statistics
 $total_orders = 0;
@@ -775,11 +491,7 @@ try {
 
         <div class="border-t pt-2 mt-2">
 
-          <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium">
-
-            <i class="fas fa-sign-out-alt"></i> Logout
-
-          </a>
+        
 
         </div>
 
@@ -1591,6 +1303,10 @@ try {
 
         successModal.classList.add('hidden');
 
+        // Reload page after modal closes to show updated profile
+
+        location.reload();
+
       }
 
       
@@ -1986,13 +1702,33 @@ try {
 
             reader.onload = (event) => {
 
-              const editPicEl = document.getElementById('editProfilePicPreview');
+              const previewContainer = document.getElementById('editProfilePicPreview').parentElement;
 
-              if (editPicEl) {
+              if (previewContainer) {
 
-                editPicEl.innerHTML = `<img src="${event.target.result}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+                // Replace whatever is there with a new img tag
 
-                editPicEl.className = 'w-32 h-32 rounded-full border-4 border-green-100';
+                const newImg = document.createElement('img');
+
+                newImg.id = 'editProfilePicPreview';
+
+                newImg.src = event.target.result;
+
+                newImg.alt = 'Profile';
+
+                newImg.className = 'w-32 h-32 rounded-full border-4 border-green-100 object-cover';
+
+                
+
+                // Remove the old element and add the new one
+
+                const oldEl = document.getElementById('editProfilePicPreview');
+
+                previewContainer.replaceChild(newImg, oldEl);
+
+                
+
+                // Show the remove button
 
                 const removeBtn = document.getElementById('removeProfilePic');
 
@@ -2276,19 +2012,27 @@ try {
 
           
 
+          // Get response text first for debugging
+
+          const responseText = await response.text();
+
+          console.log('📦 Server response status:', response.status);
+
+          console.log('📦 Server response headers:', [...response.headers.entries()]);
+
+          console.log('📦 Raw server response:', responseText.substring(0, 1000));
+
+          
+
           // Check if response is ok
 
           if (!response.ok) {
 
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error('❌ HTTP Error Response:', responseText);
+
+            throw new Error(`HTTP error! status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
 
           }
-
-          
-
-          const responseText = await response.text();
-
-          console.log('📦 Raw server response:', responseText.substring(0, 500)); // Log first 500 chars
 
           
 
@@ -2390,7 +2134,11 @@ try {
 
                 const displayPicEl = document.getElementById('displayProfilePic');
 
-                displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                if (displayPicEl) {
+
+                  displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+
+                }
 
                 
 
@@ -2398,15 +2146,11 @@ try {
 
                 const sidebarPicEl = document.getElementById('sidebarProfilePic');
 
-                sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
+                if (sidebarPicEl) {
 
-                
+                  sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
 
-                // Navbar profile picture
-
-                const navPicEl = document.getElementById('navProfilePic');
-
-                navPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">`;
+                }
 
                 
 
@@ -2414,11 +2158,31 @@ try {
 
                 const editPicEl = document.getElementById('editProfilePicPreview');
 
-                editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                if (editPicEl) {
+
+                  editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+
+                }
 
                 
 
-                document.getElementById('removeProfilePic').classList.remove('hidden');
+                // Update navbar profile picture (find by button with profile image)
+
+                const navProfileBtn = document.getElementById('profileDropdownBtn');
+
+                if (navProfileBtn) {
+
+                  navProfileBtn.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">`;
+
+                }
+
+                
+
+                // Show remove button
+
+                const removeBtn = document.getElementById('removeProfilePic');
+
+                if (removeBtn) removeBtn.classList.remove('hidden');
 
               }
 
@@ -2482,7 +2246,9 @@ try {
 
           hideLoadingModal();
 
-          showErrorModal('An error occurred while updating your profile. Please try again.');
+          showErrorModal('An error occurred while updating your profile: ' + error.message);
+
+         
 
         }
       });
