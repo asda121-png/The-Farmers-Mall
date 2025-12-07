@@ -56,7 +56,7 @@ function handleProfilePictureUpload(array $file, string $userId, string $oldProf
     } elseif (function_exists('finfo_open')) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime_type = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        // finfo_close is deprecated in PHP 8.0+ and no longer needed
     } else {
         // Fallback to browser-provided MIME type
         $mime_type = $file['type'];
