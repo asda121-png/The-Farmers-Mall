@@ -56,7 +56,7 @@ function handleProfilePictureUpload(array $file, string $userId, string $oldProf
     } elseif (function_exists('finfo_open')) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime_type = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        // finfo_close is deprecated in PHP 8.0+ and no longer needed
     } else {
         // Fallback to browser-provided MIME type
         $mime_type = $file['type'];
@@ -415,7 +415,7 @@ try {
                 <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="../auth/login.php" id="logoutLink" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
             <!-- End Profile Dropdown -->
@@ -1578,6 +1578,24 @@ try {
         });
 
       });
+
+      // --- Logout Modal Logic ---
+      const logoutLink = document.getElementById('logoutLink');
+      const logoutModal = document.getElementById('logoutModal');
+      const cancelLogout = document.getElementById('cancelLogout');
+
+      if (logoutLink) {
+        logoutLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          logoutModal.classList.remove('hidden');
+        });
+      }
+
+      if (cancelLogout) {
+        cancelLogout.addEventListener('click', () => {
+          logoutModal.classList.add('hidden');
+        });
+      }
 
       // --- Settings Logic ---
 
