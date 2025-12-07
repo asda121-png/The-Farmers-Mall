@@ -8,6 +8,7 @@
     }
 
     let cart = [];
+    let selectedItems = new Set(); // Track selected items for checkout
 
     // Load cart from database
     async function loadCartFromDB() {
@@ -192,7 +193,9 @@
         div.className = 'bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-md transition-shadow gap-4';
         div.innerHTML = `
           <div class="flex items-start gap-4 flex-1 w-full">
-            <img src="${itemImage}" class="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+            <div class="flex items-center gap-4 flex-1">
+              <input type="checkbox" class="item-checkbox w-5 h-5 rounded border-gray-300 cursor-pointer accent-green-600" data-cart-id="${item.cart_id}">
+              <img src="${itemImage}" class="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover border border-gray-200 flex-shrink-0">
             <div class="flex-1 min-w-0">
               <h3 class="font-semibold text-gray-800 text-base md:text-lg">${escapeHtml(item.name)}</h3>
               <p class="text-green-700 font-medium text-sm">₱${item.price.toFixed(2)} each</p>
@@ -249,6 +252,21 @@
           });
         });
 
+        // Checkbox toggle
+        const checkbox = div.querySelector('.item-checkbox');
+        if (checkbox) {
+          checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              selectedItems.add(item.cart_id);
+              div.classList.add('bg-green-50', 'border-l-4', 'border-l-green-600');
+            } else {
+              selectedItems.delete(item.cart_id);
+              div.classList.remove('bg-green-50', 'border-l-4', 'border-l-green-600');
+            }
+            updateCheckoutButtonState();
+          });
+        }
+
         // Remove item with confirmation
         div.querySelector('.remove-item').addEventListener('click', () => {
           showDeleteModal(item, index);
@@ -274,6 +292,7 @@
       });
 
       updateTotals();
+      updateCheckoutButtonState();
     }
 
     function escapeHtml(text) {
@@ -283,7 +302,9 @@
     }
 
     function updateTotals(){
-      let subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+      // Calculate totals only for selected items
+      const selectedItemsArray = cart.filter(item => selectedItems.has(item.cart_id));
+      let subtotal = selectedItemsArray.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
       let tax = subtotal * 0.12; // 12% tax
       let total = subtotal + tax;
       
@@ -292,10 +313,36 @@
       
       const itemCountEl = document.getElementById('itemCount');
       const taxEl = document.getElementById('tax');
-      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const totalItems = selectedItemsArray.reduce((sum, item) => sum + (item.quantity || 1), 0);
       
       if (itemCountEl) itemCountEl.textContent = totalItems;
-      if (taxEl) taxEl.textContent = `₱${tax.toFixed(2)}`;
+      updateTotals();
+    }
+
+    function updateCheckoutButtonState() {
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (!checkoutBtn) return;
+      
+      if (selectedItems.size === 0) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        checkoutBtn.innerHTML = '<i class="fa-solid fa-lock mr-2"></i>Select items to checkout<i class="fa-solid fa-arrow-right ml-2"></i>';
+      } else {
+        checkoutBtn.disabled = false;
+        checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        checkoutBtn.innerHTML = `<i class="fa-solid fa-lock mr-2"></i>Proceed to Checkout (${selectedItems.size})<i class="fa-solid fa-arrow-right ml-2"></i>`;
+      }
+      updateTotals();
+    }
+
+    function toggleSelectAll() {
+      const allCheckboxes = document.querySelectorAll('.item-checkbox');
+      const allSelected = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(cb => cb.checked);
+      
+      allCheckboxes.forEach(checkbox => {
+        checkbox.checked = !allSelected;
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     }
 
     function updateCartIcon() {
@@ -355,9 +402,15 @@
     const checkoutBtn = document.getElementById('checkoutBtn');
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', (e) => {
-        if (cart.length === 0) {
+        if (selectedItems.size === 0) {
           e.preventDefault();
-          showNotification('Your cart is empty. Add items before checkout.', 'info');
+          showNotification('Please select items to checkout', 'info');
+        } else {
+          // Store selected items in sessionStorage for payment method page
+          const selectedItemsArray = Array.from(selectedItems);
+          sessionStorage.setItem('selectedCartItems', JSON.stringify(selectedItemsArray));
+          // Navigate to payment method
+          window.location.href = 'paymentmethod.php';
         }
       });
     }

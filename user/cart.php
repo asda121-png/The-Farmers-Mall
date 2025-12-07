@@ -144,6 +144,10 @@ if ($user_id) {
         <h2 class="text-xl md:text-2xl font-semibold">Your Shopping Cart (<span id="cartCount">0</span>)</h2>
       </div>
       <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+        <button id="selectAllBtn" onclick="toggleSelectAll()" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2 transition" title="Select/Deselect all items">
+          <i class="fa-solid fa-check-double"></i>
+          <span class="hidden sm:inline">Select All</span>
+        </button>
         <a href="products.php" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2">
           <i class="fa-solid fa-plus"></i>
           <span class="hidden sm:inline">Continue Shopping</span>
@@ -186,12 +190,12 @@ if ($user_id) {
           <span id="total" class="text-green-600">₱0.00</span>
         </div>
 
-        <a href="paymentmethod.php" id="checkoutBtn"
-           class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg">
+        <button id="checkoutBtn"
+           class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-600">
           <i class="fa-solid fa-lock mr-2"></i>
-          Proceed to Checkout
+          Select items to checkout
           <i class="fa-solid fa-arrow-right ml-2"></i>
-        </a>
+        </button>
         
         <div class="mt-4 text-center space-y-2">
           <a href="products.php" class="text-sm text-gray-600 hover:text-green-600 transition block md:hidden">
