@@ -73,45 +73,6 @@ try {
     $sellers = [];
 }
 
-// =====================
-// Fetch Riders
-// =====================
-$riders = [];
-
-try {
-    $allRiders = $api->select('riders'); // your Supabase table for riders
-
-    foreach ($allRiders as $rider) {
-        // Fetch the linked user
-        if (empty($rider['user_id'])) continue;
-
-        $user = $api->select('users', ['id' => $rider['user_id']]);
-        if (!$user) continue;
-
-        $user = $user[0];
-
-        $riders[] = [
-            "id" => $rider['id'],
-            "name" => $user['full_name'],
-            "email" => $user['email'],
-            "phone" => $user['phone'] ?? 'N/A',
-            "status" => $rider['status'] ?? 'inactive',
-            "joined" => $rider['created_at'] ?? 'N/A',
-            "avatar" => !empty($user['profile_picture']) && file_exists(__DIR__ . '/../' . $user['profile_picture'])
-                ? '../' . $user['profile_picture']
-                : 'https://randomuser.me/api/portraits/lego/2.jpg',
-            "vehicle" => $rider['vehicle_type'] ?? 'N/A',
-            "plate" => $rider['plate_number'] ?? 'N/A',
-            "deliveries" => $rider['completed_deliveries'] ?? 0
-        ];
-    }
-
-    $totalRiders = count($riders);
-
-} catch (Exception $e) {
-    echo "❌ Error fetching riders: " . $e->getMessage();
-    $riders = [];
-}
 
 ?>
 
@@ -222,10 +183,7 @@ try {
       </nav>
 
        <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
-        <a href="admin-riders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-motorcycle w-5"></i>
-          <span>Riders</span>
-        </a>
+        
       </nav>
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
