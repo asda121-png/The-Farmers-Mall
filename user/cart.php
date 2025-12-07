@@ -159,8 +159,8 @@ if ($user_id) {
       
       <!-- LEFT: Cart Items -->
       <div class="lg:col-span-2">
-        <div class="flex items-center mb-4">
-          <input id="selectAllCheckbox" type="checkbox" class="w-6 h-6 text-green-600 border-2 border-gray-300 rounded-sm mr-2" />
+        <div class="flex items-center mb-4 pl-4">
+          <input id="selectAllCheckbox" type="checkbox" class="w-5 h-5 rounded border-gray-300 cursor-pointer accent-green-600 mr-2" />
           <label for="selectAllCheckbox" class="text-green-600 font-medium">Select All</label>
         </div>
 

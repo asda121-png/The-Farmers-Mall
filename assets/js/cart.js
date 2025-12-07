@@ -258,16 +258,16 @@
           checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
               selectedItems.add(item.cart_id);
-              div.classList.add('bg-green-50', 'border-l-4', 'border-l-green-600');
+              div.classList.add('bg-green-50');
             } else {
               selectedItems.delete(item.cart_id);
-              div.classList.remove('bg-green-50', 'border-l-4', 'border-l-green-600');
+              div.classList.remove('bg-green-50');
             }
             updateCheckoutButtonState();
             // Update Select All checkbox state (checked / indeterminate)
             const selectAll = document.getElementById('selectAllCheckbox');
             if (selectAll) {
-              const allCheckboxesNow = document.querySelectorAll('.item-checkbox');
+              const allCheckboxesNow = document.querySelectorAll('.item-checkbox[data-cart-id]');
               const allCheckedNow = allCheckboxesNow.length > 0 && Array.from(allCheckboxesNow).every(cb => cb.checked);
               const someCheckedNow = Array.from(allCheckboxesNow).some(cb => cb.checked);
               selectAll.checked = allCheckedNow;
@@ -306,7 +306,7 @@
       // Wire the top Select All checkbox to toggle item checkboxes
       const selectAllCheckbox = document.getElementById('selectAllCheckbox');
       if (selectAllCheckbox) {
-        const allCheckboxes = document.querySelectorAll('.item-checkbox');
+        const allCheckboxes = document.querySelectorAll('.item-checkbox[data-cart-id]');
         // Initialize state
         if (allCheckboxes.length === 0) {
           selectAllCheckbox.checked = false;
@@ -374,7 +374,7 @@
     }
 
     function toggleSelectAll() {
-      const allCheckboxes = document.querySelectorAll('.item-checkbox');
+      const allCheckboxes = document.querySelectorAll('.item-checkbox[data-cart-id]');
       const allSelected = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(cb => cb.checked);
       
       allCheckboxes.forEach(checkbox => {

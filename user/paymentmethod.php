@@ -129,7 +129,12 @@ if ($user_id) {
     
     <!-- LEFT SIDE: Payment Form -->
     <section class="flex-1 bg-white p-6 rounded-xl shadow-sm min-h-[400px]">
-      <h2 class="text-2xl font-semibold mb-6">Payment Details</h2>
+      <div class="flex items-center space-x-4 mb-6">
+        <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fa-solid fa-arrow-left text-xl"></i>
+        </button>
+        <h2 class="text-2xl font-semibold">Payment Details</h2>
+      </div>
 
       <!-- Payment Method Options -->
       <div class="space-y-3 mb-6">
