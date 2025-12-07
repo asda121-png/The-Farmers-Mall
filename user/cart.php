@@ -136,18 +136,22 @@ if ($user_id) {
      
   <!-- Main Cart Section -->
   <main class="max-w-7xl mx-auto p-4 md:p-6 mt-6 flex-grow w-full mb-20 md:mb-96">
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-      <div class="flex items-center space-x-4">
-        <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800 transition">
-          <i class="fa-solid fa-arrow-left text-xl"></i>
-        </button>
-        <h2 class="text-xl md:text-2xl font-semibold">Your Shopping Cart (<span id="cartCount">0</span>)</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-3 items-start mb-6 gap-4">
+      <div class="col-span-2 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800 transition">
+            <i class="fa-solid fa-arrow-left text-xl"></i>
+          </button>
+          <h2 class="text-xl md:text-2xl font-semibold">Your Shopping Cart (<span id="cartCount">0</span>)</h2>
+        </div>
+        <div>
+          <button id="selectAllBtn" onclick="toggleSelectAll()" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2 transition" title="Select/Deselect all items">
+            <i class="fa-solid fa-check-double"></i>
+            <span class="hidden sm:inline">Select All</span>
+          </button>
+        </div>
       </div>
-      <div class="flex items-center gap-2 md:gap-4 flex-wrap">
-        <button id="selectAllBtn" onclick="toggleSelectAll()" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2 transition" title="Select/Deselect all items">
-          <i class="fa-solid fa-check-double"></i>
-          <span class="hidden sm:inline">Select All</span>
-        </button>
+      <div class="flex items-center gap-2 md:gap-4 justify-end">
         <a href="products.php" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2">
           <i class="fa-solid fa-plus"></i>
           <span class="hidden sm:inline">Continue Shopping</span>

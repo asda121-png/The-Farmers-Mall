@@ -2,9 +2,13 @@
 // Start output buffering at the very beginning
 ob_start();
 
-// Suppress all warnings and errors when handling AJAX requests
+// Enable error logging for debugging
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../debug_profile_errors.log');
+
+// Suppress display but keep logging when handling AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    error_reporting(0);
+    error_reporting(E_ALL);
     ini_set('display_errors', '0');
 }
 
@@ -44,10 +48,20 @@ function handleProfilePictureUpload(array $file, string $userId, string $oldProf
         throw new Exception('File size must be less than 5MB');
     }
 
-    // More secure MIME type validation using mime_content_type
-    $mime_type = mime_content_type($file['tmp_name']);
-
+    // Validate MIME type - use fileinfo if available, fallback to browser-provided type
     $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
+    
+    if (function_exists('mime_content_type')) {
+        $mime_type = mime_content_type($file['tmp_name']);
+    } elseif (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+    } else {
+        // Fallback to browser-provided MIME type
+        $mime_type = $file['type'];
+    }
+    
     if (!in_array($mime_type, $allowed_mime_types)) {
         throw new Exception('Invalid file type. Only JPG, PNG, and GIF are allowed.');
     }
@@ -86,6 +100,12 @@ function handleProfileUpdate()
     $api = getSupabaseAPI();
     $user_id = $_SESSION['user_id'] ?? null;
 
+    // DEBUG: Log what we received
+    error_log("=== PROFILE UPDATE DEBUG ===");
+    error_log("User ID: " . $user_id);
+    error_log("FILES received: " . print_r($_FILES, true));
+    error_log("POST data: " . print_r($_POST, true));
+
     if (!$user_id) {
         echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
         exit();
@@ -112,12 +132,20 @@ function handleProfileUpdate()
 
         // Handle profile picture upload
         if (isset($_FILES['profile_picture'])) {
+            error_log("Profile picture file detected: " . $_FILES['profile_picture']['name']);
             $oldProfilePicture = ($_SESSION['profile_picture'] ?? '');
             $newProfilePicPath = handleProfilePictureUpload($_FILES['profile_picture'], $user_id, $oldProfilePicture);
             if ($newProfilePicPath) {
+                error_log("New profile picture saved to: " . $newProfilePicPath);
                 $updateData['profile_picture'] = $newProfilePicPath;
+            } else {
+                error_log("Profile picture upload returned null (file error or no file selected)");
             }
-        } elseif (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
+        } else {
+            error_log("No profile_picture in FILES array");
+        }
+        
+        if (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
             // Handle picture removal request from the client
             $updateData['profile_picture'] = null;
             if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/../' . $_SESSION['profile_picture'])) {
@@ -1984,19 +2012,27 @@ try {
 
           
 
+          // Get response text first for debugging
+
+          const responseText = await response.text();
+
+          console.log('📦 Server response status:', response.status);
+
+          console.log('📦 Server response headers:', [...response.headers.entries()]);
+
+          console.log('📦 Raw server response:', responseText.substring(0, 1000));
+
+          
+
           // Check if response is ok
 
           if (!response.ok) {
 
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error('❌ HTTP Error Response:', responseText);
+
+            throw new Error(`HTTP error! status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
 
           }
-
-          
-
-          const responseText = await response.text();
-
-          console.log('📦 Raw server response:', responseText.substring(0, 500)); // Log first 500 chars
 
           
 
@@ -2098,7 +2134,11 @@ try {
 
                 const displayPicEl = document.getElementById('displayProfilePic');
 
-                displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                if (displayPicEl) {
+
+                  displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+
+                }
 
                 
 
@@ -2106,15 +2146,11 @@ try {
 
                 const sidebarPicEl = document.getElementById('sidebarProfilePic');
 
-                sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
+                if (sidebarPicEl) {
 
-                
+                  sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
 
-                // Navbar profile picture
-
-                const navPicEl = document.getElementById('navProfilePic');
-
-                navPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer ring-2 ring-green-600 object-cover">`;
+                }
 
                 
 
@@ -2122,11 +2158,31 @@ try {
 
                 const editPicEl = document.getElementById('editProfilePicPreview');
 
-                editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+                if (editPicEl) {
+
+                  editPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
+
+                }
 
                 
 
-                document.getElementById('removeProfilePic').classList.remove('hidden');
+                // Update navbar profile picture (find by button with profile image)
+
+                const navProfileBtn = document.getElementById('profileDropdownBtn');
+
+                if (navProfileBtn) {
+
+                  navProfileBtn.innerHTML = `<img src="${picPath}" alt="Profile" class="w-8 h-8 rounded-full cursor-pointer object-cover">`;
+
+                }
+
+                
+
+                // Show remove button
+
+                const removeBtn = document.getElementById('removeProfilePic');
+
+                if (removeBtn) removeBtn.classList.remove('hidden');
 
               }
 
@@ -2189,6 +2245,8 @@ try {
           console.error('💥 Profile update error:', error);
 
           hideLoadingModal();
+
+          showErrorModal('An error occurred while updating your profile: ' + error.message);
 
          
 
