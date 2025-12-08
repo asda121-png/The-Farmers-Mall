@@ -475,6 +475,9 @@ if ($user_id) {
     </div>
   </div>
 
+  <script src="../assets/js/cart-preview.js"></script>
+  <script src="../assets/js/search-autocomplete.js"></script>
+
 </body>
 
 </html>

@@ -399,38 +399,38 @@ if ($user_id) {
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<<<<<<< HEAD
-<?php include __DIR__ . '/../includes/user-header.php'; ?>
-=======
-  <header class="bg-white shadow-sm">
+  <header class="bg-white shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-2">
+        <a href="user-homepage.php" class="flex items-center gap-2">
             <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
                 <i class="fas fa-leaf text-white text-lg"></i>
             </div>
             <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
-        </div>
+        </a>
 
         <div class="flex-1 mx-6">
             <form action="products.php" method="GET">
                 <input
                     type="text"
                     name="search"
-                    placeholder="Search for fresh product..."
+                    placeholder="Search for fresh produce, dairy, and more..."
                     class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
                 />
             </form>
         </div>
 
         <div class="flex items-center space-x-6">
+            <a href="user-homepage.php" class="text-gray-600 hover:text-green-600">
+                <i class="fa-solid fa-house"></i>
+            </a>
 
-            <a href="message.php" class="text-gray-600">
+            <a href="message.php" class="text-gray-600 hover:text-green-600">
                 <i class="fa-regular fa-comment"></i> 
             </a>
 
             <!-- ************ NOTIFICATION DROPDOWN START ************ -->
             <div class="relative inline-block text-left">
-                <button id="notificationDropdownBtn" class="text-gray-600 hover:text-gray-800 relative">
+                <button id="notificationDropdownBtn" class="text-gray-600 hover:text-green-600 relative">
                     <i class="fa-regular fa-bell"></i>
                     <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
                 </button>
@@ -445,7 +445,7 @@ if ($user_id) {
             </div>
             <!-- ************ NOTIFICATION DROPDOWN END ************ -->
 
-            <a href="cart.php" class="text-gray-600 relative inline-block">
+            <a href="cart.php" class="text-gray-600 hover:text-green-600 relative inline-block">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
             </a>
@@ -468,8 +468,8 @@ if ($user_id) {
                      class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="my-purchases.php" class="block px-4 py-2 hover:bg-gray-100">My Purchases</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a> 
-                    <a href="..\auth\login.php" id="logoutLink" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                    <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">Logout</button>
                 </div>
             </div>
             <!-- ************ PROFILE DROPDOWN END ************ -->
@@ -478,12 +478,34 @@ if ($user_id) {
     </div>
 </header>
 
-<!-- JS for dropdown -->
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Logout</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to logout?</p>
+            <div class="flex gap-3">
+                <button id="cancelLogout" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-medium">
+                    Cancel
+                </button>
+                <a href="../auth/logout.php" class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium text-center">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS for dropdown and functionality -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Profile Dropdown
         const profileBtn = document.getElementById('profileDropdownBtn');
         const profileMenu = document.getElementById('profileDropdown');
-        const logoutLink = document.getElementById('logoutLink');
+        const logoutBtn = document.getElementById('logoutBtn');
         const logoutModal = document.getElementById('logoutModal');
         const cancelLogout = document.getElementById('cancelLogout');
 
@@ -494,8 +516,8 @@ if ($user_id) {
             });
         }
 
-        if (logoutLink && logoutModal) {
-            logoutLink.addEventListener('click', (e) => {
+        if (logoutBtn && logoutModal) {
+            logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 logoutModal.classList.remove('hidden');
                 profileMenu.classList.add('hidden');
@@ -612,16 +634,40 @@ if ($user_id) {
             });
         }
 
-        // --- Notification Badge Logic (from storage) ---
-        const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
-        const unreadCount = notifications.filter(n => !n.read).length;
-        if (notificationBadge && unreadCount > 0) {
-            notificationBadge.textContent = unreadCount;
-            notificationBadge.classList.remove('hidden');
+        // Initialize notification badge on page load
+        updateNotificationBadge();
+
+        // --- Cart Badge Logic ---
+        async function updateCartBadge() {
+            try {
+                const response = await fetch('../api/cart.php?action=get');
+                const data = await response.json();
+                
+                if (data.success && data.items) {
+                    const totalItems = data.items.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0);
+                    const cartBadge = document.getElementById('cartBadge');
+                    
+                    if (cartBadge) {
+                        if (totalItems > 0) {
+                            cartBadge.textContent = totalItems;
+                            cartBadge.classList.remove('hidden');
+                        } else {
+                            cartBadge.classList.add('hidden');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+            }
         }
+
+        // Update cart badge on page load
+        updateCartBadge();
+
+        // Listen for cart update events
+        window.addEventListener('cartUpdated', updateCartBadge);
     });
 </script>
->>>>>>> c3064d416868e894962aa98c44fe3703d537d127
 
 
   <section class="hero-slider relative">
@@ -1092,6 +1138,8 @@ if ($user_id) {
     });
   </script>
   <script src="../assets/js/profile-sync.js"></script>
+  <script src="../assets/js/cart-preview.js"></script>
+  <script src="../assets/js/search-autocomplete.js"></script>
 
   <!-- Logout Confirmation Modal -->
   <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
