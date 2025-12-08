@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
                                 $redirect_url = '../admin/admin-dashboard.php';
                             } elseif ($user['user_type'] === 'retailer') {
                                 $login_message = 'Retailer login successful! Redirecting to dashboard...';
-                                $redirect_url = '../retailer/retailerdashboard.php';
+                                $redirect_url = '../retailer/retailer-dashboard2.php';
                             } else {
                                 // Default to customer
                                 $login_message = 'Login successful! Redirecting to homepage...';
