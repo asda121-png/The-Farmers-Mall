@@ -35,7 +35,79 @@ if ($user_id) {
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-<?php include __DIR__ . '/../includes/user-header.php'; ?>
+ <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="user-homepage.php" class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-leaf text-white text-lg"></i>
+            </div>
+            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
+        </a>
+
+        <!-- Search -->
+        <div class="flex-1 mx-6">
+            <form action="products.php" method="GET">
+                <input 
+                    id="globalSearch"
+                    type="text" 
+                    name="search"
+                    placeholder="Search for fresh produce, dairy, and more..."
+                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+                />
+            </form>
+        </div>
+
+        <!-- Icons & Profile Dropdown -->
+        <div class="flex items-center space-x-6">
+            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
+            <a href="cart.php" class="text-gray-600 hover:text-green-600 relative inline-block">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <!-- Cart badge will be added by JavaScript -->
+            </a>
+
+            <!-- Profile Dropdown -->
+            <div class="relative inline-block text-left">
+                <button id="profileDropdownBtn" class="flex items-center">
+                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
+                             alt="Profile" 
+                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
+                    <?php else: ?>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    <?php endif; ?>
+                </button>
+
+                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
+                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                </div>
+            </div>
+            <!-- End Profile Dropdown -->
+
+        </div>
+    </div>
+</header>
+
+<!-- Dropdown JS -->
+<script>
+    const btn = document.getElementById('profileDropdownBtn');
+    const menu = document.getElementById('profileDropdown');
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+        menu.classList.add('hidden');
+    });
+</script>
 
 
     
@@ -53,34 +125,45 @@ if ($user_id) {
       <div class="mb-6">
         <h3 class="font-medium mb-2 text-gray-800">Categories</h3>
         <ul class="space-y-2 text-sm text-gray-700">
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="vegetables">Vegetables (124)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="fruits">Fruits (89)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="dairy">Dairy (45)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="bakery">Bakery (32)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="meat">Meat (28)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="seafood">Seafood (20)</label></li>
+          <?php
+          // Fetch all products first to count categories
+          require_once __DIR__ . '/../config/supabase-api.php';
+          $api = getSupabaseAPI();
+          $all_products = $api->select('products') ?: [];
+          
+          // Count products per category
+          $category_counts = [];
+          foreach ($all_products as $product) {
+              $cat = strtolower(trim($product['category'] ?? ''));
+              
+              // Skip empty categories, "other", "organic", and "bakery"
+              if (empty($cat) || $cat === 'other' || $cat === 'organic' || $cat === 'bakery') {
+                  continue;
+              }
+              
+              // Remove "organic" prefix if it exists (e.g., "organic vegetables" -> "vegetables")
+              $cat = preg_replace('/^organic\s+/i', '', $cat);
+              
+              if (!isset($category_counts[$cat])) {
+                  $category_counts[$cat] = 0;
+              }
+              $category_counts[$cat]++;
+          }
+          
+          // Sort categories by count (descending)
+          arsort($category_counts);
+          
+          // Display categories with actual counts (only if count > 0)
+          foreach ($category_counts as $category => $count):
+              if ($count > 0):
+                  $category_display = ucfirst($category);
+          ?>
+          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category_display); ?> (<?php echo $count; ?>)</label></li>
+          <?php 
+              endif;
+          endforeach; 
+          ?>
         </ul>
-      </div>
-
-      <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Organic</h3>
-        <label class="text-sm text-gray-700 inline-flex items-center">
-          <input id="organicOnly" type="checkbox" class="mr-2">Organic Only
-        </label>
-      </div>
-
-      <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Price Range</h3>
-        <div class="flex items-center space-x-2 mb-2">
-          <input id="minPrice" type="number" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
-          <span>-</span>
-          <input id="maxPrice" type="number" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
-        </div>
-        <input id="priceRange" type="range" min="0" max="500" value="500" class="w-full accent-green-600">
-      </div>
-
-      <div>
-        <button id="applyFilters" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Apply Filters</button>
       </div>
     </aside>
 
