@@ -8,11 +8,6 @@
   const getProductCards = () => Array.from(document.querySelectorAll('.product-card'));
   const getAddButtons = () => Array.from(document.querySelectorAll('.add-btn'));
 
-  const organicCheckbox = $('#organicOnly');
-  const minPriceInput = $('#minPrice');
-  const maxPriceInput = $('#maxPrice');
-  const priceRange = $('#priceRange');
-  const applyBtn = $('#applyFilters');
   const clearBtn = $('#clearFilters');
   const productsGrid = $('#productsGrid');
   const sortSelect = $('#sortSelect');
@@ -37,24 +32,17 @@
   function filterProducts() {
     const categoryCheckboxes = getCategoryCheckboxes();
     const activeCats = categoryCheckboxes.filter(cb => cb.checked).map(cb => cb.dataset.cat.toLowerCase());
-    const organicOnly = organicCheckbox.checked;
-    const minP = parseFloat(minPriceInput.value) || 0;
-    const maxP = parseFloat(maxPriceInput.value) || Number.POSITIVE_INFINITY;
     const searchText = (globalSearch.value || '').trim().toLowerCase();
 
     getProductCards().forEach(card => {
       const catStr = (card.dataset.category || '').toLowerCase();
       const itemCats = catStr.split(',').map(s => s.trim()).filter(Boolean);
-      const price = parseFloat(card.dataset.price) || 0;
-      const isOrganic = String(card.dataset.organic) === 'true';
       const name = (card.dataset.name || '').toLowerCase();
 
       const categoryMatch = activeCats.length === 0 || activeCats.some(c => itemCats.includes(c));
-      const organicMatch = !organicOnly || isOrganic;
-      const priceMatch = price >= minP && price <= maxP;
       const searchMatch = !searchText || name.includes(searchText);
 
-      if (categoryMatch && organicMatch && priceMatch && searchMatch) {
+      if (categoryMatch && searchMatch) {
         showCard(card);
       } else {
         hideCard(card);
@@ -106,23 +94,11 @@
   // Wire up event listeners
   function bindEventListeners() {
     getCategoryCheckboxes().forEach(cb => cb.addEventListener('change', filterProducts));
-    organicCheckbox.addEventListener('change', filterProducts);
-    applyBtn.addEventListener('click', filterProducts);
-
-    priceRange.addEventListener('input', (e) => {
-      maxPriceInput.value = e.target.value;
-    });
-    minPriceInput.addEventListener('change', filterProducts);
-    maxPriceInput.addEventListener('change', filterProducts);
 
     sortSelect.addEventListener('change', applySort);
 
     clearBtn.addEventListener('click', () => {
       getCategoryCheckboxes().forEach(cb => cb.checked = false);
-      organicCheckbox.checked = false;
-      minPriceInput.value = '';
-      maxPriceInput.value = '';
-      priceRange.value = priceRange.max || 500;
       globalSearch.value = '';
       filterProducts();
     });

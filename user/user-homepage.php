@@ -267,6 +267,7 @@ if ($user_id) {
         overflow: hidden;
     }
 
+    
     .hero-slide {
         position: absolute;
         top: 0;

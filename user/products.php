@@ -125,34 +125,45 @@ if ($user_id) {
       <div class="mb-6">
         <h3 class="font-medium mb-2 text-gray-800">Categories</h3>
         <ul class="space-y-2 text-sm text-gray-700">
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="vegetables">Vegetables (124)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="fruits">Fruits (89)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="dairy">Dairy (45)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="bakery">Bakery (32)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="meat">Meat (28)</label></li>
-          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="seafood">Seafood (20)</label></li>
+          <?php
+          // Fetch all products first to count categories
+          require_once __DIR__ . '/../config/supabase-api.php';
+          $api = getSupabaseAPI();
+          $all_products = $api->select('products') ?: [];
+          
+          // Count products per category
+          $category_counts = [];
+          foreach ($all_products as $product) {
+              $cat = strtolower(trim($product['category'] ?? ''));
+              
+              // Skip empty categories, "other", "organic", and "bakery"
+              if (empty($cat) || $cat === 'other' || $cat === 'organic' || $cat === 'bakery') {
+                  continue;
+              }
+              
+              // Remove "organic" prefix if it exists (e.g., "organic vegetables" -> "vegetables")
+              $cat = preg_replace('/^organic\s+/i', '', $cat);
+              
+              if (!isset($category_counts[$cat])) {
+                  $category_counts[$cat] = 0;
+              }
+              $category_counts[$cat]++;
+          }
+          
+          // Sort categories by count (descending)
+          arsort($category_counts);
+          
+          // Display categories with actual counts (only if count > 0)
+          foreach ($category_counts as $category => $count):
+              if ($count > 0):
+                  $category_display = ucfirst($category);
+          ?>
+          <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category_display); ?> (<?php echo $count; ?>)</label></li>
+          <?php 
+              endif;
+          endforeach; 
+          ?>
         </ul>
-      </div>
-
-      <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Organic</h3>
-        <label class="text-sm text-gray-700 inline-flex items-center">
-          <input id="organicOnly" type="checkbox" class="mr-2">Organic Only
-        </label>
-      </div>
-
-      <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Price Range</h3>
-        <div class="flex items-center space-x-2 mb-2">
-          <input id="minPrice" type="number" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
-          <span>-</span>
-          <input id="maxPrice" type="number" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
-        </div>
-        <input id="priceRange" type="range" min="0" max="500" value="500" class="w-full accent-green-600">
-      </div>
-
-      <div>
-        <button id="applyFilters" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Apply Filters</button>
       </div>
     </aside>
 
