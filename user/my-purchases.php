@@ -260,9 +260,9 @@ $filter = $_GET['filter'] ?? 'all';
 
                         <!-- Action Buttons -->
                         <div class="flex gap-3 mt-4">
-                            <button onclick="viewOrderDetails('<?php echo $order['id']; ?>')" 
-                                    class="flex-1 bg-white border-2 border-green-600 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 font-medium">
-                                View Details
+                            <button onclick="trackOrder('<?php echo $order['id']; ?>')" 
+                                    class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">
+                                <i class="fas fa-map-marker-alt mr-2"></i>Track Order
                             </button>
                             
                             <?php if ($status === 'pending'): ?>
@@ -272,12 +272,12 @@ $filter = $_GET['filter'] ?? 'all';
                                 </button>
                             <?php elseif ($status === 'delivered'): ?>
                                 <button onclick="reorderItems('<?php echo $order['id']; ?>')" 
-                                        class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">
+                                        class="flex-1 bg-white border-2 border-green-600 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 font-medium">
                                     Buy Again
                                 </button>
                             <?php elseif ($status === 'shipped'): ?>
                                 <button onclick="confirmDelivery('<?php echo $order['id']; ?>')" 
-                                        class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">
+                                        class="flex-1 bg-white border-2 border-green-600 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 font-medium">
                                     Order Received
                                 </button>
                             <?php endif; ?>
@@ -342,6 +342,11 @@ $filter = $_GET['filter'] ?? 'all';
             const url = new URL(window.location.href);
             url.searchParams.set('filter', filter);
             window.location.href = url.toString();
+        }
+
+        // Track Order - Navigate to tracking page
+        function trackOrder(orderId) {
+            window.location.href = `track-order.php?order_id=${orderId}`;
         }
 
         // Apply filter on page load

@@ -24,7 +24,7 @@ if (!$order_id || !$new_status) {
 }
 
 // Validate status
-$valid_statuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+$valid_statuses = ['pending', 'to_pay', 'confirmed', 'to_ship', 'processing', 'shipped', 'to_receive', 'delivered', 'completed', 'cancelled'];
 if (!in_array($new_status, $valid_statuses)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid status']);
@@ -55,14 +55,17 @@ try {
     // Check if status transition is allowed
     $current_status = $order['status'];
     
-    // Users can only cancel pending orders or mark shipped orders as delivered
-    if ($new_status === 'cancelled' && $current_status !== 'pending') {
+    // Users can only cancel pending/to_pay orders or mark shipped/to_receive orders as delivered/completed
+    $cancelable_statuses = ['pending', 'to_pay'];
+    $deliverable_statuses = ['shipped', 'to_receive'];
+    
+    if ($new_status === 'cancelled' && !in_array($current_status, $cancelable_statuses)) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Can only cancel pending orders']);
+        echo json_encode(['success' => false, 'message' => 'Can only cancel pending or unpaid orders']);
         exit();
     }
     
-    if ($new_status === 'delivered' && $current_status !== 'shipped') {
+    if (in_array($new_status, ['delivered', 'completed']) && !in_array($current_status, $deliverable_statuses)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Can only mark shipped orders as delivered']);
         exit();
@@ -74,8 +77,8 @@ try {
         'updated_at' => date('Y-m-d H:i:s')
     ];
     
-    // If marking as delivered, also update payment status
-    if ($new_status === 'delivered') {
+    // If marking as delivered/completed, also update payment status
+    if (in_array($new_status, ['delivered', 'completed'])) {
         $update_data['payment_status'] = 'paid';
     }
     
