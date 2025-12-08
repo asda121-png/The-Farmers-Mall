@@ -304,6 +304,7 @@ if ($user_id) {
         overflow: hidden;
     }
 
+    
     .hero-slide {
         position: absolute;
         top: 0;
@@ -360,7 +361,7 @@ if ($user_id) {
         position: absolute;
         top: 100%;
         right: 0;
-        mt: 8px;
+        margin-top: 8px;
         width: 320px;
         background: white;
         border-radius: 8px;
@@ -423,7 +424,10 @@ if ($user_id) {
         font-size: 12px;
         color: #2E7D32;
         cursor: pointer;
-        hover: color #4CAF50;
+    }
+
+    .notification-clear-btn:hover {
+        color: #4CAF50;
     }
   
   </style>
@@ -511,6 +515,8 @@ if ($user_id) {
         const profileBtn = document.getElementById('profileDropdownBtn');
         const profileMenu = document.getElementById('profileDropdown');
         const logoutLink = document.getElementById('logoutLink');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogout = document.getElementById('cancelLogout');
 
         if (profileBtn && profileMenu) {
             profileBtn.addEventListener('click', (e) => {
@@ -519,11 +525,25 @@ if ($user_id) {
             });
         }
 
-        if (logoutLink) {
+        if (logoutLink && logoutModal) {
             logoutLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
-                    window.location.href = logoutLink.href;
+                logoutModal.classList.remove('hidden');
+                profileMenu.classList.add('hidden');
+            });
+        }
+
+        if (cancelLogout && logoutModal) {
+            cancelLogout.addEventListener('click', () => {
+                logoutModal.classList.add('hidden');
+            });
+        }
+
+        // Close logout modal when clicking outside
+        if (logoutModal) {
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) {
+                    logoutModal.classList.add('hidden');
                 }
             });
         }
@@ -1108,5 +1128,19 @@ if ($user_id) {
     });
   </script>
   <script src="../assets/js/profile-sync.js"></script>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+      <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+      <div class="flex justify-center gap-4">
+        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+        <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

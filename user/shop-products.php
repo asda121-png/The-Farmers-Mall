@@ -239,19 +239,22 @@ if ($shop_name) {
                     <span class="text-sm text-gray-500">per <?php echo htmlspecialchars($product['unit']); ?></span>
                   <?php endif; ?>
                 </div>
-                
-                <?php if ($product['stock_quantity'] > 0): ?>
-                  <button onclick="addToCart(event, '<?php echo htmlspecialchars($product['id']); ?>')" 
-                          class="w-full mt-4 bg-green-600 text-white py-2 rounded-full hover:bg-green-700 transition">
-                    <i class="fas fa-cart-plus mr-2"></i>Add to Cart
-                  </button>
-                <?php else: ?>
-                  <button class="w-full mt-4 bg-gray-300 text-gray-600 py-2 rounded-full cursor-not-allowed" disabled>
-                    Out of Stock
-                  </button>
-                <?php endif; ?>
               </div>
             </a>
+            
+            <!-- Add to Cart button outside the link -->
+            <div class="px-4 pb-4">
+              <?php if ($product['stock_quantity'] > 0): ?>
+                <button onclick="addToCart(event, '<?php echo htmlspecialchars($product['id']); ?>')" 
+                        class="w-full bg-green-600 text-white py-2 rounded-full hover:bg-green-700 transition">
+                  <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                </button>
+              <?php else: ?>
+                <button class="w-full bg-gray-300 text-gray-600 py-2 rounded-full cursor-not-allowed" disabled>
+                  Out of Stock
+                </button>
+              <?php endif; ?>
+            </div>
           </div>
         <?php endforeach; ?>
       </div>
