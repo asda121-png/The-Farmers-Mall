@@ -309,6 +309,48 @@ $filter = $_GET['filter'] ?? 'all';
         </div>
     </div>
 
+    <!-- Cancel Order Modal -->
+    <div id="cancelOrderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Cancel Order</h3>
+                <p class="text-gray-600 mb-6">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                <div class="flex gap-3">
+                    <button onclick="closeCancelOrderModal()" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-medium">
+                        No, Keep Order
+                    </button>
+                    <button onclick="confirmCancelOrder()" class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium">
+                        Yes, Cancel Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delivery Modal -->
+    <div id="confirmDeliveryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Order Received</h3>
+                <p class="text-gray-600 mb-6">Have you received this order? Confirming will mark it as completed.</p>
+                <div class="flex gap-3">
+                    <button onclick="closeConfirmDeliveryModal()" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-medium">
+                        Not Yet
+                    </button>
+                    <button onclick="confirmDeliveryOrder()" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">
+                        Yes, Received
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Order Details Modal -->
     <div id="orderDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -488,54 +530,97 @@ $filter = $_GET['filter'] ?? 'all';
             document.getElementById('orderDetailsModal').classList.add('hidden');
         }
 
-        // Cancel Order
-        async function cancelOrder(orderId) {
-            if (!confirm('Are you sure you want to cancel this order?')) {
-                return;
-            }
+        // Cancel Order Modal
+        let currentOrderId = null;
+        
+        function cancelOrder(orderId) {
+            currentOrderId = orderId;
+            document.getElementById('cancelOrderModal').classList.remove('hidden');
+        }
+        
+        function closeCancelOrderModal() {
+            document.getElementById('cancelOrderModal').classList.add('hidden');
+            currentOrderId = null;
+        }
+        
+        async function confirmCancelOrder() {
+            if (!currentOrderId) return;
             
             try {
                 const response = await fetch('../api/update-order-status.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order_id: orderId, status: 'cancelled' })
+                    body: JSON.stringify({ order_id: currentOrderId, status: 'cancelled' })
                 });
                 
                 const data = await response.json();
+                closeCancelOrderModal();
+                
                 if (data.success) {
-                    alert('Order cancelled successfully');
-                    location.reload();
+                    // Show success message
+                    showSuccessMessage('Order cancelled successfully');
+                    // Reload after a brief delay to show the message
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    alert('Failed to cancel order: ' + (data.message || 'Unknown error'));
+                    showErrorMessage('Failed to cancel order: ' + (data.message || 'Unknown error'));
                 }
             } catch (error) {
-                alert('Error cancelling order');
+                closeCancelOrderModal();
+                showErrorMessage('Error cancelling order');
             }
         }
 
-        // Confirm Delivery
-        async function confirmDelivery(orderId) {
-            if (!confirm('Have you received this order?')) {
-                return;
-            }
+        // Confirm Delivery Modal
+        function confirmDelivery(orderId) {
+            currentOrderId = orderId;
+            document.getElementById('confirmDeliveryModal').classList.remove('hidden');
+        }
+        
+        function closeConfirmDeliveryModal() {
+            document.getElementById('confirmDeliveryModal').classList.add('hidden');
+            currentOrderId = null;
+        }
+        
+        async function confirmDeliveryOrder() {
+            if (!currentOrderId) return;
             
             try {
                 const response = await fetch('../api/update-order-status.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order_id: orderId, status: 'delivered' })
+                    body: JSON.stringify({ order_id: currentOrderId, status: 'completed' })
                 });
                 
                 const data = await response.json();
+                closeConfirmDeliveryModal();
+                
                 if (data.success) {
-                    alert('Order marked as delivered!');
-                    location.reload();
+                    showSuccessMessage('Order marked as completed!');
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    alert('Failed to update order: ' + (data.message || 'Unknown error'));
+                    showErrorMessage('Failed to update order: ' + (data.message || 'Unknown error'));
                 }
             } catch (error) {
-                alert('Error updating order');
+                closeConfirmDeliveryModal();
+                showErrorMessage('Error updating order');
             }
+        }
+        
+        // Success/Error message helper functions
+        function showSuccessMessage(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+            toast.innerHTML = `<i class="fas fa-check-circle"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function showErrorMessage(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+            toast.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
 
         // Reorder Items

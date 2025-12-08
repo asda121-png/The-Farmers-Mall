@@ -82,7 +82,7 @@ try {
         $update_data['payment_status'] = 'paid';
     }
     
-    $result = $api->update('orders', ['id' => $order_id], $update_data);
+    $result = $api->update('orders', $update_data, ['id' => $order_id]);
     
     if ($result) {
         echo json_encode([
