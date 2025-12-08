@@ -77,63 +77,23 @@ try {
         footer {
             margin-top: auto;
         }
-        /* Mobile menu toggle */
-        #mobileMenuBtn {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            #mobileMenuBtn {
-                display: flex;
-            }
-            #sidebar {
-                position: fixed;
-                left: -100%;
-                top: 0;
-                height: 100vh;
-                z-index: 50;
-                transition: left 0.3s ease;
-            }
-            #sidebar.active {
-                left: 0;
-            }
-            #overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 40;
-            }
-            #overlay.active {
-                display: block;
-            }
-        }
     </style>
 </head>
 <body>
 
 <div class="flex flex-col min-h-screen">
-    <!-- Mobile Menu Overlay -->
-    <div id="overlay" onclick="toggleMobileMenu()"></div>
-    
-    <!-- Mobile Menu Button -->
-    <button id="mobileMenuBtn" class="fixed top-4 left-4 z-50 bg-green-600 text-white p-3 rounded-lg shadow-lg md:hidden" onclick="toggleMobileMenu()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-    </button>
-    
     <!-- Main Application Container -->
     <div id="app" class="flex flex-1">
         
         <!-- Sidebar Navigation -->
-        <nav id="sidebar" class="w-64 md:w-64 bg-white shadow-xl flex flex-col p-4 space-y-2 flex-shrink-0">
+        <nav class="w-64 bg-white shadow-xl flex flex-col p-4 space-y-2 flex-shrink-0">
             <div class="flex items-center mb-6">
                 <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center mr-2">
                     <i class="fas fa-leaf text-white text-lg"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
             </div>
-            <a href="retailer-dashboard2.php" class="nav-item flex items-center p-3 rounded-xl text-white bg-green-600 transition duration-150">
+            <a href="retailer-dashboard.php" class="nav-item flex items-center p-3 rounded-xl text-white bg-green-600 transition duration-150">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 Dashboard
             </a>
@@ -173,7 +133,7 @@ try {
             <header class="bg-white shadow-sm">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
-                        <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+                        <a href="retailer-dashboard.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
                         <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
                         <a href="retailernotifications.php" class="text-gray-600 relative">
                         <i class="fa-regular fa-bell"></i>
@@ -1393,23 +1353,6 @@ try {
         // Check when page loads
         window.addEventListener('load', () => {
             setTimeout(checkProfileUpdates, 1000);
-        });
-        
-        // Mobile menu toggle function
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-        
-        // Close mobile menu when clicking a nav link
-        document.querySelectorAll('#sidebar a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 768) {
-                    toggleMobileMenu();
-                }
-            });
         });
       </script>
 </body>

@@ -7,12 +7,14 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $user_id = $_SESSION['user_id'] ?? null;
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 ?>
@@ -30,107 +32,7 @@ if ($user_id) {
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-  <!-- Include Header -->
- <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <a href="user-homepage.php" class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-leaf text-white text-lg"></i>
-            </div>
-            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
-        </a>
-
-        <!-- Search -->
-        <div class="flex-1 mx-6">
-            <form action="products.php" method="GET">
-                <input 
-                    type="text" 
-                    name="search"
-                    placeholder="Search for fresh produce, dairy, and more..."
-                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-            </form>
-        </div>
-
-        <!-- Icons & Profile Dropdown -->
-        <div class="flex items-center space-x-6">
-            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-            <a href="message.php" class="text-gray-600 hover:text-green-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-green-600 relative">
-                <i class="fa-regular fa-bell"></i>
-                <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
-            </a>
-            <a href="cart.php" class="text-gray-600 relative">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
-
-            <!-- Profile Dropdown -->
-            <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
-                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
-                             alt="Profile" 
-                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
-                    <?php else: ?>
-                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    <?php endif; ?>
-                </button>
-
-                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="../auth/login.php" id="logoutLink" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
-            </div>
-            <!-- End Profile Dropdown -->
-
-        </div>
-    </div>
-</header>
-
-<!-- Dropdown JS -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const profileBtn = document.getElementById('profileDropdownBtn');
-        const profileMenu = document.getElementById('profileDropdown');
-        const logoutLink = document.getElementById('logoutLink');
-
-        if (profileBtn && profileMenu) {
-            profileBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                profileMenu.classList.toggle('hidden');
-            });
-        }
-
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                const logoutModal = document.getElementById('logoutModal');
-                if (logoutModal) {
-                    logoutModal.classList.remove('hidden');
-                }
-            });
-        }
-
-        document.addEventListener('click', (e) => {
-            if (profileMenu && !profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                profileMenu.classList.add('hidden');
-            }
-        });
-
-        // --- Notification Badge Logic ---
-        const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
-        const unreadCount = notifications.filter(n => !n.read).length;
-        const badge = document.getElementById('notificationBadge');
-        if (badge && unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.classList.remove('hidden');
-        }
-    });
-</script>
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
 
   <!-- Main Notifications Section -->
   <main class="max-w-7xl mx-auto px-6 py-8 mb-[40rem]">

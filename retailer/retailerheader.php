@@ -36,6 +36,31 @@
 </head>
 
 <body>
+<?php
+// Get profile picture from session/database if available
+$headerProfilePic = '../images/default-avatar.svg';
+$headerUserName = 'Retailer';
+
+if (isset($_SESSION['user_id'])) {
+    require_once __DIR__ . '/../config/supabase-api.php';
+    try {
+        $api = getSupabaseAPI();
+        $users = $api->select('users', ['id' => $_SESSION['user_id']]);
+        if (!empty($users)) {
+            $userData = $users[0];
+            $headerUserName = $userData['full_name'] ?? 'Retailer';
+            if (!empty($userData['profile_picture'])) {
+                $profilePath = '../' . ltrim($userData['profile_picture'], '/');
+                if (file_exists(__DIR__ . '/../' . ltrim($userData['profile_picture'], '/'))) {
+                    $headerProfilePic = $profilePath;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Header profile fetch error: " . $e->getMessage());
+    }
+}
+?>
   <!-- SELLER HEADER -->
  <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -57,8 +82,8 @@
 
         <!-- Profile Dropdown -->
         <div class="relative inline-block text-left">
-          <button id="profileDropdownBtn" class="flex items-center">
-            <img id="headerProfilePic" src="../images/karl.png" alt="User" class="w-8 h-8 rounded-full cursor-pointer object-cover">
+          <button id="profileDropdownBtn" class="flex items-center" title="<?php echo htmlspecialchars($headerUserName); ?>">
+            <img id="headerProfilePic" src="<?php echo htmlspecialchars($headerProfilePic); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($headerUserName); ?>" class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
           </button>
 
           <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
@@ -87,6 +112,40 @@
             menu.classList.add('hidden');
         }
     });
+    
+    // Real-time profile picture update for header
+    let lastHeaderProfilePic = '<?php echo htmlspecialchars($headerProfilePic); ?>';
+    
+    async function checkHeaderProfileUpdates() {
+        try {
+            const response = await fetch('../api/get-profile.php');
+            const result = await response.json();
+            
+            if (result.success && result.data && result.data.profile_picture) {
+                const profilePicElement = document.getElementById('headerProfilePic');
+                
+                if (result.data.profile_picture !== lastHeaderProfilePic) {
+                    profilePicElement.src = result.data.profile_picture + '?t=' + new Date().getTime();
+                    lastHeaderProfilePic = result.data.profile_picture;
+                }
+            }
+        } catch (error) {
+            console.error('Error checking header profile updates:', error);
+        }
+    }
+    
+    // Check every 5 seconds
+    setInterval(checkHeaderProfileUpdates, 5000);
+    
+    // Check when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            checkHeaderProfileUpdates();
+        }
+    });
+    
+    // Listen for profile update events
+    window.addEventListener('profileUpdated', checkHeaderProfileUpdates);
   </script>
 </body>
 
