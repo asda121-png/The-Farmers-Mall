@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Picture Preview Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="p-8">
+    <h1 class="text-3xl font-bold mb-6">Profile Picture Preview Test</h1>
+    
+    <div class="max-w-md">
+        <!-- Camera overlay container -->
+        <div class="relative inline-block">
+            <!-- Profile Picture Preview -->
+            <div class="relative">
+                <div id="editProfilePicPreview" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                    <i class="fas fa-user text-white text-5xl"></i>
+                </div>
+                
+                <!-- Camera Icon Overlay -->
+                <label for="profilePicInput" class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white cursor-pointer hover:bg-green-700 transition">
+                    <i class="fas fa-camera text-sm"></i>
+                </label>
+                
+                <input type="file" id="profilePicInput" accept="image/*" class="hidden">
+            </div>
+        </div>
+        
+        <p class="mt-4 text-sm text-gray-600">Click the camera icon to select an image</p>
+        <p class="text-xs text-gray-500 mt-2">Open browser console (F12) to see debug logs</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePicInput = document.getElementById('profilePicInput');
+
+            console.log('✅ Script loaded, profilePicInput:', profilePicInput);
+
+            if (profilePicInput) {
+                profilePicInput.addEventListener('change', (e) => {
+                    console.log('📸 File input changed');
+                    
+                    const file = e.target.files[0];
+                    console.log('📁 File selected:', file ? file.name : 'none');
+                    
+                    if (file) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = (event) => {
+                            console.log('📖 FileReader loaded');
+                            
+                            const previewEl = document.getElementById('editProfilePicPreview');
+                            console.log('🎨 Preview element:', previewEl);
+                            
+                            const previewContainer = previewEl.parentElement;
+                            console.log('🎨 Preview container:', previewContainer);
+                            
+                            if (previewContainer) {
+                                // Create new img element
+                                const newImg = document.createElement('img');
+                                newImg.id = 'editProfilePicPreview';
+                                newImg.src = event.target.result;
+                                newImg.alt = 'Profile';
+                                newImg.className = 'w-32 h-32 rounded-full border-4 border-green-100 object-cover';
+                                
+                                console.log('🖼️  Created new img element');
+                                
+                                // Replace old element
+                                const oldEl = document.getElementById('editProfilePicPreview');
+                                previewContainer.replaceChild(newImg, oldEl);
+                                
+                                console.log('✅ Preview image updated!');
+                                console.log('✅ Image src:', event.target.result.substring(0, 50) + '...');
+                            } else {
+                                console.error('❌ Could not find preview container');
+                            }
+                        };
+                        
+                        reader.onerror = () => {
+                            console.error('❌ FileReader error:', reader.error);
+                        };
+                        
+                        console.log('📖 Starting FileReader...');
+                        reader.readAsDataURL(file);
+                    } else {
+                        console.warn('⚠️ No file selected');
+                    }
+                });
+            } else {
+                console.error('❌ profilePicInput not found');
+            }
+        });
+    </script>
+</body>
+</html>

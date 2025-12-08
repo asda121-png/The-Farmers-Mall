@@ -12,12 +12,14 @@ $user_id = $_SESSION['user_id'] ?? null;
 
 // Fetch profile picture from database
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 ?>
@@ -44,6 +46,18 @@ if ($user_id) {
       opacity: 0;
       pointer-events: none;
     }
+
+    .notification-dropdown { position: absolute; top: 100%; right: 0; margin-top: 8px; width: 320px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 50; max-height: 400px; overflow-y: auto; }
+    .notification-item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; cursor: pointer; }
+    .notification-item:hover { background-color: #f9f9f9; }
+    .notification-item.unread { background-color: #f0f9f5; border-left: 4px solid #4CAF50; }
+    .notification-item-title { font-weight: 600; color: #333; font-size: 14px; margin-bottom: 4px; }
+    .notification-item-message { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .notification-item-time { font-size: 11px; color: #999; }
+    .notification-empty { padding: 24px 16px; text-align: center; color: #999; font-size: 14px; }
+    .notification-header { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .notification-clear-btn { font-size: 12px; color: #2E7D32; cursor: pointer; background: none; border: none; }
+    .notification-clear-btn:hover { color: #1B5E20; }
   </style>
 </head>
 
@@ -51,77 +65,7 @@ if ($user_id) {
 
   
 
-     <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <a href="user-homepage.php" class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-leaf text-white text-lg"></i>
-            </div>
-            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
-        </a>
-
-        <!-- Search -->
-        <div class="flex-1 mx-6">
-            <form action="products.php" method="GET">
-                <input 
-                    type="text" 
-                    name="search"
-                    placeholder="Search for fresh produce, dairy, and more..."
-                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-            </form>
-        </div>
-
-        <!-- Icons & Profile Dropdown -->
-        <div class="flex items-center space-x-6">
-            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-            <a href="cart.php" class="text-gray-600 relative">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
-
-            <!-- Profile Dropdown -->
-            <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
-                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
-                             alt="Profile" 
-                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
-                    <?php else: ?>
-                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    <?php endif; ?>
-                </button>
-
-                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
-            </div>
-            <!-- End Profile Dropdown -->
-
-        </div>
-    </div>
-</header>
-
-<!-- Dropdown JS -->
-<script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
-    });
-</script>
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
   <!-- PAYMENT SECTION -->
@@ -129,7 +73,12 @@ if ($user_id) {
     
     <!-- LEFT SIDE: Payment Form -->
     <section class="flex-1 bg-white p-6 rounded-xl shadow-sm min-h-[400px]">
-      <h2 class="text-2xl font-semibold mb-6">Payment Details</h2>
+      <div class="flex items-center space-x-4 mb-6">
+        <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fa-solid fa-arrow-left text-xl"></i>
+        </button>
+        <h2 class="text-2xl font-semibold">Payment Details</h2>
+      </div>
 
       <!-- Payment Method Options -->
       <div class="space-y-3 mb-6">

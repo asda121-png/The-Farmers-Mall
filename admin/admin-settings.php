@@ -109,13 +109,14 @@ $user_settings = [
           <i class="fa-solid fa-receipt w-5"></i>
           <span>Orders</span>
         </a>
+        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-user-gear w-5"></i>
+          <span>Manage Users</span>
+        </a>
       </nav>
 
       <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
-        <a href="admin-riders.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-motorcycle w-5"></i>
-          <span>Riders</span>
-        </a>
+        
       </nav>
 
       <p class="text-xs font-semibold text-green-300 uppercase tracking-widest my-4 px-2">ACCOUNT</p>
@@ -125,10 +126,7 @@ $user_settings = [
           <span>Settings</span>
         </a>
       
-        <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
-          <i class="fa-solid fa-user-gear w-5"></i>
-          <span>Manage Users</span>
-        </a>
+        
       </nav>
     </div>
 

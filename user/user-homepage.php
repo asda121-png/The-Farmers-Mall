@@ -14,12 +14,14 @@ $user_id = $_SESSION['user_id'] ?? null;
 
 // Fetch profile picture from database
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 ?>
@@ -317,112 +319,86 @@ if ($user_id) {
     .slider-dot:hover {
         background: rgba(255, 255, 255, 0.8);
     }
+
+    /* Notification dropdown styles */
+    .notification-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        width: 320px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 50;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.2s ease;
+    }
+
+    .notification-item:hover {
+        background-color: #f9f9f9;
+    }
+
+    .notification-item.unread {
+        background-color: #f0f9f5;
+        border-left: 4px solid #4CAF50;
+    }
+
+    .notification-item-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .notification-item-message {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+    }
+
+    .notification-item-time {
+        font-size: 11px;
+        color: #999;
+    }
+
+    .notification-empty {
+        padding: 24px 16px;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .notification-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e0e0e0;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-clear-btn {
+        font-size: 12px;
+        color: #2E7D32;
+        cursor: pointer;
+    }
+
+    .notification-clear-btn:hover {
+        color: #4CAF50;
+    }
+  
   </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-  <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-leaf text-white text-lg"></i>
-            </div>
-            <h1 class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</h1>
-        </div>
-
-        <div class="flex-1 mx-6">
-            <form action="products.php" method="GET">
-                <input
-                    type="text"
-                    name="search"
-                    placeholder="Search for fresh product..."
-                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-            </form>
-        </div>
-
-        <div class="flex items-center space-x-6">
-
-            <a href="message.php" class="text-gray-600">
-                <i class="fa-regular fa-comment"></i> 
-            </a>
-
-            <a href="notification.php" class="text-gray-600 relative">
-                <i class="fa-regular fa-bell"></i>
-                <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
-            </a>
-
-            <a href="cart.php" class="text-gray-600 relative inline-block">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
-            </a>
-
-            <!-- ************ PROFILE DROPDOWN START ************ -->
-            <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
-                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>"
-                             alt="Profile"
-                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
-                    <?php else: ?>
-                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    <?php endif; ?>
-                </button>
-
-                <div id="profileDropdown"
-                     class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a> 
-                    <a href="..\auth\login.php" id="logoutLink" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
-            </div>
-            <!-- ************ PROFILE DROPDOWN END ************ -->
-
-        </div>
-    </div>
-</header>
-
-<!-- JS for dropdown -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const profileBtn = document.getElementById('profileDropdownBtn');
-        const profileMenu = document.getElementById('profileDropdown');
-        const logoutLink = document.getElementById('logoutLink');
-
-        if (profileBtn && profileMenu) {
-            profileBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                profileMenu.classList.toggle('hidden');
-            });
-        }
-
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
-                    window.location.href = logoutLink.href;
-                }
-            });
-        }
-
-        document.addEventListener('click', (e) => {
-            if (profileMenu && !profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                profileMenu.classList.add('hidden');
-            }
-        });
-
-        // --- Notification Badge Logic ---
-        const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
-        const unreadCount = notifications.filter(n => !n.read).length;
-        const badge = document.getElementById('notificationBadge');
-        if (badge && unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.classList.remove('hidden');
-        }
-    });
-</script>
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
   <section class="hero-slider relative">
@@ -510,205 +486,99 @@ if ($user_id) {
       <h2 class="section-heading text-2xl font-bold">Top Products</h2>
       <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
+    <?php
+    // Fetch products from Supabase
+    require_once __DIR__ . '/../config/supabase-api.php';
+    $api = getSupabaseAPI();
+    $products = $api->select('products') ?: [];
 
+    function resolveImagePath($img) {
+        if (empty($img)) return '../images/products/placeholder.png';
+        if (preg_match('#^https?://#i', $img)) return $img;
+        if (strpos($img, '../') === 0) return $img;
+        if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
+        if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
+        return $img;
+    }
+
+    function formatPriceValue($p) {
+        if (is_null($p) || $p === '') return '0.00';
+        if (is_numeric($p)) return number_format((float)$p, 2, '.', '');
+        $clean = preg_replace('/[^0-9\.]/', '', $p);
+        return $clean === '' ? '0.00' : number_format((float)$clean, 2, '.', '');
+    }
+
+    // Sort by units_sold (or times_ordered) to get top products
+    usort($products, function($a, $b) {
+        $aSold = (int)($a['units_sold'] ?? $a['times_ordered'] ?? $a['qty_sold'] ?? 0);
+        $bSold = (int)($b['units_sold'] ?? $b['times_ordered'] ?? $b['qty_sold'] ?? 0);
+        return $bSold <=> $aSold;
+    });
+
+    // Top 5 most sold products
+    $topProducts = array_slice($products, 0, 5);
+    // Remaining products (all others) - limit to 32 for homepage
+    $otherProducts = array_slice($products, 5, 70);
+    ?>
+
+    <!-- Top 5 Most Sold Products -->
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Vegetable Box" data-price="45.00" data-img="../images/products/Fresh Vegetable Box.png">
-        <img src="../images/products/Fresh Vegetable Box.png" alt="Fresh Vegetable Box" class="w-full h-32 object-cover" loading="lazy">
+      <?php foreach ($topProducts as $prod):
+        $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
+        $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
+        $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
+        $desc = htmlspecialchars($prod['description'] ?? '');
+        $category = htmlspecialchars($prod['category'] ?? 'other');
+        $id = htmlspecialchars($prod['id'] ?? '');
+      ?>
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
+        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Fresh Vegetable Box</h3>
-          <p class="text-green-600 font-bold text-sm">₱45.00</p>
+          <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
+          <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
         </div>
         <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
           <i class="fa-solid fa-plus"></i>
         </button>
       </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Organic Lettuce" data-price="30.00" data-img="../images/products/organic lettuce.png">
-        <img src="../images/products/Organic Lettuce.png" alt="Organic Lettuce" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Organic Lettuce</h3>
-          <p class="text-green-600 font-bold text-sm">₱30.00</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Fresh Milk" data-price="50.00" data-img="../images/products/fresh milk.jpeg">
-        <img src="../images/products/Fresh Milk.png" alt="Fresh Milk" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Fresh Milk</h3>
-          <p class="text-green-600 font-bold text-sm">₱50.00</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Tilapia" data-price="80.00" data-img="../images/products/tilapia.jpg">
-        <img src="../images/products/tilapia.jpg" alt="Tilapia" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Tilapia</h3>
-          <p class="text-green-600 font-bold text-sm">₱80.00</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="Farm Eggs" data-price="60.00" data-img="../images/products/fresh eggs.jpeg">
-        <img src="../images/products/fresh eggs.jpeg" alt="Farm Eggs" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Farm Eggs</h3>
-          <p class="text-green-600 font-bold text-sm">₱60.00</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
+      <?php endforeach; ?>
     </div>
   </section>
 
+  <!-- All Products Section -->
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold">Other Products</h2>
+      <h2 class="section-heading text-2xl font-bold">All Products</h2>
       <a href="products.php" class="arrow-link text-green-600 hover:underline"><i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Emsaymada" data-price="₱25.00" data-img="../images/products/Emsaymada.jpg">
-        <img src="../images/products/Emsaymada.jpg" alt="Emsaymada" class="w-full h-32 object-cover" loading="lazy">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <?php foreach ($otherProducts as $prod):
+        $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
+        $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
+        $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
+        $desc = htmlspecialchars($prod['description'] ?? '');
+        $category = htmlspecialchars($prod['category'] ?? 'other');
+        $id = htmlspecialchars($prod['id'] ?? '');
+      ?>
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
+        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
         <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Emsaymada</h3>
-          <p class="text-green-600 font-bold text-sm">₱25.00</p>
+          <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
+          <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
         </div>
         <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
           <i class="fa-solid fa-plus"></i>
         </button>
       </a>
+      <?php endforeach; ?>
+    </div>
 
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Butter Spread" data-price="₱70.00" data-img="../images/products/Butter Spread.jpg">
-        <img src="../images/products/Butter Spread.jpg" alt="Butter Spread" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Butter Spread</h3>
-          <p class="text-green-600 font-bold text-sm">₱70.00</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Bangus" data-price="₱140.00" data-img="../images/products/Bangus.jpg">
-        <img src="../images/products/Bangus.jpg" alt="Bangus" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Bangus</h3>
-          <p class="text-green-600 font-bold text-sm">₱170.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Pork Liempo" data-price="₱180.00" data-img="../images/products/fresh pork liempo.jpg">
-        <img src="../images/products/fresh pork liempo.jpg" alt="Fresh Pork Liempo" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Fresh Pork Liempo</h3>
-          <p class="text-green-600 font-bold text-sm">₱180.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Avocado" data-price="₱50.00" data-img="../images/products/fresh avocado.jpg">
-        <img src="../images/products/fresh avocado.jpg" alt="Fresh Avocado" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Fresh Avocado</h3>
-          <p class="text-green-600 font-bold text-sm">₱50.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Native Tomatoes" data-price="₱30.00" data-img="../images/products/Native tomato.jpg">
-        <img src="../images/products/Native tomato.jpg" alt="Native Tomatoes" class="w-full h-32 object-cover" loading="lazy">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Native Tomatoes per kg</h3>
-          <p class="text-green-600 font-bold text-sm">₱30.00</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Fresh Okra" data-price="₱25.00" data-img="../images/products/fresh okra.jpg">
-        <img src="../images/products/fresh okra.jpg" alt="Baby Carrots" class="w-full h-32 object-cover">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Fresh Okra</h3>
-          <p class="text-green-600 font-bold text-sm">₱25.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Native Chicken (Manok)" data-price="₱260.00" data-img="../images/products/native chicken.jpg">
-        <img src="../images/products/native chicken.jpg" alt="Artisan Bread" class="w-full h-32 object-cover">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Native Chicken (Manok)</h3>
-          <p class="text-green-600 font-bold text-sm">₱260.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Pork Ribs" data-price="₱310.00" data-img="../images/products/pork ribs.jpg">
-        <img src="../images/products/pork ribs.jpg" alt="Banana" class="w-full h-32 object-cover">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Pork Ribs</h3>
-          <p class="text-green-600 font-bold text-sm">₱310.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Shrimp (Hipon)" data-price="₱400.00" data-img="../images/products/shrimp.jpg">
-        <img src="../images/products/shrimp.jpg" alt="Farm Eggs" class="w-full h-32 object-cover">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Shrimp (Hipon)</h3>
-          <p class="text-green-600 font-bold text-sm">₱400.00 per kg</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Chocolate Milk" data-price="₱55.00" data-img="../images/products/chocolate milk.jpg">
-        <img src="../images/products/chocolate milk.jpg" alt="Fresh Vegetable Box" class="w-full h-32 object-cover">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Chocolate Milk</h3>
-          <p class="text-green-600 font-bold text-sm">₱55.00 per 250ml</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
-
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg relative block overflow-hidden" data-name="Ube Cheese Pandesal" data-price="₱50.00" data-img="../images/products/ube cheese pandesal.jpg">
-        <img src="../images/products/ube cheese pandesal.jpg" alt="Tomato" class="w-full h-32 object-cover">
-        <div class="p-4">
-          <h3 class="mt-2 font-semibold text-sm">Ube Cheese Pandesal</h3>
-          <p class="text-green-600 font-bold text-sm">₱50.00 per 5 pcs</p>
-        </div>
-        <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white absolute bottom-3 right-3 shadow transition" title="Add to cart">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </a>
+    <div class="flex justify-center mt-6">
+      <a href="products.php" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow">See More</a>
     </div>
   </section>
+  
 
   <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
     <h2 class="section-heading text-2xl font-bold mb-6">Explore Other Shops</h2>
@@ -999,5 +869,19 @@ if ($user_id) {
     });
   </script>
   <script src="../assets/js/profile-sync.js"></script>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+      <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+      <div class="flex justify-center gap-4">
+        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+        <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

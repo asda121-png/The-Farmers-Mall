@@ -13,12 +13,14 @@ $shop_name = $_GET['shop'] ?? '';
 
 // Fetch profile picture from database
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 
@@ -62,78 +64,7 @@ if ($shop_name) {
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-<header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <a href="user-homepage.php" class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-leaf text-white text-lg"></i>
-            </div>
-            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
-        </a>
-
-        <!-- Search -->
-        <div class="flex-1 mx-6">
-            <form action="products.php" method="GET">
-                <input 
-                    type="text" 
-                    name="search"
-                    placeholder="Search for fresh produce, dairy, and more..."
-                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-            </form>
-        </div>
-
-        <!-- Icons & Profile Dropdown -->
-        <div class="flex items-center space-x-6">
-            <a href="user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-            <a href="cart.php" class="text-gray-600 relative">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-            </a>
-
-            <!-- Profile Dropdown -->
-            <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
-                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
-                             alt="Profile" 
-                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
-                    <?php else: ?>
-                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    <?php endif; ?>
-                </button>
-
-                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
-            </div>
-            <!-- End Profile Dropdown -->
-
-        </div>
-    </div>
-</header>
-
-<!-- Dropdown JS -->
-<script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
-    });
-</script>
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
   <!-- Toast Notification Container -->
@@ -238,19 +169,22 @@ if ($shop_name) {
                     <span class="text-sm text-gray-500">per <?php echo htmlspecialchars($product['unit']); ?></span>
                   <?php endif; ?>
                 </div>
-                
-                <?php if ($product['stock_quantity'] > 0): ?>
-                  <button onclick="addToCart(event, '<?php echo htmlspecialchars($product['id']); ?>')" 
-                          class="w-full mt-4 bg-green-600 text-white py-2 rounded-full hover:bg-green-700 transition">
-                    <i class="fas fa-cart-plus mr-2"></i>Add to Cart
-                  </button>
-                <?php else: ?>
-                  <button class="w-full mt-4 bg-gray-300 text-gray-600 py-2 rounded-full cursor-not-allowed" disabled>
-                    Out of Stock
-                  </button>
-                <?php endif; ?>
               </div>
             </a>
+            
+            <!-- Add to Cart button outside the link -->
+            <div class="px-4 pb-4">
+              <?php if ($product['stock_quantity'] > 0): ?>
+                <button onclick="addToCart(event, '<?php echo htmlspecialchars($product['id']); ?>')" 
+                        class="w-full bg-green-600 text-white py-2 rounded-full hover:bg-green-700 transition">
+                  <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                </button>
+              <?php else: ?>
+                <button class="w-full bg-gray-300 text-gray-600 py-2 rounded-full cursor-not-allowed" disabled>
+                  Out of Stock
+                </button>
+              <?php endif; ?>
+            </div>
           </div>
         <?php endforeach; ?>
       </div>

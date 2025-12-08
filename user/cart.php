@@ -7,12 +7,14 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $user_id = $_SESSION['user_id'] ?? null;
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 ?>
@@ -60,90 +62,20 @@ if ($user_id) {
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
 
- <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <a href="user-homepage.php" class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-leaf text-white text-lg"></i>
-            </div>
-            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
-        </a>
-
-        <!-- Search -->
-        <div class="flex-1 mx-6">
-            <form action="products.php" method="GET">
-                <input 
-                    type="text" 
-                    name="search"
-                    placeholder="Search for fresh produce, dairy, and more..."
-                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-            </form>
-        </div>
-
-        <!-- Icons & Profile Dropdown -->
-        <div class="flex items-center space-x-6">
-            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-            <a href="cart.php" class="text-gray-600 relative">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
-
-            <!-- Profile Dropdown -->
-            <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
-                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
-                             alt="Profile" 
-                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
-                    <?php else: ?>
-                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    <?php endif; ?>
-                </button>
-
-                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
-            </div>
-            <!-- End Profile Dropdown -->
-
-        </div>
-    </div>
-</header>
-
-<!-- Dropdown JS -->
-<script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
-    });
-</script>
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
      
   <!-- Main Cart Section -->
   <main class="max-w-7xl mx-auto p-4 md:p-6 mt-6 flex-grow w-full mb-20 md:mb-96">
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-      <div class="flex items-center space-x-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 items-start mb-6 gap-4">
+      <div class="col-span-2 flex items-center space-x-4">
         <button onclick="window.history.back()" class="text-gray-500 hover:text-gray-800 transition">
           <i class="fa-solid fa-arrow-left text-xl"></i>
         </button>
         <h2 class="text-xl md:text-2xl font-semibold">Your Shopping Cart (<span id="cartCount">0</span>)</h2>
       </div>
-      <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+      <div class="flex items-center gap-2 md:gap-4 justify-end">
         <a href="products.php" class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center gap-2">
           <i class="fa-solid fa-plus"></i>
           <span class="hidden sm:inline">Continue Shopping</span>
@@ -158,9 +90,16 @@ if ($user_id) {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
       <!-- LEFT: Cart Items -->
-      <section id="cartItems" class="lg:col-span-2 space-y-4">
-        <!-- Cart items will be dynamically inserted here by cart.js -->
-      </section>
+      <div class="lg:col-span-2">
+        <div class="flex items-center mb-4 pl-4">
+          <input id="selectAllCheckbox" type="checkbox" class="w-5 h-5 rounded border-gray-300 cursor-pointer accent-green-600 mr-2" />
+          <label for="selectAllCheckbox" class="text-green-600 font-medium">Select All</label>
+        </div>
+
+        <section id="cartItems" class="space-y-4">
+          <!-- Cart items will be dynamically inserted here by cart.js -->
+        </section>
+      </div>
 
       <!-- RIGHT: Order Summary -->
       <aside class="bg-white shadow-sm p-4 md:p-6 rounded-xl h-fit sticky top-4">
@@ -186,12 +125,12 @@ if ($user_id) {
           <span id="total" class="text-green-600">₱0.00</span>
         </div>
 
-        <a href="paymentmethod.php" id="checkoutBtn"
-           class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg">
+        <button id="checkoutBtn"
+           class="block text-center bg-green-600 w-full text-white py-3 rounded-lg mt-6 font-medium hover:bg-green-700 transition shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-600">
           <i class="fa-solid fa-lock mr-2"></i>
-          Proceed to Checkout
+          Select items to checkout
           <i class="fa-solid fa-arrow-right ml-2"></i>
-        </a>
+        </button>
         
         <div class="mt-4 text-center space-y-2">
           <a href="products.php" class="text-sm text-gray-600 hover:text-green-600 transition block md:hidden">
@@ -433,7 +372,38 @@ if ($user_id) {
     window.addEventListener('profileUpdated', () => {
       loadUserProfile();
     });
+
+    // Logout Modal Logic
+    const logoutLink = document.getElementById('logoutLink');
+    const logoutModal = document.getElementById('logoutModal');
+    const cancelLogout = document.getElementById('cancelLogout');
+
+    if (logoutLink) {
+      logoutLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutModal.classList.remove('hidden');
+      });
+    }
+
+    if (cancelLogout) {
+      cancelLogout.addEventListener('click', () => {
+        logoutModal.classList.add('hidden');
+      });
+    }
   </script>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+      <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+      <div class="flex justify-center gap-4">
+        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+        <a href="../auth/logout.php" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+      </div>
+    </div>
+  </div>
 
 </body>
 

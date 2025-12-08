@@ -7,12 +7,14 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $user_id = $_SESSION['user_id'] ?? null;
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 ?>
@@ -26,81 +28,23 @@ if ($user_id) {
   <!-- Tailwind + Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .notification-dropdown { position: absolute; top: 100%; right: 0; margin-top: 8px; width: 320px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 50; max-height: 400px; overflow-y: auto; }
+    .notification-item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; cursor: pointer; }
+    .notification-item:hover { background-color: #f9f9f9; }
+    .notification-item.unread { background-color: #f0f9f5; border-left: 4px solid #4CAF50; }
+    .notification-item-title { font-weight: 600; color: #333; font-size: 14px; margin-bottom: 4px; }
+    .notification-item-message { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .notification-item-time { font-size: 11px; color: #999; }
+    .notification-empty { padding: 24px 16px; text-align: center; color: #999; font-size: 14px; }
+    .notification-header { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .notification-clear-btn { font-size: 12px; color: #2E7D32; cursor: pointer; background: none; border: none; }
+    .notification-clear-btn:hover { color: #1B5E20; }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-  <!-- Navbar -->
- <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <a href="user-homepage.php" class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-leaf text-white text-lg"></i>
-            </div>
-            <span class="text-xl font-bold" style="color: #2E7D32;">Farmers Mall</span>
-        </a>
-
-        <!-- Search -->
-        <div class="flex-1 mx-6">
-            <form action="products.php" method="GET">
-                <input 
-                    type="text" 
-                    name="search"
-                    placeholder="Search for fresh produce, dairy, and more..."
-                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-            </form>
-        </div>
-
-        <!-- Icons & Profile Dropdown -->
-        <div class="flex items-center space-x-6">
-            <a href="../user/user-homepage.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-            <a href="message.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-            <a href="notification.php" class="text-gray-600"><i class="fa-regular fa-bell"></i></a>
-            <a href="cart.php" class="text-gray-600 relative">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
-
-            <!-- Profile Dropdown -->
-            <div class="relative inline-block text-left">
-                <button id="profileDropdownBtn" class="flex items-center">
-                    <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                        <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" 
-                             alt="Profile" 
-                             class="w-8 h-8 rounded-full cursor-pointer object-cover">
-                    <?php else: ?>
-                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    <?php endif; ?>
-                </button>
-
-                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                    <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                    <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                    <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
-            </div>
-            <!-- End Profile Dropdown -->
-
-        </div>
-    </div>
-</header>
-
-<!-- Dropdown JS -->
-<script>
-    const btn = document.getElementById('profileDropdownBtn');
-    const menu = document.getElementById('profileDropdown');
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', () => {
-        menu.classList.add('hidden');
-    });
-</script>
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
   <!-- Main Messaging Section -->
@@ -280,7 +224,39 @@ if ($user_id) {
         loadUserProfile();
       });
     });
+
+    // Logout Modal Logic
+    const logoutLink = document.getElementById('logoutLink');
+    const logoutModal = document.getElementById('logoutModal');
+    const cancelLogout = document.getElementById('cancelLogout');
+
+    if (logoutLink) {
+      logoutLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutModal.classList.remove('hidden');
+      });
+    }
+
+    if (cancelLogout) {
+      cancelLogout.addEventListener('click', () => {
+        logoutModal.classList.add('hidden');
+      });
+    }
   </script>
   <script src="../assets/js/profile-sync.js"></script>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+      <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+      <div class="flex justify-center gap-4">
+        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+        <a href="../auth/logout.php" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
