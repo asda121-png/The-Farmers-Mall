@@ -22,6 +22,7 @@ if ($user_id) {
         $profile_picture = $user['profile_picture'] ?? '';
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

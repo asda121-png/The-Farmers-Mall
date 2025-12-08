@@ -41,6 +41,22 @@ if ($shop_name) {
         $products = $api->select('products', ['retailer_id' => $retailer_id, 'status' => 'active']);
     }
 }
+
+// Helper function to resolve image path (same as user-homepage.php)
+function resolveImagePath($img) {
+    if (empty($img)) return '../images/products/placeholder.png';
+    if (preg_match('#^https?://#i', $img)) return $img;
+    if (strpos($img, '../') === 0) return $img;
+    if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
+    if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
+    return '../' . $img;
+}
+
+// Helper function to get product image from various possible field names
+function getProductImage($product) {
+    $img = $product['image'] ?? $product['image_url'] ?? $product['product_image'] ?? $product['image_path'] ?? '';
+    return resolveImagePath($img);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -138,17 +154,12 @@ if ($shop_name) {
           <div class="product-card bg-white rounded-lg shadow overflow-hidden">
             <a href="product-details.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="block">
               <div class="relative">
-                <?php if (!empty($product['image_url'])): ?>
-                  <img src="<?php echo htmlspecialchars('../' . $product['image_url']); ?>" 
-                       alt="<?php echo htmlspecialchars($product['name']); ?>" 
-                       class="w-full h-48 object-cover"
-                       onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
-                       loading="lazy">
-                <?php else: ?>
-                  <img src="https://via.placeholder.com/300x200?text=Product+Image" 
-                       alt="<?php echo htmlspecialchars($product['name']); ?>" 
-                       class="w-full h-48 object-cover">
-                <?php endif; ?>
+                <?php $productImg = getProductImage($product); ?>
+                <img src="<?php echo htmlspecialchars($productImg); ?>" 
+                     alt="<?php echo htmlspecialchars($product['name']); ?>" 
+                     class="w-full h-48 object-cover"
+                     onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
+                     loading="lazy">
                 
                 <?php if ($product['stock_quantity'] <= 0): ?>
                   <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
