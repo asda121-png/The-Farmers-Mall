@@ -265,10 +265,33 @@ $filter = $_GET['filter'] ?? 'all';
 
                         <!-- Order Items -->
                         <div class="space-y-4 mb-4">
-                            <?php foreach ($order_items as $item): ?>
+                            <?php foreach ($order_items as $item): 
+                                // Resolve image path
+                                $image_path = $item['product_image_url'] ?? $item['image'] ?? $item['image_url'] ?? '';
+                                if (!empty($image_path)) {
+                                    // If already has http/https, use as is
+                                    if (strpos($image_path, 'http://') === 0 || strpos($image_path, 'https://') === 0) {
+                                        $image_src = $image_path;
+                                    }
+                                    // If already has ../, use as is
+                                    elseif (strpos($image_path, '../') === 0) {
+                                        $image_src = $image_path;
+                                    }
+                                    // If starts with images/, add ../
+                                    elseif (strpos($image_path, 'images/') === 0) {
+                                        $image_src = '../' . $image_path;
+                                    }
+                                    else {
+                                        $image_src = $image_path;
+                                    }
+                                } else {
+                                    $image_src = '../images/products/placeholder.png';
+                                }
+                            ?>
                                 <div class="flex gap-4">
-                                    <img src="<?php echo htmlspecialchars($item['product_image_url'] ?? '../images/products/placeholder.png'); ?>" 
+                                    <img src="<?php echo htmlspecialchars($image_src); ?>" 
                                          alt="<?php echo htmlspecialchars($item['product_name']); ?>" 
+                                         onerror="this.src='../images/products/placeholder.png'"
                                          class="w-20 h-20 object-cover rounded-lg">
                                     <div class="flex-1">
                                         <h4 class="font-semibold text-gray-800"><?php echo htmlspecialchars($item['product_name']); ?></h4>
@@ -476,10 +499,26 @@ $filter = $_GET['filter'] ?? 'all';
                             <div class="border-t pt-4">
                                 <h4 class="font-semibold mb-3">Order Items</h4>
                                 <div class="space-y-3">
-                                    ${items.map(item => `
+                                    ${items.map(item => {
+                                        // Resolve image path in JavaScript
+                                        let imageSrc = item.product_image_url || item.image || item.image_url || '';
+                                        if (imageSrc) {
+                                            if (imageSrc.startsWith('http://') || imageSrc.startsWith('https://')) {
+                                                // Already absolute URL
+                                            } else if (imageSrc.startsWith('../')) {
+                                                // Already relative path
+                                            } else if (imageSrc.startsWith('images/')) {
+                                                imageSrc = '../' + imageSrc;
+                                            }
+                                        } else {
+                                            imageSrc = '../images/products/placeholder.png';
+                                        }
+                                        
+                                        return `
                                         <div class="flex gap-3 p-3 bg-gray-50 rounded-lg">
-                                            <img src="${item.product_image_url || '../images/products/placeholder.png'}" 
+                                            <img src="${imageSrc}" 
                                                  alt="${item.product_name}" 
+                                                 onerror="this.src='../images/products/placeholder.png'"
                                                  class="w-16 h-16 object-cover rounded">
                                             <div class="flex-1">
                                                 <p class="font-medium">${item.product_name}</p>
@@ -489,7 +528,8 @@ $filter = $_GET['filter'] ?? 'all';
                                                 <p class="font-semibold text-green-700">₱${parseFloat(item.subtotal).toFixed(2)}</p>
                                             </div>
                                         </div>
-                                    `).join('')}
+                                        `;
+                                    }).join('')}
                                 </div>
                             </div>
                             

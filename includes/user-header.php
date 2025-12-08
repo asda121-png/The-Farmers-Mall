@@ -139,8 +139,8 @@ if (in_array($current_dir, $subdirectories)) {
               <a href="<?php echo $base; ?>user/profile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
                 <i class="fas fa-user mr-2 text-gray-400"></i> My Account
               </a>
-              <a href="<?php echo $base; ?>user/profile.php#order-history" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                <i class="fas fa-box mr-2 text-gray-400"></i> My Purchase
+              <a href="<?php echo $base; ?>user/my-purchases.php" class="block px-4 py-2 text-green-600 hover:bg-gray-100 transition font-medium">
+                <i class="fas fa-shopping-bag mr-2"></i> My Purchases
               </a>
               <div class="border-t border-gray-100 my-1"></div>
               <a href="<?php echo $base; ?>auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
