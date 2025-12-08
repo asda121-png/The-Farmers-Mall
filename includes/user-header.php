@@ -143,7 +143,7 @@ if (in_array($current_dir, $subdirectories)) {
                 <i class="fas fa-box mr-2 text-gray-400"></i> My Purchase
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a href="<?php echo $base; ?>auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
+              <a href="<?php echo $base; ?>public/index.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
               </a>
             </div>
