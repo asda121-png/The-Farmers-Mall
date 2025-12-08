@@ -31,7 +31,16 @@ if ($user_id) {
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="../assets/css/productdetails.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
   <style>
+    /* Fresh Vegetable Bundle Font Style */
+    .fresh-title-font {
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
     /* Product card styling matching User Homepage */
     .product-card {
       display: flex;
@@ -97,12 +106,12 @@ if ($user_id) {
 
     <aside class="col-span-1 bg-white p-6 rounded-lg shadow-sm h-fit">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg">Filters</h2>
+        <h2 class="font-bold text-base fresh-title-font">Filters</h2>
         <button id="clearFilters" class="text-green-600 text-sm font-medium hover:underline">Clear All</button>
       </div>
 
       <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Categories</h3>
+        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Categories</h3>
         <ul class="space-y-2 text-sm text-gray-700">
           <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="vegetables">Vegetables (124)</label></li>
           <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="fruits">Fruits (89)</label></li>
@@ -114,14 +123,14 @@ if ($user_id) {
       </div>
 
       <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Organic</h3>
+        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Organic</h3>
         <label class="text-sm text-gray-700 inline-flex items-center">
           <input id="organicOnly" type="checkbox" class="mr-2">Organic Only
         </label>
       </div>
 
       <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Price Range</h3>
+        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Price Range</h3>
         <div class="flex items-center space-x-2 mb-2">
           <input id="minPrice" type="number" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
           <span>-</span>
@@ -141,7 +150,7 @@ if ($user_id) {
           <a href="user-homepage.php" class="flex items-center text-green-600 hover:text-green-700 font-medium text-xl">
             <i class="fa-solid fa-arrow-left"></i>
           </a>
-          <h2 class="text-xl font-semibold">All Products</h2>
+          <h2 class="text-lg font-bold fresh-title-font">All Products</h2>
         </div>
         <div class="flex items-center space-x-2">
           <label class="text-sm text-gray-600">Sort by:</label>
@@ -228,7 +237,7 @@ if ($user_id) {
           <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-40 object-cover">
           <div>
             <div class="w-full">
-                <h3 class="mt-2 font-bold text-lg leading-tight mb-1"><?php echo $name; ?></h3>
+                <h3 class="mt-2 font-bold text-sm leading-tight mb-1"><?php echo $name; ?></h3>
                 <p class="text-xs text-gray-500 mb-2"><?php echo ucfirst($category); ?></p>
             </div>
 

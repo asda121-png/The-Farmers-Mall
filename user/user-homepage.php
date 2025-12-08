@@ -33,7 +33,16 @@ if ($user_id) {
   <title>Farmers Mall - Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
   <style>
+    /* New Class for Fresh Vegetable Bundle Font Style */
+    .fresh-font {
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
     .category-text {
         margin-top: 0.5rem; /* Adjusts spacing to the upper */
     }
@@ -444,7 +453,7 @@ if ($user_id) {
     <div class="hero-slide active" style="background-image: url('../images/img.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Fresh Harvest Sale</h2>
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Fresh Harvest Sale</h2>
           <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
           <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
@@ -456,7 +465,7 @@ if ($user_id) {
     <div class="hero-slide" style="background-image: url('../images/img1.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Farm Fresh Daily</h2>
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Farm Fresh Daily</h2>
           <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
           <a href="../user/products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
@@ -468,7 +477,7 @@ if ($user_id) {
     <div class="hero-slide" style="background-image: url('../images/img2.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Premium Quality</h2>
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Premium Quality</h2>
           <p class="text-lg md:text-xl mb-6">Fresh ingredients delivered to your door</p>
           <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
@@ -486,7 +495,7 @@ if ($user_id) {
 
   <section class="w-full mx-auto px-0 py-10 bg-[#FFFFFF] mb-10">
     <div class="flex justify-center mb-8">
-      <h2 class="section-heading text-2xl font-bold">Shop by Category</h2>
+      <h2 class="section-heading text-2xl font-bold fresh-font">Shop by Category</h2>
     </div>
     <div class="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto px-6">
       <a href="products.php?category=vegetables" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
@@ -517,7 +526,7 @@ if ($user_id) {
   </section>
 
   <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
-    <h2 class="section-heading text-2xl font-bold mb-6">Explore Other Shops</h2>
+    <h2 class="section-heading text-2xl font-bold mb-6 fresh-font">Explore Other Shops</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <a href="shop-products.php?shop=Mesa Farm" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="../images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
@@ -558,7 +567,7 @@ if ($user_id) {
   </section>
   <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold">Top Products</h2>
+      <h2 class="section-heading text-2xl font-bold fresh-font">Top Products</h2>
     </div>
     <?php
     // Fetch products from Supabase
@@ -632,7 +641,7 @@ if ($user_id) {
 
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold">All Products</h2>
+      <h2 class="section-heading text-2xl font-bold fresh-font">All Products</h2>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
