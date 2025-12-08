@@ -12,12 +12,14 @@ $user_id = $_SESSION['user_id'] ?? null;
 
 // Fetch profile picture from database
 $profile_picture = '';
+$full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
     require_once __DIR__ . '/../config/supabase-api.php';
+    require_once __DIR__ . '/../config/uuid-helper.php';
     $api = getSupabaseAPI();
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $profile_picture = $users[0]['profile_picture'] ?? '';
+    $user = safeGetUser($user_id, $api);
+    if ($user) {
+        $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 ?>
@@ -49,8 +51,7 @@ if ($user_id) {
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-  <!-- Header -->
-  <header class="bg-white shadow-sm">
+<?php include __DIR__ . '/../includes/user-header.php'; ?>
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <!-- Logo -->
         <a href="user-homepage.php" class="flex items-center gap-2">
@@ -109,6 +110,7 @@ if ($user_id) {
 
                 <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
                     <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                    <a href="my-purchases.php" class="block px-4 py-2 hover:bg-gray-100 text-green-600 font-medium">My Purchases</a>
                     <a href="profile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
                     <a href="../auth/login.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                 </div>
