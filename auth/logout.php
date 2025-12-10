@@ -14,8 +14,8 @@ session_destroy();
     <script>
         // Clear localStorage cart data on logout
         localStorage.removeItem('cart');
-        // Redirect to login page
-        window.location.href = 'login.php?logout=success';
+        // Redirect to public index page
+        window.location.href = '../public/index.php';
     </script>
 </body>
 </html>
