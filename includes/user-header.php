@@ -86,11 +86,32 @@ if (in_array($current_dir, $subdirectories)) {
           <i class="fa-solid fa-house text-xl"></i>
         </a>
 
-        <!-- Notifications Icon -->
-        <a href="<?php echo $base; ?>user/notification.php" class="text-gray-600 hover:text-green-600 transition relative" title="Notifications">
-          <i class="fa-regular fa-bell text-xl"></i>
-          <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
-        </a>
+        <!-- Notifications Icon with Hover Preview -->
+        <div class="relative" id="notificationPreviewContainer">
+          <a href="<?php echo $base; ?>user/notification.php" class="text-gray-600 hover:text-green-600 transition relative" title="Notifications" id="notificationIcon">
+            <i class="fa-regular fa-bell text-xl"></i>
+            <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
+          </a>
+          
+          <!-- Notification Preview Dropdown -->
+          <div id="notificationPreview" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+            <div class="p-4 border-b border-gray-100">
+              <h3 class="font-semibold text-gray-800">Notifications</h3>
+            </div>
+            <div id="notificationPreviewItems" class="max-h-96 overflow-y-auto">
+              <!-- Notifications will be loaded here -->
+              <div class="p-8 text-center text-gray-500">
+                <i class="fas fa-bell text-4xl mb-2 text-gray-300"></i>
+                <p class="text-sm">No notifications</p>
+              </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50">
+              <a href="<?php echo $base; ?>user/notification.php" class="block w-full bg-green-600 text-white text-center py-2 rounded-lg hover:bg-green-700 transition font-medium">
+                View All Notifications
+              </a>
+            </div>
+          </div>
+        </div>
 
         <!-- Cart Icon with Hover Preview -->
         <div class="relative" id="cartPreviewContainer">
@@ -143,7 +164,7 @@ if (in_array($current_dir, $subdirectories)) {
                 <i class="fas fa-shopping-bag mr-2"></i> My Purchases
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a href="<?php echo $base; ?>auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
+              <a href="<?php echo $base; ?>public/index.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
               </a>
             </div>
@@ -264,18 +285,34 @@ if (in_array($current_dir, $subdirectories)) {
           
           // Update preview
           if (cartPreviewItems) {
-            cartPreviewItems.innerHTML = data.items.slice(0, 5).map(item => `
+            cartPreviewItems.innerHTML = data.items.slice(0, 5).map(item => {
+              // Resolve image path - use image_url, image, or product_image_url
+              let imageSrc = item.image_url || item.image || item.product_image_url || '../images/products/placeholder.png';
+              
+              // Ensure proper path resolution
+              if (imageSrc && !imageSrc.startsWith('http://') && !imageSrc.startsWith('https://')) {
+                // If path doesn't start with ../, add it
+                if (!imageSrc.startsWith('../') && !imageSrc.startsWith('/')) {
+                  imageSrc = '../' + imageSrc;
+                }
+              }
+              
+              const productName = item.product_name || item.name || 'Product';
+              
+              return `
               <div class="flex items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50">
-                <img src="${item.product_image_url || '../images/products/placeholder.png'}" 
-                     alt="${escapeHtml(item.product_name)}" 
-                     class="w-16 h-16 rounded object-cover">
+                <img src="${imageSrc}" 
+                     alt="${escapeHtml(productName)}" 
+                     class="w-16 h-16 rounded object-cover"
+                     onerror="this.src='${basePath}images/products/placeholder.png'">
                 <div class="flex-1 min-w-0">
-                  <p class="font-medium text-sm text-gray-800 truncate">${escapeHtml(item.product_name)}</p>
-                  <p class="text-xs text-gray-500">Qty: ${item.quantity}</p>
+                  <p class="font-medium text-sm text-gray-800 truncate">${escapeHtml(productName)}</p>
+                  <p class="text-xs text-gray-500">Qty: ${item.quantity || 1}</p>
                   <p class="text-green-600 font-semibold text-sm">₱${parseFloat(item.price || 0).toFixed(2)}</p>
                 </div>
               </div>
-            `).join('') + 
+            `;
+            }).join('') + 
             (data.items.length > 5 ? `
               <div class="p-3 text-center text-sm text-gray-500 border-t border-gray-100">
                 +${data.items.length - 5} more item(s)
@@ -292,18 +329,32 @@ if (in_array($current_dir, $subdirectories)) {
               cartBadge.classList.remove('hidden');
             }
             if (cartPreviewItems) {
-              cartPreviewItems.innerHTML = localCart.slice(0, 5).map(item => `
+              cartPreviewItems.innerHTML = localCart.slice(0, 5).map(item => {
+                // Resolve image path for localStorage items
+                let imageSrc = item.image || item.image_url || '../images/products/placeholder.png';
+                
+                // Ensure proper path resolution
+                if (imageSrc && !imageSrc.startsWith('http://') && !imageSrc.startsWith('https://')) {
+                  // If path doesn't start with ../, add it
+                  if (!imageSrc.startsWith('../') && !imageSrc.startsWith('/')) {
+                    imageSrc = '../' + imageSrc;
+                  }
+                }
+                
+                return `
                 <div class="flex items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50">
-                  <img src="${item.image || '../images/products/placeholder.png'}" 
+                  <img src="${imageSrc}" 
                        alt="${escapeHtml(item.name || 'Product')}" 
-                       class="w-16 h-16 rounded object-cover">
+                       class="w-16 h-16 rounded object-cover"
+                       onerror="this.src='${basePath}images/products/placeholder.png'">
                   <div class="flex-1 min-w-0">
                     <p class="font-medium text-sm text-gray-800 truncate">${escapeHtml(item.name || 'Product')}</p>
                     <p class="text-xs text-gray-500">Qty: ${item.quantity || 1}</p>
                     <p class="text-green-600 font-semibold text-sm">₱${parseFloat(item.price || 0).toFixed(2)}</p>
                   </div>
                 </div>
-              `).join('') + 
+              `;
+              }).join('') + 
               (localCart.length > 5 ? `
                 <div class="p-3 text-center text-sm text-gray-500 border-t border-gray-100">
                   +${localCart.length - 5} more item(s)
@@ -355,15 +406,140 @@ if (in_array($current_dir, $subdirectories)) {
     }
   }
   
+  // Load notification preview
+  function loadNotificationPreview() {
+    const notificationPreviewItems = document.getElementById('notificationPreviewItems');
+    const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+    
+    if (!notificationPreviewItems) return;
+    
+    // Sort notifications by time (newest first)
+    const sortedNotifications = [...notifications].sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.time || 0).getTime();
+      const timeB = new Date(b.timestamp || b.time || 0).getTime();
+      return timeB - timeA;
+    });
+    
+    if (sortedNotifications.length === 0) {
+      notificationPreviewItems.innerHTML = `
+        <div class="p-8 text-center text-gray-500">
+          <i class="fas fa-bell text-4xl mb-2 text-gray-300"></i>
+          <p class="text-sm">No notifications</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Show only the 5 most recent notifications
+    const recentNotifications = sortedNotifications.slice(0, 5);
+    
+    notificationPreviewItems.innerHTML = recentNotifications.map(notif => {
+      const isUnread = !notif.read;
+      const unreadClass = isUnread ? 'bg-green-50 border-l-4 border-green-500' : '';
+      const time = notif.timestamp || notif.time || Date.now();
+      const timeAgo = getTimeAgo(new Date(time));
+      
+      // Get icon and color classes based on notification type
+      let iconClass = 'fa-info-circle';
+      let iconBgClass = 'bg-blue-100';
+      let iconTextClass = 'text-blue-700';
+      if (notif.type === 'order' || notif.type === 'order_placed') {
+        iconClass = 'fa-box';
+        iconBgClass = 'bg-green-100';
+        iconTextClass = 'text-green-700';
+      } else if (notif.type === 'stock') {
+        iconClass = 'fa-exclamation-triangle';
+        iconBgClass = 'bg-yellow-100';
+        iconTextClass = 'text-yellow-700';
+      } else if (notif.type === 'review') {
+        iconClass = 'fa-star';
+        iconBgClass = 'bg-yellow-100';
+        iconTextClass = 'text-yellow-700';
+      } else if (notif.type === 'message') {
+        iconClass = 'fa-comment';
+        iconBgClass = 'bg-blue-100';
+        iconTextClass = 'text-blue-700';
+      } else if (notif.type === 'payment') {
+        iconClass = 'fa-money-bill';
+        iconBgClass = 'bg-green-100';
+        iconTextClass = 'text-green-700';
+      }
+      
+      const title = escapeHtml(notif.title || 'Notification');
+      const message = escapeHtml(notif.message || '');
+      const link = notif.link || '<?php echo $base; ?>user/notification.php';
+      
+      return `
+        <a href="${link}" class="block p-3 border-b border-gray-100 hover:bg-gray-50 transition ${unreadClass}">
+          <div class="flex items-start gap-3">
+            <div class="${iconBgClass} ${iconTextClass} p-2 rounded-full flex-shrink-0">
+              <i class="fas ${iconClass} text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-800 text-sm truncate">${title}</p>
+              <p class="text-xs text-gray-500 mt-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${message}</p>
+              <span class="text-xs text-gray-400 block mt-1">${timeAgo}</span>
+            </div>
+            ${isUnread ? '<div class="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>' : ''}
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+  
+  // Helper function to format time ago
+  function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    return date.toLocaleDateString();
+  }
+  
   // Hover delay management for dropdowns
   let profileDropdownTimeout = null;
   let cartPreviewTimeout = null;
+  let notificationPreviewTimeout = null;
   const HOVER_DELAY = 200; // milliseconds delay before hiding
   
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', function() {
     loadCartPreview();
     loadNotificationBadge();
+    loadNotificationPreview();
+    
+    // Notification preview hover handlers
+    const notificationContainer = document.getElementById('notificationPreviewContainer');
+    const notificationPreview = document.getElementById('notificationPreview');
+    const notificationIcon = document.getElementById('notificationIcon');
+    
+    if (notificationContainer && notificationPreview && notificationIcon) {
+      // Show preview on hover
+      notificationContainer.addEventListener('mouseenter', function() {
+        clearTimeout(notificationPreviewTimeout);
+        loadNotificationPreview(); // Refresh notifications when hovering
+        notificationPreview.classList.remove('hidden');
+      });
+      
+      // Hide preview with delay on mouse leave
+      notificationContainer.addEventListener('mouseleave', function() {
+        notificationPreviewTimeout = setTimeout(function() {
+          notificationPreview.classList.add('hidden');
+        }, HOVER_DELAY);
+      });
+      
+      // Keep preview visible when hovering over it
+      notificationPreview.addEventListener('mouseenter', function() {
+        clearTimeout(notificationPreviewTimeout);
+      });
+      
+      notificationPreview.addEventListener('mouseleave', function() {
+        notificationPreviewTimeout = setTimeout(function() {
+          notificationPreview.classList.add('hidden');
+        }, HOVER_DELAY);
+      });
+    }
     
     // Profile dropdown hover handlers
     const profileContainer = document.getElementById('profileDropdownContainer');
@@ -437,6 +613,10 @@ if (in_array($current_dir, $subdirectories)) {
     if (e.key === 'cart') {
       loadCartPreview();
     }
+    if (e.key === 'userNotifications') {
+      loadNotificationBadge();
+      loadNotificationPreview();
+    }
   });
 })();
 </script>
@@ -446,7 +626,8 @@ if (in_array($current_dir, $subdirectories)) {
 /* Smooth transitions */
 #autocompleteDropdown,
 #profileDropdown,
-#cartPreview {
+#cartPreview,
+#notificationPreview {
   animation: fadeIn 0.2s ease-out;
 }
 

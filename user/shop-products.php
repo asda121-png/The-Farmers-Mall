@@ -41,6 +41,22 @@ if ($shop_name) {
         $products = $api->select('products', ['retailer_id' => $retailer_id, 'status' => 'active']);
     }
 }
+
+// Helper function to resolve image path
+function resolveImagePath($img) {
+    if (empty($img)) return '../images/products/placeholder.png';
+    if (preg_match('#^https?://#i', $img)) return $img;
+    if (strpos($img, '../') === 0) return $img;
+    if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
+    if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
+    return '../' . $img;
+}
+
+// Helper function to get product image
+function getProductImage($product) {
+    $img = $product['image'] ?? $product['image_url'] ?? $product['product_image'] ?? $product['image_path'] ?? '';
+    return resolveImagePath($img);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,16 +65,35 @@ if ($shop_name) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title><?php echo htmlspecialchars($shop_name); ?> - Farmers Mall</title>
 
-  <!-- Tailwind + Font Awesome (CDN as in your project) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
+    /* Product card transition - Matching User Homepage */
     .product-card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      min-height: 24rem; /* Accommodate wrapping text */
+      border: 2px solid transparent;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      position: relative;
     }
+
     .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      border-color: #2E7D32;
+    }
+
+    /* Add to cart button styling */
+    .add-btn {
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 2;
+    }
+    .add-btn:hover {
+        transform: rotate(90deg) scale(1.2);
+        box-shadow: 0 4px 15px rgba(46, 125, 50, 0.5);
+    }
+    .add-btn:active {
+        transform: rotate(90deg) scale(0.9);
     }
   </style>
 </head>
@@ -67,10 +102,8 @@ if ($shop_name) {
 <?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
-  <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
 
-  <!-- Shop Header -->
   <?php if ($shop_info): ?>
   <section class="bg-white shadow-sm py-8">
     <div class="max-w-7xl mx-auto px-6">
@@ -98,9 +131,7 @@ if ($shop_name) {
   </section>
   <?php endif; ?>
 
-  <!-- Products Section -->
   <main class="flex-1 max-w-7xl mx-auto px-6 py-8">
-    <!-- Back Button -->
     <div class="mb-6">
       <a href="user-homepage.php" class="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium transition-colors">
         <i class="fas fa-arrow-left"></i>
@@ -134,64 +165,55 @@ if ($shop_name) {
 
       <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <?php foreach ($products as $product): ?>
-          <div class="product-card bg-white rounded-lg shadow overflow-hidden">
-            <a href="product-details.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="block">
-              <div class="relative">
-                <?php if (!empty($product['image_url'])): ?>
-                  <img src="<?php echo htmlspecialchars('../' . $product['image_url']); ?>" 
-                       alt="<?php echo htmlspecialchars($product['name']); ?>" 
-                       class="w-full h-48 object-cover"
-                       onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
-                       loading="lazy">
-                <?php else: ?>
-                  <img src="https://via.placeholder.com/300x200?text=Product+Image" 
-                       alt="<?php echo htmlspecialchars($product['name']); ?>" 
-                       class="w-full h-48 object-cover">
-                <?php endif; ?>
-                
-                <?php if ($product['stock_quantity'] <= 0): ?>
-                  <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <span class="text-white font-bold text-lg">Out of Stock</span>
-                  </div>
-                <?php endif; ?>
-              </div>
+          <a href="product-details.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="product-card bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden h-full">
+            <div class="relative">
+              <?php $productImg = getProductImage($product); ?>
+              <img src="<?php echo htmlspecialchars($productImg); ?>" 
+                   alt="<?php echo htmlspecialchars($product['name']); ?>" 
+                   class="w-full h-48 object-cover"
+                   onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
+                   loading="lazy">
               
-              <div class="p-4">
-                <h3 class="font-bold text-gray-800 text-lg mb-1 truncate"><?php echo htmlspecialchars($product['name']); ?></h3>
-                
-                <?php if (!empty($product['category'])): ?>
-                  <p class="text-xs text-gray-500 mb-2"><?php echo htmlspecialchars($product['category']); ?></p>
-                <?php endif; ?>
-                
-                <div class="flex items-center justify-between mt-3">
-                  <span class="text-green-600 font-bold text-xl">₱<?php echo number_format($product['price'], 2); ?></span>
-                  <?php if (!empty($product['unit'])): ?>
-                    <span class="text-sm text-gray-500">per <?php echo htmlspecialchars($product['unit']); ?></span>
-                  <?php endif; ?>
+              <?php if ($product['stock_quantity'] <= 0): ?>
+                <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <span class="text-white font-bold text-lg">Out of Stock</span>
                 </div>
-              </div>
-            </a>
-            
-            <!-- Add to Cart button outside the link -->
-            <div class="px-4 pb-4">
-              <?php if ($product['stock_quantity'] > 0): ?>
-                <button onclick="addToCart(event, '<?php echo htmlspecialchars($product['id']); ?>')" 
-                        class="w-full bg-green-600 text-white py-2 rounded-full hover:bg-green-700 transition">
-                  <i class="fas fa-cart-plus mr-2"></i>Add to Cart
-                </button>
-              <?php else: ?>
-                <button class="w-full bg-gray-300 text-gray-600 py-2 rounded-full cursor-not-allowed" disabled>
-                  Out of Stock
-                </button>
               <?php endif; ?>
             </div>
-          </div>
+            
+            <div class="p-4 flex flex-col flex-1">
+              <div class="flex justify-between items-start mt-2">
+                  <div class="flex-1 pr-2">
+                      <h3 class="font-bold text-lg leading-tight mb-1"><?php echo htmlspecialchars($product['name']); ?></h3>
+                      <p class="text-xs text-gray-500 mb-2"><?php echo htmlspecialchars($product['category'] ?? 'Other'); ?></p>
+                      <p class="text-green-600 font-bold text-lg">₱<?php echo number_format($product['price'], 2); ?></p>
+                  </div>
+                  
+                  <div class="flex flex-col items-center">
+                      <?php if ($product['stock_quantity'] > 0): ?>
+                        <button onclick="addToCart(event, '<?php echo htmlspecialchars($product['id']); ?>')" 
+                                class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0 mb-1" 
+                                title="Add to cart">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                      <?php else: ?>
+                        <button class="bg-gray-200 border border-gray-300 text-gray-400 rounded-full w-8 h-8 flex items-center justify-center cursor-not-allowed mb-1" disabled>
+                            <i class="fa-solid fa-ban"></i>
+                        </button>
+                      <?php endif; ?>
+                      
+                      <p class="text-xs text-gray-400 whitespace-nowrap">
+                          <?php echo ($product['units_sold'] ?? 0); ?> sold
+                      </p>
+                  </div>
+              </div>
+            </div>
+          </a>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
   </main>
 
-  <!-- Footer -->
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div>
@@ -237,23 +259,6 @@ if ($shop_name) {
   </footer>
 
   <script>
-    // Global search functionality
-    document.getElementById('globalSearch').addEventListener('input', function(e) {
-      const searchTerm = e.target.value.toLowerCase();
-      const productCards = document.querySelectorAll('.product-card');
-      
-      productCards.forEach(card => {
-        const productName = card.querySelector('h3').textContent.toLowerCase();
-        const category = card.querySelector('.text-xs.text-gray-500')?.textContent.toLowerCase() || '';
-        
-        if (productName.includes(searchTerm) || category.includes(searchTerm)) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-
     // Add to cart function with toast notification
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
@@ -283,11 +288,13 @@ if ($shop_name) {
       .then(response => response.json())
       .then(data => {
         const badge = document.getElementById('cartBadge');
-        if (data.count > 0) {
-          badge.textContent = data.count;
-          badge.classList.remove('hidden');
-        } else {
-          badge.classList.add('hidden');
+        if (badge) {
+            if (data.count > 0) {
+              badge.textContent = data.count;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
         }
       })
       .catch(error => console.error('Error updating cart badge:', error));
@@ -324,7 +331,7 @@ if ($shop_name) {
     }
 
     // Initialize cart badge on page load
-    updateCartBadge();
+    document.addEventListener('DOMContentLoaded', updateCartBadge);
   </script>
 
 </body>
