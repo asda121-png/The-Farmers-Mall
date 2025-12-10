@@ -158,9 +158,9 @@ try {
   </style>
 </head>
 
-<body class="flex min-h-screen bg-gray-50 text-gray-800">
+<body class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
 
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 overflow-y-auto">
     <div>
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
         <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
@@ -209,7 +209,7 @@ try {
     </div>
   </aside>
 
-  <div class="flex-1 p-6 space-y-6 custom-scrollbar">
+  <div class="flex-1 p-6 space-y-6 custom-scrollbar overflow-y-auto">
 
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
       <div class="relative w-full max-w-lg hidden md:block">
