@@ -22,6 +22,55 @@ if ($user_id) {
         $profile_picture = $user['profile_picture'] ?? '';
     }
 }
+
+// --- [NEW] Fetch Cart Items & Calculate Totals ---
+$cart_items_with_products = [];
+$subtotal = 0;
+$tax = 0;
+$tax_rate = 0.12; // 12% tax rate
+
+$total = 0;
+
+if ($user_id && isset($api)) {
+    try {
+        $cart_items = $api->select('cart', ['customer_id' => $user_id]);
+        
+        if (!empty($cart_items)) {
+            $product_ids = array_column($cart_items, 'product_id');
+            
+            if (!empty($product_ids)) {
+                $products_data = $api->select('products', ['id' => ['in', '(' . implode(',', $product_ids) . ')']]);
+                $products_map = array_column($products_data, null, 'id');
+                
+                foreach ($cart_items as $item) {
+                    if (isset($products_map[$item['product_id']])) {
+                        $prod = $products_map[$item['product_id']];
+                        $price = $prod['price'] ?? 0;
+                        $qty = $item['quantity'] ?? 1;
+                        $item_total = $price * $qty;
+                        
+                        $subtotal += $item_total;
+                        
+                        $cart_items_with_products[] = [
+                            'name' => $prod['name'],
+                            'image' => $prod['image_url'] ?? $prod['image'] ?? '',
+                            'price' => $price,
+                            'quantity' => $qty,
+                            'subtotal' => $item_total
+                        ];
+                    }
+                }
+            }
+        }
+        
+       
+        $tax = $subtotal * $tax_rate;
+        $total = $subtotal + $tax;
+        
+    } catch (Exception $e) {
+        error_log('Payment Page Cart Fetch Error: ' . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -167,15 +216,33 @@ if ($user_id) {
     <aside class="bg-white shadow-sm p-6 rounded-xl w-full lg:w-80 h-fit">
       <h3 class="font-semibold text-lg mb-4">Order Summary</h3>
 
-      <div id="orderItems" class="space-y-3 mb-4"></div>
-
-      <div class="text-sm text-gray-700 space-y-2">
-        <div class="flex justify-between"><span>Subtotal</span><span id="subtotal">₱0.00</span></div>
-        <div class="flex justify-between"><span>Shipping</span><span>Free</span></div>
+      <div id="orderItems" class="space-y-3 mb-4">
+        <?php foreach ($cart_items_with_products as $item): 
+            $img = $item['image'];
+            if (empty($img)) $img = 'https://via.placeholder.com/100x100?text=No+Image';
+            elseif (strpos($img, 'http') !== 0) $img = '../' . ltrim($img, '/');
+        ?>
+        <div class="flex gap-3">
+            <img src="<?php echo htmlspecialchars($img); ?>" class="w-12 h-12 rounded object-cover border bg-gray-50">
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-800 truncate"><?php echo htmlspecialchars($item['name']); ?></p>
+                <p class="text-xs text-gray-500">Qty: <?php echo $item['quantity']; ?></p>
+            </div>
+            <div class="text-sm font-semibold text-gray-700">₱<?php echo number_format($item['subtotal'], 2); ?></div>
+        </div>
+        <?php endforeach; ?>
       </div>
 
+      <div class="text-sm text-gray-700 space-y-2">
+        <div class="flex justify-between"><span>Subtotal</span><span id="subtotal">₱<?php echo number_format($subtotal, 2); ?></span></div>
+        <div class="flex justify-between"><span>Subtotal</span><span id="subtotal-display">₱<?php echo number_format($subtotal, 2); ?></span></div>
+        <div class="flex justify-between"><span>Shipping</span><span>Free</span></div>
+        <div class="flex justify-between text-xs text-gray-500"><span>Tax (estimated 12%)</span><span>₱<?php echo number_format($tax, 2); ?></span></div>
+       
+
       <div class="border-t mt-3 pt-3 flex justify-between text-lg font-semibold text-gray-800">
-        <span>Total</span><span id="total">₱0.00</span>
+        <span>Total</span><span id="total">₱<?php echo number_format($total, 2); ?></span>
+        
       </div>
 
       <button id="placeOrderBtn"
@@ -227,6 +294,6 @@ if ($user_id) {
   </footer>
 
   <script src="../assets/js/paymentmethod.js"></script>
-
+ 
 </body>
 </html>
