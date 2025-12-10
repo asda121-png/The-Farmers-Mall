@@ -361,21 +361,7 @@ $user_settings = [
                 </div>
 
                 <!-- Layout Options -->
-                <div class="bg-white p-6 rounded-xl card-shadow max-w-3xl mx-auto">
-                  <h3 class="text-lg font-bold text-gray-900 mb-1">Layout</h3>
-                  <p class="text-sm text-gray-500 mb-6">Customize the panel's layout.</p>
-                  <div class="divide-y divide-gray-100">
-                    <div class="flex items-center justify-between py-4">
-                      <div>
-                        <p class="text-sm font-medium text-gray-900">Compact Sidebar</p>
-                        <p class="text-xs text-gray-500">Reduces the width of the sidebar for more content space.</p>
-                            </div>
-                            <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                                <input type="checkbox" name="toggle" id="compactToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                <label for="compactToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                            </div>
-                        </div>
-                    </div>
+               
                 </div>
             </div>
         </div>
