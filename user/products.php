@@ -28,24 +28,34 @@ if ($user_id) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>All Products – Farmers Mall</title>
 
-  <!-- Tailwind + Font Awesome (CDN as in your project) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="../assets/css/productdetails.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
   <style>
-    /* Product card vertical rectangle styling */
+    /* Fresh Vegetable Bundle Font Style */
+    .fresh-title-font {
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
+    /* Product card styling matching User Homepage */
     .product-card {
       display: flex;
       flex-direction: column;
-      min-height: 20rem;
+      min-height: 22rem; 
       border: 2px solid transparent;
       border-radius: 0.5rem;
-      transition: all 0.6s ease;
+      transition: all 0.3s ease;
+      position: relative;
     }
 
+    /* ONLY Green Highlight Border on Hover - No Scale, No Shadow Change */
     .product-card:hover {
       border-color: #2E7D32;
-      transition: all 0.6s ease;
+      transform: none !important; /* Ensure no scaling */
     }
 
     .product-card img {
@@ -59,19 +69,32 @@ if ($user_id) {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      justify-content: space-between; 
       padding: 1rem;
     }
 
-    .product-card .product-info {
+    /* Container for the bottom elements (Price & Button) matching homepage */
+    .product-card-bottom {
       display: flex;
-      align-items: center;
+      align-items: flex-end; /* Aligns content to the bottom baseline */
       justify-content: space-between;
-      gap: 0.5rem;
+      width: 100%;
+      margin-top: auto;
     }
 
-    .product-card .add-btn {
-      flex-shrink: 0;
+    /* Add to cart button enhanced effects */
+    .add-btn {
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 2;
+    }
+
+    .add-btn:hover {
+        transform: rotate(90deg) scale(1.2);
+        box-shadow: 0 4px 15px rgba(46, 125, 50, 0.5);
+    }
+
+    .add-btn:active {
+        transform: rotate(90deg) scale(0.9);
     }
   </style>
 </head>
@@ -79,21 +102,16 @@ if ($user_id) {
 
 <?php include __DIR__ . '/../includes/user-header.php'; ?>
 
-
-    
-
-  <!-- Main content -->
   <main class="max-w-7xl mx-auto px-6 py-8 grid md:grid-cols-4 gap-8 flex-grow w-full mb-28">
 
-    <!-- Sidebar filters -->
     <aside class="col-span-1 bg-white p-6 rounded-lg shadow-sm h-fit">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg">Filters</h2>
+        <h2 class="font-bold text-base fresh-title-font">Filters</h2>
         <button id="clearFilters" class="text-green-600 text-sm font-medium hover:underline">Clear All</button>
       </div>
 
       <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Categories</h3>
+        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Categories</h3>
         <ul class="space-y-2 text-sm text-gray-700">
           <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="vegetables">Vegetables (124)</label></li>
           <li><label class="inline-flex items-center"><input type="checkbox" class="category-checkbox mr-2" data-cat="fruits">Fruits (89)</label></li>
@@ -105,14 +123,14 @@ if ($user_id) {
       </div>
 
       <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Organic</h3>
+        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Organic</h3>
         <label class="text-sm text-gray-700 inline-flex items-center">
           <input id="organicOnly" type="checkbox" class="mr-2">Organic Only
         </label>
       </div>
 
       <div class="mb-6">
-        <h3 class="font-medium mb-2 text-gray-800">Price Range</h3>
+        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Price Range</h3>
         <div class="flex items-center space-x-2 mb-2">
           <input id="minPrice" type="number" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
           <span>-</span>
@@ -126,14 +144,13 @@ if ($user_id) {
       </div>
     </aside>
 
-    <!-- Products -->
     <section class="col-span-3">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-4">
           <a href="user-homepage.php" class="flex items-center text-green-600 hover:text-green-700 font-medium text-xl">
             <i class="fa-solid fa-arrow-left"></i>
           </a>
-          <h2 class="text-xl font-semibold">All Products</h2>
+          <h2 class="text-lg font-bold fresh-title-font">All Products</h2>
         </div>
         <div class="flex items-center space-x-2">
           <label class="text-sm text-gray-600">Sort by:</label>
@@ -146,7 +163,6 @@ if ($user_id) {
         </div>
       </div>
 
-      <!-- Search Results Header -->
       <?php 
       $search_query = $_GET['search'] ?? '';
       if (!empty($search_query)): 
@@ -160,7 +176,6 @@ if ($user_id) {
         </div>
       <?php endif; ?>
 
-      <!-- Grid -->
       <div id="productsGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <?php
         // Fetch all products from Supabase
@@ -207,17 +222,34 @@ if ($user_id) {
             $category = htmlspecialchars($prod['category'] ?? 'other');
             $id = htmlspecialchars($prod['id'] ?? '');
             $organic = isset($prod['is_organic']) && $prod['is_organic'] ? 'true' : 'false';
+            
+            // Calculate sold count logic similar to user-homepage.php
+            $sold = $prod['units_sold'] ?? $prod['times_ordered'] ?? $prod['qty_sold'] ?? 0;
         ?>
-        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden" data-category="<?php echo $category; ?>" data-price="<?php echo $priceVal; ?>" data-organic="<?php echo $organic; ?>" data-name="<?php echo $name; ?>" data-description="<?php echo $desc; ?>" data-id="<?php echo $id; ?>">
+        <div class="product-card bg-white rounded-lg shadow transition relative block overflow-hidden h-full" 
+             data-category="<?php echo $category; ?>" 
+             data-price="<?php echo $priceVal; ?>" 
+             data-organic="<?php echo $organic; ?>" 
+             data-name="<?php echo $name; ?>" 
+             data-description="<?php echo $desc; ?>" 
+             data-id="<?php echo $id; ?>">
+             
           <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-40 object-cover">
           <div>
-            <div class="product-info">
-              <div>
-                <h3 class="font-medium text-gray-800"><?php echo $name; ?></h3>
-                <p class="text-sm text-gray-500">Per unit</p>
-                <p class="font-semibold text-green-700 mt-1">₱<?php echo number_format((float)$priceVal, 2); ?></p>
-              </div>
-              <button class="add-btn bg-white text-green-600 border border-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart"><i class="fa-solid fa-plus"></i></button>
+            <div class="w-full">
+                <h3 class="mt-2 font-bold text-sm leading-tight mb-1"><?php echo $name; ?></h3>
+                <p class="text-xs text-gray-500 mb-2"><?php echo ucfirst($category); ?></p>
+            </div>
+
+            <div class="product-card-bottom">
+                <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+                
+                <div class="flex flex-col items-end">
+                    <button class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
+                </div>
             </div>
           </div>
         </div>
@@ -231,7 +263,6 @@ if ($user_id) {
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       <div>

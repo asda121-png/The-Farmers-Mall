@@ -88,6 +88,17 @@ try {
         footer {
             margin-top: auto;
         }
+        /* Force sidebar to be full height with logout at bottom */
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > *:last-child {
+            margin-top: auto !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
         /* Mobile menu toggle */
         #mobileMenuBtn {
             display: none;
@@ -104,6 +115,14 @@ try {
                 z-index: 50;
                 transition: left 0.3s ease;
             }
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > div:last-child {
+            margin-top: auto !important;
+        }
             #sidebar.active {
                 left: 0;
             }
@@ -181,8 +200,8 @@ try {
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-                        <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-                        <a href="retailernotifications.php" class="text-gray-600 relative">
+                        <a href="retailermessage.php" class="text-gray-600 hover:text-green-600"><i class="fa-regular fa-comment"></i></a>
+                        <a href="retailernotifications.php" class="text-gray-600 hover:text-green-600 relative">
                         <i class="fa-regular fa-bell"></i>
                         </a>
 
@@ -204,12 +223,12 @@ try {
                 <h2 class="text-3xl font-bold text-gray-800 mb-8">Payouts & Financial Reporting</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Next Payout Schedule</h3>
                         <p class="text-3xl font-bold text-gray-800">₱1,540.20</p>
                         <p class="text-gray-500 mt-2">Scheduled for: <?php echo date('l, M d, Y', strtotime('+7 days')); ?></p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500">
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Reports & Exports</h3>
                         <div class="space-y-3">
                             <button class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
@@ -222,7 +241,7 @@ try {
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                     <h3 class="px-6 py-4 text-xl font-semibold text-gray-700 border-b">Transaction History</h3>
                     <div class="p-6 text-gray-500">
                         <ul class="space-y-3">
@@ -249,43 +268,6 @@ try {
         </div>
     </div>
     
-    <footer id="support" class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
-        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-          <div>
-            <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
-            <p class="text-gray-300 text-sm">Fresh, organic produce delivered straight to your home from local farmers.</p>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">About Us</a></li>
-              <li><a href="#" class="hover:underline">Contact</a></li>
-              <li><a href="#" class="hover:underline">FAQ</a></li>
-              <li><a href="#" class="hover:underline">Support</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-3">Categories</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">Vegetables</a></li>
-              <li><a href="#" class="hover:underline">Fruits</a></li>
-              <li><a href="#" class="hover:underline">Dairy</a></li>
-              <li><a href="#" class="hover:underline">Meat</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-            <div class="flex space-x-4 text-xl">
-              <a href="#" class="hover:text-green-300"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-instagram"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-          © 2025 The Farmer's Mall. All rights reserved.
-        </div>
-    </footer>
 </div>
 
 <script>

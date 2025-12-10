@@ -77,6 +77,17 @@ try {
         footer {
             margin-top: auto;
         }
+        /* Force sidebar to be full height with logout at bottom */
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > *:last-child {
+            margin-top: auto !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
         /* Mobile menu toggle */
         #mobileMenuBtn {
             display: none;
@@ -93,6 +104,14 @@ try {
                 z-index: 50;
                 transition: left 0.3s ease;
             }
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > div:last-child {
+            margin-top: auto !important;
+        }
             #sidebar.active {
                 left: 0;
             }
@@ -162,7 +181,7 @@ try {
             <!-- User Info at the bottom -->
             <div class="mt-auto pt-4 border-t border-gray-100">
                 <!-- Logout Button -->
-                <a href="../auth/login.php" class="w-full flex items-center justify-center p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition duration-150 font-medium">
+                <a href="../auth/logout.php" class="w-full flex items-center justify-center p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition duration-150 font-medium">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Logout
                 </a>
@@ -173,7 +192,7 @@ try {
             <header class="bg-white shadow-sm">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
-                        <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
+                        <a href="retailer-dashboard2.php" class="text-green-600"><i class="fa-solid fa-house"></i></a>
                         <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
                         <a href="retailernotifications.php" class="text-gray-600 relative">
                         <i class="fa-regular fa-bell"></i>
@@ -202,28 +221,28 @@ try {
                 
                 <!-- KPI Cards -->
                 <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-4 rounded-xl shadow-md">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">Total Revenue</p>
                             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4"></path></svg>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">₱12,450.00</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-md">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">New Orders</p>
                             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">8</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-md">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">Low Inventory Items</p>
                             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">3</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-md">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">Active Products</p>
                             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2"></path></svg>
@@ -234,13 +253,13 @@ try {
                 
                 <!-- Sales Trend and Inventory Alerts -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Sales Trend (Last 30 Days)</h3>
                         <div class="h-64 flex items-center justify-center text-gray-400 border border-dashed rounded-lg">
                             [Sales Trend Chart Placeholder]
                         </div>
                     </div>
-                    <div id="dashboard-inventory-alerts" class="bg-white p-6 rounded-xl shadow-lg">
+                    <div id="dashboard-inventory-alerts" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Inventory Alerts (Low Stock)</h3>
                         <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-lg mb-2">
                             <p class="text-sm text-red-700 font-medium">Organic Tomatoes</p>
@@ -300,59 +319,6 @@ try {
             </main>
         </div>
     </div>
-    
-    <!-- Footer - Static at bottom, spans full width in front of sidebar -->
-    <footer id="support" class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
-        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-          
-          <!-- Logo/About -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
-            <p class="text-gray-300 text-sm">
-              Fresh, organic produce delivered straight to your home from local farmers.
-            </p>
-          </div>
-          
-          <!-- Quick Links -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">About Us</a></li>
-              <li><a href="#" class="hover:underline">Contact</a></li>
-              <li><a href="#" class="hover:underline">FAQ</a></li>
-              <li><a href="#" class="hover:underline">Support</a></li>
-            </ul>
-          </div>
-
-          <!-- Categories -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Categories</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">Vegetables</a></li>
-              <li><a href="#" class="hover:underline">Fruits</a></li>
-              <li><a href="#" class="hover:underline">Dairy</a></li>
-              <li><a href="#" class="hover:underline">Meat</a></li>
-            </ul>
-          </div>
-
-          <!-- Social -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-            <div class="flex space-x-4 text-xl">
-              <!-- Updated from footer.html -->
-              <a href="#" class="hover:text-green-300"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-instagram"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-          © 2025 The Farmer's Mall. All rights reserved.
-        </div>
-    </footer>
-</div>
 
     <!-- Status Message Box (Replaces alert()) -->
     <div id="status-message" class="fixed top-5 right-5 z-50 transition-transform duration-500 transform translate-x-full">
@@ -524,7 +490,7 @@ try {
         window.signOutUser = async () => {
             window.location.href = '../auth/login.php';
         };
-            });
+        ;
 
             // 2. Orders Listener
             onSnapshot(collection(db, getCollectionPath('orders')), (snapshot) => {
@@ -552,7 +518,7 @@ try {
              if (document.getElementById('reviews-list')) {
                 renderReviewList();
              }
-        }
+        
 
         // --- CRUD Operations for Products ---
 
@@ -932,7 +898,7 @@ try {
             ];
 
             const kpisHtml = kpiData.map(kpi => `
-                <div class="bg-white p-4 rounded-xl shadow-md">
+                <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-medium text-gray-500">${kpi.title}</p>
                         <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${kpi.icon}"></path></svg>
@@ -972,7 +938,7 @@ try {
                     </button>
                 </div>
                 
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-green-50">
                             <tr>
@@ -1050,7 +1016,7 @@ try {
                     </p>
                 </div>
                 
-                <div class="bg-white rounded-xl shadow-lg overflow-auto">
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-green-50">
                             <tr>
@@ -1158,7 +1124,7 @@ try {
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                     <h3 class="px-6 py-4 text-xl font-semibold text-gray-700 border-b">Transaction History</h3>
                     <div class="p-6 text-gray-500">
                         <ul class="space-y-3">
@@ -1257,7 +1223,7 @@ try {
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">All Customer Reviews</h3>
                         <div id="reviews-list" class="divide-y divide-gray-100">
                             <!-- Reviews will be injected here -->

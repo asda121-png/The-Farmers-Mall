@@ -112,6 +112,17 @@ try {
     .scrollbar-thin::-webkit-scrollbar-track {
       background-color: #e5e7eb;
     }
+    /* Force sidebar to be full height with logout at bottom */
+    #sidebar {
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    #sidebar > *:last-child {
+        margin-top: auto !important;
+        padding-top: 1rem !important;
+        border-top: 1px solid #e5e7eb !important;
+    }
     /* Mobile menu toggle */
     #mobileMenuBtn {
         display: none;
@@ -127,6 +138,14 @@ try {
             height: 100vh;
             z-index: 50;
             transition: left 0.3s ease;
+        }
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > div:last-child {
+            margin-top: auto !important;
         }
         #sidebar.active {
             left: 0;
@@ -207,8 +226,8 @@ try {
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-                        <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-                        <a href="retailernotifications.php" class="text-gray-600 relative">
+                        <a href="retailermessage.php" class="text-green-600"><i class="fa-solid fa-comment"></i></a>
+                        <a href="retailernotifications.php" class="text-gray-600 hover:text-green-600 relative">
                         <i class="fa-regular fa-bell"></i>
                         <!-- Notification badge can be added here if needed -->
                         </a>
@@ -231,12 +250,12 @@ try {
         
             <!-- Main Content Area -->
             <main id="content" class="p-8 transition-all duration-300 flex-1">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">Customer Messages</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Messages</h1>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 h-full">
 
         <!-- Conversations List -->
         <aside id="conversationPanel"
-          class="md:col-span-1 bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 flex flex-col h-[600px]">
+          class="md:col-span-1 bg-white rounded-lg shadow-sm hover:shadow-md hover:border-green-200 transition-all duration-300 overflow-hidden border border-gray-200 flex flex-col h-[600px]">
           <div class="p-4 border-b">
             <div class="relative">
               <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -249,7 +268,7 @@ try {
 
         <!-- Chat Section -->
         <section id="chatPanel"
-          class="md:col-span-3 bg-white rounded-lg shadow-sm flex flex-col border border-gray-200 h-[600px]">
+          class="md:col-span-3 bg-white rounded-lg shadow-sm hover:shadow-md hover:border-green-200 transition-all duration-300 flex flex-col border border-gray-200 h-[600px]">
           <!-- Chat Header -->
           <div id="chatHeader" class="p-4 border-b flex items-center space-x-3">
           </div>
@@ -284,58 +303,7 @@ try {
         </div>
     </div>
     
-    <!-- Footer - Static at bottom, spans full width in front of sidebar -->
-    <footer id="support" class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
-        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-          
-          <!-- Logo/About -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
-            <p class="text-gray-300 text-sm">
-              Fresh, organic produce delivered straight to your home from local farmers.
-            </p>
-          </div>
-          
-          <!-- Quick Links -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">About Us</a></li>
-              <li><a href="#" class="hover:underline">Contact</a></li>
-              <li><a href="#" class="hover:underline">FAQ</a></li>
-              <li><a href="#" class="hover:underline">Support</a></li>
-            </ul>
-          </div>
-
-          <!-- Categories -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Categories</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">Vegetables</a></li>
-              <li><a href="#" class="hover:underline">Fruits</a></li>
-              <li><a href="#" class="hover:underline">Dairy</a></li>
-              <li><a href="#" class="hover:underline">Meat</a></li>
-            </ul>
-          </div>
-
-          <!-- Social -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-            <div class="flex space-x-4 text-xl">
-              <!-- Updated from footer.html -->
-              <a href="#" class="hover:text-green-300"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-instagram"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-          © 2025 The Farmer's Mall. All rights reserved.
-        </div>
-    </footer>
-</div>
+    </div>
 
   <!-- Delete Message Confirmation Modal -->
   <div id="deleteMessageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">

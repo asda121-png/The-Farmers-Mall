@@ -33,7 +33,16 @@ if ($user_id) {
   <title>Farmers Mall - Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
   <style>
+    /* New Class for Fresh Vegetable Bundle Font Style */
+    .fresh-font {
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
     .category-text {
         margin-top: 0.5rem; /* Adjusts spacing to the upper */
     }
@@ -116,7 +125,7 @@ if ($user_id) {
     .product-card {
       display: flex;
       flex-direction: column;
-      min-height: 20rem;
+      min-height: 22rem; /* Slightly increased for category text */
       border: 2px solid transparent;
       border-radius: 0.5rem;
       transition: all 0.3s ease;
@@ -138,15 +147,17 @@ if ($user_id) {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      justify-content: space-between;
       padding: 1rem;
     }
 
-    .product-card > div > div {
+    /* Container for the bottom elements */
+    .product-card-bottom {
       display: flex;
-      align-items: center;
+      align-items: flex-end; /* Aligns content to the bottom baseline */
       justify-content: space-between;
-      gap: 0.5rem;
+      width: 100%;
+      margin-top: auto;
     }
 
     .product-card h3,
@@ -439,11 +450,10 @@ if ($user_id) {
 
 
   <section class="hero-slider relative">
-    <!-- Slide 1 -->
     <div class="hero-slide active" style="background-image: url('../images/img.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Fresh Harvest Sale</h2>
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Fresh Harvest Sale</h2>
           <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
           <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
@@ -452,11 +462,10 @@ if ($user_id) {
       </div>
     </div>
 
-    <!-- Slide 2 -->
     <div class="hero-slide" style="background-image: url('../images/img1.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Farm Fresh Daily</h2>
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Farm Fresh Daily</h2>
           <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
           <a href="../user/products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
@@ -465,11 +474,10 @@ if ($user_id) {
       </div>
     </div>
 
-    <!-- Slide 3 -->
     <div class="hero-slide" style="background-image: url('../images/img2.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Premium Quality</h2>
+          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Premium Quality</h2>
           <p class="text-lg md:text-xl mb-6">Fresh ingredients delivered to your door</p>
           <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
             Shop Now
@@ -478,7 +486,6 @@ if ($user_id) {
       </div>
     </div>
 
-    <!-- Navigation Dots -->
     <div class="slider-dots">
       <span class="slider-dot active" data-slide="0"></span>
       <span class="slider-dot" data-slide="1"></span>
@@ -488,7 +495,7 @@ if ($user_id) {
 
   <section class="w-full mx-auto px-0 py-10 bg-[#FFFFFF] mb-10">
     <div class="flex justify-center mb-8">
-      <h2 class="section-heading text-2xl font-bold">Shop by Category</h2>
+      <h2 class="section-heading text-2xl font-bold fresh-font">Shop by Category</h2>
     </div>
     <div class="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto px-6">
       <a href="products.php?category=vegetables" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
@@ -518,113 +525,8 @@ if ($user_id) {
     </div>
   </section>
 
-  <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold">Top Products</h2>
-    </div>
-    <?php
-    // Fetch products from Supabase
-    require_once __DIR__ . '/../config/supabase-api.php';
-    $api = getSupabaseAPI();
-    $products = $api->select('products') ?: [];
-
-    function resolveImagePath($img) {
-        if (empty($img)) return '../images/products/placeholder.png';
-        if (preg_match('#^https?://#i', $img)) return $img;
-        if (strpos($img, '../') === 0) return $img;
-        if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
-        if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
-        return $img;
-    }
-
-    function formatPriceValue($p) {
-        if (is_null($p) || $p === '') return '0.00';
-        if (is_numeric($p)) return number_format((float)$p, 2, '.', '');
-        $clean = preg_replace('/[^0-9\.]/', '', $p);
-        return $clean === '' ? '0.00' : number_format((float)$clean, 2, '.', '');
-    }
-
-    // Sort by units_sold (or times_ordered) to get top products
-    usort($products, function($a, $b) {
-        $aSold = (int)($a['units_sold'] ?? $a['times_ordered'] ?? $a['qty_sold'] ?? 0);
-        $bSold = (int)($b['units_sold'] ?? $b['times_ordered'] ?? $b['qty_sold'] ?? 0);
-        return $bSold <=> $aSold;
-    });
-
-    // Top 5 most sold products
-    $topProducts = array_slice($products, 0, 5);
-    // Remaining products (all others) - limit to 32 for homepage
-    $otherProducts = array_slice($products, 5, 70);
-    ?>
-
-    <!-- Top 5 Most Sold Products -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <?php foreach ($topProducts as $prod):
-        $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
-        $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
-        $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
-        $desc = htmlspecialchars($prod['description'] ?? '');
-        $category = htmlspecialchars($prod['category'] ?? 'other');
-        $id = htmlspecialchars($prod['id'] ?? '');
-      ?>
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
-        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
-        <div>
-          <div>
-            <div>
-              <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
-              <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
-            </div>
-            <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-        </div>
-      </a>
-      <?php endforeach; ?>
-    </div>
-  </section>
-
-  <!-- All Products Section -->
-  <section class="max-w-7xl mx-auto px-6 py-8">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold">All Products</h2>
-    </div>
-
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <?php foreach ($otherProducts as $prod):
-        $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
-        $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
-        $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
-        $desc = htmlspecialchars($prod['description'] ?? '');
-        $category = htmlspecialchars($prod['category'] ?? 'other');
-        $id = htmlspecialchars($prod['id'] ?? '');
-      ?>
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
-        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
-        <div>
-          <div>
-            <div>
-              <h3 class="mt-2 font-semibold text-sm"><?php echo $name; ?></h3>
-              <p class="text-green-600 font-bold text-sm">₱<?php echo number_format((float)$priceVal, 2); ?></p>
-            </div>
-            <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition" title="Add to cart">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-        </div>
-      </a>
-      <?php endforeach; ?>
-    </div>
-
-    <div class="flex justify-center mt-6">
-      <a href="products.php" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow">See More</a>
-    </div>
-  </section>
-  
-
   <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
-    <h2 class="section-heading text-2xl font-bold mb-6">Explore Other Shops</h2>
+    <h2 class="section-heading text-2xl font-bold mb-6 fresh-font">Explore Other Shops</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <a href="shop-products.php?shop=Mesa Farm" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
         <img src="../images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
@@ -663,7 +565,124 @@ if ($user_id) {
       </a>
     </div>
   </section>
+  <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="section-heading text-2xl font-bold fresh-font">Top Products</h2>
+    </div>
+    <?php
+    // Fetch products from Supabase
+    require_once __DIR__ . '/../config/supabase-api.php';
+    $api = getSupabaseAPI();
+    $products = $api->select('products') ?: [];
 
+    function resolveImagePath($img) {
+        if (empty($img)) return '../images/products/placeholder.png';
+        if (preg_match('#^https?://#i', $img)) return $img;
+        if (strpos($img, '../') === 0) return $img;
+        if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
+        if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
+        return $img;
+    }
+
+    function formatPriceValue($p) {
+        if (is_null($p) || $p === '') return '0.00';
+        if (is_numeric($p)) return number_format((float)$p, 2, '.', '');
+        $clean = preg_replace('/[^0-9\.]/', '', $p);
+        return $clean === '' ? '0.00' : number_format((float)$clean, 2, '.', '');
+    }
+
+    // Sort by units_sold (or times_ordered) to get top products
+    usort($products, function($a, $b) {
+        $aSold = (int)($a['units_sold'] ?? $a['times_ordered'] ?? $a['qty_sold'] ?? 0);
+        $bSold = (int)($b['units_sold'] ?? $b['times_ordered'] ?? $b['qty_sold'] ?? 0);
+        return $bSold <=> $aSold;
+    });
+
+    // Top 5 most sold products
+    $topProducts = array_slice($products, 0, 5);
+    // Remaining products (all others) - limit to 32 for homepage
+    $otherProducts = array_slice($products, 5, 70);
+    ?>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <?php foreach ($topProducts as $prod):
+        $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
+        $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
+        $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
+        $desc = htmlspecialchars($prod['description'] ?? '');
+        $category = htmlspecialchars($prod['category'] ?? 'other');
+        $id = htmlspecialchars($prod['id'] ?? '');
+        // Sold Count Logic
+        $sold = $prod['units_sold'] ?? $prod['times_ordered'] ?? $prod['qty_sold'] ?? 0;
+      ?>
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
+        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
+        <div>
+          <div class="w-full">
+            <h3 class="mt-2 font-bold text-sm truncate"><?php echo $name; ?></h3>
+            <p class="text-xs text-gray-500 mb-1 truncate"><?php echo ucfirst($category); ?></p>
+          </div>
+          
+          <div class="product-card-bottom">
+            <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+            
+            <div class="flex flex-col items-end">
+                <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="section-heading text-2xl font-bold fresh-font">All Products</h2>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <?php foreach ($otherProducts as $prod):
+        $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
+        $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
+        $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
+        $desc = htmlspecialchars($prod['description'] ?? '');
+        $category = htmlspecialchars($prod['category'] ?? 'other');
+        $id = htmlspecialchars($prod['id'] ?? '');
+        // Sold Count Logic
+        $sold = $prod['units_sold'] ?? $prod['times_ordered'] ?? $prod['qty_sold'] ?? 0;
+      ?>
+      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
+        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
+        <div>
+          <div class="w-full">
+            <h3 class="mt-2 font-bold text-sm truncate"><?php echo $name; ?></h3>
+            <p class="text-xs text-gray-500 mb-1 truncate"><?php echo ucfirst($category); ?></p>
+          </div>
+          
+          <div class="product-card-bottom">
+            <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?></p>
+            
+            <div class="flex flex-col items-end">
+                <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
+            </div>
+          </div>
+        </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="flex justify-center mt-6">
+      <a href="products.php" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow">See More</a>
+    </div>
+  </section>
+  
   <footer class="text-white py-12" style="background-color: #1B5E20;">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
       
@@ -913,7 +932,6 @@ if ($user_id) {
   </script>
   <script src="../assets/js/profile-sync.js"></script>
 
-  <!-- Logout Confirmation Modal -->
   <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
       <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>

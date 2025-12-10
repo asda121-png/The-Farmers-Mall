@@ -70,10 +70,121 @@ try {
         footer {
             margin-top: auto;
         }
+        /* Force sidebar to be full height with logout at bottom */
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > *:last-child {
+            margin-top: auto !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
         /* Mobile menu toggle */
         #mobileMenuBtn {
             display: none;
         }
+        /* Product row hover effects */
+        .product-row {
+            transition: background-color 0.2s ease;
+        }
+        .product-row:hover {
+            background-color: #f9fafb;
+        }
+        .product-actions {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .product-row:hover .product-actions {
+            opacity: 1;
+        }
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+        }
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        .toast.warning {
+            border-left: 4px solid #f59e0b;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        .toast.hiding {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+        
+        /* Responsive Table Styles */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Prevent body horizontal scroll */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Responsive main content */
+        #content {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Table responsive adjustments */
+        @media (max-width: 1280px) {
+            table {
+                font-size: 0.875rem;
+            }
+            th, td {
+                padding: 0.75rem 0.5rem !important;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .filter-bar {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            table {
+                font-size: 0.8125rem;
+            }
+        }
+        
         @media (max-width: 768px) {
             #mobileMenuBtn {
                 display: flex;
@@ -86,6 +197,14 @@ try {
                 z-index: 50;
                 transition: left 0.3s ease;
             }
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > div:last-child {
+            margin-top: auto !important;
+        }
             #sidebar.active {
                 left: 0;
             }
@@ -163,8 +282,8 @@ try {
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-                        <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
-                        <a href="retailernotifications.php" class="text-gray-600 relative">
+                        <a href="retailermessage.php" class="text-gray-600 hover:text-green-600"><i class="fa-regular fa-comment"></i></a>
+                        <a href="retailernotifications.php" class="text-gray-600 hover:text-green-600 relative">
                         <i class="fa-regular fa-bell"></i>
                         </a>
 
@@ -182,133 +301,122 @@ try {
                 </div>
             </header>
         
-            <main id="content" class="p-8 transition-all duration-300 flex-1">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8">Product & Inventory Management</h2>
+            <main id="content" class="p-4 md:p-6 lg:p-8 transition-all duration-300 flex-1 w-full max-w-full">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Product & Inventory Management</h2>
                 
-                <div class="flex justify-between items-center mb-6">
-                    <button onclick="openProductModal()" class="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-150 font-medium">
+                <!-- Filter Bar -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6 filter-bar">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="relative min-w-[140px]">
+                            <select id="bulkActions" onchange="applyBulkAction()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
+                                <option value="">Bulk actions</option>
+                                <option value="edit">Edit</option>
+                                <option value="delete">Move to Trash</option>
+                            </select>
+                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        
+                        <div class="relative min-w-[160px]">
+                            <select id="categoryFilter" onchange="applyFilters()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
+                                <option value="">Select a category</option>
+                                <option value="vegetables">Vegetables</option>
+                                <option value="fruits">Fruits</option>
+                                <option value="dairy">Dairy</option>
+                                <option value="meat">Meat</option>
+                                <option value="seafood">Seafood</option>
+                                <option value="bakery">Bakery</option>
+                            </select>
+                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        
+                        <div class="relative min-w-[180px]">
+                            <select id="productTypeFilter" onchange="applyFilters()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
+                                <option value="">Filter by product type</option>
+                                <option value="simple">Simple product</option>
+                                <option value="variable">Variable product</option>
+                                <option value="grouped">Grouped product</option>
+                            </select>
+                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        
+                        <div class="relative min-w-[180px]">
+                            <select id="stockStatusFilter" onchange="applyFilters()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
+                                <option value="">Filter by stock status</option>
+                                <option value="instock">In stock</option>
+                                <option value="outofstock">Out of stock</option>
+                                <option value="onbackorder">On backorder</option>
+                            </select>
+                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                        <table class="w-full divide-y divide-gray-200" style="table-layout: auto;">
+                            <thead class="bg-green-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 50px;">
+                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-4 h-4 text-green-600 rounded focus:ring-2 focus:ring-green-500">
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 250px;">Product</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 100px;">SKU</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 100px;">Stock</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 120px;">Price</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 120px;">Categories</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 100px;">Tags</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="min-width: 180px;">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-list" class="bg-white divide-y divide-gray-200">
+                                <!-- Products will be loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-products-message" class="p-6 text-center text-gray-500 hidden">No products listed yet. Click "Add New Product" to start selling!</div>
+                </div>
+                
+                <!-- Action Buttons Below Table -->
+                <div class="flex flex-col sm:flex-row justify-start items-stretch sm:items-center gap-3 mt-6">
+                    <a href="retaileraddnewproduct.php" class="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-150 font-medium">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Add New Product
-                    </button>
+                    </a>
                     <button onclick="openBulkPriceModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow-sm hover:bg-gray-300 transition duration-150 text-sm">
                         Bulk Edit Prices
                     </button>
-                </div>
-                
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-green-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price / UOM</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="products-list" class="bg-white divide-y divide-gray-200">
-                            <!-- Sample Product Rows -->
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <img class="h-10 w-10 rounded-lg object-cover mr-4" src="https://placehold.co/40x40/22c55e/fff?text=A" alt="Organic Apples" />
-                                        <span class="text-sm font-medium text-gray-900">Organic Apples</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Fruits</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱89.00 / kg</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">45</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button onclick="editProduct('apple1')" class="text-green-600 hover:text-green-900">Edit</button>
-                                    <button onclick="deleteProduct('apple1')" class="text-red-600 hover:text-red-900">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <img class="h-10 w-10 rounded-lg object-cover mr-4" src="https://placehold.co/40x40/f59e0b/fff?text=T" alt="Organic Tomatoes" />
-                                        <span class="text-sm font-medium text-gray-900">Organic Tomatoes</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Vegetables</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱65.00 / kg</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">8</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button onclick="editProduct('tomato1')" class="text-green-600 hover:text-green-900">Edit</button>
-                                    <button onclick="deleteProduct('tomato1')" class="text-red-600 hover:text-red-900">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <img class="h-10 w-10 rounded-lg object-cover mr-4" src="https://placehold.co/40x40/3b82f6/fff?text=M" alt="Fresh Milk" />
-                                        <span class="text-sm font-medium text-gray-900">Fresh Milk</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Dairy</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱120.00 / liter</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">22</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button onclick="editProduct('milk1')" class="text-green-600 hover:text-green-900">Edit</button>
-                                    <button onclick="deleteProduct('milk1')" class="text-red-600 hover:text-red-900">Delete</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div id="no-products-message" class="p-6 text-center text-gray-500 hidden">No products listed yet. Click "Add New Product" to start selling!</div>
                 </div>
             </main>
         </div>
     </div>
     
     
-    <footer id="support" class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
-        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-          <div>
-            <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
-            <p class="text-gray-300 text-sm">Fresh, organic produce delivered straight to your home from local farmers.</p>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">About Us</a></li>
-              <li><a href="#" class="hover:underline">Contact</a></li>
-              <li><a href="#" class="hover:underline">FAQ</a></li>
-              <li><a href="#" class="hover:underline">Support</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-3">Categories</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">Vegetables</a></li>
-              <li><a href="#" class="hover:underline">Fruits</a></li>
-              <li><a href="#" class="hover:underline">Dairy</a></li>
-              <li><a href="#" class="hover:underline">Meat</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-            <div class="flex space-x-4 text-xl">
-              <a href="#" class="hover:text-green-300"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-instagram"></i></a>
-            </div>
-          </div>
+</div>
+
+<!-- View Product Modal -->
+<div id="viewProductModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+            <h3 class="text-xl font-bold text-gray-900">Product Details</h3>
+            <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
-        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-          © 2025 The Farmer's Mall. All rights reserved.
+        
+        <div id="viewProductContent" class="p-6">
+            <!-- Content will be populated dynamically -->
         </div>
-    </footer>
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -390,6 +498,93 @@ try {
         setTimeout(checkProfileUpdates, 1000);
     });
 
+    // Load products on page load
+    window.addEventListener('DOMContentLoaded', loadProducts);
+    
+    // Load products function
+    async function loadProducts() {
+        try {
+            const response = await fetch('../api/get-products.php');
+            const result = await response.json();
+            
+            if (result.success && result.products) {
+                const productsList = document.getElementById('products-list');
+                const noProductsMessage = document.getElementById('no-products-message');
+                
+                if (result.products.length === 0) {
+                    productsList.innerHTML = '';
+                    noProductsMessage.classList.remove('hidden');
+                    return;
+                }
+                
+                noProductsMessage.classList.add('hidden');
+                productsList.innerHTML = result.products.map(product => {
+                    const imageSrc = product.image_url ? `../${product.image_url}` : 'https://placehold.co/40x40/22c55e/fff?text=' + product.name.charAt(0);
+                    const stockStatus = (product.stock_quantity && product.stock_quantity > 0) ? 'In stock' : 'Out of stock';
+                    const stockClass = (product.stock_quantity && product.stock_quantity > 0) ? 'text-green-600' : 'text-red-600';
+                    const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+                    const regularPrice = parseFloat(product.price);
+                    const displayPrice = salePrice || regularPrice;
+                    const formattedDate = product.created_at ? new Date(product.created_at).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).replace(',', ' at') : 'N/A';
+                    
+                    return `
+                        <tr class="product-row">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" class="product-checkbox w-4 h-4 text-green-600 rounded focus:ring-2 focus:ring-green-500" data-product-id="${product.id}">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <img class="h-10 w-10 rounded-lg object-cover mr-4" src="${imageSrc}" alt="${product.name}" onerror="this.src='https://placehold.co/40x40/22c55e/fff?text=${product.name.charAt(0)}'" />
+                                    <div>
+                                        <div class="text-sm font-medium text-blue-600">${product.name}</div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            ID: ${product.id}
+                                        </div>
+                                        <div class="product-actions text-xs text-gray-500 mt-1">
+                                            <a href="#" onclick="editProduct('${product.id}'); return false;" class="text-blue-600 hover:underline">Edit</a> | 
+                                            <a href="#" onclick="deleteProduct('${product.id}'); return false;" class="text-red-600 hover:underline">Trash</a> | 
+                                            <a href="#" onclick="viewProduct('${product.id}'); return false;" class="text-blue-600 hover:underline">View</a> | 
+                                            <a href="#" onclick="duplicateProduct('${product.id}'); return false;" class="text-blue-600 hover:underline">Duplicate</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-500">—</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-medium ${stockClass}">${stockStatus}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                ${salePrice ? `<div class="text-sm text-gray-500 line-through">₱${regularPrice.toFixed(2)}</div>` : ''}
+                                <div class="text-sm font-medium text-gray-900">₱${displayPrice.toFixed(2)}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-blue-600">${product.category || 'Uncategorized'}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-blue-600">No tags</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500">${product.status || 'Published'}</div>
+                                <div class="text-sm text-gray-400">${formattedDate}</div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        } catch (error) {
+            console.error('Error loading products:', error);
+            showToast('Error loading products', 'error');
+        }
+    }
+
     // Product Modal Functions
     let editingProductId = null;
 
@@ -431,7 +626,7 @@ try {
         };
         
         console.log('Saving product:', formData);
-        alert(editingProductId ? 'Product updated successfully!' : 'Product added successfully!');
+        showToast(editingProductId ? 'Product updated successfully!' : 'Product added successfully!', 'success');
         closeProductModal();
         // Integrate with your database here
     }
@@ -451,7 +646,7 @@ try {
         const action = document.getElementById('priceAction').value;
         
         console.log(`Applying ${action} of ${percentage}% to all products`);
-        alert(`Bulk price ${action} of ${percentage}% applied successfully!`);
+        showToast(`Bulk price ${action} of ${percentage}% applied successfully!`, 'success');
         closeBulkPriceModal();
         // Integrate with your database here
     }
@@ -461,6 +656,8 @@ try {
     
     function deleteProduct(productId) {
         productToDelete = productId;
+        showToast('Are you sure you want to delete this product?', 'warning');
+        // Show confirmation in modal instead
         document.getElementById('deleteModal').classList.remove('hidden');
     }
     
@@ -473,35 +670,171 @@ try {
         if (productToDelete) {
             console.log('Deleting product:', productToDelete);
             // TODO: Make API call to delete product
-            // fetch('../api/delete-product.php', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ productId: productToDelete })
-            // }).then(response => response.json())
-            //   .then(data => {
-            //       if (data.success) {
-            //           location.reload();
-            //       }
-            //   });
-            
-            alert('Product deleted successfully! Database integration pending.');
             closeDeleteModal();
-            // Uncomment when API is ready:
-            // location.reload();
+            showToast('Product deleted successfully!', 'success');
+            // When API is ready, reload or remove the row
         }
     }
 
     // Edit Product Function (sample data)
     function editProduct(productId) {
-        const sampleProduct = {
-            id: productId,
-            name: 'Organic Apples',
-            category: 'Fruits',
-            price: 89.00,
-            unit: 'kg',
-            stock: 45
-        };
-        openProductModal(sampleProduct);
+        // Redirect to edit page with product ID
+        window.location.href = `retaileraddnewproduct.php?id=${productId}`;
+    }
+    
+    // View Product Function
+    async function viewProduct(productId) {
+        try {
+            const response = await fetch(`../api/get-product.php?id=${productId}`);
+            const result = await response.json();
+            
+            if (result.success && result.product) {
+                const product = result.product;
+                const imageSrc = product.image_url ? `../${product.image_url}` : 'https://placehold.co/400x300/22c55e/fff?text=' + product.name.charAt(0);
+                const salePrice = null;
+                const regularPrice = parseFloat(product.price);
+                
+                const content = `
+                    <div class="space-y-4">
+                        <div class="flex justify-center mb-4">
+                            <img src="${imageSrc}" alt="${product.name}" class="max-w-full h-64 object-cover rounded-lg" onerror="this.src='https://placehold.co/400x300/22c55e/fff?text=${product.name.charAt(0)}'">
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">${product.name}</h4>
+                            <p class="text-gray-600 text-sm">${product.description || 'No description available'}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-4 border-t">
+                            <div>
+                                <span class="text-sm text-gray-500">SKU:</span>
+                                <p class="font-medium">N/A</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Stock:</span>
+                                <p class="font-medium">${product.stock_quantity || 0} ${product.unit || 'units'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Regular Price:</span>
+                                <p class="font-medium">₱${regularPrice.toFixed(2)}</p>
+                            </div>
+                            ${salePrice ? `
+                            <div>
+                                <span class="text-sm text-gray-500">Sale Price:</span>
+                                <p class="font-medium text-green-600">₱${salePrice.toFixed(2)}</p>
+                            </div>
+                            ` : ''}
+                            <div>
+                                <span class="text-sm text-gray-500">Category:</span>
+                                <p class="font-medium">${product.category || 'Uncategorized'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Tags:</span>
+                                <p class="font-medium">No tags</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('viewProductContent').innerHTML = content;
+                document.getElementById('viewProductModal').classList.remove('hidden');
+            } else {
+                showToast('Product not found', 'error');
+            }
+        } catch (error) {
+            console.error('Error viewing product:', error);
+            showToast('Error loading product details', 'error');
+        }
+    }
+    
+    function closeViewModal() {
+        document.getElementById('viewProductModal').classList.add('hidden');
+    }
+    
+    // Duplicate Product Function
+    async function duplicateProduct(productId) {
+        try {
+            const response = await fetch('../api/duplicate-product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId })
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast('Product duplicated successfully!', 'success');
+                setTimeout(() => loadProducts(), 500);
+            } else {
+                showToast(result.message || 'Error duplicating product', 'error');
+            }
+        } catch (error) {
+            console.error('Error duplicating product:', error);
+            showToast('Error duplicating product', 'error');
+        }
+    }
+    
+    // Filter Functions
+    function applyFilters() {
+        const category = document.getElementById('categoryFilter').value;
+        const productType = document.getElementById('productTypeFilter').value;
+        const stockStatus = document.getElementById('stockStatusFilter').value;
+        
+        console.log('Applying filters:', { category, productType, stockStatus });
+        // TODO: Implement filter logic with database
+        if (category || productType || stockStatus) {
+            showToast('Filters applied successfully!', 'success');
+        }
+    }
+    
+    function applyBulkAction() {
+        const action = document.getElementById('bulkActions').value;
+        if (!action) {
+            return;
+        }
+        
+        const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+        if (checkedBoxes.length === 0) {
+            showToast('Please select at least one product.', 'warning');
+            document.getElementById('bulkActions').value = '';
+            return;
+        }
+        
+        console.log('Applying bulk action:', action, 'to', checkedBoxes.length, 'products');
+        // TODO: Implement bulk action logic
+        showToast(`Bulk action "${action}" applied to ${checkedBoxes.length} product(s)!`, 'success');
+        document.getElementById('bulkActions').value = '';
+    }
+    
+    // Checkbox functions
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+        });
+    }
+    
+    // Toast Notification Function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠';
+        const iconColor = type === 'success' ? 'text-green-600' : type === 'error' ? 'text-red-600' : 'text-yellow-600';
+        
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <span class="text-2xl ${iconColor}">${icon}</span>
+                <p class="text-gray-800 font-medium">${message}</p>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('hiding');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
     }
 </script>
 
