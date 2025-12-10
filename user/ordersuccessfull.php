@@ -10,19 +10,49 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 // Get user data from session
 $user_id = $_SESSION['user_id'] ?? null;
 
+// --- [MODIFIED] Get Order Details ---
+$order_id = $_GET['order_id'] ?? null;
+if (!$order_id) {
+    header('Location: my-purchases.php');
+    exit();
+}
+
+require_once __DIR__ . '/../config/supabase-api.php';
+require_once __DIR__ . '/../config/uuid-helper.php';
+$api = getSupabaseAPI();
+
+// Fetch the specific order
+$order = null;
+$orders = $api->select('orders', ['id' => $order_id]);
+if (!empty($orders)) {
+    $order = $orders[0];
+}
+
+// Security check: ensure order belongs to the logged-in user and exists
+if (!$order || $order['customer_id'] !== $user_id) {
+    header('Location: my-purchases.php');
+    exit();
+}
+
 // Fetch profile picture from database
 $profile_picture = '';
 $full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
-    require_once __DIR__ . '/../config/supabase-api.php';
-    require_once __DIR__ . '/../config/uuid-helper.php';
-    $api = getSupabaseAPI();
     $user = safeGetUser($user_id, $api);
     if ($user) {
         $profile_picture = $user['profile_picture'] ?? '';
     }
 }
 
+// --- [NEW] Prepare dynamic data for display ---
+$order_number_display = '#' . substr($order['id'], 0, 8);
+$total_paid = '₱' . number_format($order['total_amount'] ?? 0, 2);
+$payment_method = ucfirst($order['payment_method'] ?? 'N/A');
+
+$order_date = new DateTime($order['created_at']);
+$start_delivery = (clone $order_date)->modify('+2 days');
+$end_delivery = (clone $order_date)->modify('+4 days');
+$delivery_estimate_str = $start_delivery->format('M j') . '–' . $end_delivery->format('j, Y');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,17 +121,25 @@ if ($user_id) {
       <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 grid sm:grid-cols-3 gap-4 text-sm mb-6">
         <div>
           <p class="font-semibold text-gray-700">Order Number</p>
-          <p class="text-green-700 font-semibold">#REG-0024-PDT</p>
+          <p class="text-green-700 font-semibold"><?php echo htmlspecialchars($order_number_display); ?></p>
         </div>
         <div>
           <p class="font-semibold text-gray-700">Total Paid</p>
-          <p class="text-gray-800 font-semibold">₱226.94</p>
+          <p class="text-gray-800 font-semibold"><?php echo htmlspecialchars($total_paid); ?></p>
         </div>
         <div>
           <p class="font-semibold text-gray-700">Payment Method</p>
           <p class="flex items-center justify-center sm:justify-start space-x-1">
-            <i class="fa-brands fa-cc-visa text-blue-700 text-lg"></i>
-            <span>****1234</span>
+            <?php if (stripos($payment_method, 'card') !== false): ?>
+              <i class="fa-brands fa-cc-visa text-blue-700 text-lg"></i>
+              <span>Card Payment</span>
+            <?php elseif (stripos($payment_method, 'cash') !== false): ?>
+              <i class="fa-solid fa-money-bill-wave text-green-700 text-lg"></i>
+              <span>Cash on Delivery</span>
+            <?php else: ?>
+              <i class="fa-solid fa-wallet text-gray-700 text-lg"></i>
+              <span><?php echo htmlspecialchars($payment_method); ?></span>
+            <?php endif; ?>
           </p>
         </div>
       </div>
@@ -119,9 +157,9 @@ if ($user_id) {
         </div>
         <div class="text-sm text-right">
           <p class="font-semibold text-gray-800">Expected Arrival</p>
-          <p class="text-gray-600">Dec 2–4, 2024</p>
+          <p class="text-gray-600"><?php echo htmlspecialchars($delivery_estimate_str); ?></p>
           <div class="bg-green-200 rounded-full h-2 mt-1 w-28">
-            <div class="bg-green-600 h-2 rounded-full w-3/5"></div>
+            <div class="bg-green-600 h-2 rounded-full w-1/5"></div>
           </div>
         </div>
       </div>
