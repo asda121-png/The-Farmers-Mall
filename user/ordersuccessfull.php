@@ -128,8 +128,8 @@ if ($user_id) {
 
       <!-- Buttons -->
       <div class="flex flex-col sm:flex-row justify-center gap-3 mt-8">
-        <button class="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition flex items-center justify-center">
-          <i class="fa-solid fa-box mr-2"></i>Track Order
+        <button onclick="window.location.href='my-purchases.php'" class="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition flex items-center justify-center">
+          <i class="fa-solid fa-box mr-2"></i>View My Orders
         </button>
         <button onclick="window.location.href='../user/user-homepage.php'"
                 class="border border-green-700 text-green-700 px-6 py-2 rounded-lg hover:bg-green-50 transition flex items-center justify-center">

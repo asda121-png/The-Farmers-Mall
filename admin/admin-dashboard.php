@@ -120,10 +120,10 @@ $notifications = [
   </style>
 </head>
 
-<body class="flex min-h-screen bg-gray-50 text-gray-800">
+<body class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
 
   <!-- Sidebar (Deep Green - Primary Brand Color) -->
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 overflow-y-auto">
     <div>
       <!-- Logo and Title -->
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
@@ -178,7 +178,7 @@ $notifications = [
   </aside>
 
   <!-- Main Content Area -->
-  <div class="flex-1 p-6 space-y-6 custom-scrollbar">
+  <div class="flex-1 p-6 space-y-6 custom-scrollbar overflow-y-auto">
 
     <!-- Top Header and Search Bar -->
     <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">

@@ -3,121 +3,92 @@
 
 // Mock notifications for the dropdown
 $notifications = [
-    [
-        "id" => "N001",
-        "type" => "New User",
-        "icon" => "fa-user-plus",
-        "color" => "green",
-        "title" => "New Customer Registered",
-        "message" => "Alex Reyes has created an account.",
-        "time" => "15m ago",
-        "read" => false
-    ],
-    [
-        "id" => "N002",
-        "type" => "New Order",
-        "icon" => "fa-receipt",
-        "color" => "blue",
-        "title" => "New Order #ORD-006",
-        "message" => "An order amounting to ₱1,250 has been placed.",
-        "time" => "1h ago",
-        "read" => false
-    ],
-    [
-        "id" => "N003",
-        "type" => "Low Stock",
-        "icon" => "fa-box-open",
-        "color" => "yellow",
-        "title" => "Low Stock Warning",
-        "message" => "'Organic Apples' are running low.",
-        "time" => "3h ago",
-        "read" => true
-    ],
-    [
-        "id" => "N004",
-        "type" => "System Alert",
-        "icon" => "fa-shield-halved",
-        "color" => "red",
-        "title" => "System Maintenance Scheduled",
-        "message" => "A system-wide maintenance is scheduled for tonight.",
-        "time" => "1d ago",
-        "read" => true
-    ],
 ];
+
 // Mock Order Data
 $order_stats = [
-  "total_revenue" => 0.00,
-  "pending_orders" => 0,
-  "processing" => 0,
-  "completed" => 0
+    "total_revenue"  => 0.00,
+    "pending_orders" => 0,
+    "processing"     => 0,
+    "completed"      => 0  
 ];
 
 // Fetch orders from Supabase (REST wrapper)
 $orders = [];
 try {
-  require_once __DIR__ . '/../config/supabase-api.php';
-  $api = getSupabaseAPI();
+    require_once __DIR__ . '/../config/supabase-api.php';
+    $api = getSupabaseAPI();
 
-  // Attempt to retrieve all orders. Adjust table name or filters if your orders table uses a different name.
-  $rawOrders = $api->select('orders');
+    // Attempt to retrieve all orders.
+    $rawOrders = $api->select('orders');
 
-  if (!is_array($rawOrders)) {
-    $rawOrders = [];
-  }
+    if (!is_array($rawOrders)) {
+        $rawOrders = [];
+    }
 
-  foreach ($rawOrders as $r) {
-    // Normalize common fields with fallbacks
-    $itemsField = '';
-    if (isset($r['items']) && is_string($r['items'])) {
-      $itemsField = $r['items'];
-    } elseif (isset($r['items']) && is_array($r['items'])) {
-      // If items are stored as an array, try to join names
-      $parts = [];
-      foreach ($r['items'] as $it) {
-        if (is_array($it)) {
-          $parts[] = ($it['name'] ?? $it['title'] ?? '') . (isset($it['qty']) ? ' (' . $it['qty'] . ')' : '');
-        } else {
-          $parts[] = (string)$it;
+    // --- [CHANGE START] Initialize counter ---
+    $counter = 1; 
+    // --- [CHANGE END] ---
+
+    foreach ($rawOrders as $r) {
+        
+        // ----- 1. Order ID -------------------------------------------------
+        // OLD CODE: $orderId = $r['id'] ?? null; ...
+        
+        // NEW CODE: Rewrite ID to order1, order2, order3...
+        $orderId = 'order' . $counter;
+        $counter++; // Increase for the next loop
+
+        // ----- 2. Customer -------------------------------------------------
+        $customerName  = $r['customer_name']  ?? '';
+        $customerEmail = $r['customer_email'] ?? '';
+
+        // ----- 3. Items ----------------------------------------------------
+        $items = $r['product_name'] ?? '';
+
+        // ----- 4. Money ----------------------------------------------------
+        $total = floatval($r['total_amount'] ?? 0.0);
+
+        // ----- 5. Dates ----------------------------------------------------
+        $date = '';
+        if (!empty($r['created_at'])) {
+            $date = date('M d, Y - h:i A', strtotime($r['created_at']));
         }
-      }
-      $itemsField = implode(', ', array_filter($parts));
-    } else {
-      $itemsField = $r['items_summary'] ?? ($r['summary'] ?? '');
+
+        // ----- 6. Payment --------------------------------------------------
+        $paymentMethod = $r['payment_method'] ?? '';
+        $paymentStatus = ucfirst(strtolower($r['payment_status'] ?? 'pending'));
+
+        // ----- 7. Order status ---------------------------------------------
+        $status = ucfirst(strtolower($r['status'] ?? 'pending'));
+
+        // ----- 8. Push normalised row --------------------------------------
+        $orders[] = [
+            'id'           => $orderId,  // This now holds "order1", "order2", etc.
+            'real_id'      => $r['id'] ?? null, // (Optional) Keeping the real ID hidden in case you need it for buttons later
+            'customer'     => $customerName,
+            'email'        => $customerEmail,
+            'items'        => $items,
+            'total'        => $total,
+            'date'         => $date,
+            'payment_method' => $paymentMethod,
+            'payment_status' => $paymentStatus,
+            'status'       => $status,
+        ];
     }
 
-    $orderId = $r['order_id'] ?? ($r['id'] ?? null);
-    if ($orderId === null) {
-      // last resort: generate an id
-      $orderId = '#ORD-' . ($r['id'] ?? uniqid());
+    // Populate summary stats
+    foreach ($orders as $o) {
+        $order_stats['total_revenue'] += floatval($o['total']);
+        $st = strtolower($o['status']);
+        if ($st === 'pending') $order_stats['pending_orders']++;
+        if ($st === 'processing') $order_stats['processing']++;
+        if ($st === 'completed' || $st === 'delivered') $order_stats['completed']++;
     }
-
-    $total = isset($r['total']) ? floatval($r['total']) : (isset($r['amount']) ? floatval($r['amount']) : 0.0);
-
-    $orders[] = [
-      'id' => $orderId,
-      'customer' => $r['customer_name'] ?? ($r['name'] ?? ''),
-      'email' => $r['customer_email'] ?? ($r['email'] ?? ''),
-      'items' => $itemsField,
-      'total' => $total,
-      'date' => isset($r['created_at']) ? date('M d, Y - h:i A', strtotime($r['created_at'])) : ($r['date'] ?? ''),
-      'payment_method' => $r['payment_method'] ?? ($r['payment_type'] ?? ''),
-      'payment_status' => $r['payment_status'] ?? ($r['status_payment'] ?? 'Pending'),
-      'status' => $r['status'] ?? ($r['order_status'] ?? 'Pending')
-    ];
-  }
-
-  // Populate summary stats
-  foreach ($orders as $o) {
-    $order_stats['total_revenue'] += floatval($o['total']);
-    $st = strtolower($o['status']);
-    if ($st === 'pending') $order_stats['pending_orders']++;
-    if ($st === 'processing') $order_stats['processing']++;
-    if ($st === 'completed' || $st === 'delivered') $order_stats['completed']++;
-  }
 
 } catch (Exception $e) {
-  // If API fails, leave $orders empty and keep stats at zero. Optionally log $e->getMessage().
-  $orders = [];
+    // If API fails, leave $orders empty
+    $orders = [];
 }
 ?>
 <!DOCTYPE html>
@@ -335,61 +306,7 @@ try {
                     </tr>
                 </thead>
                 <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
-                    <?php foreach ($orders as $order): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-bold text-green-700"><?php echo $order['id']; ?></div>
-                            <div class="text-xs text-gray-400"><?php echo $order['date']; ?></div>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900"><?php echo $order['customer']; ?></div>
-                            <div class="text-xs text-gray-500"><?php echo $order['email']; ?></div>
-                        </td>
-                        
-                         <td class="px-6 py-4">
-                            <div class="text-xs text-gray-600 max-w-xs truncate" title="<?php echo $order['items']; ?>">
-                                <?php echo $order['items']; ?>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-semibold text-gray-900">₱<?php echo number_format($order['total'], 2); ?></div>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-xs">
-                                <span class="block font-medium text-gray-700"><?php echo $order['payment_method']; ?></span>
-                                <?php 
-                                    $payColor = 'text-gray-500';
-                                    if($order['payment_status'] == 'Paid') $payColor = 'text-green-600';
-                                    if($order['payment_status'] == 'Pending') $payColor = 'text-orange-500';
-                                    if($order['payment_status'] == 'Cancelled') $payColor = 'text-red-500';
-                                ?>
-                                <span class="<?php echo $payColor; ?> font-bold text-[10px] uppercase tracking-wide"><?php echo $order['payment_status']; ?></span>
-                            </div>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap">
-                             <?php 
-                                $statusClass = 'bg-gray-100 text-gray-800';
-                                if($order['status'] === 'Delivered') $statusClass = 'bg-green-100 text-green-800 border border-green-200';
-                                if($order['status'] === 'Shipped') $statusClass = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
-                                if($order['status'] === 'Processing') $statusClass = 'bg-blue-100 text-blue-800 border border-blue-200';
-                                if($order['status'] === 'Pending') $statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-                                if($order['status'] === 'Cancelled') $statusClass = 'bg-red-100 text-red-800 border border-red-200';
-                            ?>
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $statusClass; ?>">
-                                <?php echo $order['status']; ?>
-                            </span>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="action-btn text-gray-400 hover:text-green-600 mr-2" title="View Details" data-action="view" data-id="<?php echo $order['id']; ?>"><i class="fa-solid fa-eye"></i></button>
-                            <button class="action-btn text-gray-400 hover:text-blue-600" title="Print Invoice" data-action="print" data-id="<?php echo $order['id']; ?>"><i class="fa-solid fa-print"></i></button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                    <!-- Rows will be populated by JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -671,7 +588,10 @@ try {
         hideModal(btn.closest('.fixed'));
       }));
 
-      document.getElementById('create-order-btn').addEventListener('click', () => showModal(createOrderModal));
+      const createOrderBtn = document.getElementById('create-order-btn');
+      if (createOrderBtn) {
+          createOrderBtn.addEventListener('click', () => showModal(createOrderModal));
+      }
 
       tableBody.addEventListener('click', (e) => {
         const btn = e.target.closest('.action-btn');
