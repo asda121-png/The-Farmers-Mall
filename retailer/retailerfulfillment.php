@@ -204,12 +204,107 @@ try {
             <main id="content" class="p-8 transition-all duration-300 flex-1">
                 <h2 class="text-3xl font-bold text-gray-800 mb-8">Order Management & Fulfillment</h2>
                 
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Total New Orders -->
+                    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Total New Orders</p>
+                                <h3 class="text-3xl font-bold text-gray-900">594</h3>
+                                <p class="text-xs text-green-600 mt-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                    +19%
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Order Pending -->
+                    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Total Order Pending</p>
+                                <h3 class="text-3xl font-bold text-gray-900">257,361</h3>
+                                <p class="text-xs text-red-600 mt-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                                    </svg>
+                                    -15%
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Products Sales -->
+                    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Total Products Sales</p>
+                                <h3 class="text-3xl font-bold text-gray-900">8,594</h3>
+                                <p class="text-xs text-green-600 mt-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                    +61%
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions Bar (Hidden by default, shown when items are selected) -->
+                <div id="bulk-actions-bar" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium text-gray-700 mr-4">
+                                <span id="selected-count">0</span> order(s) selected
+                            </span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="bulkEditOrders()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </button>
+                            <button onclick="bulkPrintOrders()" class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-print mr-1"></i> Print
+                            </button>
+                            <button onclick="clearSelection()" class="px-4 py-2 bg-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-400 transition">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="flex justify-between items-center mb-6">
                     <p class="text-gray-500">Filter by Status: 
                         <select id="order-status-filter" onchange="filterOrders()" class="p-2 border border-gray-300 rounded-lg text-sm">
                             <option value="All">All</option>
-                            <option value="New">New</option>
-                            <option value="Processing">Processing</option>
+                            <option value="In Queue">In Queue</option>
+                            <option value="Pending Fulfillment">Pending Fulfillment</option>
+                            <option value="Picking in Progress">Picking in Progress</option>
+                            <option value="Packing in Progress">Packing in Progress</option>
+                            <option value="Picking Issue">Picking Issue</option>
+                            <option value="Packing Issue">Packing Issue</option>
+                            <option value="Ready for Delivery">Ready for Delivery</option>
+                            <option value="Shipping / In Transit">Shipping / In Transit</option>
+                            <option value="Late Delivery">Late Delivery</option>
                             <option value="Completed">Completed</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
@@ -220,52 +315,98 @@ try {
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-green-50">
                             <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                                    <input type="checkbox" id="select-all-orders" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                                </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU/Unit</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount & Method</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
                             <!-- Sample Order Rows -->
-                            <tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('A1B2C3D4')">
+                                <td class="px-6 py-4" onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="A1B2C3D4">
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#A1B2C3D4</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Alice Johnson</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/7/2025</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">₱415.98</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">New</span>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex items-center">
+                                        <img src="../images/default-avatar.svg" alt="Alice Johnson" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
+                                        <span class="text-gray-900">Alice Johnson</span>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button onclick="updateStatus('A1B2C3D4', 'Processing')" class="text-yellow-600 hover:text-yellow-900">Process</button>
-                                    <button onclick="viewDetails('A1B2C3D4')" class="text-blue-600 hover:text-blue-900">Details</button>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">3/15</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <div class="font-semibold text-gray-900">₱1,205.00</div>
+                                    <div class="text-xs text-gray-500">GCash</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-10 h-1 rounded" style="background-color: #1E88E5;"></div>
+                                        <div class="w-10 h-1 bg-gray-200 rounded"></div>
+                                        <div class="w-10 h-1 bg-gray-200 rounded"></div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: #E3F2FD; color: #1E88E5;">Picking in Progress</span>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('E5F6G7H8')">
+                                <td class="px-6 py-4" onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="E5F6G7H8">
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#E5F6G7H8</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bob Williams</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/6/2025</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">₱625.00</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Processing</span>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex items-center">
+                                        <img src="../images/default-avatar.svg" alt="Bob Williams" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
+                                        <span class="text-gray-900">Bob Williams</span>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button onclick="updateStatus('E5F6G7H8', 'Completed')" class="text-green-600 hover:text-green-900">Complete</button>
-                                    <button onclick="viewDetails('E5F6G7H8')" class="text-blue-600 hover:text-blue-900">Details</button>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">12/23</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <div class="font-semibold text-gray-900">₱1,000.00</div>
+                                    <div class="text-xs text-gray-500">COD</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-10 h-1 rounded" style="background-color: #1E88E5;"></div>
+                                        <div class="w-10 h-1 rounded" style="background-color: #D32F2F;"></div>
+                                        <div class="w-10 h-1 bg-gray-200 rounded"></div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: #FFEBEE; color: #D32F2F;">Packing Issue</span>
                                 </td>
                             </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#I9J0K1L2</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Charlie Brown</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/5/2025</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">₱310.50</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('I9J0K1L2')">
+                                <td class="px-6 py-4" onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="I9J0K1L2">
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button onclick="viewDetails('I9J0K1L2')" class="text-blue-600 hover:text-blue-900">Details</button>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#I9J0K1L2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex items-center">
+                                        <img src="../images/default-avatar.svg" alt="Charlie Brown" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
+                                        <span class="text-gray-900">Charlie Brown</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">17/32</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <div class="font-semibold text-gray-900">₱516.70</div>
+                                    <div class="text-xs text-gray-500">GCash</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-10 h-1 rounded" style="background-color: #1E88E5;"></div>
+                                        <div class="w-10 h-1 rounded" style="background-color: #00BCD4;"></div>
+                                        <div class="w-10 h-1 rounded" style="background-color: #4CAF50;"></div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: #E8F5E9; color: #4CAF50;">Ready for Delivery</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -395,8 +536,15 @@ try {
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
                     <select id="newStatusSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="New">New</option>
-                        <option value="Processing">Processing</option>
+                        <option value="In Queue">In Queue</option>
+                        <option value="Pending Fulfillment">Pending Fulfillment</option>
+                        <option value="Picking in Progress">Picking in Progress</option>
+                        <option value="Packing in Progress">Packing in Progress</option>
+                        <option value="Picking Issue">Picking Issue</option>
+                        <option value="Packing Issue">Packing Issue</option>
+                        <option value="Ready for Delivery">Ready for Delivery</option>
+                        <option value="Shipping / In Transit">Shipping / In Transit</option>
+                        <option value="Late Delivery">Late Delivery</option>
                         <option value="Completed">Completed</option>
                         <option value="Cancelled">Cancelled</option>
                     </select>
@@ -468,6 +616,128 @@ try {
         setTimeout(checkProfileUpdates, 1000);
     });
 
+    // Select all orders functionality
+    document.getElementById('select-all-orders').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.order-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    // Individual checkbox handling
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('order-checkbox')) {
+            const allCheckboxes = document.querySelectorAll('.order-checkbox');
+            const checkedBoxes = document.querySelectorAll('.order-checkbox:checked');
+            const selectAll = document.getElementById('select-all-orders');
+            
+            selectAll.checked = allCheckboxes.length === checkedBoxes.length;
+            selectAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < allCheckboxes.length;
+            
+            // Update bulk actions bar
+            updateBulkActionsBar();
+        }
+    });
+
+    // Update bulk actions bar visibility and count
+    function updateBulkActionsBar() {
+        const checkedBoxes = document.querySelectorAll('.order-checkbox:checked');
+        const bulkActionsBar = document.getElementById('bulk-actions-bar');
+        const selectedCount = document.getElementById('selected-count');
+        
+        if (checkedBoxes.length > 0) {
+            bulkActionsBar.classList.remove('hidden');
+            selectedCount.textContent = checkedBoxes.length;
+        } else {
+            bulkActionsBar.classList.add('hidden');
+            selectedCount.textContent = '0';
+        }
+    }
+
+    // Bulk update status
+    function bulkUpdateStatus(newStatus) {
+        const checkedBoxes = document.querySelectorAll('.order-checkbox:checked');
+        
+        if (checkedBoxes.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+        
+        const orderIds = Array.from(checkedBoxes).map(cb => cb.dataset.orderId);
+        
+        if (confirm(`Are you sure you want to update ${orderIds.length} order(s) to "${newStatus}"?`)) {
+            console.log('Bulk updating orders:', orderIds);
+            console.log('New status:', newStatus);
+            
+            // TODO: Make API call to bulk update order statuses
+            // Example:
+            // fetch('../api/bulk-update-order-status.php', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ orderIds, status: newStatus })
+            // }).then(response => response.json())
+            //   .then(data => {
+            //       if (data.success) {
+            //           location.reload();
+            //       }
+            //   });
+            
+            alert(`${orderIds.length} order(s) will be updated to "${newStatus}".\n\nOrders: ${orderIds.join(', ')}\n\nDatabase integration pending.`);
+            
+            // Uncomment when API is ready:
+            // clearSelection();
+            // location.reload();
+        }
+    }
+
+    // Bulk edit orders
+    function bulkEditOrders() {
+        const checkedBoxes = document.querySelectorAll('.order-checkbox:checked');
+        
+        if (checkedBoxes.length === 0) {
+            alert('Please select at least one order to edit.');
+            return;
+        }
+        
+        const orderIds = Array.from(checkedBoxes).map(cb => cb.dataset.orderId);
+        
+        console.log('Bulk editing orders:', orderIds);
+        
+        // TODO: Open bulk edit modal or redirect to bulk edit page
+        alert(`Bulk editing ${orderIds.length} order(s):\n${orderIds.join(', ')}\n\nBulk edit functionality will be implemented.`);
+    }
+
+    // Bulk print orders
+    function bulkPrintOrders() {
+        const checkedBoxes = document.querySelectorAll('.order-checkbox:checked');
+        
+        if (checkedBoxes.length === 0) {
+            alert('Please select at least one order to print.');
+            return;
+        }
+        
+        const orderIds = Array.from(checkedBoxes).map(cb => cb.dataset.orderId);
+        
+        console.log('Printing orders:', orderIds);
+        
+        // TODO: Implement print functionality
+        alert(`Printing ${orderIds.length} order(s):\n${orderIds.join(', ')}\n\nPrint functionality will be implemented.`);
+    }
+
+    // Clear selection
+    function clearSelection() {
+        const checkboxes = document.querySelectorAll('.order-checkbox');
+        const selectAll = document.getElementById('select-all-orders');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+        
+        updateBulkActionsBar();
+    }
+
     function filterOrders() {
         const filter = document.getElementById('order-status-filter').value;
         const tbody = document.getElementById('orders-table-body');
@@ -476,7 +746,7 @@ try {
         let visibleCount = 0;
         
         for (let row of rows) {
-            const statusSpan = row.querySelector('td:nth-child(5) span');
+            const statusSpan = row.querySelector('td:nth-child(7) span'); // Status is now 7th column
             if (!statusSpan) continue;
             
             const statusText = statusSpan.textContent.trim();
@@ -510,7 +780,8 @@ try {
             id: '#A1B2C3D4',
             customer: 'Alice Johnson',
             date: '12/7/2025',
-            status: 'New',
+            status: 'Picking in Progress',
+            progress: 1, // 0-3 (representing progress stages)
             items: [
                 { name: 'Fresh Apples', quantity: '2 kg', price: '₱150.00', subtotal: '₱300.00' },
                 { name: 'Organic Tomatoes', quantity: '1 kg', price: '₱65.00', subtotal: '₱65.00' }
@@ -526,7 +797,8 @@ try {
             id: '#E5F6G7H8',
             customer: 'Bob Williams',
             date: '12/6/2025',
-            status: 'Processing',
+            status: 'Packing Issue',
+            progress: 2,
             items: [
                 { name: 'Fresh Milk', quantity: '2 liters', price: '₱120.00', subtotal: '₱240.00' },
                 { name: 'Organic Eggs', quantity: '1 dozen', price: '₱180.00', subtotal: '₱180.00' }
@@ -542,7 +814,8 @@ try {
             id: '#I9J0K1L2',
             customer: 'Charlie Brown',
             date: '12/5/2025',
-            status: 'Completed',
+            status: 'Ready for Delivery',
+            progress: 3,
             items: [
                 { name: 'Fresh Mangoes', quantity: '3 kg', price: '₱103.50', subtotal: '₱310.50' }
             ],
@@ -573,15 +846,25 @@ try {
         const statusBadge = document.getElementById('modal-order-status');
         statusBadge.textContent = order.status;
         statusBadge.className = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full';
-        if (order.status === 'New') {
-            statusBadge.className += ' bg-blue-100 text-blue-800';
-        } else if (order.status === 'Processing') {
-            statusBadge.className += ' bg-yellow-100 text-yellow-800';
-        } else if (order.status === 'Completed') {
-            statusBadge.className += ' bg-green-100 text-green-800';
-        } else if (order.status === 'Cancelled') {
-            statusBadge.className += ' bg-red-100 text-red-800';
-        }
+        
+        // Map statuses to colors based on the color guide
+        const statusColors = {
+            'In Queue': { bg: '#E0F2F1', color: '#00897B' },                    // Light Gray/Blue
+            'Pending Fulfillment': { bg: '#FFF9C4', color: '#F57C00' },        // Amber/Yellow
+            'Picking in Progress': { bg: '#E3F2FD', color: '#1E88E5' },        // Blue
+            'Packing in Progress': { bg: '#E1F5FE', color: '#00BCD4' },        // Cyan/Light Blue
+            'Picking Issue': { bg: '#FFEBEE', color: '#EF5350' },              // Red/Pink
+            'Packing Issue': { bg: '#FFCDD2', color: '#D32F2F' },              // Darker Red
+            'Ready for Delivery': { bg: '#E8F5E9', color: '#4CAF50' },         // Green
+            'Shipping / In Transit': { bg: '#E0F2F1', color: '#00897B' },      // Teal
+            'Late Delivery': { bg: '#FFE0B2', color: '#FF9800' },              // Orange
+            'Completed': { bg: '#E8F5E9', color: '#388E3C' },                  // Dark Green
+            'Cancelled': { bg: '#EEEEEE', color: '#757575' }                   // Dark Gray
+        };
+        
+        const colors = statusColors[order.status] || { bg: '#EEEEEE', color: '#757575' };
+        statusBadge.style.backgroundColor = colors.bg;
+        statusBadge.style.color = colors.color;
         
         // Populate items table
         const itemsTableBody = document.getElementById('modal-order-items');

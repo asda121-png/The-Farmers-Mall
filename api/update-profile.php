@@ -95,50 +95,43 @@ try {
     // Handle profile data update
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updateData = [];
+        $shopData = [];
         
+        // User data updates
         if (isset($_POST['full_name']) && !empty(trim($_POST['full_name']))) {
             $updateData['full_name'] = trim($_POST['full_name']);
             $_SESSION['full_name'] = $updateData['full_name'];
         }
         
-        if (isset($_POST['phone']) && !empty(trim($_POST['phone']))) {
+        if (isset($_POST['phone'])) {
             $updateData['phone'] = trim($_POST['phone']);
         }
         
+        if (isset($_POST['email']) && !empty(trim($_POST['email']))) {
+            $updateData['email'] = trim($_POST['email']);
+        }
+        
+        // Shop/Retailer data updates
+        if (isset($_POST['shop_name']) && !empty(trim($_POST['shop_name']))) {
+            $shopData['shop_name'] = trim($_POST['shop_name']);
+        }
+        
+        if (isset($_POST['shop_description'])) {
+            $shopData['business_address'] = trim($_POST['shop_description']);
+        }
+        
+        // Update user data if any
         if (!empty($updateData)) {
             $result = $api->update('users', ['id' => $userId], $updateData);
-            
-            echo json_encode([
-                'success' => true,
-                'message' => 'Profile updated successfully',
-                'data' => $updateData
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'No data to update'
-            ]);
         }
-        exit;
-    }
-    
-    // Handle shop settings for retailers
-    if (isset($_POST['shop_name']) || isset($_POST['shop_description'])) {
-        $users = $api->select('users', ['id' => $userId]);
         
-        if (!empty($users) && $users[0]['user_type'] === 'retailer') {
-            // Check if retailer record exists
-            $retailers = $api->select('retailers', ['user_id' => $userId]);
+        // Update retailer data if any
+        if (!empty($shopData)) {
+            $users = $api->select('users', ['id' => $userId]);
             
-            $shopData = [];
-            if (isset($_POST['shop_name']) && !empty(trim($_POST['shop_name']))) {
-                $shopData['shop_name'] = trim($_POST['shop_name']);
-            }
-            if (isset($_POST['shop_description'])) {
-                $shopData['shop_description'] = trim($_POST['shop_description']);
-            }
-            
-            if (!empty($shopData)) {
+            if (!empty($users) && $users[0]['user_type'] === 'retailer') {
+                $retailers = $api->select('retailers', ['user_id' => $userId]);
+                
                 if (!empty($retailers)) {
                     // Update existing retailer record
                     $result = $api->update('retailers', ['user_id' => $userId], $shopData);
@@ -147,14 +140,22 @@ try {
                     $shopData['user_id'] = $userId;
                     $result = $api->insert('retailers', $shopData);
                 }
-                
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Shop settings updated successfully'
-                ]);
-                exit;
             }
         }
+        
+        if (!empty($updateData) || !empty($shopData)) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'data' => array_merge($updateData, $shopData)
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No data to update'
+            ]);
+        }
+        exit;
     }
     
     echo json_encode([

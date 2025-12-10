@@ -123,16 +123,6 @@ try {
             <!-- Personal Info -->
             <div class="space-y-6 pt-6 border-t">
               <div class="grid md:grid-cols-2 gap-6">
-                <!-- First Name -->
-                <div class="info-block">
-                  <div class="display-view bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">First Name</label><p id="displayFirstName" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars(explode(' ', $userData['full_name'] ?? 'User')[0]); ?></p></div>
-                  <div class="edit-view hidden"><label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label><input type="text" id="firstName" value="<?php echo htmlspecialchars(explode(' ', $userData['full_name'] ?? '')[0]); ?>" class="mt-1 w-full border rounded-md px-3 py-2"></div>
-                </div>
-                <!-- Last Name -->
-                <div class="info-block">
-                  <div class="display-view bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Last Name</label><p id="displayLastName" class="text-gray-800 font-medium mt-1"><?php $nameParts = explode(' ', $userData['full_name'] ?? 'User'); echo htmlspecialchars(isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : ''); ?></p></div>
-                  <div class="edit-view hidden"><label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label><input type="text" id="lastName" value="<?php $nameParts = explode(' ', $userData['full_name'] ?? ''); echo htmlspecialchars(isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : ''); ?>" class="mt-1 w-full border rounded-md px-3 py-2"></div>
-                </div>
                 <!-- Mobile Number -->
                 <div class="info-block">
                   <div class="display-view bg-gray-50 p-4 rounded-lg"><label class="text-xs text-gray-500 uppercase tracking-wide">Mobile Number</label><p id="displayMobileNumber" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($userData['phone'] ?? 'Not set'); ?></p></div>
@@ -287,59 +277,42 @@ try {
       // Show content based on initial URL hash
       updateContent(window.location.hash);
 
-      // Handle profile picture upload
+      // Store selected profile picture for later upload
+      let selectedProfileImage = null;
       const imageUpload = document.getElementById('imageUpload');
       const profileImage = document.getElementById('profileImage');
+      const saveChangesBtn = document.getElementById('saveChangesBtn');
       
-      imageUpload.addEventListener('change', async function(e) {
+      imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
         
         // Validate file size (5MB max)
         if (file.size > 5 * 1024 * 1024) {
           alert('File size must be less than 5MB');
+          imageUpload.value = '';
           return;
         }
         
         // Validate file type
         if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
           alert('Only JPG, PNG, GIF, and WEBP images are allowed');
+          imageUpload.value = '';
           return;
         }
         
-        // Show loading state
-        const originalSrc = profileImage.src;
-        profileImage.style.opacity = '0.5';
+        // Store file for later upload
+        selectedProfileImage = file;
         
-        try {
-          const formData = new FormData();
-          formData.append('profile_picture', file);
-          
-          const response = await fetch('../api/update-profile.php', {
-            method: 'POST',
-            body: formData
-          });
-          
-          const result = await response.json();
-          
-          if (result.success) {
-            // Update image with cache buster
-            profileImage.src = result.profile_picture + '?t=' + new Date().getTime();
-            profileImage.style.opacity = '1';
-            alert('Profile picture updated successfully!');
-            
-            // Trigger update in dashboard if it's open
-            window.dispatchEvent(new CustomEvent('profileUpdated'));
-          } else {
-            profileImage.style.opacity = '1';
-            alert('Error: ' + result.message);
-          }
-        } catch (error) {
-          console.error('Upload error:', error);
-          profileImage.src = originalSrc;
-          profileImage.style.opacity = '1';
-          alert('Failed to upload profile picture. Please try again.');
-        }
+        // Show preview only (not uploaded yet)
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          profileImage.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+        
+        // Show save button
+        saveChangesBtn.classList.remove('hidden');
       });
 
       // Handle Edit Profile button
@@ -348,13 +321,12 @@ try {
       let isEditing = false;
       
       editProfileBtn.addEventListener('click', function() {
-        isEditing = !isEditing;
-        
-        if (isEditing) {
+        if (!isEditing) {
           // Enable edit mode
-          editProfileBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+          isEditing = true;
+          editProfileBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
           editProfileBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-          editProfileBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+          editProfileBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
           
           infoBlocks.forEach(block => {
             block.querySelector('.display-view').classList.add('hidden');
@@ -367,30 +339,70 @@ try {
           document.getElementById('shopName').classList.add('border', 'border-gray-300', 'px-3', 'py-2', 'rounded');
           document.getElementById('shopAddress').classList.add('border', 'border-gray-300', 'px-3', 'py-2', 'rounded');
           
-          // Enable image upload
-          document.getElementById('imageUpload').disabled = false;
+          // Show save button at bottom
+          saveChangesBtn.classList.remove('hidden');
         } else {
-          // Save changes
-          saveProfileChanges();
+          // Cancel edit mode
+          location.reload();
         }
       });
       
-      async function saveProfileChanges() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
+      // Handle Save Changes button click
+      saveChangesBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
         const phone = document.getElementById('mobileNumber').value.trim();
+        const email = document.getElementById('email').value.trim();
         const shopName = document.getElementById('shopName').value.trim();
         const shopAddress = document.getElementById('shopAddress').value.trim();
         
-        if (!firstName) {
-          alert('First name is required');
+        // Validation
+        if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+          alert('Valid email address is required');
+          return;
+        }
+        
+        if (phone && !phone.match(/^[0-9+\-\s()]+$/)) {
+          alert('Please enter a valid phone number');
           return;
         }
         
         try {
+          // Disable button during save
+          saveChangesBtn.disabled = true;
+          saveChangesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+          
+          // First, upload profile picture if selected
+          if (selectedProfileImage) {
+            const imageFormData = new FormData();
+            imageFormData.append('profile_picture', selectedProfileImage);
+            
+            const imageResponse = await fetch('../api/update-profile.php', {
+              method: 'POST',
+              body: imageFormData
+            });
+            
+            const imageResult = await imageResponse.json();
+            
+            if (!imageResult.success) {
+              alert('Error uploading profile picture: ' + imageResult.message);
+              saveChangesBtn.disabled = false;
+              saveChangesBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+              return;
+            }
+            
+            // Update header profile picture immediately
+            const headerProfilePic = document.getElementById('headerProfilePic');
+            if (headerProfilePic && imageResult.profile_picture) {
+              const timestamp = new Date().getTime();
+              headerProfilePic.src = imageResult.profile_picture + '?t=' + timestamp;
+            }
+          }
+          
+          // Then, update profile data
           const formData = new FormData();
-          formData.append('full_name', firstName + ' ' + lastName);
           formData.append('phone', phone);
+          formData.append('email', email);
           formData.append('shop_name', shopName);
           formData.append('shop_description', shopAddress);
           
@@ -402,40 +414,23 @@ try {
           const result = await response.json();
           
           if (result.success) {
-            // Update display values
-            document.getElementById('displayFirstName').textContent = firstName;
-            document.getElementById('displayLastName').textContent = lastName;
-            document.getElementById('displayMobileNumber').textContent = phone || 'Not set';
-            
-            // Exit edit mode
-            editProfileBtn.innerHTML = '<i class="fas fa-pen"></i> Edit Profile';
-            editProfileBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            editProfileBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-            
-            infoBlocks.forEach(block => {
-              block.querySelector('.display-view').classList.remove('hidden');
-              block.querySelector('.edit-view').classList.add('hidden');
-            });
-            
-            document.getElementById('shopName').disabled = true;
-            document.getElementById('shopAddress').disabled = true;
-            document.getElementById('shopName').classList.remove('border', 'border-gray-300', 'px-3', 'py-2', 'rounded');
-            document.getElementById('shopAddress').classList.remove('border', 'border-gray-300', 'px-3', 'py-2', 'rounded');
-            document.getElementById('imageUpload').disabled = true;
-            
-            isEditing = false;
-            alert('Profile updated successfully!');
+            // Trigger profile update event for all pages
+            window.dispatchEvent(new CustomEvent('profileUpdated'));
             
             // Reload page to reflect all changes
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => location.reload(), 500);
           } else {
             alert('Error: ' + result.message);
+            saveChangesBtn.disabled = false;
+            saveChangesBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
           }
         } catch (error) {
           console.error('Save error:', error);
           alert('Failed to save changes. Please try again.');
+          saveChangesBtn.disabled = false;
+          saveChangesBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
         }
-      }
+      });
     });
   </script>
   </body>

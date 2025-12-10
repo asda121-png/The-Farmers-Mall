@@ -499,12 +499,19 @@ try {
     });
 
     // Load products on page load
-    window.addEventListener('DOMContentLoaded', loadProducts);
+    window.addEventListener('DOMContentLoaded', () => loadProducts());
     
-    // Load products function
-    async function loadProducts() {
+    // Load products function with filters
+    async function loadProducts(filters = {}) {
         try {
-            const response = await fetch('../api/get-products.php');
+            // Build query string from filters
+            const params = new URLSearchParams();
+            if (filters.category) params.append('category', filters.category);
+            if (filters.stock_status) params.append('stock_status', filters.stock_status);
+            if (filters.product_type) params.append('product_type', filters.product_type);
+            
+            const url = '../api/get-products.php' + (params.toString() ? '?' + params.toString() : '');
+            const response = await fetch(url);
             const result = await response.json();
             
             if (result.success && result.products) {
@@ -663,16 +670,67 @@ try {
     
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.add('hidden');
+        // Reset modal text
+        const modalContent = document.querySelector('#deleteModal .p-6 p');
+        if (modalContent) {
+            modalContent.textContent = 'Are you sure you want to delete this product?';
+        }
         productToDelete = null;
     }
     
-    function confirmDelete() {
+    async function confirmDelete() {
         if (productToDelete) {
-            console.log('Deleting product:', productToDelete);
-            // TODO: Make API call to delete product
-            closeDeleteModal();
-            showToast('Product deleted successfully!', 'success');
-            // When API is ready, reload or remove the row
+            try {
+                // Check if it's bulk delete (array) or single delete (string)
+                const isBulkDelete = Array.isArray(productToDelete);
+                const productIds = isBulkDelete ? productToDelete : [productToDelete];
+                
+                if (isBulkDelete) {
+                    // Bulk delete
+                    const response = await fetch('../api/bulk-action-products.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            product_ids: productIds, 
+                            action: 'delete' 
+                        })
+                    });
+                    const result = await response.json();
+                    
+                    closeDeleteModal();
+                    
+                    if (result.success) {
+                        showToast(result.message || `${productIds.length} product(s) deleted successfully!`, 'success');
+                        setTimeout(() => loadProducts(), 500);
+                        // Uncheck all checkboxes
+                        document.getElementById('selectAll').checked = false;
+                        document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = false);
+                    } else {
+                        showToast(result.message || 'Error deleting products', 'error');
+                    }
+                } else {
+                    // Single delete
+                    const response = await fetch('../api/delete-product.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ product_id: productToDelete })
+                    });
+                    const result = await response.json();
+                    
+                    closeDeleteModal();
+                    
+                    if (result.success) {
+                        showToast('Product deleted successfully!', 'success');
+                        setTimeout(() => loadProducts(), 500);
+                    } else {
+                        showToast(result.message || 'Error deleting product', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                closeDeleteModal();
+                showToast('Error deleting product', 'error');
+            }
         }
     }
 
@@ -777,14 +835,19 @@ try {
         const productType = document.getElementById('productTypeFilter').value;
         const stockStatus = document.getElementById('stockStatusFilter').value;
         
-        console.log('Applying filters:', { category, productType, stockStatus });
-        // TODO: Implement filter logic with database
+        const filters = {};
+        if (category) filters.category = category;
+        if (productType) filters.product_type = productType;
+        if (stockStatus) filters.stock_status = stockStatus;
+        
+        loadProducts(filters);
+        
         if (category || productType || stockStatus) {
             showToast('Filters applied successfully!', 'success');
         }
     }
     
-    function applyBulkAction() {
+    async function applyBulkAction() {
         const action = document.getElementById('bulkActions').value;
         if (!action) {
             return;
@@ -797,10 +860,59 @@ try {
             return;
         }
         
-        console.log('Applying bulk action:', action, 'to', checkedBoxes.length, 'products');
-        // TODO: Implement bulk action logic
-        showToast(`Bulk action "${action}" applied to ${checkedBoxes.length} product(s)!`, 'success');
+        const productIds = Array.from(checkedBoxes).map(cb => cb.dataset.productId);
+        
+        if (action === 'delete') {
+            // Show custom confirmation via modal instead of browser dialog
+            productToDelete = productIds; // Store array for bulk delete
+            document.getElementById('deleteModal').classList.remove('hidden');
+            // Update modal text for bulk delete
+            const modalContent = document.querySelector('#deleteModal .p-6 p');
+            if (modalContent) {
+                modalContent.textContent = `Are you sure you want to delete ${productIds.length} product(s)?`;
+            }
+            document.getElementById('bulkActions').value = '';
+            return;
+        }
+        
+        if (action === 'edit' && productIds.length > 1) {
+            showToast('Please select only one product to edit', 'warning');
+            document.getElementById('bulkActions').value = '';
+            return;
+        }
+        
+        try {
+            const response = await fetch('../api/bulk-action-products.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    product_ids: productIds, 
+                    action: action 
+                })
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                if (result.redirect && action === 'edit' && productIds.length === 1) {
+                    // Redirect to edit page for single product
+                    window.location.href = `retaileraddnewproduct.php?id=${productIds[0]}`;
+                } else if (result.redirect && action === 'edit') {
+                    showToast('Please select only one product to edit', 'warning');
+                } else {
+                    showToast(result.message, 'success');
+                    setTimeout(() => loadProducts(), 500);
+                }
+            } else {
+                showToast(result.message || 'Error processing bulk action', 'error');
+            }
+        } catch (error) {
+            console.error('Error applying bulk action:', error);
+            showToast('Error processing bulk action', 'error');
+        }
+        
         document.getElementById('bulkActions').value = '';
+        document.getElementById('selectAll').checked = false;
+        checkedBoxes.forEach(cb => cb.checked = false);
     }
     
     // Checkbox functions

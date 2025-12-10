@@ -219,63 +219,109 @@ try {
             <main id="content" class="p-8 transition-all duration-300 flex-1">
                 <h2 class="text-3xl font-bold text-gray-800 mb-8">Vouchers & Coupons Management</h2>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Active Vouchers & Coupons</h3>
-                        <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-lg space-y-3">
-                            <div class="flex justify-between items-center border-b border-blue-100 pb-3">
+                        <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-lg space-y-3">
+                            <div class="flex justify-between items-center border-b border-green-100 pb-3 cursor-pointer hover:bg-green-100 p-3 rounded transition" onclick="showCouponPerformance('FRESH20', 75, 120, 4120.50, 45.80)">
                                 <div>
-                                    <p class="font-bold text-blue-800">FRESH20</p>
-                                    <p class="text-sm text-blue-600">20% off all Fresh Produce (Min ₱30 spend)</p>
+                                    <p class="font-bold text-green-800">FRESH20</p>
+                                    <p class="text-sm text-green-600">20% off all Fresh Produce (Min ₱30 spend)</p>
                                 </div>
-                                <span class="text-xs text-blue-500 font-medium bg-blue-100 px-2 py-1 rounded">Expires: 2024-11-30</span>
+                                <span class="text-xs text-green-500 font-medium bg-green-100 px-2 py-1 rounded">Expires: 2024-11-30</span>
                             </div>
-                            <div class="flex justify-between items-center border-b border-blue-100 pb-3">
+                            <div class="flex justify-between items-center border-b border-green-100 pb-3 cursor-pointer hover:bg-green-100 p-3 rounded transition" onclick="showCouponPerformance('LOCALSHIP', 60, 89, 1850.00, 62.30)">
                                 <div>
-                                    <p class="font-bold text-blue-800">LOCALSHIP</p>
-                                    <p class="text-sm text-blue-600">Free Shipping on orders over ₱50</p>
+                                    <p class="font-bold text-green-800">LOCALSHIP</p>
+                                    <p class="text-sm text-green-600">Free Shipping on orders over ₱50</p>
                                 </div>
-                                <span class="text-xs text-blue-500 font-medium bg-blue-100 px-2 py-1 rounded">Always Active</span>
+                                <span class="text-xs text-green-500 font-medium bg-green-100 px-2 py-1 rounded">Always Active</span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex justify-between items-center cursor-pointer hover:bg-green-100 p-3 rounded transition" onclick="showCouponPerformance('NEWBIE10', 45, 56, 560.00, 38.50)">
                                 <div>
-                                    <p class="font-bold text-blue-800">NEWBIE10</p>
-                                    <p class="text-sm text-blue-600">Flat ₱10 off first order</p>
+                                    <p class="font-bold text-green-800">NEWBIE10</p>
+                                    <p class="text-sm text-green-600">Flat ₱10 off first order</p>
                                 </div>
-                                <span class="text-xs text-blue-500 font-medium bg-blue-100 px-2 py-1 rounded">Expires: 2025-01-01</span>
+                                <span class="text-xs text-green-500 font-medium bg-green-100 px-2 py-1 rounded">Expires: 2025-01-01</span>
                             </div>
                         </div>
-                        <button onclick="openCouponModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150 font-medium shadow-md">
+                        <button onclick="openCouponModal()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-150 font-medium shadow-md">
                             <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Create New Coupon
                         </button>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Coupon Performance</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-sm text-gray-600 mb-1">FRESH20 Usage:</p>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-green-600 h-2.5 rounded-full" style="width: 75%"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">75% redemption rate (120 uses)</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Total Discount Value Given (Last 30 Days):</p>
-                                <p class="text-2xl font-bold text-red-600 mt-1">₱4,120.50</p>
-                            </div>
-                            <div class="border-t pt-4">
-                                <p class="text-sm text-gray-600">Avg. Basket Size with Coupon:</p>
-                                <p class="text-xl font-bold text-green-700 mt-1">₱45.80</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
     
+</div>
+
+<!-- Coupon Performance Modal -->
+<div id="couponPerformanceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-800">Coupon Performance</h3>
+                <button onclick="closeCouponPerformanceModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="mb-6">
+                <h4 class="text-xl font-bold text-green-800 mb-2" id="performanceCouponCode">FRESH20</h4>
+                <p class="text-sm text-gray-600">Performance metrics for the last 30 days</p>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Redemption Rate -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600 mb-2 font-medium">Redemption Rate</p>
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                        <div id="redemptionBar" class="bg-green-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-sm text-gray-700">
+                        <span id="redemptionRate" class="font-bold text-green-700">0%</span> redemption rate 
+                        (<span id="usageCount" class="font-semibold">0</span> uses)
+                    </p>
+                </div>
+                
+                <!-- Total Discount Given -->
+                <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
+                    <p class="text-sm text-gray-600 mb-1">Total Discount Value Given (Last 30 Days)</p>
+                    <p class="text-3xl font-bold text-red-600" id="totalDiscount">₱0.00</p>
+                    <p class="text-xs text-gray-500 mt-1">Total amount saved by customers</p>
+                </div>
+                
+                <!-- Average Basket Size -->
+                <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                    <p class="text-sm text-gray-600 mb-1">Average Basket Size with Coupon</p>
+                    <p class="text-3xl font-bold text-green-700" id="avgBasket">₱0.00</p>
+                    <p class="text-xs text-gray-500 mt-1">Average order value when this coupon is used</p>
+                </div>
+                
+                <!-- Additional Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-600 mb-1">Total Orders</p>
+                        <p class="text-2xl font-bold text-blue-700" id="totalOrders">0</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-600 mb-1">ROI Impact</p>
+                        <p class="text-2xl font-bold text-purple-700">+<span id="roiImpact">0</span>%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-6 border-t bg-gray-50 flex justify-end">
+            <button onclick="closeCouponPerformanceModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">
+                Close
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- Coupon Creation Modal -->
@@ -421,6 +467,29 @@ try {
     window.addEventListener('load', () => {
         setTimeout(checkProfileUpdates, 1000);
     });
+    
+    // Coupon Performance Modal Functions
+    function showCouponPerformance(code, redemptionRate, usageCount, totalDiscount, avgBasket) {
+        // Update modal content
+        document.getElementById('performanceCouponCode').textContent = code;
+        document.getElementById('redemptionRate').textContent = redemptionRate + '%';
+        document.getElementById('redemptionBar').style.width = redemptionRate + '%';
+        document.getElementById('usageCount').textContent = usageCount;
+        document.getElementById('totalDiscount').textContent = '₱' + totalDiscount.toFixed(2);
+        document.getElementById('avgBasket').textContent = '₱' + avgBasket.toFixed(2);
+        document.getElementById('totalOrders').textContent = usageCount;
+        
+        // Calculate ROI impact (simplified example)
+        const roiImpact = Math.round((avgBasket * usageCount - totalDiscount) / totalDiscount * 10);
+        document.getElementById('roiImpact').textContent = roiImpact;
+        
+        // Show modal
+        document.getElementById('couponPerformanceModal').classList.remove('hidden');
+    }
+    
+    function closeCouponPerformanceModal() {
+        document.getElementById('couponPerformanceModal').classList.add('hidden');
+    }
     
     // Coupon Modal Functions
     function openCouponModal() {

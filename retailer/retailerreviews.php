@@ -217,7 +217,61 @@ try {
             </header>
         
             <main id="content" class="p-8 transition-all duration-300 flex-1">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8">Customer Reviews & Ratings</h2>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">Customer Reviews & Ratings</h2>
+                    
+                    <!-- Filter Dropdown -->
+                    <div class="relative">
+                        <button id="filterBtn" onclick="toggleFilterDropdown()" class="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
+                            <i class="fas fa-filter text-gray-600"></i>
+                            <span class="text-gray-700 font-medium">Filter by Rating</span>
+                            <i class="fas fa-chevron-down text-gray-500 text-sm"></i>
+                        </button>
+                        <div id="filterDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border z-50">
+                            <div class="py-2">
+                                <button onclick="filterReviews('all')" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center justify-between">
+                                    <span class="text-gray-700">All Reviews</span>
+                                    <span class="text-xs text-gray-500">342</span>
+                                </button>
+                                <button onclick="filterReviews(5)" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center justify-between">
+                                    <span class="flex items-center">
+                                        <span class="text-yellow-500 mr-2">★★★★★</span>
+                                        <span class="text-gray-700">5 Stars</span>
+                                    </span>
+                                    <span class="text-xs text-gray-500">274</span>
+                                </button>
+                                <button onclick="filterReviews(4)" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center justify-between">
+                                    <span class="flex items-center">
+                                        <span class="text-yellow-500 mr-2">★★★★</span>
+                                        <span class="text-gray-700">4 Stars</span>
+                                    </span>
+                                    <span class="text-xs text-gray-500">41</span>
+                                </button>
+                                <button onclick="filterReviews(3)" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center justify-between">
+                                    <span class="flex items-center">
+                                        <span class="text-yellow-500 mr-2">★★★</span>
+                                        <span class="text-gray-700">3 Stars</span>
+                                    </span>
+                                    <span class="text-xs text-gray-500">17</span>
+                                </button>
+                                <button onclick="filterReviews(2)" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center justify-between">
+                                    <span class="flex items-center">
+                                        <span class="text-yellow-500 mr-2">★★</span>
+                                        <span class="text-gray-700">2 Stars</span>
+                                    </span>
+                                    <span class="text-xs text-gray-500">7</span>
+                                </button>
+                                <button onclick="filterReviews(1)" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center justify-between">
+                                    <span class="flex items-center">
+                                        <span class="text-yellow-500 mr-2">★</span>
+                                        <span class="text-gray-700">1 Star</span>
+                                    </span>
+                                    <span class="text-xs text-gray-500">3</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -274,8 +328,8 @@ try {
 
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Recent Reviews</h3>
-                        <div class="space-y-6">
-                            <div class="border-b pb-4">
+                        <div id="reviewsContainer" class="space-y-6">
+                            <div class="border-b pb-4 review-item" data-rating="5">
                                 <div class="flex items-center justify-between mb-2">
                                     <div>
                                         <p class="font-semibold text-gray-800">Maria Santos</p>
@@ -303,7 +357,7 @@ try {
                                 </div>
                             </div>
 
-                            <div class="border-b pb-4">
+                            <div class="border-b pb-4 review-item" data-rating="4">
                                 <div class="flex items-center justify-between mb-2">
                                     <div>
                                         <p class="font-semibold text-gray-800">John Reyes</p>
@@ -327,7 +381,7 @@ try {
                                 </div>
                             </div>
 
-                            <div class="border-b pb-4">
+                            <div class="border-b pb-4 review-item" data-rating="5">
                                 <div class="flex items-center justify-between mb-2">
                                     <div>
                                         <p class="font-semibold text-gray-800">Ana Cruz</p>
@@ -345,6 +399,62 @@ try {
                                 <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
                                     <p class="text-xs text-gray-700"><strong>Your Reply:</strong> Thank you so much, Ana! We're glad you enjoyed our mangoes. 🥭</p>
                                     <span class="text-xs text-gray-500">Replied 1 week ago</span>
+                                </div>
+                            </div>
+
+                            <div class="border-b pb-4 review-item" data-rating="3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Pedro Garcia</p>
+                                        <div class="flex items-center text-yellow-500 text-sm mt-1">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-gray-500">2 weeks ago</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-3">"Average experience. Products were okay but packaging could be better."</p>
+                                <div id="reply-box-3" class="hidden mb-2">
+                                    <textarea id="reply-text-3" class="w-full p-2 border border-gray-300 rounded-lg text-sm mb-2" rows="2" placeholder="Write your response..."></textarea>
+                                    <div class="flex space-x-2">
+                                        <button onclick="submitReviewResponse(3)" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs font-medium">Send Reply</button>
+                                        <button onclick="toggleReplyBox(3)" class="px-4 py-1.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-xs font-medium">Cancel</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button onclick="toggleReplyBox(3)" class="text-xs text-blue-600 hover:underline">Reply</button>
+                                    <button onclick="markHelpful(3)" class="text-xs text-gray-500 hover:underline">Mark as helpful</button>
+                                </div>
+                            </div>
+
+                            <div class="border-b pb-4 review-item" data-rating="2">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Linda Gomez</p>
+                                        <div class="flex items-center text-yellow-500 text-sm mt-1">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-gray-500">3 weeks ago</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-3">"Delivery was very late and some items were damaged."</p>
+                                <div id="reply-box-4" class="hidden mb-2">
+                                    <textarea id="reply-text-4" class="w-full p-2 border border-gray-300 rounded-lg text-sm mb-2" rows="2" placeholder="Write your response..."></textarea>
+                                    <div class="flex space-x-2">
+                                        <button onclick="submitReviewResponse(4)" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs font-medium">Send Reply</button>
+                                        <button onclick="toggleReplyBox(4)" class="px-4 py-1.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-xs font-medium">Cancel</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button onclick="toggleReplyBox(4)" class="text-xs text-blue-600 hover:underline">Reply</button>
+                                    <button onclick="markHelpful(4)" class="text-xs text-gray-500 hover:underline">Mark as helpful</button>
                                 </div>
                             </div>
                         </div>
@@ -428,6 +538,49 @@ try {
     // Review Response Functions
     let pendingAction = null;
     let pendingData = null;
+    
+    // Filter Functions
+    function toggleFilterDropdown() {
+        const dropdown = document.getElementById('filterDropdown');
+        dropdown.classList.toggle('hidden');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const filterBtn = document.getElementById('filterBtn');
+        const dropdown = document.getElementById('filterDropdown');
+        if (!filterBtn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+    
+    function filterReviews(rating) {
+        const reviewItems = document.querySelectorAll('.review-item');
+        
+        reviewItems.forEach(item => {
+            if (rating === 'all') {
+                item.style.display = '';
+            } else {
+                const itemRating = parseInt(item.getAttribute('data-rating'));
+                if (itemRating === rating) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        });
+        
+        // Update button text
+        const filterBtn = document.getElementById('filterBtn');
+        if (rating === 'all') {
+            filterBtn.innerHTML = '<i class="fas fa-filter text-gray-600"></i><span class="text-gray-700 font-medium">Filter by Rating</span><i class="fas fa-chevron-down text-gray-500 text-sm"></i>';
+        } else {
+            filterBtn.innerHTML = `<i class="fas fa-filter text-gray-600"></i><span class="text-gray-700 font-medium">${rating} Star${rating > 1 ? 's' : ''}</span><i class="fas fa-chevron-down text-gray-500 text-sm"></i>`;
+        }
+        
+        // Close dropdown
+        document.getElementById('filterDropdown').classList.add('hidden');
+    }
     
     function toggleReplyBox(reviewId) {
         const replyBox = document.getElementById(`reply-box-${reviewId}`);

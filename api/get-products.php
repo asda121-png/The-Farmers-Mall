@@ -23,8 +23,48 @@ try {
     }
     $retailerId = $retailers[0]['id'];
     
-    // Get all products for this retailer
-    $products = $api->select('products', ['retailer_id' => $retailerId]);
+    // Build filter conditions
+    $conditions = ['retailer_id' => $retailerId];
+    
+    // Add category filter
+    if (isset($_GET['category']) && !empty($_GET['category'])) {
+        $conditions['category'] = $_GET['category'];
+    }
+    
+    // Get all products for this retailer with filters
+    $products = $api->select('products', $conditions);
+    
+    // Apply additional filters that can't be done in the query
+    if (!empty($products)) {
+        // Filter by stock status
+        if (isset($_GET['stock_status']) && !empty($_GET['stock_status'])) {
+            $stockStatus = $_GET['stock_status'];
+            $products = array_filter($products, function($product) use ($stockStatus) {
+                $stock = intval($product['stock_quantity'] ?? 0);
+                switch ($stockStatus) {
+                    case 'instock':
+                        return $stock > 0;
+                    case 'outofstock':
+                        return $stock <= 0;
+                    case 'onbackorder':
+                        // For now, treat as out of stock or low stock
+                        return $stock <= 5 && $stock > 0;
+                    default:
+                        return true;
+                }
+            });
+            $products = array_values($products); // Re-index array
+        }
+        
+        // Filter by product type (if you add this field later)
+        if (isset($_GET['product_type']) && !empty($_GET['product_type'])) {
+            $productType = $_GET['product_type'];
+            $products = array_filter($products, function($product) use ($productType) {
+                return isset($product['product_type']) && $product['product_type'] === $productType;
+            });
+            $products = array_values($products);
+        }
+    }
     
     echo json_encode(['success' => true, 'products' => $products]);
     

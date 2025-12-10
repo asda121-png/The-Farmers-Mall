@@ -231,10 +231,10 @@ try {
                     <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Reports & Exports</h3>
                         <div class="space-y-3">
-                            <button class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
+                            <button onclick="downloadSalesReport()" class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
                                 <i class="fas fa-download mr-2"></i> Download Total Sales Report (CSV)
                             </button>
-                            <button class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
+                            <button onclick="downloadTaxReport()" class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
                                 <i class="fas fa-download mr-2"></i> Download Tax & Commission Report (CSV)
                             </button>
                         </div>
@@ -245,19 +245,19 @@ try {
                     <h3 class="px-6 py-4 text-xl font-semibold text-gray-700 border-b">Transaction History</h3>
                     <div class="p-6 text-gray-500">
                         <ul class="space-y-3">
-                            <li class="flex justify-between items-center border-b pb-2">
+                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8291', 'Sale', 'Apples, Bread', 21.50, '2024-12-10', 'completed')">
                                 <span class="text-sm font-medium">Sale #8291 (Apples, Bread)</span>
                                 <span class="text-sm text-green-600 font-semibold">+ ₱21.50</span>
                             </li>
-                            <li class="flex justify-between items-center border-b pb-2">
+                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('P001-2024', 'Payout', 'Monthly payout to bank account', -890.00, '2024-12-09', 'completed')">
                                 <span class="text-sm font-medium">Payout ID P001-2024</span>
                                 <span class="text-sm text-red-600 font-semibold">- ₱890.00</span>
                             </li>
-                            <li class="flex justify-between items-center border-b pb-2">
+                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8290', 'Sale', 'Potatoes', 12.00, '2024-12-09', 'completed')">
                                 <span class="text-sm font-medium">Sale #8290 (Potatoes)</span>
                                 <span class="text-sm text-green-600 font-semibold">+ ₱12.00</span>
                             </li>
-                            <li class="flex justify-between items-center border-b pb-2">
+                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8289', 'Sale', 'Tomatoes, Lettuce', 35.75, '2024-12-08', 'completed')">
                                 <span class="text-sm font-medium">Sale #8289 (Tomatoes, Lettuce)</span>
                                 <span class="text-sm text-green-600 font-semibold">+ ₱35.75</span>
                             </li>
@@ -270,7 +270,200 @@ try {
     
 </div>
 
+<!-- Transaction Details Modal -->
+<div id="transactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+            <h3 class="text-2xl font-bold text-gray-800">Transaction Details</h3>
+            <button onclick="closeTransactionModal()" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        
+        <div class="p-6 space-y-6">
+            <!-- Transaction ID -->
+            <div class="flex items-center justify-between pb-4 border-b">
+                <span class="text-gray-600 font-medium">Transaction ID</span>
+                <span id="modalTransactionId" class="text-gray-800 font-semibold text-lg"></span>
+            </div>
+            
+            <!-- Type -->
+            <div class="flex items-center justify-between pb-4 border-b">
+                <span class="text-gray-600 font-medium">Type</span>
+                <span id="modalTransactionType" class="px-4 py-2 rounded-full text-sm font-semibold"></span>
+            </div>
+            
+            <!-- Description -->
+            <div class="pb-4 border-b">
+                <span class="text-gray-600 font-medium block mb-2">Description</span>
+                <p id="modalTransactionDesc" class="text-gray-800"></p>
+            </div>
+            
+            <!-- Amount -->
+            <div class="flex items-center justify-between pb-4 border-b">
+                <span class="text-gray-600 font-medium">Amount</span>
+                <span id="modalTransactionAmount" class="text-2xl font-bold"></span>
+            </div>
+            
+            <!-- Date -->
+            <div class="flex items-center justify-between pb-4 border-b">
+                <span class="text-gray-600 font-medium">Date</span>
+                <span id="modalTransactionDate" class="text-gray-800 font-semibold"></span>
+            </div>
+            
+            <!-- Status -->
+            <div class="flex items-center justify-between pb-4 border-b">
+                <span class="text-gray-600 font-medium">Status</span>
+                <span id="modalTransactionStatus" class="px-4 py-2 rounded-full text-sm font-semibold"></span>
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-700 mb-2">Additional Information</h4>
+                <div class="text-sm text-gray-600 space-y-1">
+                    <p><i class="fas fa-info-circle mr-2 text-green-600"></i>Transaction processed successfully</p>
+                    <p><i class="fas fa-shield-alt mr-2 text-green-600"></i>Secure payment verified</p>
+                    <p><i class="fas fa-receipt mr-2 text-green-600"></i>Receipt available for download</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sticky bottom-0 bg-gray-50 px-6 py-4 border-t flex justify-end space-x-3">
+            <button onclick="closeTransactionModal()" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium text-gray-700 transition">
+                Close
+            </button>
+            <button class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium text-white transition">
+                <i class="fas fa-download mr-2"></i>Download Receipt
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Transaction Modal Functions
+    function showTransactionDetails(id, type, description, amount, date, status) {
+        const modal = document.getElementById('transactionModal');
+        
+        // Set transaction details
+        document.getElementById('modalTransactionId').textContent = id;
+        document.getElementById('modalTransactionDesc').textContent = description;
+        
+        // Format amount
+        const amountElement = document.getElementById('modalTransactionAmount');
+        const formattedAmount = new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
+        }).format(Math.abs(amount));
+        
+        if (amount >= 0) {
+            amountElement.textContent = '+ ' + formattedAmount;
+            amountElement.className = 'text-2xl font-bold text-green-600';
+        } else {
+            amountElement.textContent = '- ' + formattedAmount;
+            amountElement.className = 'text-2xl font-bold text-red-600';
+        }
+        
+        // Set type badge
+        const typeElement = document.getElementById('modalTransactionType');
+        typeElement.textContent = type;
+        if (type === 'Sale') {
+            typeElement.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-700';
+        } else if (type === 'Payout') {
+            typeElement.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-blue-100 text-blue-700';
+        } else {
+            typeElement.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700';
+        }
+        
+        // Format date
+        const dateObj = new Date(date);
+        document.getElementById('modalTransactionDate').textContent = dateObj.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Set status badge
+        const statusElement = document.getElementById('modalTransactionStatus');
+        statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        if (status === 'completed') {
+            statusElement.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-700';
+        } else if (status === 'pending') {
+            statusElement.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700';
+        } else {
+            statusElement.className = 'px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700';
+        }
+        
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeTransactionModal() {
+        const modal = document.getElementById('transactionModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Download Reports Functions
+    function downloadSalesReport() {
+        // Sample sales data
+        const salesData = [
+            ['Order ID', 'Customer', 'Products', 'Amount', 'Date', 'Status'],
+            ['8291', 'John Doe', 'Apples, Bread', '₱21.50', '2024-12-10', 'Completed'],
+            ['8290', 'Jane Smith', 'Potatoes', '₱12.00', '2024-12-09', 'Completed'],
+            ['8289', 'Bob Johnson', 'Tomatoes, Lettuce', '₱35.75', '2024-12-08', 'Completed'],
+            ['8288', 'Alice Brown', 'Carrots, Onions', '₱28.30', '2024-12-07', 'Completed'],
+            ['8287', 'Charlie Wilson', 'Cabbage, Peppers', '₱45.60', '2024-12-06', 'Completed']
+        ];
+        
+        // Convert to CSV
+        const csv = salesData.map(row => row.join(',')).join('\n');
+        
+        // Create download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        // Show success message
+        alert('Sales report downloaded successfully!');
+    }
+    
+    function downloadTaxReport() {
+        // Sample tax and commission data
+        const taxData = [
+            ['Transaction ID', 'Type', 'Gross Amount', 'Commission (10%)', 'Tax (12%)', 'Net Amount', 'Date'],
+            ['8291', 'Sale', '₱21.50', '₱2.15', '₱2.58', '₱16.77', '2024-12-10'],
+            ['8290', 'Sale', '₱12.00', '₱1.20', '₱1.44', '₱9.36', '2024-12-09'],
+            ['8289', 'Sale', '₱35.75', '₱3.58', '₱4.29', '₱27.88', '2024-12-08'],
+            ['8288', 'Sale', '₱28.30', '₱2.83', '₱3.40', '₱22.07', '2024-12-07'],
+            ['P001-2024', 'Payout', '-₱890.00', '₱0.00', '₱0.00', '-₱890.00', '2024-12-09']
+        ];
+        
+        // Convert to CSV
+        const csv = taxData.map(row => row.join(',')).join('\n');
+        
+        // Create download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tax_commission_report_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        // Show success message
+        alert('Tax & Commission report downloaded successfully!');
+    }
+    
     const btn = document.getElementById('profileDropdownBtn');
     const menu = document.getElementById('profileDropdown');
 
