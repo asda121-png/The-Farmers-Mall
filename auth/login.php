@@ -82,12 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
                             if ($user['user_type'] === 'admin') {
                                 send_json_response('success', 'Admin login successful! Redirecting...', '../admin/admin-dashboard.php');
                             } elseif ($user['user_type'] === 'retailer') {
-
-                                $login_message = 'Retailer login successful! Redirecting to dashboard...';
-                                $redirect_url = '../retailer/retailer-dashboard2.php';
-
-                                send_json_response('success', 'Retailer login successful! Redirecting...', '../retailer/retailerdashboard.php');
-
+                                send_json_response('success', 'Retailer login successful! Redirecting...', '../retailer/retailer-dashboard2.php');
                             } else {
                                 // Default to customer
                                 send_json_response('success', 'Login successful! Redirecting...', '../user/user-homepage.php');

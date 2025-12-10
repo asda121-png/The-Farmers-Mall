@@ -490,7 +490,7 @@ try {
         window.signOutUser = async () => {
             window.location.href = '../auth/login.php';
         };
-            });
+        ;
 
             // 2. Orders Listener
             onSnapshot(collection(db, getCollectionPath('orders')), (snapshot) => {
@@ -518,7 +518,7 @@ try {
              if (document.getElementById('reviews-list')) {
                 renderReviewList();
              }
-        }
+        
 
         // --- CRUD Operations for Products ---
 
