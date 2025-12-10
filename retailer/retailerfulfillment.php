@@ -293,9 +293,9 @@ try {
                 </div>
                 
                 <div class="flex justify-between items-center mb-6">
-                    <p class="text-gray-500">Filter by Status: 
-                        <select id="order-status-filter" onchange="filterOrders()" class="p-2 border border-gray-300 rounded-lg text-sm">
-                            <option value="All">All</option>
+                    <div class="relative min-w-[180px]">
+                        <select id="order-status-filter" onchange="filterOrders()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
+                            <option value="All">Filter by Status</option>
                             <option value="In Queue">In Queue</option>
                             <option value="Pending Fulfillment">Pending Fulfillment</option>
                             <option value="Picking in Progress">Picking in Progress</option>
@@ -308,7 +308,10 @@ try {
                             <option value="Completed">Completed</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
-                    </p>
+                        <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
                 </div>
                 
                 <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-auto">

@@ -372,12 +372,16 @@ try {
                                     <span class="text-xs text-gray-500">5 days ago</span>
                                 </div>
                                 <p class="text-gray-600 text-sm mb-3">"Good quality, slightly delayed delivery but worth the wait."</p>
-                                <div id="reply-box-2" class="mb-2">
+                                <div id="reply-box-2" class="hidden mb-2">
                                     <textarea id="reply-text-2" class="w-full p-2 border border-gray-300 rounded-lg text-sm mb-2" rows="2" placeholder="Write your response..."></textarea>
                                     <div class="flex space-x-2">
                                         <button onclick="submitReviewResponse(2)" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs font-medium">Send Reply</button>
                                         <button onclick="toggleReplyBox(2)" class="px-4 py-1.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-xs font-medium">Cancel</button>
                                     </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button onclick="toggleReplyBox(2)" class="text-xs text-blue-600 hover:underline">Reply</button>
+                                    <button onclick="markHelpful(2)" class="text-xs text-gray-500 hover:underline">Mark as helpful</button>
                                 </div>
                             </div>
 
@@ -396,9 +400,20 @@ try {
                                     <span class="text-xs text-gray-500">1 week ago</span>
                                 </div>
                                 <p class="text-gray-600 text-sm mb-3">"Amazing service! The mangoes were perfectly ripe. Will order again!"</p>
-                                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded mb-2">
                                     <p class="text-xs text-gray-700"><strong>Your Reply:</strong> Thank you so much, Ana! We're glad you enjoyed our mangoes. 🥭</p>
                                     <span class="text-xs text-gray-500">Replied 1 week ago</span>
+                                </div>
+                                <div id="reply-box-5" class="hidden mb-2">
+                                    <textarea id="reply-text-5" class="w-full p-2 border border-gray-300 rounded-lg text-sm mb-2" rows="2" placeholder="Write your response..."></textarea>
+                                    <div class="flex space-x-2">
+                                        <button onclick="submitReviewResponse(5)" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs font-medium">Send Reply</button>
+                                        <button onclick="toggleReplyBox(5)" class="px-4 py-1.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-xs font-medium">Cancel</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button onclick="toggleReplyBox(5)" class="text-xs text-blue-600 hover:underline">Reply</button>
+                                    <button onclick="markHelpful(5)" class="text-xs text-gray-500 hover:underline">Mark as helpful</button>
                                 </div>
                             </div>
 
@@ -539,49 +554,6 @@ try {
     let pendingAction = null;
     let pendingData = null;
     
-    // Filter Functions
-    function toggleFilterDropdown() {
-        const dropdown = document.getElementById('filterDropdown');
-        dropdown.classList.toggle('hidden');
-    }
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        const filterBtn = document.getElementById('filterBtn');
-        const dropdown = document.getElementById('filterDropdown');
-        if (!filterBtn.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.add('hidden');
-        }
-    });
-    
-    function filterReviews(rating) {
-        const reviewItems = document.querySelectorAll('.review-item');
-        
-        reviewItems.forEach(item => {
-            if (rating === 'all') {
-                item.style.display = '';
-            } else {
-                const itemRating = parseInt(item.getAttribute('data-rating'));
-                if (itemRating === rating) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            }
-        });
-        
-        // Update button text
-        const filterBtn = document.getElementById('filterBtn');
-        if (rating === 'all') {
-            filterBtn.innerHTML = '<i class="fas fa-filter text-gray-600"></i><span class="text-gray-700 font-medium">Filter by Rating</span><i class="fas fa-chevron-down text-gray-500 text-sm"></i>';
-        } else {
-            filterBtn.innerHTML = `<i class="fas fa-filter text-gray-600"></i><span class="text-gray-700 font-medium">${rating} Star${rating > 1 ? 's' : ''}</span><i class="fas fa-chevron-down text-gray-500 text-sm"></i>`;
-        }
-        
-        // Close dropdown
-        document.getElementById('filterDropdown').classList.add('hidden');
-    }
-    
     function toggleReplyBox(reviewId) {
         const replyBox = document.getElementById(`reply-box-${reviewId}`);
         if (replyBox.classList.contains('hidden')) {
@@ -625,6 +597,34 @@ try {
                 //       }
                 //   });
                 
+                // Create and display the reply
+                const replyBox = document.getElementById(`reply-box-${reviewId}`);
+                const reviewItem = replyBox.closest('.review-item');
+                
+                // Check if there's already a reply display area
+                let replyDisplay = reviewItem.querySelector('.reply-display');
+                if (!replyDisplay) {
+                    // Create new reply display area
+                    replyDisplay = document.createElement('div');
+                    replyDisplay.className = 'bg-blue-50 border-l-4 border-blue-500 p-3 rounded mb-2 reply-display';
+                    replyDisplay.innerHTML = `
+                        <p class="text-xs text-gray-700"><strong>Your Reply:</strong> ${replyText}</p>
+                        <span class="text-xs text-gray-500">Replied just now</span>
+                    `;
+                    // Insert before reply box
+                    reviewItem.insertBefore(replyDisplay, replyBox);
+                } else {
+                    // Update existing reply display
+                    replyDisplay.innerHTML = `
+                        <p class="text-xs text-gray-700"><strong>Your Reply:</strong> ${replyText}</p>
+                        <span class="text-xs text-gray-500">Replied just now</span>
+                    `;
+                }
+                
+                // Clear textarea and hide reply box
+                document.getElementById(`reply-text-${reviewId}`).value = '';
+                toggleReplyBox(reviewId);
+                
                 showConfirmationModal(
                     'Success',
                     'Your reply has been posted successfully!\n\nDatabase integration pending.',
@@ -632,10 +632,8 @@ try {
                     false
                 );
                 
-                // Uncomment when API is ready:
-                // document.getElementById(`reply-text-${reviewId}`).value = '';
-                // toggleReplyBox(reviewId);
-                // location.reload();
+                // TODO: Make API call when ready
+                // When API is ready, uncomment location.reload() to refresh from database
             }
         );
     }

@@ -222,7 +222,7 @@ try {
                 <div class="grid grid-cols-1 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Active Vouchers & Coupons</h3>
-                        <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-lg space-y-3">
+                        <div class="p-4 bg-green-50 rounded-lg space-y-3">
                             <div class="flex justify-between items-center border-b border-green-100 pb-3 cursor-pointer hover:bg-green-100 p-3 rounded transition" onclick="showCouponPerformance('FRESH20', 75, 120, 4120.50, 45.80)">
                                 <div>
                                     <p class="font-bold text-green-800">FRESH20</p>
@@ -250,6 +250,33 @@ try {
                             Create New Coupon
                         </button>
                     </div>
+                    
+                    <!-- Expired Vouchers & Coupons Section -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Expired Vouchers & Coupons</h3>
+                        <div class="p-4 bg-red-50 rounded-lg space-y-3">
+                            <div class="flex justify-between items-center border-b border-red-100 pb-3 opacity-60">
+                                <div>
+                                    <p class="font-bold text-red-800">HARVEST15</p>
+                                    <p class="text-sm text-red-600">15% off all Harvest Products (Min ₱50 spend)</p>
+                                </div>
+                                <span class="text-xs text-red-500 font-medium bg-red-100 px-2 py-1 rounded">Expired: 2024-10-31</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-red-100 pb-3 opacity-60">
+                                <div>
+                                    <p class="font-bold text-red-800">SUMMER30</p>
+                                    <p class="text-sm text-red-600">₱30 off orders over ₱100</p>
+                                </div>
+                                <span class="text-xs text-red-500 font-medium bg-red-100 px-2 py-1 rounded">Expired: 2024-09-15</span>
+                            </div>
+                            <div class="flex justify-between items-center opacity-60">
+                                <div>
+                                    <p class="font-bold text-red-800">WELCOME5</p>
+                                    <p class="text-sm text-red-600">₱5 off first purchase</p>
+                                </div>
+                                <span class="text-xs text-red-500 font-medium bg-red-100 px-2 py-1 rounded">Expired: 2024-08-20</span>
+                            </div>
+
                 </div>
             </main>
         </div>
@@ -262,8 +289,8 @@ try {
     <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div class="p-6 border-b border-gray-200">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-bold text-gray-800">Coupon Performance</h3>
-                <button onclick="closeCouponPerformanceModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                <h3 class="text-lg font-bold text-gray-800">Coupon Performance</h3>
+                <button onclick="closeCouponPerformanceModal()" class="text-gray-400 hover:text-gray-600 text-xl">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -271,8 +298,8 @@ try {
         
         <div class="p-6">
             <div class="mb-6">
-                <h4 class="text-xl font-bold text-green-800 mb-2" id="performanceCouponCode">FRESH20</h4>
-                <p class="text-sm text-gray-600">Performance metrics for the last 30 days</p>
+                <h4 class="text-base font-bold text-green-800 mb-2" id="performanceCouponCode">FRESH20</h4>
+                <p class="text-xs text-gray-600">Performance metrics for the last 30 days</p>
             </div>
             
             <div class="space-y-6">
@@ -289,28 +316,28 @@ try {
                 </div>
                 
                 <!-- Total Discount Given -->
-                <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
-                    <p class="text-sm text-gray-600 mb-1">Total Discount Value Given (Last 30 Days)</p>
-                    <p class="text-3xl font-bold text-red-600" id="totalDiscount">₱0.00</p>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-600 mb-1">Total Discount Value Given (Last 30 Days)</p>
+                    <p class="text-2xl font-bold text-red-600" id="totalDiscount">₱0.00</p>
                     <p class="text-xs text-gray-500 mt-1">Total amount saved by customers</p>
                 </div>
                 
                 <!-- Average Basket Size -->
-                <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-                    <p class="text-sm text-gray-600 mb-1">Average Basket Size with Coupon</p>
-                    <p class="text-3xl font-bold text-green-700" id="avgBasket">₱0.00</p>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-600 mb-1">Average Basket Size with Coupon</p>
+                    <p class="text-2xl font-bold text-green-700" id="avgBasket">₱0.00</p>
                     <p class="text-xs text-gray-500 mt-1">Average order value when this coupon is used</p>
                 </div>
                 
                 <!-- Additional Stats -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-blue-50 p-4 rounded-lg text-center">
-                        <p class="text-sm text-gray-600 mb-1">Total Orders</p>
-                        <p class="text-2xl font-bold text-blue-700" id="totalOrders">0</p>
+                        <p class="text-xs text-gray-600 mb-1">Total Orders</p>
+                        <p class="text-xl font-bold text-blue-700" id="totalOrders">0</p>
                     </div>
                     <div class="bg-purple-50 p-4 rounded-lg text-center">
-                        <p class="text-sm text-gray-600 mb-1">ROI Impact</p>
-                        <p class="text-2xl font-bold text-purple-700">+<span id="roiImpact">0</span>%</p>
+                        <p class="text-xs text-gray-600 mb-1">ROI Impact</p>
+                        <p class="text-xl font-bold text-purple-700">+<span id="roiImpact">0</span>%</p>
                     </div>
                 </div>
             </div>

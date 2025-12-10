@@ -52,6 +52,54 @@ try {
 } catch (Exception $e) {
     error_log("Error fetching user data: " . $e->getMessage());
 }
+
+// Fetch sales data for the last 30 days
+$salesData = [];
+$salesLabels = [];
+$salesValues = [];
+
+try {
+    // Get orders from the last 30 days for this retailer
+    $thirtyDaysAgo = date('Y-m-d', strtotime('-30 days'));
+    
+    // Fetch all orders for this retailer
+    $orders = $api->select('orders', ['retailer_id' => $userId]);
+    
+    // Group by date and sum amounts
+    $dailySales = [];
+    
+    foreach ($orders as $order) {
+        if (!empty($order['created_at'])) {
+            $orderDate = date('Y-m-d', strtotime($order['created_at']));
+            
+            // Only include orders from last 30 days
+            if ($orderDate >= $thirtyDaysAgo) {
+                if (!isset($dailySales[$orderDate])) {
+                    $dailySales[$orderDate] = 0;
+                }
+                $dailySales[$orderDate] += floatval($order['total_amount'] ?? 0);
+            }
+        }
+    }
+    
+    // Create data for last 30 days (fill missing days with 0)
+    for ($i = 29; $i >= 0; $i--) {
+        $date = date('Y-m-d', strtotime("-$i days"));
+        $label = date('M d', strtotime($date));
+        
+        $salesLabels[] = $label;
+        $salesValues[] = isset($dailySales[$date]) ? $dailySales[$date] : 0;
+    }
+    
+} catch (Exception $e) {
+    error_log("Error fetching sales data: " . $e->getMessage());
+    // Fill with sample data if error
+    for ($i = 29; $i >= 0; $i--) {
+        $date = date('M d', strtotime("-$i days"));
+        $salesLabels[] = $date;
+        $salesValues[] = 0;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,6 +110,8 @@ try {
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- Load Inter font -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -254,9 +304,29 @@ try {
                 <!-- Sales Trend and Inventory Alerts -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Sales Trend (Last 30 Days)</h3>
-                        <div class="h-64 flex items-center justify-center text-gray-400 border border-dashed rounded-lg">
-                            [Sales Trend Chart Placeholder]
+                        <div class="flex items-start justify-between mb-6">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">Overall Sales</h3>
+                                <div class="flex items-baseline gap-3">
+                                    <p class="text-3xl font-bold text-gray-900" id="totalSalesAmount">₱0.00</p>
+                                    <span class="flex items-center text-sm font-medium text-green-600">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                        </svg>
+                                        <span id="salesPercentChange">0%</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <select id="salesPeriod" class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                                    <option value="month">This Month</option>
+                                    <option value="week">This Week</option>
+                                    <option value="30days" selected>Last 30 Days</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="salesTrendChart"></canvas>
                         </div>
                     </div>
                     <div id="dashboard-inventory-alerts" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -1303,6 +1373,124 @@ try {
 
       <!-- Dropdown JS -->
       <script>
+        // Initialize Sales Trend Chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('salesTrendChart');
+            if (ctx) {
+                const salesData = <?php echo json_encode($salesValues); ?>;
+                const totalSales = salesData.reduce((sum, val) => sum + val, 0);
+                
+                // Calculate percentage change (mock calculation - compare first half vs second half)
+                const firstHalf = salesData.slice(0, 15).reduce((sum, val) => sum + val, 0) / 15;
+                const secondHalf = salesData.slice(15).reduce((sum, val) => sum + val, 0) / 15;
+                const percentChange = firstHalf > 0 ? (((secondHalf - firstHalf) / firstHalf) * 100).toFixed(2) : 0;
+                
+                // Update total sales and percentage
+                document.getElementById('totalSalesAmount').textContent = '₱' + totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('salesPercentChange').textContent = percentChange + '%';
+                
+                const salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: <?php echo json_encode($salesLabels); ?>,
+                        datasets: [{
+                            label: 'Daily Sales',
+                            data: salesData,
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: 'rgb(59, 130, 246)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: 'rgb(59, 130, 246)',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 3,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: {
+                                    family: 'Inter',
+                                    size: 12,
+                                    weight: '600'
+                                },
+                                bodyFont: {
+                                    family: 'Inter',
+                                    size: 13,
+                                    weight: '500'
+                                },
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₱' + context.parsed.y.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                border: {
+                                    display: false
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₱' + (value / 1000).toFixed(0) + 'K';
+                                    },
+                                    font: {
+                                        family: 'Inter',
+                                        size: 11
+                                    },
+                                    color: '#9CA3AF',
+                                    padding: 8
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.06)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                border: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    font: {
+                                        family: 'Inter',
+                                        size: 10
+                                    },
+                                    color: '#9CA3AF',
+                                    padding: 8,
+                                    autoSkip: true,
+                                    maxTicksLimit: 13
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                });
+            }
+        });
+
         const btn = document.getElementById('profileDropdownBtn');
         const menu = document.getElementById('profileDropdown');
 

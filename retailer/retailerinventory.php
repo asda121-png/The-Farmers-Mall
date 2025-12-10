@@ -305,7 +305,7 @@ try {
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Product & Inventory Management</h2>
                 
                 <!-- Filter Bar -->
-                <div class="bg-white rounded-lg shadow-sm p-4 mb-6 filter-bar">
+                <div class="mb-6 filter-bar">
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="relative min-w-[140px]">
                             <select id="bulkActions" onchange="applyBulkAction()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
