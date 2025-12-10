@@ -92,6 +92,17 @@ try {
         footer {
             margin-top: auto;
         }
+        /* Force sidebar to be full height with logout at bottom */
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > *:last-child {
+            margin-top: auto !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
         /* Mobile menu toggle */
         #mobileMenuBtn {
             display: none;
@@ -108,6 +119,14 @@ try {
                 z-index: 50;
                 transition: left 0.3s ease;
             }
+        #sidebar {
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #sidebar > div:last-child {
+            margin-top: auto !important;
+        }
             #sidebar.active {
                 left: 0;
             }
@@ -187,7 +206,7 @@ try {
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>
-                        <a href="retailermessage.php" class="text-gray-600"><i class="fa-regular fa-comment"></i></a>
+                        <a href="retailermessage.php" class="text-gray-600 hover:text-green-600"><i class="fa-regular fa-comment"></i></a>
                         <a href="retailernotifications.php" class="text-green-600 relative">
                         <i class="fa-solid fa-bell"></i>
                         <!-- Notification badge can be added here if needed -->
@@ -214,9 +233,6 @@ try {
       <!-- Title & Actions -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-3">
-          <button onclick="window.location.href='retailerdashboard.php'" class="text-gray-600 hover:text-black">
-            <i class="fa-solid fa-arrow-left text-lg"></i>
-          </button>
           <h2 class="text-3xl font-bold text-gray-800">Notifications</h2>
         </div>
         <button id="markAllRead" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700">Mark all as read</button>
@@ -229,7 +245,7 @@ try {
       </div>
 
       <!-- Notifications List -->
-      <div id="notificationList" class="bg-white rounded-lg shadow-sm divide-y">
+      <div id="notificationList" class="bg-white rounded-lg shadow-sm hover:shadow-md hover:border-green-200 transition-all duration-300 divide-y">
         <!-- Notifications will be dynamically loaded here -->
       </div>
     </div>
@@ -237,58 +253,7 @@ try {
         </div>
     </div>
     
-    <!-- Footer - Static at bottom, spans full width in front of sidebar -->
-    <footer id="support" class="text-white py-12 mt-auto" style="background-color: #1B5E20;">
-        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-          
-          <!-- Logo/About -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">The Farmer's Mall</h3>
-            <p class="text-gray-300 text-sm">
-              Fresh, organic produce delivered straight to your home from local farmers.
-            </p>
-          </div>
-          
-          <!-- Quick Links -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">About Us</a></li>
-              <li><a href="#" class="hover:underline">Contact</a></li>
-              <li><a href="#" class="hover:underline">FAQ</a></li>
-              <li><a href="#" class="hover:underline">Support</a></li>
-            </ul>
-          </div>
-
-          <!-- Categories -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Categories</h3>
-            <ul class="space-y-2 text-sm text-gray-300">
-              <li><a href="#" class="hover:underline">Vegetables</a></li>
-              <li><a href="#" class="hover:underline">Fruits</a></li>
-              <li><a href="#" class="hover:underline">Dairy</a></li>
-              <li><a href="#" class="hover:underline">Meat</a></li>
-            </ul>
-          </div>
-
-          <!-- Social -->
-          <div>
-            <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-            <div class="flex space-x-4 text-xl">
-              <!-- Updated from footer.html -->
-              <a href="#" class="hover:text-green-300"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="hover:text-green-300"><i class="fab fa-instagram"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-          © 2025 The Farmer's Mall. All rights reserved.
-        </div>
-    </footer>
-</div>
+    </div>
 
   <!-- Delete Notification Confirmation Modal -->
   <div id="deleteNotificationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
