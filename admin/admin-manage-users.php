@@ -209,45 +209,55 @@ try {
     </div>
   </aside>
 
-  <div class="flex-1 p-6 space-y-6 custom-scrollbar overflow-y-auto">
+  <div class="flex-1 custom-scrollbar overflow-y-auto relative">
 
-    <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
-      <div class="relative w-full max-w-lg hidden md:block">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" id="search-input" placeholder="Search by name, email, or user ID..."
-          class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
-      </div>
+    <div class="p-6">
+      <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-0 z-10">
+        <div class="relative w-full max-w-lg hidden md:block">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="search-input" placeholder="Search by name, email, or user ID..."
+            class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
+        </div>
 
-      <div class="flex items-center gap-4 ml-auto">
-        <div class="relative">
-            <button id="notification-btn" class="relative" title="View Notifications">
+        <div class="flex items-center gap-4 ml-auto">
+          <div class="relative flex items-center">
+            <a href="admin-notification.php" class="relative" title="View Notifications">
                 <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                <span id="notification-pulse" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </a>
+            <button id="notification-btn" class="ml-2 text-gray-400 hover:text-gray-600" title="Toggle Notifications">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
             </button>
-            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+            <div id="notification-dropdown" class="hidden absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
                 <div class="p-4 border-b">
                     <h4 class="font-bold text-gray-800">Notifications</h4>
                 </div>
                 <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
                     <?php if(isset($notifications)): foreach($notifications as $notif): ?>
-                    <a href="#" class="flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>">
+                    <div class="notification-item flex items-start gap-3 p-4 hover:bg-green-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
                         <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
                             <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
                         </div>
-                        <div class="flex-1"><p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p><p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p></div>
-                        <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
-                    </a>
+                        <a href="#" class="flex-1 cursor-pointer">
+                            <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($notif['title']); ?></p>
+                            <p class="text-xs text-gray-500"><?php echo htmlspecialchars($notif['message']); ?></p>
+                            <p class="text-xs text-gray-400 mt-1"><?php echo htmlspecialchars($notif['time']); ?></p>
+                        </a>
+                        <button class="remove-notification-btn text-gray-400 hover:text-red-500 transition-colors" title="Remove notification"><i class="fa-solid fa-times text-xs"></i></button>
+                    </div>
                     <?php endforeach; endif; ?>
                 </div>
-                <div class="p-2 border-t"><a href="#" id="view-all-notifications-btn" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
+                <div class="p-2 border-t"><a href="admin-notification.php" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
             </div>
+          </div>
+          <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
+          <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
+            <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
+          </a>
         </div>
-        <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
-          <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-        </a>
-      </div>
-    </header>
+      </header>
+
+      <div class="space-y-6 pt-6">
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -273,11 +283,9 @@ try {
                 Sellers (Retailers)
                 <span class="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2">48</span>
             </button>
-           
-</button>
-
         </nav>
     </div>
+      </div>
 
     <div id="tab-customers" class="tab-content active">
         <div class="bg-white rounded-xl card-shadow overflow-hidden">
@@ -285,8 +293,7 @@ try {
                 <h3 class="font-bold text-gray-700">Customer List</h3>
                 <div class="flex gap-2">
                     <select id="customer-status-filter" class="filter-dropdown text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
-                        <option>All Statuses</option>
-                        <option>Active</option>
+                        <option>Overall status</option>
                         <option>Inactive</option>
                     </select>
                 </div>
@@ -356,7 +363,7 @@ try {
                 <h3 class="font-bold text-gray-700">Seller / Retailer List</h3>
                 <div class="flex gap-2">
                     <select id="seller-status-filter" class="filter-dropdown text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500">
-                        <option>All Statuses</option>
+                        <option>Overall status</option>
                         <option>Verified</option>
                         <option>Pending</option>
                         <option>Suspended</option>
@@ -424,6 +431,8 @@ try {
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 
 
@@ -515,7 +524,7 @@ try {
           <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
             Cancel
           </button>
-          <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+          <a href="../public/index.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
             Logout
           </a>
         </div>
@@ -565,16 +574,17 @@ try {
                 logoutModal: document.getElementById('logoutModal'),
                 notificationBtn: document.getElementById('notification-btn'),
                 notificationDropdown: document.getElementById('notification-dropdown'),
-                viewAllNotificationsBtn: document.getElementById('view-all-notifications-btn'),
+                notificationPulse: document.getElementById('notification-pulse'),
+                notificationList: document.getElementById('notification-list'),
             };
         },
 
         bindEvents() {
-            this.elements.tabsContainer.addEventListener('click', this.handleTabSwitch.bind(this));
             this.elements.searchInput.addEventListener('input', () => this.applyFilters(true));
             this.elements.customerFilter.addEventListener('change', () => this.applyFilters(true));
             this.elements.sellerFilter.addEventListener('change', () => this.applyFilters(true));
             this.elements.exportBtn.addEventListener('click', this.handleExport.bind(this));
+            this.elements.tabsContainer.addEventListener('click', this.handleTabSwitch.bind(this));
             this.elements.editUserForm.addEventListener('submit', this.handleFormSubmit.bind(this));
             this.elements.cancelActionBtn.addEventListener('click', () => this.hideModal(this.elements.confirmationModal));
             this.elements.confirmActionBtn.addEventListener('click', this.handleConfirmAction.bind(this));
@@ -593,7 +603,7 @@ try {
             
             this.elements.logoutButton.addEventListener('click', () => this.showModal(this.elements.logoutModal));
             this.elements.notificationBtn.addEventListener('click', this.toggleNotificationDropdown.bind(this));
-            this.elements.viewAllNotificationsBtn.addEventListener('click', this.expandNotifications.bind(this));
+            this.elements.notificationList.addEventListener('click', this.handleNotificationClick.bind(this));
             window.addEventListener('click', this.closeNotificationDropdown.bind(this));
             
             // Pagination listeners
@@ -605,10 +615,17 @@ try {
             const tabButton = e.target.closest('.tab-btn');
             if (!tabButton) return;
 
+            // Update active tab state
             this.activeTab = tabButton.dataset.tab;
 
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Update button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-b-2', 'font-semibold');
+                btn.classList.add('border-transparent', 'font-medium', 'text-gray-500', 'hover:text-green-600', 'hover:border-green-300');
+            });
             tabButton.classList.add('active');
+            tabButton.classList.remove('border-transparent', 'font-medium', 'text-gray-500', 'hover:text-green-600', 'hover:border-green-300');
+
 
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`tab-${this.activeTab}`).classList.add('active');
@@ -627,7 +644,7 @@ try {
 
                 rows.forEach(row => {
                     const rowText = row.textContent.toLowerCase();
-                    const statusMatch = status === 'All Statuses' || row.dataset.status === status;
+                    const statusMatch = status === 'Overall status' || row.dataset.status === status;
                     const searchMatch = rowText.includes(searchTerm);
                     
                     if (statusMatch && searchMatch) {
@@ -792,7 +809,31 @@ try {
                 this.elements.notificationDropdown.classList.add('hidden');
             }
         },
-        expandNotifications(e) { e.preventDefault(); this.elements.notificationDropdown.querySelector('#notification-list').classList.replace('max-h-80', 'max-h-[60vh]'); e.target.style.display = 'none'; },
+        toggleNotificationDropdown(e) {
+            e.stopPropagation();
+            this.elements.notificationDropdown.classList.toggle('hidden');
+            if (this.elements.notificationPulse) {
+                this.elements.notificationPulse.style.display = 'none';
+            }
+        },
+        handleNotificationClick(e) {
+            const removeBtn = e.target.closest('.remove-notification-btn');
+            if (removeBtn) {
+                e.stopPropagation(); // Prevent other click events on the item
+                const notificationItem = removeBtn.closest('.notification-item');
+                if (notificationItem) {
+                    notificationItem.style.transition = 'opacity 0.3s ease';
+                    notificationItem.style.opacity = '0';
+                    setTimeout(() => notificationItem.remove(), 300);
+                }
+            } else {
+                const item = e.target.closest('.notification-item');
+                if (item && item.dataset.read === 'false') {
+                    item.classList.remove('bg-green-50');
+                    item.dataset.read = 'true';
+                }
+            }
+        },
         downloadCSV(headers, data, filename) {
             let csvContent = [headers.join(","), ...data.map(row => row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(','))].join("\n");
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

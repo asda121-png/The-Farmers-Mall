@@ -131,9 +131,9 @@ try {
   </style>
 </head>
 
-<body class="flex min-h-screen bg-gray-50 text-gray-800">
+<body class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
 
-  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 sticky top-0 h-screen overflow-y-auto">
+  <aside class="w-64 flex flex-col justify-between p-4 bg-green-950 text-gray-100 rounded-r-xl shadow-2xl transition-all duration-300 h-screen overflow-y-auto">
     <div>
       <div class="flex items-center gap-3 mb-8 px-2 py-2">
         <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white">
@@ -183,47 +183,56 @@ try {
     </div>
   </aside>
 
-  <div class="flex-1 p-6 space-y-6 custom-scrollbar">
+  <div class="flex-1 custom-scrollbar overflow-y-auto relative">
 
-    <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
-      <div class="relative w-full max-w-lg hidden md:block">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" id="search-input" placeholder="Search orders, customers, or IDs..."
-          class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
-      </div>
-
-      <div class="flex items-center gap-4 ml-auto">
-        <div class="relative">
-            <button id="notification-btn" class="relative" title="View Notifications">
-                <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            </button>
-            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
-                <div class="p-4 border-b">
-                    <h4 class="font-bold text-gray-800">Notifications</h4>
-                </div>
-                <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
-                    <?php foreach($notifications as $notif): ?>
-                    <a href="#" class="flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>">
-                        <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
-                            <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
-                        </div>
-                        <div class="flex-1"><p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p><p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p></div>
-                        <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
-                    </a>
-                    <?php endforeach; ?>
-                </div>
-                <div class="p-2 border-t"><a href="#" id="view-all-notifications-btn" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
-            </div>
+    <div class="p-6">
+      <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-0 z-10">
+        <div class="relative w-full max-w-lg hidden md:block">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="search-input" placeholder="Search orders, customers, or IDs..."
+            class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
         </div>
-        <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
-          <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-        </a>
-      </div>
-    </header>
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex items-center gap-4 ml-auto">
+          <div class="relative flex items-center">
+              <a href="admin-notification.php" class="relative" title="View Notifications">
+                  <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
+                  <span id="notification-pulse" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              </a>
+              <button id="notification-btn" class="ml-2 text-gray-400 hover:text-gray-600" title="Toggle Notifications">
+                  <i class="fa-solid fa-chevron-down text-xs"></i>
+              </button>
+              <div id="notification-dropdown" class="hidden absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+                  <div class="p-4 border-b">
+                      <h4 class="font-bold text-gray-800">Notifications</h4>
+                  </div>
+                  <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
+                      <?php foreach($notifications as $notif): ?>
+                      <div class="notification-item flex items-start gap-3 p-4 hover:bg-green-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
+                          <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
+                              <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
+                          </div>
+                          <a href="#" class="flex-1 cursor-pointer">
+                              <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($notif['title']); ?></p>
+                              <p class="text-xs text-gray-500"><?php echo htmlspecialchars($notif['message']); ?></p>
+                              <p class="text-xs text-gray-400 mt-1"><?php echo htmlspecialchars($notif['time']); ?></p>
+                          </a>
+                          <button class="remove-notification-btn text-gray-400 hover:text-red-500 transition-colors" title="Remove notification"><i class="fa-solid fa-times text-xs"></i></button>
+                      </div>
+                      <?php endforeach; ?>
+                  </div>
+                  <div class="p-2 border-t"><a href="admin-notification.php" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
+              </div>
+          </div>
+          <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
+          <a href="admin-settings.php" class="flex items-center gap-2 cursor-pointer">
+            <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
+          </a>
+        </div>
+      </header>
+
+      <div class="space-y-6 pt-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h2 class="text-3xl font-bold text-gray-900">Orders Management</h2>
             <p class="text-sm text-gray-500">Track and manage customer orders</p>
@@ -234,9 +243,9 @@ try {
             </button>
            
         </div>
-    </div>
+      </div>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white p-4 rounded-xl card-shadow flex items-center justify-between">
             <div>
                  <p class="text-sm text-gray-500 font-medium">Total Revenue</p>
@@ -275,7 +284,7 @@ try {
         </div>
     </div>
 
-    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+        <div class="bg-white rounded-xl card-shadow overflow-hidden">
         <div class="p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center justify-between">
             <div id="status-filters" class="flex gap-2">
                 <button data-filter="all" class="filter-btn px-3 py-1.5 text-xs font-medium text-white bg-green-700 rounded-lg shadow-sm">All Orders</button>
@@ -334,7 +343,7 @@ try {
         </div>
     </div>
 
-    <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+        <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-2xl">
         <div class="flex justify-between items-center border-b pb-3 mb-4">
             <h3 class="font-bold text-xl text-gray-900">Order Details</h3>
@@ -348,7 +357,7 @@ try {
       </div>
     </div>
 
-    <div id="create-order-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+        <div id="create-order-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-6 w-full max-w-lg">
         <h3 class="font-bold text-xl mb-4 text-gray-900">Create New Order</h3>
         <form id="create-order-form">
@@ -385,7 +394,7 @@ try {
     </div>
 
 
-    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
+        <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-sm text-center">
         <div class="text-red-500 text-4xl mb-4">
           <i class="fa-solid fa-triangle-exclamation"></i>
@@ -401,6 +410,8 @@ try {
           </a>
         </div>
       </div>
+    </div>
+    </div>
     </div>
 
   </div> <script src="admin-theme.js"></script>
@@ -435,11 +446,34 @@ try {
       // --- Notification Dropdown Logic ---
       const notificationBtn = document.getElementById('notification-btn');
       const notificationDropdown = document.getElementById('notification-dropdown');
-      const viewAllBtn = document.getElementById('view-all-notifications-btn');
+      const notificationPulse = document.getElementById('notification-pulse');
+      const notificationList = document.getElementById('notification-list');
 
       notificationBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         notificationDropdown.classList.toggle('hidden');
+        if (notificationPulse) {
+            notificationPulse.style.display = 'none';
+        }
+      });
+
+      notificationList.addEventListener('click', (e) => {
+          const removeBtn = e.target.closest('.remove-notification-btn');
+          if (removeBtn) {
+              e.stopPropagation();
+              const notificationItem = removeBtn.closest('.notification-item');
+              if (notificationItem) {
+                  notificationItem.style.transition = 'opacity 0.3s ease';
+                  notificationItem.style.opacity = '0';
+                  setTimeout(() => notificationItem.remove(), 300);
+              }
+          } else {
+              const item = e.target.closest('.notification-item');
+              if (item && item.dataset.read === 'false') {
+                  item.classList.remove('bg-green-50');
+                  item.dataset.read = 'true';
+              }
+          }
       });
 
       window.addEventListener('click', (e) => {
@@ -447,13 +481,6 @@ try {
           notificationDropdown.classList.add('hidden');
         }
       });
-
-      viewAllBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('notification-list').classList.replace('max-h-80', 'max-h-[60vh]');
-        viewAllBtn.style.display = 'none';
-      });
-
 
       // --- Filtering and Pagination State ---
       let state = {

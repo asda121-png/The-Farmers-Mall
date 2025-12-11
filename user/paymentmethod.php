@@ -60,6 +60,18 @@ if ($user_id && isset($api)) {
         $cart_items = $api->select('cart', ['customer_name' => $customer_name]);
         
         if (!empty($cart_items)) {
+            // Filter cart items based on selected items from sessionStorage (passed via JavaScript)
+            // We'll check for selected_cart_ids in the request or use all items as fallback
+            $selected_cart_ids = $_GET['cart_ids'] ?? null;
+            
+            // If specific cart IDs are provided, filter the cart items
+            if ($selected_cart_ids) {
+                $selected_ids_array = explode(',', $selected_cart_ids);
+                $cart_items = array_filter($cart_items, function($item) use ($selected_ids_array) {
+                    return in_array($item['id'], $selected_ids_array);
+                });
+            }
+            
             $product_ids = array_column($cart_items, 'product_id');
             
             if (!empty($product_ids)) {
@@ -76,6 +88,7 @@ if ($user_id && isset($api)) {
                         $subtotal += $item_total;
                         
                         $cart_items_with_products[] = [
+                            'cart_id' => $item['id'], // Include cart_id for reference
                             'name' => $prod['name'],
                             'image' => $prod['image_url'] ?? $prod['image'] ?? '',
                             'price' => $price,

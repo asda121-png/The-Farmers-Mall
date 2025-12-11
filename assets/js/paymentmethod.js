@@ -66,13 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const selectedPayment = document.querySelector('input[name="payment"]:checked');
       const paymentMethod = selectedPayment ? selectedPayment.value : 'card';
+      
+      // Get selected cart IDs from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const cartIds = urlParams.get('cart_ids');
+      const selectedCartIds = cartIds ? cartIds.split(',') : [];
 
       const response = await fetch('../api/order.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'place_order',
-          payment_method: paymentMethod
+          payment_method: paymentMethod,
+          cart_ids: selectedCartIds
         })
       });
 

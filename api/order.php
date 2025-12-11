@@ -61,6 +61,20 @@ try {
                 echo json_encode(['success' => false, 'message' => 'Cart is empty']);
                 exit();
             }
+            
+            // Filter by selected cart IDs if provided
+            $selected_cart_ids = $data['cart_ids'] ?? [];
+            if (!empty($selected_cart_ids)) {
+                $cartItems = array_filter($cartItems, function($item) use ($selected_cart_ids) {
+                    return in_array($item['id'], $selected_cart_ids);
+                });
+                
+                if (empty($cartItems)) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => 'No selected items found in cart']);
+                    exit();
+                }
+            }
 
             // Calculate total and prepare order items
             $total_amount = 0;

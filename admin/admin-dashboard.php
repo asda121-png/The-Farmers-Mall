@@ -67,6 +67,12 @@ $notifications = [
         "read" => true
     ],
 ];
+
+// --- [CHANGE START] Calculate unread notifications ---
+$unread_notifications_count = 0;
+foreach ($notifications as $notif) {
+    if (!$notif['read']) $unread_notifications_count++;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -178,328 +184,337 @@ $notifications = [
   </aside>
 
   <!-- Main Content Area -->
-  <div class="flex-1 p-6 space-y-6 custom-scrollbar overflow-y-auto">
+  <div class="flex-1 custom-scrollbar overflow-y-auto relative">
 
-    <!-- Top Header and Search Bar -->
-    <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-6 z-10 w-full">
-      <div class="relative w-full max-w-lg hidden md:block">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        <input type="text" placeholder="Search products, orders, customers..."
-          class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
+    <div class="p-6">
+      <!-- Top Header and Search Bar -->
+      <header class="bg-white p-4 rounded-xl card-shadow flex justify-between items-center sticky top-0 z-10">
+        <div class="relative w-full max-w-lg hidden md:block">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" placeholder="Search products, orders, customers..."
+            class="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-green-500 focus:border-green-500 transition-colors">
+        </div>
+
+        <!-- Right Header Icons -->
+        <div class="flex items-center gap-4 ml-auto">
+          <!-- Notification Dropdown -->
+          <div class="relative flex items-center">
+              <a href="admin-notification.php" class="relative" title="View Notifications">
+                  <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
+                  <?php if ($unread_notifications_count > 0): ?>
+                  <span id="notification-pulse" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                  <?php endif; ?>
+              </a>
+              <button id="notification-btn" class="ml-2 text-gray-400 hover:text-gray-600" title="Toggle Notifications">
+                  <i class="fa-solid fa-chevron-down text-xs"></i>
+              </button>
+              <div id="notification-dropdown" class="hidden absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+                  <div class="p-4 border-b">
+                      <h4 class="font-bold text-gray-800">Notifications</h4>
+                  </div>
+                  <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
+                      <?php foreach($notifications as $notif): ?>
+                      <a href="#" class="notification-item flex items-start gap-3 p-4 hover:bg-green-50 cursor-pointer <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
+                          <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
+                              <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
+                          </div>
+                          <div class="flex-1">
+                              <p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p>
+                              <p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p>
+                          </div>
+                          <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
+                      </a>
+                      <?php endforeach; ?>
+                  </div>
+                  <div class="p-2 border-t">
+                      <a href="admin-notification.php" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">
+                          View all notifications
+                      </a>
+                  </div>
+              </div>
+          </div>
+
+          <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
+          <!-- User Dropdown -->
+          <div class="relative">
+              <button id="user-menu-btn" class="flex items-center gap-2 cursor-pointer">
+                  <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
+              </button>
+              <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
+                  <div class="p-3 border-b">
+                      <p class="text-sm font-semibold text-gray-800"><?php echo $admin_name; ?></p>
+                      <p class="text-xs text-gray-500"><?php echo $admin_email; ?></p>
+                  </div>
+                  <nav class="p-2">
+                      <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                          <i class="fa-solid fa-user-cog w-5 text-gray-500"></i>
+                          <span>Profile & Settings</span>
+                      </a>
+                      <button id="logoutButtonDropdown" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                          <i class="fa-solid fa-sign-out-alt w-5 text-gray-500"></i>
+                          <span>Logout</span>
+                      </button>
+                  </nav>
+              </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="space-y-6 pt-6"> <!-- This wrapper now controls the spacing for the rest of the content -->
+      <!-- Welcome Banner & Controls -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <h2 class="text-3xl font-bold text-gray-900 mb-2 md:mb-0">Welcome Back, <?php echo $admin_name; ?>!</h2>
+          <div class="flex gap-3">
+              <select class="p-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-green-500 cursor-pointer transition-colors">
+                  <option>Previous Year</option>
+                  <option>Last 30 Days</option>
+                  <option>Last 7 Days</option>
+              </select>
+              <button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                  View All Time
+              </button>
+          </div>
       </div>
 
-      <!-- Right Header Icons -->
-      <div class="flex items-center gap-4 ml-auto">
-        <!-- Notification Dropdown -->
-        <div class="relative">
-            <button id="notification-btn" class="relative" title="View Notifications">
-                <i class="fa-regular fa-bell text-xl text-gray-500 hover:text-green-600 cursor-pointer"></i>
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            </button>
-            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
-                <div class="p-4 border-b">
-                    <h4 class="font-bold text-gray-800">Notifications</h4>
-                </div>
-                <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
-                    <?php foreach($notifications as $notif): ?>
-                    <a href="#" class="flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>">
-                        <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
-                            <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p>
-                            <p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p>
-                        </div>
-                        <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
-                    </a>
-                    <?php endforeach; ?>
-                </div>
-                <div class="p-2 border-t">
-                    <a href="#" id="view-all-notifications-btn" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">
-                        View all notifications
-                    </a>
-                </div>
-            </div>
-        </div>
+      <!-- 1. Stat Cards (Updated: Removed colored top borders) -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
 
-        <div class="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
-        <!-- User Dropdown -->
-        <div class="relative">
-            <button id="user-menu-btn" class="flex items-center gap-2 cursor-pointer">
-                <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-9 h-9 rounded-full border-2 border-green-500" alt="Admin">
-            </button>
-            <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
-                <div class="p-3 border-b">
-                    <p class="text-sm font-semibold text-gray-800"><?php echo $admin_name; ?></p>
-                    <p class="text-xs text-gray-500"><?php echo $admin_email; ?></p>
-                </div>
-                <nav class="p-2">
-                    <a href="admin-settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
-                        <i class="fa-solid fa-user-cog w-5 text-gray-500"></i>
-                        <span>Profile & Settings</span>
-                    </a>
-                    <button id="logoutButtonDropdown" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
-                        <i class="fa-solid fa-sign-out-alt w-5 text-gray-500"></i>
-                        <span>Logout</span>
-                    </button>
-                </nav>
-            </div>
-        </div>
+          <!-- Card 1: Revenue (Positive) -->
+          <div class="bg-green-50 rounded-xl p-5 card-shadow">
+              <p class="text-sm font-medium text-gray-500 mb-1">Ecommerce Revenue</p>
+              <h3 class="text-2xl font-extrabold text-gray-900">₱245,450</h3>
+              <div class="flex items-center text-sm mt-2">
+                  <i class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
+                  <span class="text-green-600 font-semibold">+34.9%</span>
+                  <span class="text-gray-500 ml-1">(+43.21 K)</span>
+              </div>
+          </div>
+
+          <!-- Card 2: New Customers (Negative Trend - Neutral Color) -->
+          <div class="bg-green-50 rounded-xl p-5 card-shadow">
+              <p class="text-sm font-medium text-gray-500 mb-1">New Customers</p>
+              <h3 class="text-2xl font-extrabold text-gray-900">684</h3>
+              <div class="flex items-center text-sm mt-2">
+                  <i class="fa-solid fa-arrow-down text-red-600 mr-1"></i>
+                  <span class="text-red-600 font-semibold">-8.6%</span>
+                  <span class="text-gray-500 ml-1">(-64)</span>
+              </div>
+          </div>
+
+          <!-- Card 3: Reject Purchase Rate (Warning/Negative) -->
+          <div class="bg-green-50 rounded-xl p-5 card-shadow">
+              <p class="text-sm font-medium text-gray-500 mb-1">Reject Purchase Rate</p>
+              <h3 class="text-2xl font-extrabold text-gray-900">75.12 %</h3>
+              <div class="flex items-center text-sm mt-2">
+                  <i class="fa-solid fa-arrow-up text-red-600 mr-1"></i>
+                  <span class="text-red-600 font-semibold">+25.4 %</span>
+                  <span class="text-gray-500 ml-1">(+20.11 K)</span>
+              </div>
+          </div>
+          
+          <!-- Card 4: Average Order Value (Positive) -->
+          <div class="bg-green-50 rounded-xl p-5 card-shadow">
+              <p class="text-sm font-medium text-gray-500 mb-1">Average Order Value</p>
+              <h3 class="text-2xl font-extrabold text-gray-900">₱2,412.23</h3>
+              <div class="flex items-center text-sm mt-2">
+                  <i class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
+                  <span class="text-green-600 font-semibold">+35.2 %</span>
+                  <span class="text-gray-500 ml-1">(+₱744)</span>
+              </div>
+          </div>
+          
+          <!-- Card 5: Conversion Rate (Negative Trend - Warning Color) -->
+          <div class="bg-green-50 rounded-xl p-5 card-shadow">
+              <p class="text-sm font-medium text-gray-500 mb-1">Conversion Rate</p>
+              <h3 class="text-2xl font-extrabold text-gray-900">32.65 %</h3>
+              <div class="flex items-center text-sm mt-2">
+                  <i class="fa-solid fa-arrow-down text-red-600 mr-1"></i>
+                  <span class="text-red-600 font-semibold">-12.62 %</span>
+                  <span class="text-gray-500 ml-1">(-3.42 %)</span>
+              </div>
+          </div>
       </div>
-    </header>
-    
-    <!-- Welcome Banner & Controls -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2 md:mb-0">Welcome Back, <?php echo $admin_name; ?>!</h2>
-        <div class="flex gap-3">
-            <select class="p-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-green-500 cursor-pointer transition-colors">
-                <option>Previous Year</option>
-                <option>Last 30 Days</option>
-                <option>Last 7 Days</option>
-            </select>
-            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                View All Time
-            </button>
-        </div>
+
+
+      <!-- 2. Main Grid: Chart & Side Panels -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- A. Monthly Revenue Chart (Summary) -->
+          <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-6 chart-container">
+              <div class="flex justify-between items-center mb-4">
+                  <h3 class="font-semibold text-lg text-gray-900">Summary</h3>
+                  <div class="flex items-center gap-4 text-sm text-gray-600">
+                      <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>Order</div>
+                      <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-lime-400 mr-2"></span>Income Growth</div>
+                      <select class="p-1 border border-gray-200 rounded-lg text-xs hover:border-green-500 cursor-pointer">
+                          <option>Last 7 days</option>
+                          <option>Last 30 days</option>
+                      </select>
+                  </div>
+              </div>
+              <canvas id="adminChart"></canvas>
+          </div>
+
+          <!-- B. Most Selling Products (Static Mockup) -->
+          <div class="bg-white rounded-xl card-shadow p-6">
+              <h3 class="font-semibold text-lg text-gray-900 mb-4">Most Selling Products</h3>
+              <div class="space-y-4">
+                  <!-- Item 1 -->
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                          <!-- Placeholder using neutral colors -->
+                          <img src="https://placehold.co/40x40/f3f4f6/1f2937?text=VEG" class="w-10 h-10 rounded-lg" alt="Product">
+                          <div>
+                              <p class="text-sm font-medium">Fresh Carrots</p>
+                              <p class="text-xs text-gray-500">ID: #98432</p>
+                          </div>
+                      </div>
+                      <p class="text-xs font-semibold text-gray-600">421 Sold</p>
+                  </div>
+                  <!-- Item 2 -->
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                          <img src="https://placehold.co/40x40/f3f4f6/1f2937?text=FRU" class="w-10 h-10 rounded-lg" alt="Product">
+                          <div>
+                              <p class="text-sm font-medium">Organic Apples</p>
+                              <p class="text-xs text-gray-500">ID: #76112</p>
+                          </div>
+                      </div>
+                      <p class="text-xs font-semibold text-gray-600">355 Sold</p>
+                  </div>
+                  <!-- Item 3 -->
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                          <img src="https://placehold.co/40x40/f3f4f6/1f2937?text=MEA" class="w-10 h-10 rounded-lg" alt="Product">
+                          <div>
+                              <p class="text-sm font-medium">Chicken Breast</p>
+                              <p class="text-xs text-gray-500">ID: #23891</p>
+                          </div>
+                      </div>
+                      <p class="text-xs font-semibold text-gray-600">210 Sold</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+      <!-- 3. Bottom Row: Recent Orders & Top Users -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- A. Recent Orders Table (Static Mockup) -->
+          <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-6">
+              <div class="flex justify-between items-center mb-4">
+                  <h3 class="font-semibold text-lg text-gray-900">Recent Orders</h3>
+                  <a href="admin-orders.php" class="text-sm text-green-600 hover:text-green-800 font-medium">View All</a>
+              </div>
+              
+              <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200">
+                      <thead>
+                          <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              <th class="py-3 px-2">Product</th>
+                              <th class="py-3 px-2">Customer</th>
+                              <th class="py-3 px-2">Order ID</th>
+                              <th class="py-3 px-2">Date</th>
+                              <th class="py-3 px-2">Status</th>
+                              <th class="py-3 px-2"></th>
+                          </tr>
+                      </thead>
+                      <tbody class="bg-white divide-y divide-gray-100">
+                          <!-- Order 1: Pending (Yellow/Orange is a standard color for Pending) -->
+                          <tr class="hover:bg-gray-50 transition-colors">
+                              <td class="py-3 px-2 flex items-center gap-3">
+                                  <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=VEG" class="w-8 h-8 rounded-md" alt="Product">
+                                  <p class="text-sm font-medium">Spinach Bundle</p>
+                              </td>
+                              <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Alvin Merto</td>
+                              <td class="py-3 px-2 text-sm text-gray-500">#245789</td>
+                              <td class="py-3 px-2 text-sm text-gray-500">27 Jun 2024</td>
+                              <td class="py-3 px-2">
+                                  <span class="flex items-center gap-1 text-yellow-600 text-xs font-semibold">
+                                      <i class="fa-solid fa-circle text-[6px]"></i>Pending
+                                  </span>
+                              </td>
+                              <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
+                          </tr>
+                          <!-- Order 2: Canceled (Red is a standard color for Cancelled/Warning) -->
+                          <tr class="hover:bg-gray-50 transition-colors">
+                              <td class="py-3 px-2 flex items-center gap-3">
+                                  <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=FRU" class="w-8 h-8 rounded-md" alt="Product">
+                                  <p class="text-sm font-medium">Banana Box</p>
+                              </td>
+                              <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Michelle Data</td>
+                              <td class="py-3 px-2 text-sm text-gray-500">#245788</td>
+                              <td class="py-3 px-2 text-sm text-gray-500">26 Jun 2024</td>
+                              <td class="py-3 px-2">
+                                  <span class="flex items-center gap-1 text-red-600 text-xs font-semibold">
+                                      <i class="fa-solid fa-circle text-[6px]"></i>Cancelled
+                                  </span>
+                              </td>
+                              <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
+                          </tr>
+                          <!-- Order 3: Shipped (Green is a standard color for Shipped/Complete) -->
+                          <tr class="hover:bg-gray-50 transition-colors">
+                              <td class="py-3 px-2 flex items-center gap-3">
+                                  <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=DAI" class="w-8 h-8 rounded-md" alt="Product">
+                                  <p class="text-sm font-medium">Fresh Milk</p>
+                              </td>
+                              <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Jessy Rose</td>
+                              <td class="py-3 px-2 text-sm text-gray-500">#1024784</td>
+                              <td class="py-3 px-2 text-sm text-gray-500">20 Jun 2024</td>
+                              <td class="py-3 px-2">
+                                  <span class="flex items-center gap-1 text-green-600 text-xs font-semibold">
+                                      <i class="fa-solid fa-circle text-[6px]"></i>Shipped
+                                  </span>
+                              </td>
+                              <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+          <!-- B. Weekly Top Customers (Static Mockup) -->
+          <div class="bg-white rounded-xl card-shadow p-6">
+              <h3 class="font-semibold text-lg text-gray-900 mb-4">Weekly Top Customers</h3>
+              <div class="space-y-4">
+                  <!-- User 1 -->
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                          <img src="https://randomuser.me/api/portraits/women/61.jpg" class="w-10 h-10 rounded-full" alt="User">
+                          <div>
+                              <p class="text-sm font-medium">Marks Hoverson</p>
+                              <p class="text-xs text-gray-500">25 Orders</p>
+                          </div>
+                      </div>
+                      <button class="text-sm text-green-600 hover:text-green-800 font-medium">View</button>
+                  </div>
+                  <!-- User 2 -->
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                          <img src="https://randomuser.me/api/portraits/men/50.jpg" class="w-10 h-10 rounded-full" alt="User">
+                          <div>
+                              <p class="text-sm font-medium">Johny Peters</p>
+                              <p class="text-xs text-gray-500">23 Orders</p>
+                          </div>
+                      </div>
+                      <button class="text-sm text-green-600 hover:text-green-800 font-medium">View</button>
+                  </div>
+                  <!-- User 3 -->
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                          <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full" alt="User">
+                          <div>
+                              <p class="text-sm font-medium">Jane Doe</p>
+                              <p class="text-xs text-gray-500">18 Orders</p>
+                          </div>
+                      </div>
+                      <button class="text-sm text-green-600 hover:text-green-800 font-medium">View</button>
+                  </div>
+              </div>
+          </div>
+      </div>
     </div>
-
-    <!-- 1. Stat Cards (Updated: Removed colored top borders) -->
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
-
-        <!-- Card 1: Revenue (Positive) -->
-        <div class="bg-green-50 rounded-xl p-5 card-shadow">
-            <p class="text-sm font-medium text-gray-500 mb-1">Ecommerce Revenue</p>
-            <h3 class="text-2xl font-extrabold text-gray-900">₱245,450</h3>
-            <div class="flex items-center text-sm mt-2">
-                <i class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
-                <span class="text-green-600 font-semibold">+34.9%</span>
-                <span class="text-gray-500 ml-1">(+43.21 K)</span>
-            </div>
-        </div>
-
-        <!-- Card 2: New Customers (Negative Trend - Neutral Color) -->
-        <div class="bg-green-50 rounded-xl p-5 card-shadow">
-            <p class="text-sm font-medium text-gray-500 mb-1">New Customers</p>
-            <h3 class="text-2xl font-extrabold text-gray-900">684</h3>
-            <div class="flex items-center text-sm mt-2">
-                <i class="fa-solid fa-arrow-down text-red-600 mr-1"></i>
-                <span class="text-red-600 font-semibold">-8.6%</span>
-                <span class="text-gray-500 ml-1">(-64)</span>
-            </div>
-        </div>
-
-        <!-- Card 3: Reject Purchase Rate (Warning/Negative) -->
-        <div class="bg-green-50 rounded-xl p-5 card-shadow">
-            <p class="text-sm font-medium text-gray-500 mb-1">Reject Purchase Rate</p>
-            <h3 class="text-2xl font-extrabold text-gray-900">75.12 %</h3>
-            <div class="flex items-center text-sm mt-2">
-                <i class="fa-solid fa-arrow-up text-red-600 mr-1"></i>
-                <span class="text-red-600 font-semibold">+25.4 %</span>
-                <span class="text-gray-500 ml-1">(+20.11 K)</span>
-            </div>
-        </div>
-        
-        <!-- Card 4: Average Order Value (Positive) -->
-        <div class="bg-green-50 rounded-xl p-5 card-shadow">
-            <p class="text-sm font-medium text-gray-500 mb-1">Average Order Value</p>
-            <h3 class="text-2xl font-extrabold text-gray-900">₱2,412.23</h3>
-            <div class="flex items-center text-sm mt-2">
-                <i class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
-                <span class="text-green-600 font-semibold">+35.2 %</span>
-                <span class="text-gray-500 ml-1">(+₱744)</span>
-            </div>
-        </div>
-        
-        <!-- Card 5: Conversion Rate (Negative Trend - Warning Color) -->
-        <div class="bg-green-50 rounded-xl p-5 card-shadow">
-            <p class="text-sm font-medium text-gray-500 mb-1">Conversion Rate</p>
-            <h3 class="text-2xl font-extrabold text-gray-900">32.65 %</h3>
-            <div class="flex items-center text-sm mt-2">
-                <i class="fa-solid fa-arrow-down text-red-600 mr-1"></i>
-                <span class="text-red-600 font-semibold">-12.62 %</span>
-                <span class="text-gray-500 ml-1">(-3.42 %)</span>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 2. Main Grid: Chart & Side Panels -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- A. Monthly Revenue Chart (Summary) -->
-        <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-6 chart-container">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-lg text-gray-900">Summary</h3>
-                <div class="flex items-center gap-4 text-sm text-gray-600">
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>Order</div>
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-lime-400 mr-2"></span>Income Growth</div>
-                    <select class="p-1 border border-gray-200 rounded-lg text-xs hover:border-green-500 cursor-pointer">
-                        <option>Last 7 days</option>
-                        <option>Last 30 days</option>
-                    </select>
-                </div>
-            </div>
-            <canvas id="adminChart"></canvas>
-        </div>
-
-        <!-- B. Most Selling Products (Static Mockup) -->
-        <div class="bg-white rounded-xl card-shadow p-6">
-            <h3 class="font-semibold text-lg text-gray-900 mb-4">Most Selling Products</h3>
-            <div class="space-y-4">
-                <!-- Item 1 -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <!-- Placeholder using neutral colors -->
-                        <img src="https://placehold.co/40x40/f3f4f6/1f2937?text=VEG" class="w-10 h-10 rounded-lg" alt="Product">
-                        <div>
-                            <p class="text-sm font-medium">Fresh Carrots</p>
-                            <p class="text-xs text-gray-500">ID: #98432</p>
-                        </div>
-                    </div>
-                    <p class="text-xs font-semibold text-gray-600">421 Sold</p>
-                </div>
-                <!-- Item 2 -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://placehold.co/40x40/f3f4f6/1f2937?text=FRU" class="w-10 h-10 rounded-lg" alt="Product">
-                        <div>
-                            <p class="text-sm font-medium">Organic Apples</p>
-                            <p class="text-xs text-gray-500">ID: #76112</p>
-                        </div>
-                    </div>
-                    <p class="text-xs font-semibold text-gray-600">355 Sold</p>
-                </div>
-                <!-- Item 3 -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://placehold.co/40x40/f3f4f6/1f2937?text=MEA" class="w-10 h-10 rounded-lg" alt="Product">
-                        <div>
-                            <p class="text-sm font-medium">Chicken Breast</p>
-                            <p class="text-xs text-gray-500">ID: #23891</p>
-                        </div>
-                    </div>
-                    <p class="text-xs font-semibold text-gray-600">210 Sold</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 3. Bottom Row: Recent Orders & Top Users -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- A. Recent Orders Table (Static Mockup) -->
-        <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-lg text-gray-900">Recent Orders</h3>
-                <a href="admin-orders.php" class="text-sm text-green-600 hover:text-green-800 font-medium">View All</a>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <th class="py-3 px-2">Product</th>
-                            <th class="py-3 px-2">Customer</th>
-                            <th class="py-3 px-2">Order ID</th>
-                            <th class="py-3 px-2">Date</th>
-                            <th class="py-3 px-2">Status</th>
-                            <th class="py-3 px-2"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        <!-- Order 1: Pending (Yellow/Orange is a standard color for Pending) -->
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="py-3 px-2 flex items-center gap-3">
-                                <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=VEG" class="w-8 h-8 rounded-md" alt="Product">
-                                <p class="text-sm font-medium">Spinach Bundle</p>
-                            </td>
-                            <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Alvin Merto</td>
-                            <td class="py-3 px-2 text-sm text-gray-500">#245789</td>
-                            <td class="py-3 px-2 text-sm text-gray-500">27 Jun 2024</td>
-                            <td class="py-3 px-2">
-                                <span class="flex items-center gap-1 text-yellow-600 text-xs font-semibold">
-                                    <i class="fa-solid fa-circle text-[6px]"></i>Pending
-                                </span>
-                            </td>
-                            <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
-                        </tr>
-                        <!-- Order 2: Canceled (Red is a standard color for Cancelled/Warning) -->
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="py-3 px-2 flex items-center gap-3">
-                                <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=FRU" class="w-8 h-8 rounded-md" alt="Product">
-                                <p class="text-sm font-medium">Banana Box</p>
-                            </td>
-                            <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Michelle Data</td>
-                            <td class="py-3 px-2 text-sm text-gray-500">#245788</td>
-                            <td class="py-3 px-2 text-sm text-gray-500">26 Jun 2024</td>
-                            <td class="py-3 px-2">
-                                <span class="flex items-center gap-1 text-red-600 text-xs font-semibold">
-                                    <i class="fa-solid fa-circle text-[6px]"></i>Cancelled
-                                </span>
-                            </td>
-                            <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
-                        </tr>
-                        <!-- Order 3: Shipped (Green is a standard color for Shipped/Complete) -->
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="py-3 px-2 flex items-center gap-3">
-                                <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=DAI" class="w-8 h-8 rounded-md" alt="Product">
-                                <p class="text-sm font-medium">Fresh Milk</p>
-                            </td>
-                            <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Jessy Rose</td>
-                            <td class="py-3 px-2 text-sm text-gray-500">#1024784</td>
-                            <td class="py-3 px-2 text-sm text-gray-500">20 Jun 2024</td>
-                            <td class="py-3 px-2">
-                                <span class="flex items-center gap-1 text-green-600 text-xs font-semibold">
-                                    <i class="fa-solid fa-circle text-[6px]"></i>Shipped
-                                </span>
-                            </td>
-                            <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- B. Weekly Top Customers (Static Mockup) -->
-        <div class="bg-white rounded-xl card-shadow p-6">
-            <h3 class="font-semibold text-lg text-gray-900 mb-4">Weekly Top Customers</h3>
-            <div class="space-y-4">
-                <!-- User 1 -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://randomuser.me/api/portraits/women/61.jpg" class="w-10 h-10 rounded-full" alt="User">
-                        <div>
-                            <p class="text-sm font-medium">Marks Hoverson</p>
-                            <p class="text-xs text-gray-500">25 Orders</p>
-                        </div>
-                    </div>
-                    <button class="text-sm text-green-600 hover:text-green-800 font-medium">View</button>
-                </div>
-                <!-- User 2 -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/50.jpg" class="w-10 h-10 rounded-full" alt="User">
-                        <div>
-                            <p class="text-sm font-medium">Johny Peters</p>
-                            <p class="text-xs text-gray-500">23 Orders</p>
-                        </div>
-                    </div>
-                    <button class="text-sm text-green-600 hover:text-green-800 font-medium">View</button>
-                </div>
-                <!-- User 3 -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full" alt="User">
-                        <div>
-                            <p class="text-sm font-medium">Jane Doe</p>
-                            <p class="text-xs text-gray-500">18 Orders</p>
-                        </div>
-                    </div>
-                    <button class="text-sm text-green-600 hover:text-green-800 font-medium">View</button>
-                </div>
-            </div>
-        </div>
     </div>
 
 
@@ -515,7 +530,7 @@ $notifications = [
           <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
             Cancel
           </button>
-          <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+          <a href="../public/index.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
             Logout
           </a>
         </div>
@@ -556,10 +571,24 @@ $notifications = [
       const userMenuBtn = document.getElementById('user-menu-btn');
       const userMenuDropdown = document.getElementById('user-menu-dropdown');
       const viewAllBtn = document.getElementById('view-all-notifications-btn');
+      const notificationPulse = document.getElementById('notification-pulse');
+      const notificationList = document.getElementById('notification-list');
 
       notificationBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent the window click event from firing immediately
         notificationDropdown.classList.toggle('hidden');
+        // Hide the pulse when the dropdown is opened
+        if (notificationPulse) {
+            notificationPulse.style.display = 'none';
+        }
+      });
+
+      notificationList.addEventListener('click', (e) => {
+          const item = e.target.closest('.notification-item');
+          if (item && item.dataset.read === 'false') {
+              item.classList.remove('bg-green-50');
+              item.dataset.read = 'true';
+          }
       });
 
       // Close dropdown if clicked outside
@@ -582,15 +611,6 @@ $notifications = [
       document.getElementById('logoutButtonDropdown').addEventListener('click', function() {
         logoutModal.classList.remove('hidden');
         logoutModal.classList.add('flex');
-      });
-
-      // Expand notifications list
-      viewAllBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const notificationList = document.getElementById('notification-list');
-        notificationList.classList.remove('max-h-80'); // Remove the old height
-        notificationList.classList.add('max-h-[60vh]'); // Apply a larger, but still limited, scrollable height
-        viewAllBtn.style.display = 'none'; // Hide the "View all" button
       });
 
       // --- Chart.js Initialization ---

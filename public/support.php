@@ -183,7 +183,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>We deliver from 8:00 AM to 5:00 PM, Monday through Saturday. You can select your preferred 2-hour delivery window during checkout.</p>
                                 </div>
@@ -197,7 +197,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>We're so sorry for any trouble! Please contact us within 24 hours of your delivery at <a href="mailto:support@farmersmall.com" class="text-green-600 hover:underline">support@farmersmall.com</a> or call us at (123) 456-7890. We will happily arrange a refund or a re-delivery for the affected items.</p>
                                 </div>
@@ -211,7 +211,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>Currently, we deliver to Central, Dahican, Badas, Matiao, and Madang. We are expanding quickly! Please <a href="#contact" class="text-green-600 hover:underline">contact us</a> to let us know where you'd like us to deliver next.</p>
                                 </div>
@@ -225,7 +225,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>Due to the perishable nature of our products, we do not accept returns. However, if you are unsatisfied with the quality of any item, please refer to our policy on missing or damaged items, and we will make it right.</p>
                                 </div>
@@ -239,7 +239,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>Yes, creating an account allows you to track your orders, save your delivery address, and manage your subscriptions for a faster checkout experience in the future.</p>
                                 </div>
@@ -253,7 +253,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>We accept all major credit cards (Visa, MasterCard, American Express), G-Cash, and Cash on Delivery (COD). You can select your preferred payment method at checkout.</p>
                                 </div>
@@ -267,7 +267,7 @@
                             <i class="fas fa-chevron-down text-green-600 transition-transform duration-200"></i>
                         </button>
                         <div class="faq-answer">
-                            <div>
+                            <div class="overflow-hidden">
                                 <div class="p-6 pt-0 text-gray-600">
                                     <p>If you need to make changes to your order, please contact us immediately at (123) 456-7890. We can modify orders as long as they have not yet been prepared for delivery by our team.</p>
                                 </div>
@@ -316,7 +316,6 @@
         include '../auth/login.php';
         include '../auth/register.php';
     ?>
-
     <script src="../assets/js/modal-handler.js"></script>
 
     <!-- Toast Notification Container -->
