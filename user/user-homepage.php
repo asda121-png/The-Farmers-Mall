@@ -37,9 +37,9 @@ if ($user_id) {
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
   <style>
-    /* New Class for Fresh Vegetable Bundle Font Style */
+    /* New Class for Fresh Vegetable Bundle Font Style - UPDATED to sans-serif */
     .fresh-font {
-        font-family: 'Playfair Display', serif;
+        font-family: sans-serif;
         letter-spacing: 0.5px;
     }
 

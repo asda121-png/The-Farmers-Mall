@@ -35,9 +35,9 @@ if ($user_id) {
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
   <style>
-    /* Fresh Vegetable Bundle Font Style */
+    /* Fresh Vegetable Bundle Font Style - UPDATED to sans-serif */
     .fresh-title-font {
-        font-family: 'Playfair Display', serif;
+        font-family: sans-serif;
         letter-spacing: 0.5px;
     }
 
@@ -50,6 +50,7 @@ if ($user_id) {
       border-radius: 0.5rem;
       transition: all 0.3s ease;
       position: relative;
+      cursor: pointer; /* Indicates it's clickable */
     }
 
     /* ONLY Green Highlight Border on Hover - No Scale, No Shadow Change */
@@ -86,6 +87,7 @@ if ($user_id) {
     .add-btn {
         transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         z-index: 2;
+        cursor: pointer;
     }
 
     .add-btn:hover {
@@ -122,27 +124,7 @@ if ($user_id) {
         </ul>
       </div>
 
-      <div class="mb-6">
-        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Organic</h3>
-        <label class="text-sm text-gray-700 inline-flex items-center">
-          <input id="organicOnly" type="checkbox" class="mr-2">Organic Only
-        </label>
-      </div>
-
-      <div class="mb-6">
-        <h3 class="font-bold mb-2 text-gray-800 fresh-title-font text-sm">Price Range</h3>
-        <div class="flex items-center space-x-2 mb-2">
-          <input id="minPrice" type="number" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
-          <span>-</span>
-          <input id="maxPrice" type="number" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none">
-        </div>
-        <input id="priceRange" type="range" min="0" max="500" value="500" class="w-full accent-green-600">
-      </div>
-
-      <div>
-        <button id="applyFilters" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Apply Filters</button>
-      </div>
-    </aside>
+      </aside>
 
     <section class="col-span-3">
       <div class="flex items-center justify-between mb-6">
@@ -227,10 +209,12 @@ if ($user_id) {
             $sold = $prod['units_sold'] ?? $prod['times_ordered'] ?? $prod['qty_sold'] ?? 0;
         ?>
         <div class="product-card bg-white rounded-lg shadow transition relative block overflow-hidden h-full" 
+             onclick="window.location.href='productdetails.php?name=<?php echo urlencode($name); ?>&price=<?php echo urlencode($priceVal); ?>&img=<?php echo urlencode($img); ?>&description=<?php echo urlencode($desc); ?>&category=<?php echo urlencode($category); ?>&id=<?php echo urlencode($id); ?>'"
              data-category="<?php echo $category; ?>" 
              data-price="<?php echo $priceVal; ?>" 
              data-organic="<?php echo $organic; ?>" 
              data-name="<?php echo $name; ?>" 
+             data-img="<?php echo $img; ?>" 
              data-description="<?php echo $desc; ?>" 
              data-id="<?php echo $id; ?>">
              
@@ -245,7 +229,7 @@ if ($user_id) {
                 <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?></p>
                 
                 <div class="flex flex-col items-end">
-                    <button class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart">
+                    <button class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart" onclick="event.stopPropagation();">
                         <i class="fa-solid fa-plus"></i>
                     </button>
                     <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
@@ -305,11 +289,10 @@ if ($user_id) {
   <script src="../assets/js/products.js"></script>
   <script src="../assets/js/profile-sync.js"></script>
   <script>
-    // Update search result count and pre-fill search input
     document.addEventListener('DOMContentLoaded', function() {
+      // --- Search Pre-fill Logic ---
       const searchQuery = '<?php echo htmlspecialchars($search_query ?? '', ENT_QUOTES, 'UTF-8'); ?>';
       if (searchQuery) {
-        // Wait for products.js to filter, then count visible products
         setTimeout(() => {
           const productCards = document.querySelectorAll('.product-card');
           const visibleCount = Array.from(productCards).filter(card => {
@@ -322,12 +305,187 @@ if ($user_id) {
           }
         }, 100);
         
-        // Pre-fill search input with query
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
           searchInput.value = searchQuery;
         }
       }
+
+      // --- FILTERING LOGIC ---
+      
+      const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+      const clearBtn = document.getElementById('clearFilters');
+      const productCards = document.querySelectorAll('.product-card');
+
+      // Function to check visibility based on selected filters
+      function applyFilters() {
+        // 1. Get all currently checked categories
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.dataset.cat.toLowerCase());
+        
+        // 2. Iterate products and toggle display
+        let visibleCount = 0;
+        productCards.forEach(card => {
+            const cardCat = (card.getAttribute('data-category') || '').toLowerCase();
+            
+            // Category logic: 
+            // If NO categories selected, show all.
+            // If categories ARE selected, check if this card's category is in the list.
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(cardCat);
+
+            if (matchesCategory) {
+                card.style.display = ''; // Show
+                visibleCount++;
+            } else {
+                card.style.display = 'none'; // Hide
+            }
+        });
+      }
+
+      // Attach Event Listeners to Category Checkboxes (Auto-filter on change)
+      categoryCheckboxes.forEach(cb => {
+          cb.addEventListener('change', applyFilters);
+      });
+
+      // Attach Event Listener to "Clear All" Button
+      if (clearBtn) {
+          clearBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              // Uncheck all categories
+              categoryCheckboxes.forEach(cb => cb.checked = false);
+              // Re-apply filters (shows all)
+              applyFilters();
+          });
+      }
+
+      // Check URL parameters on page load (from Homepage)
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryParam = urlParams.get('category');
+
+      if (categoryParam) {
+        const targetCheckbox = document.querySelector(`.category-checkbox[data-cat="${categoryParam.toLowerCase()}"]`);
+        if (targetCheckbox) {
+          targetCheckbox.checked = true;
+          applyFilters();
+        }
+      }
+
+      // --- ADD TO CART LOGIC ---
+
+      // Show toast notification
+      function showNotification(message, type = 'success') {
+        const existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+        toast.innerHTML = `
+          <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle text-xl"></i>
+            <span class="font-medium">${message}</span>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        // Animate in
+        setTimeout(() => toast.classList.remove('translate-x-full'), 10);
+        // Animate out and remove
+        setTimeout(() => {
+          toast.classList.add('translate-x-full');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      // Update cart icon
+      async function updateCartIcon() {
+        const badge = document.getElementById('cartBadge');
+        if (!badge) return;
+        try {
+          // Add timestamp to prevent caching and ensure real-time status
+          const response = await fetch('../api/cart.php?_=' + new Date().getTime());
+          const data = await response.json();
+          
+          if (data.success && data.items) {
+            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            
+            // STRICT DISPLAY LOGIC
+            if (totalItems > 0) {
+              badge.textContent = totalItems;
+              badge.classList.remove('hidden');
+            } else {
+              // If empty, user requested "no or 0". Hiding it is the standard "no" behavior.
+              // To show '0' instead, remove the classList.add('hidden') and uncomment textContent='0'
+              badge.textContent = '0'; 
+              badge.classList.add('hidden'); // This hides the badge completely when 0
+            }
+          } else {
+             // Fallback if no items or API fail
+             badge.classList.add('hidden');
+          }
+        } catch (error) {
+          console.log('Error loading cart count:', error);
+        }
+      }
+
+      // Add to cart API call
+      async function addToCart(product) {
+        try {
+          const payload = { quantity: 1 };
+          if (product.id) {
+            payload.product_id = product.id;
+          } else {
+            payload.product_name = product.name;
+            payload.price = parseFloat(product.price);
+            payload.description = product.description || '';
+            payload.image = product.image || '';
+            payload.category = product.category || 'other';
+          }
+
+          const response = await fetch('../api/cart.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          
+          const data = await response.json();
+          if (data.success) {
+            updateCartIcon();
+            showNotification(`${product.name} added to cart!`);
+          } else {
+            showNotification(data.message || 'Failed to add to cart', 'error');
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+          showNotification('Error adding to cart', 'error');
+        }
+      }
+
+      // Attach click listeners to all Add buttons
+      document.querySelectorAll('.add-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation(); // Stop click from opening product details
+          
+          const card = button.closest('.product-card');
+          if (card) {
+            const product = {
+              name: card.dataset.name,
+              price: parseFloat(card.dataset.price.replace('₱', '')),
+              image: card.dataset.img,
+              description: card.dataset.description || '',
+              category: card.dataset.category || 'other',
+              id: card.dataset.id
+            };
+            addToCart(product);
+          }
+        });
+      });
+      
+      // Initialize cart icon count on load
+      updateCartIcon();
+      
+      // Also update when returning to the page (e.g. back button from cart)
+      window.addEventListener('pageshow', updateCartIcon);
+
     });
   </script>
 
