@@ -94,6 +94,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_form'])) {
         .faq-item .faq-answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-out; }
         .faq-item.active .faq-answer { grid-template-rows: 1fr; }
         .faq-item.active .faq-toggle i { transform: rotate(180deg); }
+        .login-modal, .register-modal {
+            z-index: 100; /* Ensure modal is on top of the header */
+        }
+        .login-modal:not(.hidden), .register-modal:not(.hidden) {
+            backdrop-filter: blur(4px);
+            transition: opacity 0.5s ease, visibility 0.5s ease, backdrop-filter 0.5s ease;
+        }
     </style>
 </head>
 <body class="bg-[#f6fff8] text-gray-800 antialiased">

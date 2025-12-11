@@ -44,6 +44,14 @@
             display: block;
             min-height: 1.25rem;
         }
+        .login-modal, .register-modal {
+            z-index: 100; /* Ensure modal is on top of the header */
+        }
+        .login-modal:not(.hidden), .register-modal:not(.hidden) {
+            backdrop-filter: blur(4px);
+            transition: opacity 0.5s ease, visibility 0.5s ease, backdrop-filter 0.5s ease;
+        }
+
         /* End Field Error Styles */
 
         /* Centered Notification Style */
