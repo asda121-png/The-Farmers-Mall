@@ -122,16 +122,30 @@ try {
 
             $newOrder = $api->insert('orders', $orderData);
             
-            if (empty($newOrder)) {
-                throw new Exception('Failed to create order');
+            if (empty($newOrder) || !isset($newOrder[0]['id'])) {
+                // If insert doesn't return ID, try to fetch the latest order
+                error_log('Order insert did not return ID, attempting to fetch latest order');
+                $latestOrders = $api->select('orders', ['customer_id' => $user_id]);
+                if (!empty($latestOrders)) {
+                    // Sort by created_at or id to get the latest
+                    usort($latestOrders, function($a, $b) {
+                        return strcmp($b['created_at'] ?? '', $a['created_at'] ?? '');
+                    });
+                    $order_id = $latestOrders[0]['id'];
+                } else {
+                    throw new Exception('Failed to create order - no ID returned');
+                }
+            } else {
+                $order_id = $newOrder[0]['id'];
             }
-
-            $order_id = $newOrder[0]['id'];
 
             // Insert order items
             foreach ($order_items as $item) {
                 $item['order_id'] = $order_id;
-                $api->insert('order_items', $item);
+                $result = $api->insert('order_items', $item);
+                if (empty($result)) {
+                    error_log('Warning: order_items insert returned empty for order_id: ' . $order_id);
+                }
             }
 
             // Clear the cart
