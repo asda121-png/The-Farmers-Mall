@@ -214,19 +214,16 @@ foreach ($notifications as $notif) {
                   </div>
                   <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
                       <?php foreach($notifications as $notif): ?>
-                      <div class="notification-item flex items-start gap-3 p-4 hover:bg-green-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
+                      <a href="#" class="notification-item flex items-start gap-3 p-4 hover:bg-green-50 cursor-pointer <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
                           <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
                               <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
                           </div>
-                          <a href="#" class="flex-1 cursor-pointer">
-                              <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($notif['title']); ?></p>
-                              <p class="text-xs text-gray-500"><?php echo htmlspecialchars($notif['message']); ?></p>
-                              <p class="text-xs text-gray-400 mt-1"><?php echo htmlspecialchars($notif['time']); ?></p>
-                          </a>
-                          <button class="remove-notification-btn text-gray-400 hover:text-red-500 transition-colors" title="Remove notification">
-                              <i class="fa-solid fa-times text-xs"></i>
-                          </button>
-                      </div>
+                          <div class="flex-1">
+                              <p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p>
+                              <p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p>
+                          </div>
+                          <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
+                      </a>
                       <?php endforeach; ?>
                   </div>
                   <div class="p-2 border-t">
@@ -533,7 +530,7 @@ foreach ($notifications as $notif) {
           <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
             Cancel
           </button>
-          <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+          <a href="../public/index.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
             Logout
           </a>
         </div>
@@ -587,22 +584,10 @@ foreach ($notifications as $notif) {
       });
 
       notificationList.addEventListener('click', (e) => {
-          const removeBtn = e.target.closest('.remove-notification-btn');
-          if (removeBtn) {
-              e.stopPropagation(); // Prevent other click events on the item
-              const notificationItem = removeBtn.closest('.notification-item');
-              if (notificationItem) {
-                  // Add a fade-out effect before removing
-                  notificationItem.style.transition = 'opacity 0.3s ease';
-                  notificationItem.style.opacity = '0';
-                  setTimeout(() => notificationItem.remove(), 300);
-              }
-          } else {
-              const item = e.target.closest('.notification-item');
-              if (item && item.dataset.read === 'false') {
-                  item.classList.remove('bg-green-50');
-                  item.dataset.read = 'true';
-              }
+          const item = e.target.closest('.notification-item');
+          if (item && item.dataset.read === 'false') {
+              item.classList.remove('bg-green-50');
+              item.dataset.read = 'true';
           }
       });
 

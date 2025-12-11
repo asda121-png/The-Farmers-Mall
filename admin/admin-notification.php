@@ -156,7 +156,7 @@ $admin_email = "admin@farmersmall.com";
       <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
       <div class="flex justify-center gap-4">
         <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
-        <a href="../auth/login.php" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Logout</a>
+        <a href="../public/index.php" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Logout</a>
       </div>
     </div>
   </div>

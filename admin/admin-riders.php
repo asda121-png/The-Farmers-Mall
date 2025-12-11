@@ -808,7 +808,7 @@ $notifications = [
         // For now, I'll hook it to a standard redirect or alert as per previous files
          logoutBtn.addEventListener('click', () => {
             if(confirm("Are you sure you want to logout?")) {
-                window.location.href = '../auth/login.php';
+                window.location.href = '../public/index.php';
             }
         });
         
