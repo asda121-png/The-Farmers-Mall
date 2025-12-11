@@ -77,6 +77,8 @@ try {
             }
 
             // Calculate total and prepare order items
+            $subtotal_amount = 0;
+            $tax_rate = 0.12; // 12% tax rate
             $total_amount = 0;
             $order_items = [];
             
@@ -97,9 +99,13 @@ try {
                         'subtotal' => $subtotal
                     ];
                     
-                    $total_amount += $subtotal;
+                    $subtotal_amount += $subtotal;
                 }
             }
+
+            // Calculate final total with tax
+            $tax_amount = $subtotal_amount * $tax_rate;
+            $total_amount = $subtotal_amount + $tax_amount;
 
             // Create the order
             $orderData = [
