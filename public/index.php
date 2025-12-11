@@ -34,7 +34,7 @@
    .login-modal.hidden {
      opacity: 0;
      visibility: hidden;
-   }
+   }GI
    .login-modal:not(.hidden) {
      backdrop-filter: blur(4px); /* Corresponds to backdrop-blur-sm */
    }

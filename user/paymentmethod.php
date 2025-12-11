@@ -31,9 +31,33 @@ $tax_rate = 0.12; // 12% tax rate
 
 $total = 0;
 
+// Get customer name for cart lookup (cart uses customer_name, not customer_id)
+$customer_name = 'Unknown Customer';
 if ($user_id && isset($api)) {
     try {
-        $cart_items = $api->select('cart', ['customer_id' => $user_id]);
+        // First, get the customer's full name
+        $customer = $api->select('users', ['id' => $user_id]);
+        if (!empty($customer)) {
+            $customer_data = $customer[0];
+            
+            // Get customer name from full_name field or build from first/last name
+            if (!empty($customer_data['full_name'])) {
+                $customer_name = trim($customer_data['full_name']);
+            } else {
+                // Fallback to first_name + last_name if full_name doesn't exist
+                $first_name = $customer_data['first_name'] ?? '';
+                $last_name = $customer_data['last_name'] ?? '';
+                $customer_name = trim($first_name . ' ' . $last_name);
+            }
+            
+            // If still empty, use username or email as fallback
+            if (empty($customer_name)) {
+                $customer_name = $customer_data['username'] ?? $customer_data['email'] ?? 'Unknown Customer';
+            }
+        }
+        
+        // Now fetch cart items using customer_name (matching cart.php logic)
+        $cart_items = $api->select('cart', ['customer_name' => $customer_name]);
         
         if (!empty($cart_items)) {
             $product_ids = array_column($cart_items, 'product_id');
@@ -235,14 +259,12 @@ if ($user_id && isset($api)) {
 
       <div class="text-sm text-gray-700 space-y-2">
         <div class="flex justify-between"><span>Subtotal</span><span id="subtotal">₱<?php echo number_format($subtotal, 2); ?></span></div>
-        <div class="flex justify-between"><span>Subtotal</span><span id="subtotal-display">₱<?php echo number_format($subtotal, 2); ?></span></div>
         <div class="flex justify-between"><span>Shipping</span><span>Free</span></div>
-        <div class="flex justify-between text-xs text-gray-500"><span>Tax (estimated 12%)</span><span>₱<?php echo number_format($tax, 2); ?></span></div>
-       
+        <div class="flex justify-between text-xs text-gray-500"><span>Tax (estimated 12%)</span><span id="tax">₱<?php echo number_format($tax, 2); ?></span></div>
+      </div>
 
       <div class="border-t mt-3 pt-3 flex justify-between text-lg font-semibold text-gray-800">
         <span>Total</span><span id="total">₱<?php echo number_format($total, 2); ?></span>
-        
       </div>
 
       <button id="placeOrderBtn"
@@ -293,6 +315,15 @@ if ($user_id && isset($api)) {
     </div>
   </footer>
 
+  <script>
+    // Pass PHP data to JavaScript
+    window.paymentData = {
+      cart: <?php echo json_encode($cart_items_with_products); ?>,
+      subtotal: <?php echo json_encode($subtotal); ?>,
+      tax: <?php echo json_encode($tax); ?>,
+      total: <?php echo json_encode($total); ?>
+    };
+  </script>
   <script src="../assets/js/paymentmethod.js"></script>
  
 </body>
