@@ -447,8 +447,10 @@
           // Store selected items in sessionStorage for payment method page
           const selectedItemsArray = Array.from(selectedItems);
           sessionStorage.setItem('selectedCartItems', JSON.stringify(selectedItemsArray));
-          // Navigate to payment method
-          window.location.href = 'paymentmethod.php';
+          
+          // Pass selected cart IDs via URL parameter
+          const cartIdsParam = selectedItemsArray.join(',');
+          window.location.href = `paymentmethod.php?cart_ids=${cartIdsParam}`;
         }
       });
     }
