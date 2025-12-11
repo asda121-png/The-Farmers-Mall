@@ -1,24 +1,53 @@
 <?php
-// Start output buffering
-ob_start();
-
-// Enable error logging
+// Enable error logging FIRST
 ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/../debug_retailer_profile_errors.log');
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
 
-// Suppress display but keep logging when handling AJAX requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    error_reporting(E_ALL);
-    ini_set('display_errors', '0');
-}
-
+// Start session
 session_start();
 
-// Check if user is logged in
+// Handle AJAX requests BEFORE any output
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    error_log("=== AJAX REQUEST DETECTED ===");
+    error_log("Action: " . $_POST['action']);
+    error_log("POST data: " . print_r($_POST, true));
+    error_log("FILES data: " . print_r($_FILES, true));
+    
+    // Clean any existing output
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Load database connection for AJAX
+    require_once __DIR__ . '/../config/supabase-api.php';
+    
+    // Route to appropriate handler
+    if ($_POST['action'] === 'update_profile') {
+        error_log("Calling handleRetailerProfileUpdate()");
+        handleRetailerProfileUpdate();
+        exit;
+    } elseif ($_POST['action'] === 'remove_profile_picture') {
+        error_log("Calling handleRemoveProfilePicture()");
+        handleRemoveProfilePicture();
+        exit;
+    }
+    
+    // If we get here, unknown action
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Unknown action: ' . $_POST['action']]);
+    exit;
+}
+
+// Check if user is logged in (only for page display)
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: ../auth/login.php');
     exit;
 }
+
+// Start output buffering for page display
+ob_start();
 
 // Load database connection
 require_once __DIR__ . '/../config/supabase-api.php';
@@ -86,20 +115,21 @@ function handleRetailerProfilePictureUpload(array $file, string $userId, string 
 function handleRetailerProfileUpdate()
 {
     header('Content-Type: application/json');
-    $api = getSupabaseAPI();
-    $user_id = $_SESSION['user_id'] ?? null;
-
-    error_log("=== RETAILER PROFILE UPDATE DEBUG ===");
-    error_log("User ID: " . $user_id);
-    error_log("FILES received: " . print_r($_FILES, true));
-    error_log("POST data: " . print_r($_POST, true));
-
-    if (!$user_id) {
-        echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
-        exit();
-    }
-
+    
     try {
+        $api = getSupabaseAPI();
+        $user_id = $_SESSION['user_id'] ?? null;
+
+        error_log("=== RETAILER PROFILE UPDATE DEBUG ===");
+        error_log("User ID: " . $user_id);
+        error_log("FILES received: " . print_r($_FILES, true));
+        error_log("POST data: " . print_r($_POST, true));
+
+        if (!$user_id) {
+            echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
+            exit();
+        }
+        
         // User data updates
         $updateData = [];
         
@@ -108,6 +138,10 @@ function handleRetailerProfileUpdate()
         }
         if (!empty(trim($_POST['phone'] ?? ''))) {
             $updateData['phone'] = trim($_POST['phone']);
+        }
+        // Contact number maps to phone in users table
+        if (!empty(trim($_POST['contact_number'] ?? ''))) {
+            $updateData['phone'] = trim($_POST['contact_number']);
         }
         if (!empty(trim($_POST['email'] ?? ''))) {
             $updateData['email'] = trim($_POST['email']);
@@ -122,9 +156,7 @@ function handleRetailerProfileUpdate()
         if (!empty(trim($_POST['business_address'] ?? ''))) {
             $retailerData['business_address'] = trim($_POST['business_address']);
         }
-        if (!empty(trim($_POST['contact_number'] ?? ''))) {
-            $retailerData['contact_number'] = trim($_POST['contact_number']);
-        }
+        // Note: contact_number is stored in users.phone, not in retailers table
 
         // Handle profile picture upload
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -193,19 +225,18 @@ function handleRetailerProfileUpdate()
     } catch (Exception $e) {
         error_log("EXCEPTION during profile update: " . $e->getMessage());
         error_log("Stack trace: " . $e->getTraceAsString());
+        
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
     }
     exit();
 }
 
-// Handle AJAX requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
-    handleRetailerProfileUpdate();
-}
-
-// Handle remove profile picture
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove_profile_picture') {
+/**
+ * Handles profile picture removal
+ */
+function handleRemoveProfilePicture()
+{
     header('Content-Type: application/json');
     try {
         $user_id = $_SESSION['user_id'] ?? null;
@@ -272,7 +303,8 @@ $created_at = $userData['created_at'] ?? '';
 $shop_name = $retailerData['shop_name'] ?? 'My Shop';
 $business_address = $retailerData['business_address'] ?? '';
 $business_permit = $retailerData['business_permit'] ?? '';
-$contact_number = $retailerData['contact_number'] ?? $phone;
+// Contact number is actually stored in users.phone
+$contact_number = $phone;
 $permit_status = !empty($business_permit) ? 'Verified' : 'Not Uploaded';
 
 // Get shop statistics
@@ -515,8 +547,8 @@ try {
           <!-- Personal & Business Information -->
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-              <input type="text" id="editFullName" name="full_name" value="<?php echo htmlspecialchars($full_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
+              <input type="text" id="editShopName" name="shop_name" value="<?php echo htmlspecialchars($shop_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
@@ -525,10 +557,6 @@ try {
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
               <input type="tel" id="editPhone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
-              <input type="text" id="editShopName" name="shop_name" value="<?php echo htmlspecialchars($shop_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
@@ -1000,7 +1028,6 @@ try {
         
         const formData = new FormData();
         formData.append('action', 'update_profile');
-        formData.append('full_name', document.getElementById('editFullName').value);
         formData.append('email', document.getElementById('editEmail').value);
         formData.append('phone', document.getElementById('editPhone').value);
         formData.append('shop_name', document.getElementById('editShopName').value);
@@ -1020,9 +1047,12 @@ try {
           });
 
           const responseText = await response.text();
+          console.log('Server response status:', response.status);
           console.log('Server response:', responseText.substring(0, 1000));
 
           if (!response.ok) {
+            console.error('Server returned error status:', response.status);
+            console.error('Response text:', responseText);
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -1031,7 +1061,8 @@ try {
             result = JSON.parse(responseText);
           } catch (parseError) {
             console.error('JSON parse error:', parseError);
-            throw new Error('Invalid server response');
+            console.error('Response was:', responseText);
+            throw new Error('Invalid server response. Check console for details.');
           }
 
           if (result.status === 'success') {
