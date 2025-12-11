@@ -208,13 +208,17 @@ try {
                   </div>
                   <div id="notification-list" class="max-h-80 overflow-y-auto custom-scrollbar transition-all duration-300">
                       <?php foreach($notifications as $notif): ?>
-                      <a href="#" class="notification-item flex items-start gap-3 p-4 hover:bg-gray-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
+                      <div class="notification-item flex items-start gap-3 p-4 hover:bg-green-50 <?php echo !$notif['read'] ? 'bg-green-50' : ''; ?>" data-read="<?php echo $notif['read'] ? 'true' : 'false'; ?>">
                           <div class="w-8 h-8 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
                               <i class="fa-solid <?php echo $notif['icon']; ?> text-sm"></i>
                           </div>
-                          <div class="flex-1"><p class="text-sm font-semibold text-gray-800"><?php echo $notif['title']; ?></p><p class="text-xs text-gray-500"><?php echo $notif['message']; ?></p></div>
-                          <span class="text-xs text-gray-400"><?php echo $notif['time']; ?></span>
-                      </a>
+                          <a href="#" class="flex-1 cursor-pointer">
+                              <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($notif['title']); ?></p>
+                              <p class="text-xs text-gray-500"><?php echo htmlspecialchars($notif['message']); ?></p>
+                              <p class="text-xs text-gray-400 mt-1"><?php echo htmlspecialchars($notif['time']); ?></p>
+                          </a>
+                          <button class="remove-notification-btn text-gray-400 hover:text-red-500 transition-colors" title="Remove notification"><i class="fa-solid fa-times text-xs"></i></button>
+                      </div>
                       <?php endforeach; ?>
                   </div>
                   <div class="p-2 border-t"><a href="admin-notification.php" class="block w-full text-center text-sm font-medium text-green-600 hover:bg-gray-100 rounded-lg py-2">View all notifications</a></div>
@@ -454,10 +458,21 @@ try {
       });
 
       notificationList.addEventListener('click', (e) => {
-          const item = e.target.closest('.notification-item');
-          if (item && item.dataset.read === 'false') {
-              item.classList.remove('bg-green-50');
-              item.dataset.read = 'true';
+          const removeBtn = e.target.closest('.remove-notification-btn');
+          if (removeBtn) {
+              e.stopPropagation();
+              const notificationItem = removeBtn.closest('.notification-item');
+              if (notificationItem) {
+                  notificationItem.style.transition = 'opacity 0.3s ease';
+                  notificationItem.style.opacity = '0';
+                  setTimeout(() => notificationItem.remove(), 300);
+              }
+          } else {
+              const item = e.target.closest('.notification-item');
+              if (item && item.dataset.read === 'false') {
+                  item.classList.remove('bg-green-50');
+                  item.dataset.read = 'true';
+              }
           }
       });
 
