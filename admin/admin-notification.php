@@ -128,16 +128,16 @@ $admin_email = "admin@farmersmall.com";
             </div>
           <?php else: ?>
             <?php foreach ($notifications as $notif): ?>
-            <div class="p-5 flex items-start gap-4 hover:bg-green-50 transition-colors cursor-pointer">
+            <div class="notification-item p-5 flex items-start gap-4 hover:bg-green-50 transition-colors">
               <div class="w-10 h-10 rounded-full bg-<?php echo $notif['color']; ?>-100 flex-shrink-0 flex items-center justify-center text-<?php echo $notif['color']; ?>-600">
                   <i class="fa-solid <?php echo $notif['icon']; ?>"></i>
               </div>
-              <div class="flex-1">
+              <a href="#" class="flex-1 cursor-pointer">
                 <p class="font-semibold text-gray-800"><?php echo $notif['title']; ?></p>
                 <p class="text-sm text-gray-600"><?php echo $notif['message']; ?></p>
                 <p class="text-xs text-gray-400 mt-1"><?php echo $notif['time']; ?></p>
-              </div>
-              <button class="text-gray-400 hover:text-red-500 text-sm" title="Dismiss">
+              </a>
+              <button class="remove-notification-btn text-gray-400 hover:text-red-500 text-sm" title="Dismiss">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
@@ -156,7 +156,7 @@ $admin_email = "admin@farmersmall.com";
       <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
       <div class="flex justify-center gap-4">
         <button id="cancelLogout" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
-        <a href="../auth/login.php" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Logout</a>
+        <a href="../public/index.php" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Logout</a>
       </div>
     </div>
   </div>
@@ -169,7 +169,19 @@ $admin_email = "admin@farmersmall.com";
     const cancelLogout = document.getElementById('cancelLogout');
     logoutButton.addEventListener('click', () => logoutModal.classList.replace('hidden', 'flex'));
     cancelLogout.addEventListener('click', () => logoutModal.classList.replace('flex', 'hidden'));
-    logoutModal.addEventListener('click', (e) => { if (e.target === logoutModal) logoutModal.classList.replace('flex', 'hidden'); });
+    logoutModal.addEventListener('click', (e) => { 
+      if (e.target === logoutModal) logoutModal.classList.replace('flex', 'hidden'); 
+    });
+
+    document.querySelector('main').addEventListener('click', (e) => {
+      const removeBtn = e.target.closest('.remove-notification-btn');
+      if (removeBtn) {
+        const item = removeBtn.closest('.notification-item');
+        item.style.transition = 'opacity 0.3s ease, max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease';
+        item.style.opacity = '0';
+        setTimeout(() => item.remove(), 300);
+      }
+    });
   });
 </script>
 </html>
