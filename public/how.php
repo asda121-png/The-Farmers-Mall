@@ -1,5 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How It Works – Farmers Mall</title>
+    <style>
+        /* Field Error Styles for Modals */
+        .input-error {
+            border-color: #dc2626 !important;
+        }
+        .error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+            min-height: 1.25rem;
+        }
+        /* End Field Error Styles */
+
+        /* Centered Notification Style */
+        .centered-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            z-index: 101; /* Higher than modals */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+    </style>
 <?php
-        // Include the header
+    // Include the header
     include '../includes/header.php';
     ?>
 
@@ -147,3 +185,15 @@
         include '../includes/footer.php';
     ?>
 
+    <?php
+        include '../auth/login.php';
+        include '../auth/register.php';
+    ?>
+
+    <script src="../assets/js/modal-handler.js"></script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[100]"></div>
+
+</body>
+</html>

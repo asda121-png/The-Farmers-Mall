@@ -1,67 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support – Farmers Mall</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - Farmers Mall</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 100px;
-        }
-        
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        main {
-            flex-grow: 1;
-        }
-
-        /* * =================================================================
-         * PRO-LEVEL FAQ ACCORDION
-         * Uses CSS Grid to animate height instead of 'max-height'.
-         * This animates to the *exact* content height every time.
-         * =================================================================
-        */
-        .faq-answer {
-            display: grid;
-            grid-template-rows: 0fr; /* Start collapsed */
-            transition: grid-template-rows 0.3s ease-out;
-        }
-        
-        /* This class is toggled by JS */
-        .faq-item.active .faq-answer {
-            grid-template-rows: 1fr; /* Animate to 1 fraction (full content) */
-        }
-        
-        /* The direct child of .faq-answer must have overflow: hidden */
-        .faq-answer > div {
-            overflow: hidden;
-        }
-        
-        /* Rotate the arrow icon (JS toggles .active on .faq-item) */
-        .faq-item.active .faq-toggle i {
-            transform: rotate(180deg);
-        }
+        html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+        .faq-item .faq-answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-out; }
+        .faq-item.active .faq-answer { grid-template-rows: 1fr; }
+        .faq-item.active .faq-toggle i { transform: rotate(180deg); }
     </style>
 </head>
-
 <body class="bg-[#f6fff8] text-gray-800 antialiased">
-
     <?php
         // Include the header
         include '../includes/header.php';
     ?>
 
-    <main class="pt-[100px]"> 
+    <main class="pt-[100px] bg-[#f6fff8] text-gray-800 antialiased"> 
         
 
         <section class="px-6 pb-24">
@@ -354,60 +312,46 @@
             });
         });
     </script>
+     <?php
+        include '../auth/login.php';
+        include '../auth/register.php';
+    ?>
 
-</body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support – Farmers Mall</title>
+    <script src="../assets/js/modal-handler.js"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[100]"></div>
 
     <style>
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 100px;
+        /* Field Error Styles for Modals */
+        .input-error {
+            border-color: #dc2626 !important;
         }
-        
-        body {
+        .error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+            min-height: 1.25rem;
+        }
+
+        /* Centered Notification Style */
+        .centered-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            z-index: 101; /* Higher than modals */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        main {
-            flex-grow: 1;
-        }
-
-        /* * =================================================================
-         * PRO-LEVEL FAQ ACCORDION
-         * Uses CSS Grid to animate height instead of 'max-height'.
-         * This animates to the *exact* content height every time.
-         * =================================================================
-        */
-        .faq-answer {
-            display: grid;
-            grid-template-rows: 0fr; /* Start collapsed */
-            transition: grid-template-rows 0.3s ease-out;
-        }
-        
-        /* This class is toggled by JS */
-        .faq-item.active .faq-answer {
-            grid-template-rows: 1fr; /* Animate to 1 fraction (full content) */
-        }
-        
-        /* The direct child of .faq-answer must have overflow: hidden */
-        .faq-answer > div {
-            overflow: hidden;
-        }
-        
-        /* Rotate the arrow icon (JS toggles .active on .faq-item) */
-        .faq-item.active .faq-toggle i {
-            transform: rotate(180deg);
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
         }
     </style>
-</head>
+</body>
+</html>

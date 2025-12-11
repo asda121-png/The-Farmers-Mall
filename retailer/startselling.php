@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
             border-color: #dc2626 !important;
         }
         .error-message {
-            color: #dc2626;
+            color: #dc2626; /* red-600 */
             font-size: 0.75rem;
             margin-top: 0.25rem;
             display: block;
@@ -277,6 +277,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         /* NEW: Styles for fixed-height form */
         .form-step.active { display: flex; flex-direction: column; flex-grow: 1; }
         .step-content { flex-grow: 1; }
+
+        /* Centered Notification Style for Modals */
+        .centered-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            z-index: 101; /* Higher than modals */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
 </style>
 
 <body class="bg-gray-50 font-sans">
@@ -618,6 +636,17 @@ include '../includes/header.php';
       © 2025 Farmers Mall. All rights reserved.
     </div>
   </footer>
+
+  <?php
+    // Include login and register modals
+    include '../auth/login.php';
+    include '../auth/register.php';
+  ?>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[100]"></div>
+
+  <script src="../assets/js/modal-handler.js"></script>
 
   <script>
     // Mati City Barangays
