@@ -1,4 +1,87 @@
-<!DOCTYPE html>
+<?php
+// Only include the modal HTML if this is NOT a POST request for the contact form.
+// This prevents the modal's HTML from being sent during an AJAX call, which would corrupt the JSON response.
+if (!isset($_POST['contact_form'])) {
+    include '../auth/login.php';
+    include '../auth/register.php';
+}
+ 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../PHPMailer-master/src/Exception.php';
+require '../PHPMailer-master/src/PHPMailer.php';
+require '../PHPMailer-master/src/SMTP.php';
+
+$form_message = '';
+
+// Function to send a JSON response and exit
+function send_json_response($status, $message) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => $status, 'message' => $message]);
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_form'])) {    
+    // Check if it's an AJAX request
+    $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    
+    // --- Form Processing Logic ---
+
+    $name = strip_tags(trim($_POST["name"]));
+    $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
+    $subject = strip_tags(trim($_POST["subject"]));
+    $message = trim($_POST["message"]);
+
+    if (!empty($name) && !empty($email) && !empty($subject) && !empty($message) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $mail = new PHPMailer(true); // Passing `true` enables exceptions
+
+        try {
+            // Server settings for sending email via Gmail SMTP
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            // IMPORTANT: Replace with your Gmail address and an App Password.
+            // It's best practice to use environment variables for credentials.
+            $mail->Username   = 'mati.farmersmall@gmail.com'; // Your Gmail address
+            $mail->Password   = 'hiov goyk hblw nizf';    // Your Gmail App Password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            // Recipients
+            $mail->setFrom('mati.farmersmall@gmail.com', 'Farmers Mall Contact Form'); // Set a fixed "from" address
+            $mail->addAddress('mati.farmersmall@gmail.com', 'Farmers Mall Support'); // The address that will receive the form submission
+            $mail->addReplyTo($email, $name); // So you can reply directly to the user
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = "Subject: " . htmlspecialchars($subject);
+            $mail->Body    = "<p>You have received a new message from your support form.</p><strong>Name:</strong> " . htmlspecialchars($name) . "<br><strong>Email:</strong> {$email}<br><strong>Message:</strong><br>" . nl2br(htmlspecialchars($message));
+            $mail->AltBody = "Name: {$name}\nEmail: {$email}\nMessage:\n{$message}";
+
+            $mail->send();
+            $success_message = 'Thank you for your message! We will get back to you shortly.';
+            if ($is_ajax) {
+                send_json_response('success', $success_message);
+            }
+            $form_message = '<div id="form-success-msg" class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">' . $success_message . '</div>';
+        } catch (Exception $e) {
+            $error_message = 'Message could not be sent. Please try again later.';
+            if ($is_ajax) {
+                send_json_response('error', $error_message);
+            }
+            $form_message = '<div id="form-error-msg" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">' . $error_message . '</div>';
+            error_log("Mailer Error: " . $mail->ErrorInfo); // Log the detailed error
+        }
+    } else {
+        $error_message = 'Please fill out all fields correctly.';
+        if ($is_ajax) { send_json_response('error', $error_message); }
+        $form_message = '<div id="form-error-msg" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">' . $error_message . '</div>';
+    }
+    // If this was an AJAX request, we've already sent a JSON response and exited.
+    // If it's a non-AJAX POST, we'll fall through and render the page with the message.
+}
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,11 +98,26 @@
 </head>
 <body class="bg-[#f6fff8] text-gray-800 antialiased">
     <?php
+        // Include modal logic at the top to handle sessions and form posts before any HTML is sent.
+        // Note: This is a placeholder for where the includes *should* go if they weren't already at the top.
+        // The actual includes have been moved to the very top of the file.
+
+
         // Include the header
         include '../includes/header.php';
     ?>
 
     <main class="pt-[100px] bg-[#f6fff8] text-gray-800 antialiased"> 
+        <style>
+            /* Style for highlighting search results */
+            .highlight {
+                background-color: #d1fae5; /* Tailwind green-100 */
+                transition: background-color 0.5s ease;
+            }
+            .search-notification {
+                transition: opacity 0.3s ease-out;
+            }
+        </style>
         
 
         <section class="px-6 pb-24">
@@ -28,13 +126,16 @@
                 
                 <div class="relative max-w-2xl mx-auto mb-16">
                     <input 
+                        id="faq-search"
                         type="text" 
                         placeholder="Search for articles, topics, etc." 
                         class="w-full pl-6 pr-16 py-4 border border-gray-300 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg transition-all duration-200"
                     />
-                    <button class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600 transition-colors duration-200">
+                    <button id="faq-search-btn" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600 transition-colors duration-200">
                         <i class="fas fa-search text-xl"></i>
                     </button>
+                    <!-- Notification for no search results -->
+                    <div id="search-notification" class="text-center text-red-600 mt-2 hidden opacity-0 search-notification"></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -85,6 +186,34 @@
                         <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-green-700 transition-colors duration-300">Technical Support</h3>
                         <p class="text-gray-600 text-sm">Help with website issues, app usage, and bugs.</p>
                     </a>
+
+                    <!-- New Card 1 -->
+                    <a href="../retailer/startselling.php" class="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-5 group-hover:bg-green-200 transition-colors duration-300">
+                            <i class="fas fa-store text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-green-700 transition-colors duration-300">Selling on Farmers Mall</h3>
+                        <p class="text-gray-600 text-sm">Information for our valued farm partners and sellers.</p>
+                    </a>
+
+                    <!-- New Card 2 -->
+                    <a href="#" class="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-5 group-hover:bg-green-200 transition-colors duration-300">
+                            <i class="fas fa-shield-alt text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-green-700 transition-colors duration-300">Safety & Security</h3>
+                        <p class="text-gray-600 text-sm">Learn how we protect your account and data.</p>
+                    </a>
+
+                    <!-- New Card 3 -->
+                    <a href="#" class="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-5 group-hover:bg-green-200 transition-colors duration-300">
+                            <i class="fas fa-handshake text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-green-700 transition-colors duration-300">Community Guidelines</h3>
+                        <p class="text-gray-600 text-sm">Our rules for a safe and respectful marketplace.</p>
+                    </a>
+
                 </div>
             </div>
         </section>
@@ -93,9 +222,10 @@
             <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
                 
                 <div class="bg-white p-8 rounded-2xl shadow-lg">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
-                    
-                    <form action="#" method="POST" class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6" id="form-title">Send Us a Message</h2>
+                    <div id="form-notification-area"><?php echo $form_message; ?></div>
+                    <form id="support-form" action="#contact" method="POST" class="space-y-6">
+                        <input type="hidden" name="contact_form" value="1">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
                             <input type="text" id="name" name="name" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition-all duration-200">
@@ -117,7 +247,7 @@
                         </div>
                         
                         <div>
-                            <button type="submit" class="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                            <button type="submit" id="submit-btn" class="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                                 Send Message
                             </button>
                         </div>
@@ -136,7 +266,7 @@
                             </div>
                             <div class="ml-4">
                                 <h4 class="text-lg font-semibold text-gray-900">Email</h4>
-                                <a href="mailto:support@farmersmall.com" class="text-green-600 hover:underline">support@farmersmall.com</a>
+                                <a href="mailto:mati.farmersmall@gmail.com" class="text-green-600 hover:underline">mati.farmersmall@gmail.com</a>
                                 <p class="text-sm text-gray-500">We respond within 24 hours.</p>
                             </div>
                         </div>
@@ -287,36 +417,136 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- FAQ Accordion Logic ---
             const faqItems = document.querySelectorAll('.faq-item');
 
             faqItems.forEach(item => {
                 const toggle = item.querySelector('.faq-toggle');
 
                 toggle.addEventListener('click', () => {
-                    // Check if this item is already active
-                    const isActive = item.classList.contains('active');
-
-                    // Optional: Close all other items
-                    faqItems.forEach(otherItem => {
-                        if (otherItem !== item) {
-                            otherItem.classList.remove('active');
-                        }
-                    });
-
-                    if (isActive) {
-                        item.classList.remove('active');
-                    } else {
-                        item.classList.add('active');
-                    }
+                    item.classList.toggle('active');
                 });
             });
+
+            // --- Search Bar Logic ---
+            const searchInput = document.getElementById('faq-search');
+            const searchBtn = document.getElementById('faq-search-btn');
+            const notificationEl = document.getElementById('search-notification');
+
+            function performSearch() {
+                const query = searchInput.value.toLowerCase().trim();
+                if (!query) return;
+
+                let matchFound = false;
+
+                // Clear previous highlights
+                faqItems.forEach(item => {
+                    item.classList.remove('highlight');
+                });
+                notificationEl.classList.add('hidden', 'opacity-0');
+
+                for (const item of faqItems) {
+                    const question = item.querySelector('h3').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+
+                    if (question.includes(query) || answer.includes(query)) {
+                        matchFound = true;
+
+                        // Scroll the found item into the center of the view
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Expand and highlight the item
+                        item.classList.add('active', 'highlight');
+
+                        // Remove highlight after a delay
+                        setTimeout(() => {
+                            item.classList.remove('highlight');
+                        }, 2500);
+
+                        break; // Stop after finding the first match
+                    }
+                }
+
+                if (!matchFound) {
+                    notificationEl.textContent = `No results found for "${searchInput.value}".`;
+                    notificationEl.classList.remove('hidden');
+                    setTimeout(() => notificationEl.classList.remove('opacity-0'), 10);
+                }
+            }
+
+            // Trigger search on button click
+            searchBtn.addEventListener('click', performSearch);
+
+            // Trigger search on "Enter" key press
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent form submission if it's in a form
+                    performSearch();
+                }
+            });
+
+            // Hide form submission messages after a delay
+            setTimeout(() => {
+                const formMsg = document.getElementById('form-success-msg') || document.getElementById('form-error-msg');
+                if (formMsg) {
+                    formMsg.style.transition = 'opacity 0.5s ease';
+                    formMsg.style.opacity = '0';
+                    setTimeout(() => formMsg.remove(), 500);
+                }
+            }, 5000);
         });
+
+        // --- AJAX Form Submission ---
+        const supportForm = document.getElementById('support-form');
+        if (supportForm) {
+            supportForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent the default page reload
+
+                const submitBtn = document.getElementById('submit-btn');
+                const notificationArea = document.getElementById('form-notification-area');
+                const formData = new FormData(this);
+
+                // Disable button and show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+
+                // Clear previous messages
+                notificationArea.innerHTML = '';
+
+                fetch('support.php', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Use the existing centered notification for a better UX
+                        if (typeof showCenteredNotification === 'function') {
+                            showCenteredNotification(data.message, 'success');
+                        } else {
+                            notificationArea.innerHTML = `<div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">${data.message}</div>`;
+                        }
+                        supportForm.reset(); // Clear the form on success
+                    } else {
+                        // Show error message above the form
+                        notificationArea.innerHTML = `<div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    notificationArea.innerHTML = `<div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">A network error occurred. Please try again.</div>`;
+                })
+                .finally(() => {
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Message';
+                });
+            });
+        }
     </script>
-     <?php
-        include '../auth/login.php';
-        include '../auth/register.php';
-    ?>
-    <script src="../assets/js/modal-handler.js"></script>
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-[100]"></div>
@@ -352,5 +582,6 @@
             color: white;
         }
     </style>
+    <script src="../assets/js/modal-handler.js"></script>
 </body>
 </html>

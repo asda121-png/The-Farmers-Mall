@@ -1,3 +1,8 @@
+<?php
+    // Include modal logic at the top to handle sessions and form posts before any HTML is sent.
+    include '../auth/login.php';
+    include '../auth/register.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,8 +68,7 @@
 
 <body class="bg-[#f6fff8] text-gray-800">
 
-    <?php
-        // Include the header
+    <?php // Include the header
         include '../includes/header.php';
     ?>
 
@@ -160,11 +164,6 @@
 
     <?php
         include '../includes/footer.php';
-    ?>
-
-    <?php
-        include '../auth/login.php';
-        include '../auth/register.php';
     ?>
 
     <script src="../assets/js/modal-handler.js"></script>
