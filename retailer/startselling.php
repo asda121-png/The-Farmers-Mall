@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         
         // Validation
         if (empty($shopName)) $errors[] = "Shop name is required.";
-        if (!preg_match('/^\+63 9\d{9}$/', $phone)) $errors[] = "Invalid phone number (must be +63 9XXXXXXXXX).";
+        if (!preg_match('/^09\d{9}$/', $phone)) $errors[] = "Invalid phone number (must be 09XXXXXXXXX).";
         if (empty($shopCategory)) $errors[] = "Shop category is required.";
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
         if (empty($shopAddress)) $errors[] = "Shop address is required.";
@@ -128,14 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
 </head>
 
 <style>
-        /* Import Google Fonts - Match customer registration */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        /* How To Start Selling Section */
+   /* How To Start Selling Section */
         .how-to-sell {
             padding: 80px 0;
             justify-content: center;
@@ -211,29 +204,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         .benefit-card:nth-child(5) { animation-delay: 0.5s; }
         .benefit-card:nth-child(6) { animation-delay: 0.6s; }
 
-        /* Styles for multi-step form - Match customer registration */
+        /* Styles for multi-step form */
         .form-step { display: none; }
-        .form-step.active { display: flex; flex-direction: column; flex-grow: 1; }
-        .step-content { flex-grow: 1; }
-        
-        /* Match customer registration progress bar */
-        .progress-bar-fill {
-            transition: width 0.4s ease-in-out;
+        .form-step.active { display: block; }
+        .form-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 1rem; outline: none; transition: border-color 0.2s; }
+        .form-input:focus { border-color: #15803d; }
+        /* Custom style for file input */
+        .form-input[type="file"] { padding: 0.5rem; }
+        .form-input.error { border-color: #dc2626; } /* red-600 */
+        /* Disable browser's default password reveal button */
+        .form-input[type="password"]::-ms-reveal,
+        .form-input[type="password"]::-ms-clear {
+          display: none;
         }
-        
-        /* Match customer registration input styles */
-        .input-focus {
-            transition: border-color 0.2s;
+        .form-input[type="password"]::-webkit-credentials-auto-fill-button,
+        .form-input[type="password"]::-webkit-contacts-auto-fill-button {
+          visibility: hidden;
+          pointer-events: none;
+          position: absolute;
+          right: 0;
         }
-        .input-focus:focus-within {
-            border-color: #16a34a;
+        /* Add padding to password fields for eye icon */
+        .password-field-container .form-input[type="password"],
+        .password-field-container .form-input[type="text"] {
+          padding-right: 2.5rem;
         }
+        /* Style for terms and conditions */
+        .terms-box { border: 1px solid #d1d5db; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; color: #4b5563; background-color: #f9fafb; margin-bottom: 1rem; }
         
+        /* Customer registration style for input focus and errors */
         .input-error {
             border-color: #dc2626 !important;
         }
         .error-message {
-            color: #dc2626;
+            color: #dc2626; /* red-600 */
             font-size: 0.75rem;
             margin-top: 0.25rem;
             display: block;
@@ -243,25 +247,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
             display: none;
         }
         
-        /* Terms box styling */
-        .terms-box { 
-            border: 1px solid #d1d5db; 
-            padding: 1rem; 
-            border-radius: 0.5rem; 
-            font-size: 0.875rem; 
-            color: #4b5563; 
-            background-color: #f9fafb; 
-            margin-bottom: 1rem; 
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        /* Password toggle button */
+        /* Hide eye icon when input is empty and position it inside the field */
         .password-toggle-btn {
           opacity: 0;
           pointer-events: none;
           position: absolute;
-          right: 0.75rem;
+          right: 0.75rem; /* 12px */
           top: 50%;
           transform: translateY(-50%);
           background: none;
@@ -270,49 +261,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
           padding: 0;
           transition: opacity 0.2s;
         }
-        input:not(:placeholder-shown) + .password-toggle-btn {
+        .form-input:not(:placeholder-shown) + .password-toggle-btn {
           opacity: 1;
           pointer-events: auto;
         }
-        
+        /* Container for password field with relative positioning */
         .password-field-container {
           position: relative;
         }
-        
-        /* Others category field */
-        #shop_category_other_container {
-            margin-top: 1rem;
+        /* Remove input margin to prevent container stretching and fix icon alignment */
+        .password-field-container .form-input {
+            margin-bottom: 0;
         }
-        
-        /* Toast notification animation */
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -20px);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-        }
-        
-        .animate-slideDown {
-            animation: slideDown 0.3s ease-out forwards;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-            to {
-                opacity: 0;
-                transform: translate(-50%, -20px);
-            }
-        }
-        
-        .animate-slideUp {
-            animation: slideUp 0.3s ease-out forwards;
+
+        /* NEW: Styles for fixed-height form */
+        .form-step.active { display: flex; flex-direction: column; flex-grow: 1; }
+        .step-content { flex-grow: 1; }
+
+        /* Centered Notification Style for Modals */
+        .centered-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            z-index: 101; /* Higher than modals */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
         }
 </style>
 
@@ -323,21 +304,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
 // Include the header
 include '../includes/header.php';
 ?>
-
-  <!-- Toast Notification for Errors -->
-  <div id="error-toast" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
-    <div class="bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[320px] max-w-md">
-      <div class="flex-shrink-0">
-        <i class="fas fa-exclamation-circle text-xl"></i>
-      </div>
-      <div class="flex-1">
-        <p id="error-toast-text" class="text-sm font-medium">Please fix the highlighted errors.</p>
-      </div>
-      <button onclick="hideErrorToast()" class="flex-shrink-0 ml-2 text-white hover:text-red-100">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
 
   <!-- Hero / Sign Up Section -->
   <section class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between py-16 px-6">
@@ -351,185 +317,107 @@ include '../includes/header.php';
         <li class="flex items-center"><span class="text-green-700 mr-2">&#10003;</span>Easy management via web and mobile app.</li>
       </ul>
     </div>
-    <div class="md:w-2/5 bg-white p-8 rounded-2xl shadow-xl mt-10 md:mt-0 w-full">
-      <!-- Initial Step: Choose Registration Method -->
-      <div id="registration-choice" class="flex flex-col">
-        <h4 class="text-2xl font-bold text-gray-800 mb-2">Become a Seller</h4>
-        <p class="text-sm text-gray-600 mb-6">Choose how you'd like to sign up</p>
-        
-        <button type="button" onclick="continueWithGoogle()" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-150 mb-3 flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Continue with Google
-        </button>
-        
-        <div class="relative my-4">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">or</span>
-          </div>
-        </div>
-        
-        <button type="button" onclick="continueWithEmail()" class="w-full bg-green-700 text-white py-3 rounded-lg hover:bg-green-800 transition duration-150">
-          Sign up with Email
-        </button>
-        
-        <p class="text-xs text-gray-500 mt-4 text-center">
-          Already have an account? <a href="../auth/login.php" class="text-green-700 hover:underline">Sign in</a>
-        </p>
+    <div class="md:w-2/5 bg-white p-8 rounded-lg shadow-lg mt-10 md:mt-0 w-full">
+      <!-- Error/Success Messages -->
+      <?php if ($registration_status === 'error' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])): ?>
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-red-700 text-sm"><?= htmlspecialchars($registration_message) ?></p>
       </div>
+      <?php endif; ?>
       
       <!-- UPDATED: Added flex classes and a fixed height -->
-      <form id="retailer-signup-form" method="POST" class="flex flex-col h-auto hidden">
+      <form id="retailer-signup-form" method="POST" class="flex flex-col h-auto">
         <input type="hidden" name="retailer_signup" value="1">
-        <div class="mb-6">
-          <h4 class="text-2xl font-bold text-gray-800">Become a Seller</h4>
-          <p class="text-gray-600 mt-1">Join us and start selling your products!</p>
-        </div>
-
-        <!-- Progress Bar matching customer registration -->
-        <div class="mb-8">
-          <div class="flex justify-between text-xs text-gray-500 mb-1">
-            <span id="step-name-text">Shop Info</span>
-            <span>Step <span id="step-current">1</span> of 5</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="progress-bar" class="bg-green-600 h-2 rounded-full progress-bar-fill" style="width: 20%;"></div>
-          </div>
-        </div>
+        <h4 class="text-xl font-semibold mb-1">Become a Seller</h4>
+        <p id="step-indicator" class="text-sm text-gray-500 mb-6">Step 1 of 5: Shop Info</p>
 
         <div class="flex-grow">
           <!-- Step 1: Shop Info -->
           <div class="form-step active" data-step="1">
-            <div class="step-content space-y-4">
-              <div>
-                <label for="shop_name" class="block text-sm font-medium text-gray-700 mb-1">Shop / Farm Name</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="text" name="shop_name" id="shop_name" placeholder="Enter your shop or farm name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" required>
-                </div>
+            <div class="step-content">
+              <div class="mb-4">
+                <input type="text" name="shop_name" id="shop_name" placeholder="Shop / Farm Name" class="form-input" required>
                 <span id="shop_name-error" class="error-message hidden"></span>
               </div>
-              <div>
-                <label for="shop_category" class="block text-sm font-medium text-gray-700 mb-1">Shop Category</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
-                  <select name="shop_category" id="shop_category" class="w-full outline-none text-gray-700 text-sm bg-transparent py-2" required>
-                    <option value="">Select Shop Category</option>
-                    <option value="vegetables">Vegetables</option>
-                    <option value="fruits">Fruits</option>
-                    <option value="dairy">Dairy Products</option>
-                    <option value="meat">Meat & Poultry</option>
-                    <option value="grains">Grains & Cereals</option>
-                    <option value="processed">Processed Foods</option>
-                    <option value="organic">Organic Products</option>
-                    <option value="mixed">Mixed Farm Products</option>
-                    <option value="others">Others</option>
-                  </select>
-                </div>
+              <div class="mb-4">
+                <select name="shop_category" id="shop_category" class="form-input" required>
+                  <option value="">Select Shop Category</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="dairy">Dairy Products</option>
+                  <option value="meat">Meat & Poultry</option>
+                  <option value="grains">Grains & Cereals</option>
+                  <option value="processed">Processed Foods</option>
+                  <option value="organic">Organic Products</option>
+                  <option value="mixed">Mixed Farm Products</option>
+                </select>
                 <span id="shop_category-error" class="error-message hidden"></span>
               </div>
-              <div id="shop_category_other_container" class="hidden">
-                <label for="shop_category_other" class="block text-sm font-medium text-gray-700 mb-1">Specify Category</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="text" name="shop_category_other" id="shop_category_other" placeholder="Please specify your shop category" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
-                </div>
-                <span id="shop_category_other-error" class="error-message hidden"></span>
-              </div>
-              <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="tel" name="phone" id="phone" placeholder="+63 9XXXXXXXXX" value="+63 " class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" required>
-                </div>
+              <div class="mb-4">
+                <input type="text" name="phone" id="phone" placeholder="Mobile Number (09XXXXXXXXX)" class="form-input" pattern="09[0-9]{9}" required>
                 <span id="phone-error" class="error-message hidden"></span>
-                <p class="text-xs text-gray-500 mt-1">Format: +63 9XXXXXXXXX (Philippine mobile number)</p>
               </div>
             </div>
-            <div class="flex gap-4 mt-6">
-              <button type="button" onclick="nextStep()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-150 font-medium text-sm">Next</button>
+            <div class="flex gap-4">
+              <button type="button" onclick="nextStep()" class="w-full bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
             </div>
           </div>
 
           <!-- Step 2: Shop Details -->
           <div class="form-step" data-step="2">
-            <div class="step-content space-y-4">
-              <div>
-                <label for="street" class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="text" name="street" id="street" placeholder="Enter your street address" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" required>
-                </div>
+            <div class="step-content">
+              <div class="mb-4">
+                <input type="text" name="street" id="street" placeholder="Street Address" class="form-input" required>
                 <span id="street-error" class="error-message hidden"></span>
               </div>
-              <div>
-                <label for="barangay" class="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
-                  <select name="barangay" id="barangay" class="w-full outline-none text-gray-700 text-sm bg-transparent py-2" required>
-                    <option value="">Select Barangay</option>
-                    <!-- Options will be populated by JavaScript -->
-                  </select>
-                </div>
+              <div class="mb-4">
+                <select name="barangay" id="barangay" class="form-input" required>
+                  <option value="">Select Barangay</option>
+                  <!-- Options will be populated by JavaScript -->
+                </select>
                 <span id="barangay-error" class="error-message hidden"></span>
               </div>
-              <div>
-                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
-                  <input type="text" name="city" id="city" value="Mati City" readonly class="w-full outline-none text-gray-700 text-sm placeholder:text-sm bg-gray-100 cursor-not-allowed">
-                </div>
+              <div class="mb-4">
+                <input type="text" name="city" id="city" value="Mati City" readonly class="form-input bg-gray-100">
               </div>
-              <div>
-                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
-                  <input type="text" name="province" id="province" value="Davao Oriental" readonly class="w-full outline-none text-gray-700 text-sm placeholder:text-sm bg-gray-100 cursor-not-allowed">
-                </div>
+              <div class="mb-4">
+                <input type="text" name="province" id="province" value="Davao Oriental" readonly class="form-input bg-gray-100">
               </div>
             </div>
-            <div class="flex gap-4 mt-6">
-              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition duration-150 font-medium text-sm">Previous</button>
-              <button type="button" onclick="nextStep()" class="w-1/2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-150 font-medium text-sm">Next</button>
+            <div class="flex gap-4">
+              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
+              <button type="button" onclick="nextStep()" class="w-1/2 bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
             </div>
           </div>
 
           <!-- Step 3: Email Verification -->
           <div class="form-step" data-step="3">
-            <div class="step-content space-y-4">
-              <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="email" name="email" id="email" placeholder="Enter your email address" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" required>
-                </div>
+            <div class="step-content">
+              <div class="mb-4">
+                <input type="email" name="email" id="email" placeholder="Email Address" class="form-input" required>
                 <span id="email-error" class="error-message hidden"></span>
               </div>
-              <button type="button" class="w-full text-center text-sm text-green-600 hover:underline font-medium">Send Verification Code</button>
-              <div>
-                <label for="verification_code" class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
-                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                  <input type="text" name="verification_code" id="verification_code" placeholder="Enter 6-digit code" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" required>
-                </div>
+              <button type="button" class="w-full text-center text-sm text-green-600 hover:underline font-medium mb-4">Send Verification Code</button>
+              <div class="mb-4">
+                <input type="text" name="verification_code" id="verification_code" placeholder="Enter Verification Code" class="form-input" required>
                 <span id="verification_code-error" class="error-message hidden"></span>
               </div>
             </div>
-            <div class="flex gap-4 mt-6">
-              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition duration-150 font-medium text-sm">Previous</button>
-              <button type="button" onclick="nextStep()" class="w-1/2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-150 font-medium text-sm">Next</button>
+            <div class="flex gap-4">
+              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
+              <button type="button" onclick="nextStep()" class="w-1/2 bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
             </div>
           </div>
 
           <!-- Step 4: Create Account -->
           <div class="form-step" data-step="4">
-            <div class="step-content space-y-4">
-              <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div class="step-content">
+              <div class="mb-4">
                 <div class="password-field-container">
-                  <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                    <input type="password" name="password" id="password" placeholder="Create your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" minlength="8" required>
-                    <button type="button" onclick="togglePassword('password')" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-                      <i class="fas fa-eye text-lg" id="password-toggle"></i>
-                    </button>
-                  </div>
+                  <input type="password" name="password" id="password" placeholder="Create Password" class="form-input" minlength="8" required>
+                  <button type="button" onclick="togglePassword('password')" class="password-toggle-btn text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-eye" id="password-toggle"></i>
+                  </button>
                 </div>
                 <span id="password-error" class="error-message hidden"></span>
                 <!-- Password Strength Meter -->
@@ -543,55 +431,53 @@ include '../includes/header.php';
                   <p class="text-xs text-gray-600">Requires: uppercase, lowercase, numbers, 8+ characters</p>
                 </div>
               </div>
-              <div>
-                <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <div class="mb-4">
                 <div class="password-field-container">
-                  <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm" minlength="8" required>
-                    <button type="button" onclick="togglePassword('confirm_password')" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-                      <i class="fas fa-eye text-lg" id="confirm-password-toggle"></i>
-                    </button>
-                  </div>
+                  <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-input" minlength="8" required>
+                  <button type="button" onclick="togglePassword('confirm_password')" class="password-toggle-btn text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-eye" id="confirm-password-toggle"></i>
+                  </button>
                 </div>
                 <span id="confirm_password-error" class="error-message hidden"></span>
               </div>
             </div>
-            <div class="flex gap-4 mt-6">
-              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition duration-150 font-medium text-sm">Previous</button>
-              <button type="button" onclick="nextStep()" class="w-1/2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-150 font-medium text-sm">Next</button>
+            <div class="flex gap-4">
+              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
+              <button type="button" onclick="nextStep()" class="w-1/2 bg-green-700 text-white py-3 rounded hover:bg-green-800">Next</button>
             </div>
           </div>
 
           <!-- Step 5: Terms & Conditions -->
           <div class="form-step" data-step="5">
-            <div class="step-content space-y-4">
+            <div class="step-content">
               <div class="terms-box">
-                <p class="mb-3 text-gray-700">Welcome to Farmers Mall. By creating a seller account and using our platform, you agree to comply with these terms and conditions. These terms govern your relationship with Farmers Mall and outline your responsibilities as a seller on our marketplace.</p>
-                
-                <p class="mb-3 text-gray-700">As a seller, you are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must provide accurate, current, and complete information during registration and keep this information updated. Any false or misleading information may result in immediate account suspension.</p>
-                
-                <p class="mb-3 text-gray-700">All product listings must contain accurate descriptions, current pricing, and high-quality images. Products must be fresh, safe for consumption, and comply with all applicable local food safety regulations and standards. Misleading product information or poor quality goods may result in listing removal and potential account termination.</p>
-                
-                <p class="mb-3 text-gray-700">Farmers Mall operates on a commission-based model. While listing products on our platform is free, we charge a small commission fee on each completed sale. This fee structure allows us to maintain and improve our platform while keeping it accessible to all sellers. Commission rates and payment schedules will be communicated clearly and are subject to change with prior notice.</p>
-                
-                <p class="text-gray-700">Farmers Mall reserves the right to suspend or terminate seller accounts that violate these terms, engage in fraudulent activities, receive excessive customer complaints, or conduct business in a manner deemed harmful to our community. We are committed to maintaining a fair and trustworthy marketplace for both sellers and customers.</p>
+                <p class="mb-2"><strong>1. Introduction</strong><br>Welcome to Farmers Mall. These Terms and Conditions govern your use of our platform as a seller. By creating a seller account, you agree to be bound by these terms.</p>
+                <p class="mb-2"><strong>2. Seller Account</strong><br>You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account. You must provide accurate and complete information and keep it updated.</p>
+                <p class="mb-2"><strong>3. Product Listings & Quality</strong><br>You agree that all product descriptions will be accurate. All produce must be fresh, of high quality, and comply with local food safety regulations. Misleading information may result in account suspension.</p>
+                <p class="mb-2"><strong>4. Fees and Payments</strong><br>Listing products is free. Farmers Mall will charge a commission fee on each completed sale. This fee is subject to change upon prior notification. Payments will be processed according to our payment schedule.</p>
+                <p class="mb-2"><strong>5. Termination</strong><br>Farmers Mall reserves the right to terminate or suspend your seller account at any time for conduct that violates these Terms and Conditions or is harmful to other users of the platform.</p>
               </div>
-              <div>
-                <label class="flex items-start">
-                  <input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1 mr-2" required>
-                  <span class="text-sm text-gray-700">I have read and agree to the Terms and Conditions</span>
-                </label>
+              <div class="mb-4">
+                <label class="flex items-center"><input type="checkbox" name="terms" id="terms-checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2" required> I agree to the Terms and Conditions</label>
                 <span id="terms-error" class="error-message hidden"></span>
               </div>
             </div>
-            <div class="flex gap-4 mt-6">
-              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition duration-150 font-medium text-sm">Previous</button>
-              <button type="submit" class="w-1/2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-150 font-medium text-sm">Create Account</button>
+            <div class="flex gap-4">
+              <button type="button" onclick="prevStep()" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded hover:bg-gray-300">Previous</button>
+              <button type="submit" class="w-1/2 bg-green-700 text-white py-3 rounded hover:bg-green-800">Create Account</button>
             </div>
           </div>
         </div>
 
-        <p class="text-xs text-gray-500 mt-6 text-center">Have an account? <a href="../auth/login.php" class="text-green-600 hover:underline font-medium">Log in</a>.</p>
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
+          <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">Or</span></div>
+        </div>
+
+        <button type="button" class="w-full flex items-center justify-center gap-2 border border-gray-300 py-3 rounded hover:bg-gray-100">
+          <i class="fab fa-google text-red-500"></i> Continue with Google
+        </button>
+        <p class="text-xs text-gray-400 mt-4 text-center">By signing up, you agree to Farmers Mall <a href="#" class="text-green-700">Terms of Service & Privacy Policy</a>. Have an account? <a href="../auth/login.php" class="text-green-700">Log in</a>.</p>
       </form>
     </div>
   </section>
@@ -751,60 +637,18 @@ include '../includes/header.php';
     </div>
   </footer>
 
+  <?php
+    // Include login and register modals
+    include '../auth/login.php';
+    include '../auth/register.php';
+  ?>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[100]"></div>
+
+  <script src="../assets/js/modal-handler.js"></script>
+
   <script>
-    // ====== REGISTRATION METHOD CHOICE ======
-    function continueWithGoogle() {
-      // TODO: Implement Google OAuth
-      alert('Google Sign-In will be implemented soon!');
-      // For now, you can redirect to Google OAuth or show a message
-      // window.location.href = '/auth/google';
-    }
-
-    function continueWithEmail() {
-      // Hide the choice screen
-      document.getElementById('registration-choice').classList.add('hidden');
-      // Show the registration form
-      document.getElementById('retailer-signup-form').classList.remove('hidden');
-    }
-    
-    // Handle "Others" category option
-    document.addEventListener('DOMContentLoaded', function() {
-      const shopCategory = document.getElementById('shop_category');
-      const shopCategoryOtherContainer = document.getElementById('shop_category_other_container');
-      
-      if (shopCategory && shopCategoryOtherContainer) {
-        shopCategory.addEventListener('change', function() {
-          if (this.value === 'others') {
-            shopCategoryOtherContainer.classList.remove('hidden');
-            document.getElementById('shop_category_other').required = true;
-          } else {
-            shopCategoryOtherContainer.classList.add('hidden');
-            document.getElementById('shop_category_other').required = false;
-          }
-        });
-      }
-      
-      // Handle phone number +63 prefix
-      const phoneInput = document.getElementById('phone');
-      if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-          let value = e.target.value;
-          // Ensure it always starts with +63
-          if (!value.startsWith('+63 ')) {
-            value = '+63 ';
-          }
-          e.target.value = value;
-        });
-        
-        phoneInput.addEventListener('keydown', function(e) {
-          // Prevent deleting the +63 prefix
-          if (e.target.selectionStart < 4 && (e.key === 'Backspace' || e.key === 'Delete')) {
-            e.preventDefault();
-          }
-        });
-      }
-    });
-
     // Mati City Barangays
     const matiBarangays = [
       "Badas", "Bobon", "Buso", "Cawayanan", "Central", "Dahican", "Danao", "Dawan", "Don Enrique Lopez",
@@ -829,15 +673,14 @@ include '../includes/header.php';
     // ====== VALIDATION PATTERNS AND ERROR MESSAGES ======
     const validationPatterns = {
       email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      phone: /^\+63 9\d{9}$/,
+      phone: /^09\d{9}$/,
       password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
     };
 
     const errorMessages = {
       shop_name: 'Shop name is required',
       shop_category: 'Shop category is required',
-      shop_category_other: 'Please specify your shop category',
-      phone: 'Invalid phone number. Must be +63 9XXXXXXXXX',
+      phone: 'Invalid phone number. Must be 09XXXXXXXXX',
       street: 'Street address is required',
       barangay: 'Barangay is required',
       email: 'Invalid email format',
@@ -854,11 +697,6 @@ include '../includes/header.php';
       
       if (field) {
         field.classList.add('input-error');
-        // Also add red border to parent input-focus div
-        const parent = field.closest('.input-focus');
-        if (parent) {
-          parent.style.borderColor = '#dc2626';
-        }
       }
       if (errorElement) {
         errorElement.textContent = message;
@@ -872,46 +710,10 @@ include '../includes/header.php';
       
       if (field) {
         field.classList.remove('input-error');
-        // Also remove red border from parent input-focus div
-        const parent = field.closest('.input-focus');
-        if (parent) {
-          parent.style.borderColor = '';
-        }
       }
       if (errorElement) {
         errorElement.textContent = '';
         errorElement.classList.add('hidden');
-      }
-    }
-
-    // ====== ERROR TOAST FUNCTIONS ======
-    function showErrorBanner(message) {
-      const toast = document.getElementById('error-toast');
-      const toastText = document.getElementById('error-toast-text');
-      if (toast && toastText) {
-        toastText.textContent = message;
-        toast.classList.remove('hidden', 'animate-slideUp');
-        toast.classList.add('animate-slideDown');
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-          hideErrorToast();
-        }, 5000);
-      }
-    }
-
-    function hideErrorBanner() {
-      hideErrorToast();
-    }
-    
-    function hideErrorToast() {
-      const toast = document.getElementById('error-toast');
-      if (toast && !toast.classList.contains('hidden')) {
-        toast.classList.remove('animate-slideDown');
-        toast.classList.add('animate-slideUp');
-        setTimeout(() => {
-          toast.classList.add('hidden');
-        }, 300);
       }
     }
 
@@ -1010,12 +812,6 @@ include '../includes/header.php';
         return false;
       }
       
-      // If field is empty and not required, clear errors and return true
-      if (!value && !field.hasAttribute('required')) {
-        clearFieldError(fieldId);
-        return true;
-      }
-      
       // Validate specific fields
       if (fieldId === 'phone' && value) {
         if (!validationPatterns.phone.test(value)) {
@@ -1051,14 +847,6 @@ include '../includes/header.php';
         return false;
       }
       
-      if (fieldId === 'shop_category_other' && value) {
-        const category = document.getElementById('shop_category');
-        if (category && category.value === 'others' && !value) {
-          setFieldError(fieldId, errorMessages.shop_category_other);
-          return false;
-        }
-      }
-      
       if (fieldId === 'barangay' && !value) {
         setFieldError(fieldId, errorMessages.barangay);
         return false;
@@ -1071,7 +859,7 @@ include '../includes/header.php';
     // ====== ATTACH INPUT LISTENERS ======
     function initializeValidation() {
       const fieldsToValidate = [
-        'shop_name', 'shop_category', 'shop_category_other', 'phone', 'street', 'barangay',
+        'shop_name', 'shop_category', 'phone', 'street', 'barangay',
         'email', 'verification_code', 'password', 'confirm_password'
       ];
       
@@ -1081,7 +869,6 @@ include '../includes/header.php';
           // Clear error on input
           element.addEventListener('input', () => {
             clearFieldError(fieldId);
-            hideErrorBanner();
             
             // Update password strength
             if (fieldId === 'password') {
@@ -1128,79 +915,44 @@ include '../includes/header.php';
     // ====== MULTI-STEP FORM NAVIGATION ======
     let currentStep = 1;
     const totalSteps = 5;
-    
-    const stepInfo = [
-      { name: "Shop Info", percentage: 20 },
-      { name: "Shop Details", percentage: 40 },
-      { name: "Email Verification", percentage: 60 },
-      { name: "Create Password", percentage: 80 },
-      { name: "Terms & Conditions", percentage: 100 }
+    const stepIndicator = document.getElementById('step-indicator');
+    const stepTitles = [
+      "Step 1 of 5: Shop Info", 
+      "Step 2 of 5: Shop Details", 
+      "Step 3 of 5: Email Verification", 
+      "Step 4 of 5: Create Password", 
+      "Step 5 of 5: Terms & Conditions"
     ];
-
-    function updateProgressBar(step) {
-      const stepNameText = document.getElementById('step-name-text');
-      const stepCurrent = document.getElementById('step-current');
-      const progressBar = document.getElementById('progress-bar');
-      
-      if (stepNameText) stepNameText.textContent = stepInfo[step - 1].name;
-      if (stepCurrent) stepCurrent.textContent = step;
-      if (progressBar) progressBar.style.width = stepInfo[step - 1].percentage + '%';
-    }
 
     function showStep(step) {
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
       const nextStepElement = document.querySelector(`.form-step[data-step="${step}"]`);
       if (nextStepElement) {
         nextStepElement.classList.add('active');
-        updateProgressBar(step);
+        stepIndicator.textContent = stepTitles[step - 1];
       }
     }
 
     function validateStep(step) {
       const currentStepElement = document.querySelector(`.form-step[data-step="${step}"]`);
       let isValid = true;
-      const errors = [];
-
-      // Hide error banner initially
-      hideErrorBanner();
 
       // Get all inputs within the current step
-      const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"], input[type="password"], select');
+      const inputs = currentStepElement.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], select');
       
       inputs.forEach(input => {
-        if (input.hasAttribute('required')) {
+        if (input.hasAttribute('required') || input.value.trim()) {
           if (!validateField(input.id)) {
             isValid = false;
-            const fieldLabel = input.closest('div').previousElementSibling?.textContent || input.placeholder || 'This field';
-            errors.push(fieldLabel.replace('*', '').trim());
           }
         }
       });
-      
-      // Special validation for "Others" category
-      if (step === 1) {
-        const category = document.getElementById('shop_category');
-        const categoryOther = document.getElementById('shop_category_other');
-        if (category && category.value === 'others' && categoryOther) {
-          if (!categoryOther.value.trim()) {
-            setFieldError('shop_category_other', errorMessages.shop_category_other);
-            isValid = false;
-            errors.push('Specify Category');
-          }
-        }
-      }
-
-      // Show error banner if there are errors
-      if (!isValid && errors.length > 0) {
-        showErrorBanner('Please fix the highlighted errors.');
-      }
 
       return isValid;
     }
 
     function nextStep() {
       if (validateStep(currentStep)) {
-        hideErrorBanner();
         if (currentStep < totalSteps) {
           currentStep++;
           showStep(currentStep);
@@ -1238,15 +990,12 @@ include '../includes/header.php';
         if (!termsCheckbox.checked) {
           event.preventDefault();
           setFieldError('terms', errorMessages.terms);
-          showErrorBanner('Please agree to the Terms and Conditions to continue.');
           return false;
         }
         clearFieldError('terms');
-        hideErrorBanner();
         // Form will submit normally to PHP
       } else {
         event.preventDefault();
-        showErrorBanner('Please complete all steps before submitting.');
       }
     });
   </script>

@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     @file_put_contents($logFile, $logEntry, FILE_APPEND);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])) { // Server-side logic for form submission
     try {
         // 1. Get Supabase API instance
         $api = getSupabaseAPI();
@@ -213,6 +213,224 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submitted'])
         exit();
     }
 }
-// PHP SCRIPT END
+// If it's not a POST request, the script will continue and render the HTML below.
 ?>
-        });
+<!-- START: Register Modal -->
+<div id="registerModal" class="register-modal hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="modal-content w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden relative lg:flex" style="min-height: 680px;">
+    <!-- Left Side - Branding with Image -->
+    <div class="hidden lg:flex lg:w-1/2 p-16 flex-col justify-center items-center text-white text-center relative bg-cover bg-center" style="background-image: url('../images/img.png');">
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-green-800 opacity-60"></div>
+      
+      <button id="closeRegisterModal" class="absolute top-6 left-6 h-12 w-12 flex items-center justify-center bg-black bg-opacity-30 rounded-full text-white hover:bg-opacity-50 transition-all z-20">
+        <i class="fas fa-arrow-left text-xl"></i>
+      </button>
+
+      <!-- Content -->
+      <div class="relative z-10">
+        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg" style="animation: float 3s ease-in-out infinite;">
+          <i class="fas fa-leaf text-green-600 text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold">Join The Community</h2>
+        <p class="mt-2 text-green-100">Connecting farmers and consumers directly, offering fresh, local, and organic produce.</p>
+      </div>
+    </div>
+
+    <!-- Right Side - Form -->
+    <div class="w-full lg:w-1/2 p-8 md:p-16 flex flex-col">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">Create an Account</h2>
+        <p class="text-gray-600 mt-1">Join us and start shopping for fresh produce!</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mb-8">
+        <div class="flex justify-between text-xs text-gray-500 mb-1">
+          <span id="step-name">Personal Info</span>
+          <span>Step <span id="step-current">1</span> of 5</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="progress-bar" class="bg-green-600 h-2 rounded-full progress-bar-fill" style="width: 25%;"></div>
+        </div>
+      </div>
+
+      <div class="flex-grow flex flex-col">
+        <form id="registerForm" method="POST" action="../auth/register.php" class="flex-grow flex flex-col">
+          <div class="flex-grow" style="min-height: 360px;">
+            <div class="flex-grow" style="height: 320px; overflow-y: auto;">
+            <!-- Step 1: Personal Info -->
+            <div class="form-step active space-y-4 text-left">
+              <div>
+                <label for="firstname" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="firstname" name="firstname" required placeholder="Enter your first name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="firstname-error" class="error-message hidden"></span>
+              </div>
+              <div>
+                <label for="middlename" class="block text-sm font-medium text-gray-700 mb-1">Middle Name <span class="text-gray-400">(Optional)</span></label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="middlename" name="middlename" placeholder="Enter your middle name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="middlename-error" class="error-message hidden"></span>
+              </div>
+              <div>
+                <label for="lastname" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="lastname" name="lastname" required placeholder="Enter your last name" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="lastname-error" class="error-message hidden"></span>
+              </div>
+              <div>
+                <label for="suffix" class="block text-sm font-medium text-gray-700 mb-1">Suffix <span class="text-gray-400">(Optional)</span></label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="suffix" name="suffix" placeholder="e.g. Jr., Sr." class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="suffix-error" class="error-message hidden"></span>
+              </div>
+            </div>
+    
+            <!-- Step 2: Account Details -->
+            <div class="form-step hidden space-y-4 text-left">
+              <div>
+                <label for="street" class="block text-sm font-medium text-gray-700 mb-1">Street</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="street" name="street" required placeholder="Enter your street address" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="street-error" class="error-message hidden"></span>
+              </div>
+              <div>
+                <label for="barangay" class="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3">
+                  <select id="barangay" name="barangay" required class="w-full outline-none text-gray-700 text-sm bg-transparent py-2">
+                    <option value="">Select Barangay</option>
+                  </select>
+                </div>
+                <span id="barangay-error" class="error-message hidden"></span>
+              </div>
+              <div>
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
+                  <input type="text" id="city" name="city" value="Mati City" readonly class="w-full outline-none text-gray-700 text-sm placeholder:text-sm bg-gray-100 cursor-not-allowed">
+                </div>
+              </div>
+              <div>
+                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
+                  <input type="text" id="province" name="province" value="Davao Oriental" readonly class="w-full outline-none text-gray-700 text-sm placeholder:text-sm bg-gray-100 cursor-not-allowed">
+                </div>
+              </div>
+            </div>
+     
+            <input type="hidden" name="city" value="Mati City">
+            <input type="hidden" name="province" value="Davao Oriental">
+
+            <!-- Step 3: Contact Info -->
+            <div class="form-step hidden space-y-4 text-left" id="step3">
+              <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="username" name="username" required placeholder="Choose a username" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="username-error" class="error-message hidden"></span>
+              </div>
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="tel" id="phone" name="phone" required placeholder="09XXXXXXXXX" pattern="09[0-9]{9}" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="phone-error" class="error-message hidden"></span>
+                <p class="text-xs text-gray-500 mt-1">Format: 09XXXXXXXXX (11 digits)</p>
+              </div>
+              <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="password" id="password" name="password" required placeholder="Enter your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <button type="button" id="togglePassword" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye text-lg"></i>
+                  </button>
+                </div>
+                <span id="password-error" class="error-message hidden"></span>
+                <div id="password-strength" class="mt-2 hidden">
+                  <div class="flex items-center gap-2 mb-1">
+                    <div class="flex-grow h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div id="strength-bar" class="h-full w-0 rounded-full transition-all duration-300" style="background-color: #ef4444;"></div>
+                    </div>
+                    <span id="strength-text" class="text-xs font-semibold text-red-600">Weak</span>
+                  </div>
+                  <p class="text-xs text-gray-600">Requires: numbers, symbols, 6+ characters</p>
+                </div>
+              </div>
+              <div>
+                <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="password" id="confirm" name="confirm" required placeholder="Confirm your password" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                  <button type="button" id="toggleConfirm" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye text-lg"></i>
+                  </button>
+                </div>
+                <span id="confirm-error" class="error-message hidden"></span>
+              </div>
+            </div>
+     
+            <!-- Step 4: Verification -->
+            <div class="form-step hidden space-y-4 text-left" id="step4">
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email or Phone Number for Verification</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="email" name="email" required placeholder="Enter your email or phone" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="email-error" class="error-message hidden"></span>
+              </div>
+              <button type="button" id="sendVerificationBtn" class="w-full text-center text-sm text-green-600 hover:underline font-medium py-2">Send Verification Code</button>
+              <button type="button" id="resendVerificationBtn" class="w-full text-center text-sm text-blue-600 hover:underline font-medium hidden py-2">Resend Code</button>
+              <div id="verificationMessage" class="text-sm text-center hidden"></div>
+              <div>
+                <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
+                <div class="input-focus flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                  <input type="text" id="otp" name="otp" required placeholder="Enter the code you received" class="w-full outline-none text-gray-700 text-sm placeholder:text-sm">
+                </div>
+                <span id="otp-error" class="error-message hidden"></span>
+              </div>
+            </div>
+
+            <!-- Step 5: Finalize (Terms & Conditions) -->
+            <div class="form-step hidden space-y-4 text-left" id="step5">
+              <h3 class="text-lg font-semibold text-gray-800">Final Agreement</h3>
+              <p class="text-sm text-gray-600">Please review and agree to the following terms before creating your account. By proceeding, you acknowledge and accept:</p>
+              <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside bg-gray-50 p-4 rounded-lg">
+                <li>You agree to our <a href="#" id="termsLink" class="text-green-600 font-medium hover:underline cursor-pointer">Terms of Service</a>, which govern your use of our platform.</li>
+                <li>You have read and understood our <a href="#" id="privacyLink" class="text-green-600 font-medium hover:underline cursor-pointer">Privacy Policy</a>, which details how we handle your data.</li>
+                <li>You consent to receive communications from us regarding your account and our services.</li>
+                <li>You confirm that all information provided is accurate and that you are at least 18 years of age..</li>
+              </ul>
+            </div>
+            </div>
+  
+            <div id="terms-container" class="flex items-start mt-4 hidden">
+              <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1">
+              <label for="terms" class="ml-3 block text-sm text-gray-700">
+                I have read and agree to all the terms and conditions listed above.
+              </label>
+            </div>
+          </div>
+
+          <div id="navigation-buttons" class="mt-auto pt-6 flex gap-4">
+            <button type="button" id="prevBtn" class="prev-btn w-32 justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg transition-colors text-sm hidden">Previous</button>
+            <button type="button" id="nextBtn" class="next-btn w-32 justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors text-sm ml-auto">Next</button>
+            <button type="submit" id="submitBtn" form="registerForm" class="w-32 justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors shadow-md hover:shadow-lg text-sm hidden ml-auto">
+              Sign Up
+            </button>
+          </div>
+        </form>
+  
+        <p class="text-center text-sm text-gray-600 mt-8">
+          Already have an account? 
+          <a href="login.php" class="text-green-600 font-medium hover:underline">Log In</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END: Register Modal -->
