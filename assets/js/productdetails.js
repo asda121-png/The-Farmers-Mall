@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Clear old localStorage cart data to prevent conflicts
+  localStorage.removeItem('cart');
+  
   // Get URL parameters
   const params = new URLSearchParams(window.location.search);
   const productId = params.get('id') || null;
@@ -154,6 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update cart icon count
         await updateCartIcon();
         showNotification(`${product.quantity}x ${product.name} added to cart!`, 'success');
+        // Trigger event for other components
+        window.dispatchEvent(new Event('cartUpdated'));
+        localStorage.setItem('cartUpdated', Date.now());
       } else {
         showNotification(data.message || 'Failed to add to cart', 'error');
       }

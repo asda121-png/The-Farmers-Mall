@@ -132,6 +132,9 @@ if ($user_id) {
 
     // Highlight the active notification icon in the header
     document.addEventListener('DOMContentLoaded', function() {
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
+      
       const notificationIconLink = document.querySelector('a[href="notification.php"]');
       if (notificationIconLink) {
         // The bell icon is inside the link, so we target the link itself

@@ -195,6 +195,9 @@ if ($user_id) {
 
     // Highlight the active message icon in the header
     document.addEventListener('DOMContentLoaded', function() {
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
+      
       const messageIconLink = document.querySelector('a[href="message.php"]');
       if (messageIconLink) {
         messageIconLink.classList.remove('text-gray-600');

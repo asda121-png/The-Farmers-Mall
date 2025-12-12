@@ -450,6 +450,9 @@ if ($user_id) {
           if (data.success) {
             updateCartIcon();
             showNotification(`${product.name} added to cart!`);
+            // Trigger event for other components
+            window.dispatchEvent(new Event('cartUpdated'));
+            localStorage.setItem('cartUpdated', Date.now());
           } else {
             showNotification(data.message || 'Failed to add to cart', 'error');
           }
@@ -479,6 +482,9 @@ if ($user_id) {
           }
         });
       });
+      
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
       
       // Initialize cart icon count on load
       updateCartIcon();

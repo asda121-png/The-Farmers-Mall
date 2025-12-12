@@ -355,6 +355,9 @@ if ($user_id) {
 
     // Update cart icon on page load
     document.addEventListener('DOMContentLoaded', function() {
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
+      
       updateCartIconFromDB();
       
       // Refresh cart icon every 3 seconds to stay in sync
