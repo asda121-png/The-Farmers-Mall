@@ -1,18 +1,38 @@
 <?php
 // admin-settings.php
-// Mock User Data for Pre-filling forms
-$user_settings = [
-    "name" => "Admin User",
-    "email" => "admin@farmersmall.com",
-    "phone" => "+63 917 000 0000",
-    "role" => "Super Admin",
-    "notifications" => [
-        "email_alerts" => true,
-        "order_updates" => true,
-        "new_retailers" => false,
-        "marketing" => false
-    ]
-];
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'admin') {
+    header('Location: ../auth/login.php');
+    exit();
+}
+
+require_once __DIR__ . '/../config/supabase-api.php';
+require_once __DIR__ . '/../config/uuid-helper.php';
+
+$api = getSupabaseAPI();
+$user_id = $_SESSION['user_id'] ?? null;
+
+$user_data = [];
+if ($user_id) {
+    $user_data = safeGetUser($user_id, $api) ?: [];
+}
+
+// Prepare variables for the view, with fallbacks
+$full_name = $user_data['full_name'] ?? 'Admin User';
+$email = $user_data['email'] ?? 'admin@email.com';
+$phone = $user_data['phone'] ?? 'Not provided';
+$role = ucfirst($user_data['user_type'] ?? 'admin');
+$profile_picture = $user_data['profile_picture'] ?? '';
+$member_since = !empty($user_data['created_at']) ? date('F Y', strtotime($user_data['created_at'])) : 'N/A';
+$last_login = !empty($user_data['updated_at']) ? date('M d, Y - h:i A', strtotime($user_data['updated_at'])) : 'N/A';
+
+// Resolve profile picture path
+$avatar_path = 'https://randomuser.me/api/portraits/men/40.jpg'; // Default
+if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
+    $avatar_path = '../' . $profile_picture;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -173,7 +193,7 @@ $user_settings = [
                 <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-gray-200">
                     <div class="flex-shrink-0">
                         <div class="relative w-32 h-32 rounded-full mx-auto border-4 border-gray-100 overflow-hidden bg-gray-200 group">
-                            <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-full h-full object-cover" alt="Profile" id="profile-image">
+                            <img src="<?php echo htmlspecialchars($avatar_path); ?>" class="w-full h-full object-cover" alt="Profile" id="profile-image">
                             <label for="profileUpload" class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                                 <i class="fa-solid fa-camera text-white text-2xl"></i>
                             </label>
@@ -181,8 +201,8 @@ $user_settings = [
                         </div>
                     </div>
                     <div class="flex-1 text-center sm:text-left">
-                        <h3 class="text-2xl font-bold text-gray-900"><?php echo $user_settings['name']; ?></h3>
-                        <p class="text-gray-500"><?php echo $user_settings['role']; ?></p>
+                        <h3 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($full_name); ?></h3>
+                        <p class="text-gray-500"><?php echo htmlspecialchars($role); ?></p>
                         <div id="profile-actions" class="mt-4 flex gap-2 justify-center sm:justify-start">
                             <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
                             <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
@@ -197,15 +217,15 @@ $user_settings = [
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" value="<?php echo $user_settings['name']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                                <input type="text" value="<?php echo htmlspecialchars($full_name); ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" value="<?php echo $user_settings['email']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                                <input type="email" value="<?php echo htmlspecialchars($email); ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                <input type="text" value="<?php echo $user_settings['phone']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                                <input type="text" value="<?php echo htmlspecialchars($phone); ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
@@ -233,11 +253,11 @@ $user_settings = [
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
-                            <input type="text" value="January 2024" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            <input type="text" value="<?php echo htmlspecialchars($member_since); ?>" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Last Login</label>
-                            <input type="text" value="Today, 10:30 AM" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            <input type="text" value="<?php echo htmlspecialchars($last_login); ?>" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
                         </div>
                     </div>
                 </form>
