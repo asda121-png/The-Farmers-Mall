@@ -10,6 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 require_once __DIR__ . '/../config/supabase-api.php';
+require_once __DIR__ . '/../config/notifications-helper.php';
 
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
@@ -140,12 +141,36 @@ try {
             }
 
             // Insert order items
+            $retailerOrders = []; // Track orders by retailer
             foreach ($order_items as $item) {
                 $item['order_id'] = $order_id;
                 $result = $api->insert('order_items', $item);
                 if (empty($result)) {
                     error_log('Warning: order_items insert returned empty for order_id: ' . $order_id);
                 }
+                
+                // Track which retailers have items in this order
+                $product = $api->select('products', ['id' => $item['product_id']]);
+                if (!empty($product)) {
+                    $retailer_id = $product[0]['retailer_id'];
+                    error_log("[ORDER] Product {$item['product_id']} belongs to retailer: $retailer_id");
+                    if (!isset($retailerOrders[$retailer_id])) {
+                        $retailerOrders[$retailer_id] = [
+                            'items' => [],
+                            'subtotal' => 0
+                        ];
+                    }
+                    $retailerOrders[$retailer_id]['items'][] = $item;
+                    $retailerOrders[$retailer_id]['subtotal'] += $item['subtotal'];
+                }
+            }
+            
+            error_log("[ORDER] Total retailers affected: " . count($retailerOrders));
+            
+            // Create notifications for each retailer
+            foreach ($retailerOrders as $retailer_id => $orderInfo) {
+                error_log("[ORDER] Creating notification for retailer: $retailer_id, subtotal: {$orderInfo['subtotal']}");
+                notifyRetailerNewOrder($retailer_id, $order_id, $customer_name, $orderInfo['subtotal']);
             }
 
             // Clear the cart
