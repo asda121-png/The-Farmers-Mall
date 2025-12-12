@@ -32,6 +32,13 @@ function getBaseUrl() {
 }
 
 function sendJsonResponse($status, $message, $redirectUrl = '') {
+    // If successful and has redirect URL, do actual redirect
+    if ($status === 'success' && !empty($redirectUrl)) {
+        header('Location: ' . $redirectUrl);
+        exit();
+    }
+    
+    // For errors or no redirect, return JSON for modal handling
     header('Content-Type: application/json');
     echo json_encode([
         'status' => $status,
