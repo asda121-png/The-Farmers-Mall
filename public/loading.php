@@ -6,6 +6,9 @@
   <title>Farmers Mall – Loading</title>
   <style>
     * {margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+    html {
+      background-color:#1fa02d;
+    }
     body {
       background-color:#1fa02d;
       color:white;
@@ -16,6 +19,11 @@
       align-items:center;
       min-height:100vh;
       overflow:hidden;
+      opacity:1;
+      transition:opacity 0.5s ease;
+    }
+    body.fade-out {
+      opacity:0;
     }
     /* floating circles */
     .circle {
@@ -113,8 +121,20 @@
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect_to');
 
-        // Redirect to the final destination, or fallback to index.php
-        window.location.href = redirectTo || "index.php";
+        // Preload the next page to avoid flash
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = redirectTo || 'index.php';
+        document.head.appendChild(link);
+
+        // Fade out the loading screen before redirect
+        document.body.classList.add('fade-out');
+        
+        // Wait for fade animation to complete before redirecting
+        setTimeout(() => {
+          // Redirect to the final destination, or fallback to index.php
+          window.location.replace(redirectTo || "index.php");
+        }, 500);
       }
     }, 30);
   </script>

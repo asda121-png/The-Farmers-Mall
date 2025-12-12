@@ -66,6 +66,7 @@ try {
         $orders[] = [
             'id'           => $orderId,  // This now holds "order1", "order2", etc.
             'real_id'      => $r['id'] ?? null, // (Optional) Keeping the real ID hidden in case you need it for buttons later
+            'raw_date'     => $r['created_at'] ?? null, // Pass the raw timestamp to JS
             'customer'     => $customerName,
             'email'        => $customerEmail,
             'items'        => $items,
@@ -156,6 +157,10 @@ try {
         <a href="admin-manage-users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
+        </a>
+        <a href="admin-finance.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-chart-pie w-5"></i>
+          <span>Financial Reports</span>
         </a>
         </nav>
         
@@ -286,17 +291,25 @@ try {
 
         <div class="bg-white rounded-xl card-shadow overflow-hidden">
         <div class="p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center justify-between">
-            <div id="status-filters" class="flex gap-2">
-                <button data-filter="all" class="filter-btn px-3 py-1.5 text-xs font-medium text-white bg-green-700 rounded-lg shadow-sm">All Orders</button>
-                <button data-filter="pending" class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Pending</button>
-                <button data-filter="unpaid" class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Unpaid</button>
+            <div class="flex items-center gap-2">
+                <select id="status-filter-dropdown" class="text-sm border-gray-300 border rounded-lg p-2 focus:ring-green-500 focus:border-green-500 bg-white">
+                    <option value="all">All Orders</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="unpaid">Unpaid</option>
+                </select>
             </div>
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-calendar text-gray-400"></i>
-                <select id="date-filter" class="text-sm border-none bg-transparent text-gray-600 font-medium outline-none cursor-pointer">
-                    <option>Last 30 Days</option>
-                    <option>This Week</option>
-                    <option>Yesterday</option>
+                <select id="date-filter" class="text-sm border-none bg-transparent text-gray-600 font-medium outline-none cursor-pointer focus:ring-0">
+                    <option value="all" selected>All Time</option>
+                    <option value="30days">Last 30 Days</option>
+                    <option value="7days">This Week</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="today">Today</option>
                 </select>
             </div>
         </div>
@@ -488,6 +501,7 @@ try {
         rowsPerPage: 10, // UPDATED: Changed limit to 10
         searchTerm: '',
         statusFilter: 'all',
+        dateFilter: 'all', // Default to 'All Time'
       };
 
       const tableBody = document.getElementById('orders-table-body');
@@ -499,11 +513,47 @@ try {
                                 order.customer.toLowerCase().includes(state.searchTerm) ||
                                 order.email.toLowerCase().includes(state.searchTerm);
 
-            const statusMatch = state.statusFilter === 'all' ||
-                                (state.statusFilter === 'pending' && order.status.toLowerCase() === 'pending') ||
-                                (state.statusFilter === 'unpaid' && order.payment_status.toLowerCase() === 'pending');
+            let statusMatch = false;
+            if (state.statusFilter === 'all') {
+                statusMatch = true;
+            } else if (state.statusFilter === 'unpaid') {
+                statusMatch = order.payment_status.toLowerCase() === 'pending';
+            } else if (state.statusFilter === 'completed') {
+                // "Completed" filter should show both "Completed" and "Delivered" statuses
+                statusMatch = ['completed', 'delivered'].includes(order.status.toLowerCase());
+            } else {
+                statusMatch = order.status.toLowerCase() === state.statusFilter;
+            }
 
-            return searchMatch && statusMatch;
+            // --- [NEW] Date Filtering Logic ---
+            const orderDate = new Date(order.raw_date); // Use the raw timestamp for accurate parsing
+            const now = new Date();
+            let dateMatch = false;
+
+            switch (state.dateFilter) {
+                case 'today':
+                    dateMatch = orderDate.toDateString() === now.toDateString();
+                    break;
+                case 'yesterday':
+                    const yesterday = new Date();
+                    yesterday.setDate(now.getDate() - 1);
+                    dateMatch = orderDate.toDateString() === yesterday.toDateString();
+                    break;
+                case '7days':
+                    const last7days = new Date();
+                    last7days.setDate(now.getDate() - 7);
+                    dateMatch = orderDate >= last7days;
+                    break;
+                case '30days':
+                    const last30days = new Date();
+                    last30days.setDate(now.getDate() - 30);
+                    dateMatch = orderDate >= last30days;
+                    break;
+                default: // 'all'
+                    dateMatch = true;
+            }
+
+            return searchMatch && statusMatch && dateMatch;
         });
 
         const totalResults = filteredOrders.length;
@@ -580,19 +630,20 @@ try {
         displayOrders();
       });
 
-      document.getElementById('status-filters').addEventListener('click', (e) => {
-        const btn = e.target.closest('.filter-btn');
-        if (btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('bg-green-700', 'text-white');
-                b.classList.add('text-gray-600', 'hover:bg-gray-100');
-            });
-            btn.classList.add('bg-green-700', 'text-white');
-            btn.classList.remove('text-gray-600', 'hover:bg-gray-100');
-            state.statusFilter = btn.dataset.filter;
-            state.currentPage = 1;
-            displayOrders();
-        }
+      // --- [MODIFIED] Event listener for the new dropdown ---
+      const statusFilterDropdown = document.getElementById('status-filter-dropdown');
+      statusFilterDropdown.addEventListener('change', (e) => {
+        state.statusFilter = e.target.value;
+        state.currentPage = 1;
+        displayOrders();
+      });
+
+      // --- [NEW] Event listener for the date filter ---
+      const dateFilterDropdown = document.getElementById('date-filter');
+      dateFilterDropdown.addEventListener('change', (e) => {
+        state.dateFilter = e.target.value;
+        state.currentPage = 1;
+        displayOrders();
       });
 
       document.getElementById('pagination-controls').addEventListener('click', (e) => {

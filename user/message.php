@@ -164,25 +164,40 @@ if ($user_id) {
 
   <script src="../assets/js/customermessage.js"></script>
   <script>
-    // Update cart icon with item count
-    function updateCartIcon() {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const cartIcon = document.querySelector('a[href="cart.php"]');
-      if (!cartIcon) return;
-      // Create or update a badge for the count
-      let badge = cartIcon.querySelector('.cart-badge');
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
-        cartIcon.appendChild(badge);
+    // Update cart icon with item count from database
+    async function updateCartIcon() {
+      try {
+        const response = await fetch('../api/cart.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'count' })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          const cartIcon = document.querySelector('a[href="cart.php"]');
+          if (!cartIcon) return;
+          
+          let badge = cartIcon.querySelector('.cart-badge');
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
+            cartIcon.appendChild(badge);
+          }
+          const totalItems = data.count || 0;
+          badge.textContent = totalItems;
+          badge.style.display = totalItems > 0 ? 'block' : 'none';
+        }
+      } catch (error) {
+        console.error('Error updating cart icon:', error);
       }
-      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      badge.textContent = totalItems;
-      badge.style.display = totalItems > 0 ? 'block' : 'none';
     }
 
     // Highlight the active message icon in the header
     document.addEventListener('DOMContentLoaded', function() {
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
+      
       const messageIconLink = document.querySelector('a[href="message.php"]');
       if (messageIconLink) {
         messageIconLink.classList.remove('text-gray-600');

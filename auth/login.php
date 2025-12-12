@@ -1,3 +1,4 @@
+
 <?php
 // PHP SCRIPT START - SUPABASE LOGIN
 
@@ -7,6 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submitted'])) {
 // Load Supabase API
+
 require_once __DIR__ . '/../config/supabase-api.php';
 
 $login_status = '';

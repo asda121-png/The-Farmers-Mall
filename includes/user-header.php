@@ -320,73 +320,28 @@ if (in_array($current_dir, $subdirectories)) {
             ` : '');
           }
         } else {
-          // Try localStorage as fallback
-          const localCart = JSON.parse(localStorage.getItem('cart')) || [];
-          if (localCart.length > 0) {
-            const totalItems = localCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-            if (cartBadge) {
-              cartBadge.textContent = totalItems;
-              cartBadge.classList.remove('hidden');
-            }
-            if (cartPreviewItems) {
-              cartPreviewItems.innerHTML = localCart.slice(0, 5).map(item => {
-                // Resolve image path for localStorage items
-                let imageSrc = item.image || item.image_url || '../images/products/placeholder.png';
-                
-                // Ensure proper path resolution
-                if (imageSrc && !imageSrc.startsWith('http://') && !imageSrc.startsWith('https://')) {
-                  // If path doesn't start with ../, add it
-                  if (!imageSrc.startsWith('../') && !imageSrc.startsWith('/')) {
-                    imageSrc = '../' + imageSrc;
-                  }
-                }
-                
-                return `
-                <div class="flex items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50">
-                  <img src="${imageSrc}" 
-                       alt="${escapeHtml(item.name || 'Product')}" 
-                       class="w-16 h-16 rounded object-cover"
-                       onerror="this.src='${basePath}images/products/placeholder.png'">
-                  <div class="flex-1 min-w-0">
-                    <p class="font-medium text-sm text-gray-800 truncate">${escapeHtml(item.name || 'Product')}</p>
-                    <p class="text-xs text-gray-500">Qty: ${item.quantity || 1}</p>
-                    <p class="text-green-600 font-semibold text-sm">₱${parseFloat(item.price || 0).toFixed(2)}</p>
-                  </div>
-                </div>
-              `;
-              }).join('') + 
-              (localCart.length > 5 ? `
-                <div class="p-3 text-center text-sm text-gray-500 border-t border-gray-100">
-                  +${localCart.length - 5} more item(s)
-                </div>
-              ` : '');
-            }
-          } else {
-            // Empty cart
-            if (cartBadge) {
-              cartBadge.classList.add('hidden');
-            }
-            if (cartPreviewItems) {
-              cartPreviewItems.innerHTML = `
-                <div class="p-8 text-center text-gray-500">
-                  <i class="fas fa-shopping-cart text-4xl mb-2 text-gray-300"></i>
-                  <p class="text-sm">Your cart is empty</p>
-                </div>
-              `;
-            }
+          // Empty cart - no localStorage fallback
+          if (cartBadge) {
+            cartBadge.classList.add('hidden');
           }
+          if (cartPreviewItems) {
+            cartPreviewItems.innerHTML = `
+              <div class="p-8 text-center text-gray-500">
+                <i class="fas fa-shopping-cart text-4xl mb-2 text-gray-300"></i>
+                <p class="text-sm">Your cart is empty</p>
+              </div>
+            `;
+          }
+          // Clear old localStorage cart data
+          localStorage.removeItem('cart');
         }
       })
       .catch(error => {
         console.error('Cart load error:', error);
-        // Fallback to localStorage
-        const localCart = JSON.parse(localStorage.getItem('cart')) || [];
-        if (localCart.length > 0) {
-          const totalItems = localCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-          if (cartBadge) {
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.remove('hidden');
-          }
+        // Clear old localStorage cart data
+        localStorage.removeItem('cart');
+        if (cartBadge) {
+          cartBadge.classList.add('hidden');
         }
       });
   }
@@ -505,6 +460,9 @@ if (in_array($current_dir, $subdirectories)) {
   
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', function() {
+    // Clear old localStorage cart data to prevent conflicts
+    localStorage.removeItem('cart');
+    
     loadCartPreview();
     loadNotificationBadge();
     loadNotificationPreview();
@@ -578,9 +536,10 @@ if (in_array($current_dir, $subdirectories)) {
     const cartIcon = document.getElementById('cartIcon');
     
     if (cartContainer && cartPreview && cartIcon) {
-      // Show preview on hover
+      // Show preview on hover and refresh cart data
       cartContainer.addEventListener('mouseenter', function() {
         clearTimeout(cartPreviewTimeout);
+        loadCartPreview(); // Refresh cart data when hovering
         cartPreview.classList.remove('hidden');
       });
       
@@ -603,14 +562,35 @@ if (in_array($current_dir, $subdirectories)) {
       });
     }
     
-    // Refresh cart every 10 seconds
-    setInterval(loadCartPreview, 10000);
+    // Refresh cart every 5 seconds for real-time updates
+    setInterval(loadCartPreview, 5000);
   });
   
-  // Listen for cart updates
-  window.addEventListener('cartUpdated', loadCartPreview);
+  // Listen for cart updates from same page or other tabs
+  window.addEventListener('cartUpdated', function() {
+    loadCartPreview();
+    // Also update badge separately for immediate feedback
+    const basePath = '<?php echo $base; ?>';
+    fetch(`${basePath}api/cart.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'count' })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const cartBadge = document.getElementById('cartBadge');
+        if (cartBadge) {
+          cartBadge.textContent = data.count || 0;
+          cartBadge.classList.toggle('hidden', data.count === 0);
+        }
+      }
+    })
+    .catch(error => console.log('Error updating badge:', error));
+  });
+  
   window.addEventListener('storage', function(e) {
-    if (e.key === 'cart') {
+    if (e.key === 'cart' || e.key === 'cartUpdated') {
       loadCartPreview();
     }
     if (e.key === 'userNotifications') {

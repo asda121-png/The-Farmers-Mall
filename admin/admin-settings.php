@@ -1,18 +1,38 @@
 <?php
 // admin-settings.php
-// Mock User Data for Pre-filling forms
-$user_settings = [
-    "name" => "Admin User",
-    "email" => "admin@farmersmall.com",
-    "phone" => "+63 917 000 0000",
-    "role" => "Super Admin",
-    "notifications" => [
-        "email_alerts" => true,
-        "order_updates" => true,
-        "new_retailers" => false,
-        "marketing" => false
-    ]
-];
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'admin') {
+    header('Location: ../auth/login.php');
+    exit();
+}
+
+require_once __DIR__ . '/../config/supabase-api.php';
+require_once __DIR__ . '/../config/uuid-helper.php';
+
+$api = getSupabaseAPI();
+$user_id = $_SESSION['user_id'] ?? null;
+
+$user_data = [];
+if ($user_id) {
+    $user_data = safeGetUser($user_id, $api) ?: [];
+}
+
+// Prepare variables for the view, with fallbacks
+$full_name = $user_data['full_name'] ?? 'Admin User';
+$email = $user_data['email'] ?? 'admin@email.com';
+$phone = $user_data['phone'] ?? 'Not provided';
+$role = ucfirst($user_data['user_type'] ?? 'admin');
+$profile_picture = $user_data['profile_picture'] ?? '';
+$member_since = !empty($user_data['created_at']) ? date('F Y', strtotime($user_data['created_at'])) : 'N/A';
+$last_login = !empty($user_data['updated_at']) ? date('M d, Y - h:i A', strtotime($user_data['updated_at'])) : 'N/A';
+
+// Resolve profile picture path
+$avatar_path = 'https://randomuser.me/api/portraits/men/40.jpg'; // Default
+if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)) {
+    $avatar_path = '../' . $profile_picture;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -113,6 +133,10 @@ $user_settings = [
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
         </a>
+        <a href="admin-finance.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-chart-pie w-5"></i>
+          <span>Financial Reports</span>
+        </a>
       </nav>
 
       <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
@@ -154,9 +178,6 @@ $user_settings = [
             <button onclick="switchTab('security')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
                 Security
             </button>
-            <button onclick="switchTab('notifications')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
-                Notifications
-            </button>
             <button onclick="switchTab('appearance')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
                 Appearance
             </button>
@@ -167,51 +188,79 @@ $user_settings = [
     <div class="pt-6">
         <!-- Profile Tab -->
         <div id="tab-profile" class="tab-content active">
-            <div class="bg-white p-6 rounded-xl card-shadow">                
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-3 text-center">
+            <div class="bg-white p-8 rounded-xl card-shadow max-w-3xl mx-auto">
+                <!-- Profile Header -->
+                <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-gray-200">
+                    <div class="flex-shrink-0">
                         <div class="relative w-32 h-32 rounded-full mx-auto border-4 border-gray-100 overflow-hidden bg-gray-200 group">
-                            <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-full h-full object-cover" alt="Profile" id="profile-image">
+                            <img src="<?php echo htmlspecialchars($avatar_path); ?>" class="w-full h-full object-cover" alt="Profile" id="profile-image">
                             <label for="profileUpload" class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                                 <i class="fa-solid fa-camera text-white text-2xl"></i>
                             </label>
                             <input type="file" id="profileUpload" class="hidden">
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mt-4"><?php echo $user_settings['name']; ?></h3>
-                        <p class="text-sm text-gray-500"><?php echo $user_settings['role']; ?></p>
                     </div>
-                    <div class="lg:col-span-9">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold text-gray-900">Personal Information</h3>
-                            <div id="profile-actions" class="flex gap-2">
-                                <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
-                                <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
-                            </div>
+                    <div class="flex-1 text-center sm:text-left">
+                        <h3 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($full_name); ?></h3>
+                        <p class="text-gray-500"><?php echo htmlspecialchars($role); ?></p>
+                        <div id="profile-actions" class="mt-4 flex gap-2 justify-center sm:justify-start">
+                            <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
+                            <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
                         </div>
-                        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" value="<?php echo $user_settings['name']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                            <input type="text" value="<?php echo $user_settings['role']; ?>" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" value="<?php echo $user_settings['email']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input type="text" value="<?php echo $user_settings['phone']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div class="col-span-1 md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                            <textarea rows="3" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" placeholder="Tell us a little about yourself..." readonly></textarea>
-                        </div>
-                        </form>
                     </div>
                 </div>
+
+                <!-- Profile Form -->
+                <form id="profile-form" class="pt-6 space-y-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Personal Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" value="<?php echo htmlspecialchars($full_name); ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" value="<?php echo htmlspecialchars($email); ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <input type="text" value="<?php echo htmlspecialchars($phone); ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <input type="text" value="Mati, Davao Oriental" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Access & Permissions</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
+                                <span class="text-gray-600">Dashboard Access</span>
+                                <span class="font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Full Access</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
+                                <span class="text-gray-600">User Management</span>
+                                <span class="font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Full Access</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
+                                <span class="text-gray-600">Financial Reports</span>
+                                <span class="font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">Read-Only</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
+                            <input type="text" value="<?php echo htmlspecialchars($member_since); ?>" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Login</label>
+                            <input type="text" value="<?php echo htmlspecialchars($last_login); ?>" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -265,67 +314,6 @@ $user_settings = [
                             </div>
                         </div>
                         <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Manage 2FA</button>
-                    </div>
-                </div>
-
-                <!-- Login Activity Section -->
-                <div class="bg-white p-6 rounded-xl card-shadow max-w-3xl mx-auto">
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Login Activity</h3>
-                    <p class="text-sm text-gray-500 mb-6">This is a list of devices that have logged into your account. Revoke any sessions you do not recognize.</p>
-                    <ul class="space-y-4">
-                        <li class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-desktop text-xl text-gray-500"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Chrome on Windows <span class="text-green-600 font-semibold text-xs ml-1">(This Device)</span></p>
-                                    <p class="text-xs text-gray-500">Makati City, PH · Last active now</p>
-                                </div>
-                            </div>
-                            <button class="text-sm text-gray-500 font-medium hover:text-red-600 hover:underline">Log Out</button>
-                        </li>
-                        <li class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-mobile-screen-button text-xl text-gray-500"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Safari on iPhone</p>
-                                    <p class="text-xs text-gray-500">Cebu City, PH · Last active 2 days ago</p>
-                                </div>
-                            </div>
-                            <button class="text-sm text-gray-500 font-medium hover:text-red-600 hover:underline">Log Out</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifications Tab -->
-        <div id="tab-notifications" class="tab-content">
-            <div class="bg-white p-6 rounded-xl card-shadow max-w-2xl mx-auto">
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Notification Settings</h3>
-                <p class="text-sm text-gray-500 mb-6">Choose how you want to be notified.</p>
-                <div class="space-y-4 divide-y divide-gray-100">
-
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">Email Alerts</p>
-                            <p class="text-xs text-gray-500">Receive summaries and important updates via email.</p>
-                        </div>
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifEmail" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
-                            <label for="notifEmail" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                        </div>
-
-                    </div>
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">Order Updates</p>
-                            <p class="text-xs text-gray-500">Get notified when a new order is placed.</p>
-                        </div>
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifOrder" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
-                            <label for="notifOrder" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                        </div>
-
                     </div>
                 </div>
             </div>

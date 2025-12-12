@@ -600,8 +600,15 @@ if ($user_id) {
 
     // Top 5 most sold products
     $topProducts = array_slice($products, 0, 5);
-    // Remaining products (all others) - limit to 32 for homepage
-    $otherProducts = array_slice($products, 5, 70);
+    
+    // Pagination for All Products
+    $itemsPerPage = 24;
+    $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $allProducts = array_slice($products, 5); // All products except top 5
+    $totalProducts = count($allProducts);
+    $totalPages = ceil($totalProducts / $itemsPerPage);
+    $offset = ($currentPage - 1) * $itemsPerPage;
+    $otherProducts = array_slice($allProducts, $offset, $itemsPerPage);
     ?>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -639,7 +646,7 @@ if ($user_id) {
     </div>
   </section>
 
-  <section class="max-w-7xl mx-auto px-6 py-8">
+  <section id="all-products" class="max-w-7xl mx-auto px-6 py-8 scroll-mt-20">
     <div class="flex justify-between items-center mb-4">
       <h2 class="section-heading text-2xl font-bold fresh-font">All Products</h2>
     </div>
@@ -678,9 +685,78 @@ if ($user_id) {
       <?php endforeach; ?>
     </div>
 
-    <div class="flex justify-center mt-6">
-      <a href="products.php" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow">See More</a>
+    <!-- Pagination -->
+    <?php if ($totalPages > 1): ?>
+    <div class="flex justify-center items-center gap-2 mt-8">
+      <!-- Previous Button -->
+      <?php if ($currentPage > 1): ?>
+        <a href="?page=<?php echo $currentPage - 1; ?>#all-products" 
+           class="w-10 h-10 flex items-center justify-center rounded-full border border-green-600 text-green-600 hover:bg-green-50 transition-all">
+          <i class="fa-solid fa-chevron-left text-sm"></i>
+        </a>
+      <?php else: ?>
+        <span class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-300 cursor-not-allowed">
+          <i class="fa-solid fa-chevron-left text-sm"></i>
+        </span>
+      <?php endif; ?>
+      
+      <?php
+      // Pagination logic: show first 4, ..., current range, ..., last pages
+      $range = 2; // Show 2 pages before and after current
+      $showPages = [];
+      
+      // Always show first page
+      $showPages[] = 1;
+      
+      // Show pages around current page
+      for ($i = max(2, $currentPage - $range); $i <= min($totalPages - 1, $currentPage + $range); $i++) {
+        $showPages[] = $i;
+      }
+      
+      // Always show last page
+      if ($totalPages > 1) {
+        $showPages[] = $totalPages;
+      }
+      
+      // Remove duplicates and sort
+      $showPages = array_unique($showPages);
+      sort($showPages);
+      
+      // Display pagination numbers
+      $prevPage = 0;
+      foreach ($showPages as $page):
+        // Add ellipsis if there's a gap
+        if ($page - $prevPage > 1): ?>
+          <span class="w-10 h-10 flex items-center justify-center text-gray-400 font-semibold">...</span>
+        <?php endif;
+        
+        if ($page == $currentPage): ?>
+          <span class="w-10 h-10 flex items-center justify-center rounded-full bg-green-600 text-white font-semibold shadow-md">
+            <?php echo $page; ?>
+          </span>
+        <?php else: ?>
+          <a href="?page=<?php echo $page; ?>#all-products" 
+             class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600 hover:bg-green-50 transition-all font-medium">
+            <?php echo $page; ?>
+          </a>
+        <?php endif;
+        
+        $prevPage = $page;
+      endforeach; ?>
+      
+      <!-- Next Button -->
+      <?php if ($currentPage < $totalPages): ?>
+        <a href="?page=<?php echo $currentPage + 1; ?>#all-products" 
+           class="w-10 h-10 flex items-center justify-center rounded-full border border-green-600 text-green-600 hover:bg-green-50 transition-all">
+          <i class="fa-solid fa-chevron-right text-sm"></i>
+        </a>
+      <?php else: ?>
+        <span class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-300 cursor-not-allowed">
+          <i class="fa-solid fa-chevron-right text-sm"></i>
+        </span>
+      <?php endif; ?>
     </div>
+    <?php endif; ?>
   </section>
   
   <footer class="text-white py-12" style="background-color: #1B5E20;">
@@ -780,7 +856,10 @@ if ($user_id) {
           const name = link.dataset.name;
           const price = link.dataset.price;
           const img = link.dataset.img;
-          window.location.href = `productdetails.php?name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}`;
+          const id = link.dataset.id;
+          const description = link.dataset.description || '';
+          const category = link.dataset.category || '';
+          window.location.href = `productdetails.php?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}&description=${encodeURIComponent(description)}&category=${encodeURIComponent(category)}`;
         });
       });
 
@@ -816,6 +895,9 @@ if ($user_id) {
           if (data.success) {
             updateCartIcon();
             showNotification(`${product.name} added to cart!`);
+            // Trigger event for other components
+            window.dispatchEvent(new Event('cartUpdated'));
+            localStorage.setItem('cartUpdated', Date.now());
           } else {
             showNotification(data.message || 'Failed to add to cart', 'error');
           }
@@ -914,8 +996,14 @@ if ($user_id) {
       // Load profile on page load
       loadUserProfile();
 
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
+      
       // Update cart icon on page load
       updateCartIcon();
+      
+      // Refresh cart icon every 3 seconds to stay in sync
+      setInterval(updateCartIcon, 3000);
 
       // Listen for profile updates from other tabs
       window.addEventListener('storage', (e) => {
