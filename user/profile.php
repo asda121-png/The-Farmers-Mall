@@ -121,7 +121,6 @@ function handleProfileUpdate()
             'email' => trim($_POST['email'] ?? ''),
             'date_of_birth' => trim($_POST['date_of_birth'] ?? null),
             'gender' => trim($_POST['gender'] ?? ''),
-            'bio' => trim($_POST['bio'] ?? ''),
             'address' => trim($_POST['address'] ?? '')
         ];
 
@@ -297,7 +296,6 @@ $username = $userData['username'] ?? '';
 $profile_picture = $userData['profile_picture'] ?? $_SESSION['profile_picture'] ?? '';
 $date_of_birth = $userData['date_of_birth'] ?? '';
 $gender = $userData['gender'] ?? '';
-$bio = $userData['bio'] ?? '';
 $address = $userData['address'] ?? '';
 $created_at = $userData['created_at'] ?? '';
 
@@ -468,7 +466,6 @@ try {
               <div class="flex-1">
                 <h3 id="displayFullName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($full_name); ?></h3>
                 <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
-                <p id="displayBio" class="text-gray-600 text-sm italic"><?php echo htmlspecialchars($bio ?: 'Welcome to Farmers Mall!'); ?></p>
               </div>
             </div>
 
@@ -686,12 +683,6 @@ try {
               <input type="text" id="editAddress" name="address" value="<?php echo htmlspecialchars($address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Full address">
 
             </div>
-          </div>
-
-          <!-- Bio -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-            <textarea id="editBio" name="bio" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Tell us about yourself..."><?php echo htmlspecialchars($bio); ?></textarea>
           </div>
 
           <!-- Action Buttons -->
