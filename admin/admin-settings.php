@@ -154,9 +154,6 @@ $user_settings = [
             <button onclick="switchTab('security')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
                 Security
             </button>
-            <button onclick="switchTab('notifications')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
-                Notifications
-            </button>
             <button onclick="switchTab('appearance')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700">
                 Appearance
             </button>
@@ -204,10 +201,6 @@ $user_settings = [
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                             <input type="text" value="<?php echo $user_settings['phone']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div class="col-span-1 md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                            <textarea rows="3" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" placeholder="Tell us a little about yourself..." readonly></textarea>
                         </div>
                         </form>
                     </div>
@@ -265,67 +258,6 @@ $user_settings = [
                             </div>
                         </div>
                         <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">Manage 2FA</button>
-                    </div>
-                </div>
-
-                <!-- Login Activity Section -->
-                <div class="bg-white p-6 rounded-xl card-shadow max-w-3xl mx-auto">
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Login Activity</h3>
-                    <p class="text-sm text-gray-500 mb-6">This is a list of devices that have logged into your account. Revoke any sessions you do not recognize.</p>
-                    <ul class="space-y-4">
-                        <li class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-desktop text-xl text-gray-500"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Chrome on Windows <span class="text-green-600 font-semibold text-xs ml-1">(This Device)</span></p>
-                                    <p class="text-xs text-gray-500">Makati City, PH · Last active now</p>
-                                </div>
-                            </div>
-                            <button class="text-sm text-gray-500 font-medium hover:text-red-600 hover:underline">Log Out</button>
-                        </li>
-                        <li class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-mobile-screen-button text-xl text-gray-500"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Safari on iPhone</p>
-                                    <p class="text-xs text-gray-500">Cebu City, PH · Last active 2 days ago</p>
-                                </div>
-                            </div>
-                            <button class="text-sm text-gray-500 font-medium hover:text-red-600 hover:underline">Log Out</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifications Tab -->
-        <div id="tab-notifications" class="tab-content">
-            <div class="bg-white p-6 rounded-xl card-shadow max-w-2xl mx-auto">
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Notification Settings</h3>
-                <p class="text-sm text-gray-500 mb-6">Choose how you want to be notified.</p>
-                <div class="space-y-4 divide-y divide-gray-100">
-
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">Email Alerts</p>
-                            <p class="text-xs text-gray-500">Receive summaries and important updates via email.</p>
-                        </div>
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifEmail" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
-                            <label for="notifEmail" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                        </div>
-
-                    </div>
-                    <div class="flex items-center justify-between pt-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">Order Updates</p>
-                            <p class="text-xs text-gray-500">Get notified when a new order is placed.</p>
-                        </div>
-                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="notifOrder" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
-                            <label for="notifOrder" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                        </div>
-
                     </div>
                 </div>
             </div>
