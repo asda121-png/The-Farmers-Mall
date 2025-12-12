@@ -356,6 +356,10 @@ try {
                 <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                     <nav class="pagination flex gap-2" id="customers-pagination"></nav>
                 </div>
+                <div id="no-customers-message" class="p-12 text-center text-gray-500 hidden">
+                    <i class="fa-solid fa-user-slash text-4xl text-gray-300 mb-4"></i>
+                    <p class="font-medium">No customers found matching your criteria.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -431,6 +435,10 @@ try {
                 </table>
                 <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                     <nav class="pagination flex gap-2" id="sellers-pagination"></nav>
+                </div>
+                <div id="no-sellers-message" class="p-12 text-center text-gray-500 hidden">
+                    <i class="fa-solid fa-store-slash text-4xl text-gray-300 mb-4"></i>
+                    <p class="font-medium">No sellers found matching your criteria.</p>
                 </div>
             </div>
         </div>
@@ -579,6 +587,8 @@ try {
                 notificationDropdown: document.getElementById('notification-dropdown'),
                 notificationPulse: document.getElementById('notification-pulse'),
                 notificationList: document.getElementById('notification-list'),
+                noCustomersMessage: document.getElementById('no-customers-message'),
+                noSellersMessage: document.getElementById('no-sellers-message'),
             };
         },
 
@@ -668,6 +678,10 @@ try {
         renderPage(type) {
             const tableBody = type === 'customers' ? this.elements.customersTableBody : this.elements.sellersTableBody;
             const rows = Array.from(tableBody.querySelectorAll('tr'));
+            const table = tableBody.closest('table');
+            const noResultsMessage = type === 'customers' ? this.elements.noCustomersMessage : this.elements.noSellersMessage;
+            const paginationContainer = type === 'customers' ? this.elements.customersPagination.parentElement : this.elements.sellersPagination.parentElement;
+
             const matchedRows = rows.filter(r => r.classList.contains('filter-match'));
             
             const totalItems = matchedRows.length;
@@ -683,6 +697,16 @@ try {
             // Show slice
             matchedRows.slice(startIndex, endIndex).forEach(r => r.style.display = '');
             
+            // Show/hide no results message
+            if (totalItems === 0) {
+                table.classList.add('hidden');
+                paginationContainer.classList.add('hidden');
+                noResultsMessage.classList.remove('hidden');
+            } else {
+                table.classList.remove('hidden');
+                paginationContainer.classList.remove('hidden');
+                noResultsMessage.classList.add('hidden');
+            }
             this.updatePaginationControls(type, totalPages);
         },
         

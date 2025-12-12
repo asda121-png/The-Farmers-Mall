@@ -24,6 +24,7 @@ $profilePicture = '../images/default-avatar.svg';
 $userFullName = $_SESSION['full_name'] ?? 'Retailer';
 $userEmail = $_SESSION['email'] ?? '';
 $shopName = 'My Shop';
+$retailerId = null;
 
 try {
     $users = $api->select('users', ['id' => $userId]);
@@ -43,11 +44,104 @@ try {
             $retailers = $api->select('retailers', ['user_id' => $userId]);
             if (!empty($retailers)) {
                 $shopName = $retailers[0]['shop_name'] ?? $shopName;
+                $retailerId = $retailers[0]['id'];
             }
         }
     }
 } catch (Exception $e) {
     error_log("Error fetching user data: " . $e->getMessage());
+}
+    
+// Fetch orders for this retailer
+$orders = [];
+if ($retailerId) {
+    try {
+        // Fetch orders for this retailer, newest first
+        $orders = $api->select('orders', ['retailer_id' => $retailerId], ['order' => 'created_at:desc']);
+        
+        // Fallback: If no orders found directly, check order_items (handles mixed orders or missing retailer_id)
+        if (empty($orders)) {
+            $retailerItems = $api->select('order_items', ['retailer_id' => $retailerId]);
+            $orderIds = [];
+            foreach ($retailerItems as $item) {
+                if (!empty($item['order_id'])) {
+                    $orderIds[] = $item['order_id'];
+                }
+            }
+            $orderIds = array_unique($orderIds);
+            
+            foreach ($orderIds as $oid) {
+                $result = $api->select('orders', ['id' => $oid]);
+                if (!empty($result)) {
+                    $orders[] = $result[0];
+                }
+            }
+            
+            // Sort by date descending
+            usort($orders, function($a, $b) {
+                return strtotime($b['created_at']) - strtotime($a['created_at']);
+            });
+        }
+    } catch (Exception $e) {
+        error_log("Error fetching orders: " . $e->getMessage());
+    }
+}
+
+// Helper function to map status to a color and progress
+function getStatusInfo($status) {
+    $statusMap = [
+        'pending' => ['color' => '#F57C00', 'bg' => '#FFF9C4', 'text' => 'Pending', 'progress' => 0],
+        'confirmed' => ['color' => '#1E88E5', 'bg' => '#E3F2FD', 'text' => 'Confirmed', 'progress' => 1],
+        'processing' => ['color' => '#00BCD4', 'bg' => '#E1F5FE', 'text' => 'Processing', 'progress' => 2],
+        'shipped' => ['color' => '#00897B', 'bg' => '#E0F2F1', 'text' => 'Shipped', 'progress' => 3],
+        'delivered' => ['color' => '#388E3C', 'bg' => '#E8F5E9', 'text' => 'Delivered', 'progress' => 3],
+        'cancelled' => ['color' => '#757575', 'bg' => '#EEEEEE', 'text' => 'Cancelled', 'progress' => 0],
+    ];
+    $status = strtolower($status);
+    return $statusMap[$status] ?? ['color' => '#757575', 'bg' => '#EEEEEE', 'text' => ucfirst($status), 'progress' => 0];
+}
+
+// Prepare data for JavaScript modal
+$jsOrderData = [];
+foreach ($orders as $order) {
+    $items = [];
+    
+    // Try to fetch actual order items
+    try {
+        $orderItems = $api->select('order_items', ['order_id' => $order['id'], 'retailer_id' => $retailerId]);
+        foreach ($orderItems as $item) {
+            $items[] = [
+                'name' => $item['product_name'],
+                'quantity' => $item['quantity'],
+                'price' => '₱' . number_format($item['price'], 2),
+                'subtotal' => '₱' . number_format($item['subtotal'], 2)
+            ];
+        }
+    } catch (Exception $e) { /* Ignore errors, fall back to simple display */ }
+
+    if (empty($items) && !empty($order['product_name'])) {
+        $items[] = [
+            'name' => $order['product_name'],
+            'quantity' => '1', // Placeholder, as this is not in the orders table
+            'price' => '₱' . number_format($order['total_amount'], 2), // Placeholder
+            'subtotal' => '₱' . number_format($order['total_amount'], 2)
+        ];
+    }
+
+    $jsOrderData[$order['id']] = [
+        'id' => '#' . substr($order['id'], 0, 8),
+        'customer' => $order['customer_name'],
+        'date' => date('m/d/Y', strtotime($order['created_at'])),
+        'status' => ucfirst($order['status']),
+        'progress' => getStatusInfo($order['status'])['progress'],
+        'items' => $items,
+        'address' => $order['delivery_address'],
+        'phone' => '', // Not in orders table
+        'notes' => $order['notes'],
+        'subtotal' => '₱' . number_format($order['total_amount'], 2),
+        'deliveryFee' => '₱0.00', // Not in orders table
+        'total' => '₱' . number_format($order['total_amount'], 2)
+    ];
 }
 ?>
 <!DOCTYPE html>
@@ -306,6 +400,11 @@ try {
                             <option value="Shipping / In Transit">Shipping / In Transit</option>
                             <option value="Late Delivery">Late Delivery</option>
                             <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
                         <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,88 +429,44 @@ try {
                             </tr>
                         </thead>
                         <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
-                            <!-- Sample Order Rows -->
-                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('A1B2C3D4')">
-                                <td class="px-6 py-4" onclick="event.stopPropagation()">
-                                    <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="A1B2C3D4">
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#A1B2C3D4</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div class="flex items-center">
-                                        <img src="../images/default-avatar.svg" alt="Alice Johnson" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
-                                        <span class="text-gray-900">Alice Johnson</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">3/15</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    <div class="font-semibold text-gray-900">₱1,205.00</div>
-                                    <div class="text-xs text-gray-500">GCash</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center space-x-1">
-                                        <div class="w-10 h-1 rounded" style="background-color: #1E88E5;"></div>
-                                        <div class="w-10 h-1 bg-gray-200 rounded"></div>
-                                        <div class="w-10 h-1 bg-gray-200 rounded"></div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: #E3F2FD; color: #1E88E5;">Picking in Progress</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('E5F6G7H8')">
-                                <td class="px-6 py-4" onclick="event.stopPropagation()">
-                                    <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="E5F6G7H8">
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#E5F6G7H8</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div class="flex items-center">
-                                        <img src="../images/default-avatar.svg" alt="Bob Williams" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
-                                        <span class="text-gray-900">Bob Williams</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">12/23</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    <div class="font-semibold text-gray-900">₱1,000.00</div>
-                                    <div class="text-xs text-gray-500">COD</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center space-x-1">
-                                        <div class="w-10 h-1 rounded" style="background-color: #1E88E5;"></div>
-                                        <div class="w-10 h-1 rounded" style="background-color: #D32F2F;"></div>
-                                        <div class="w-10 h-1 bg-gray-200 rounded"></div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: #FFEBEE; color: #D32F2F;">Packing Issue</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('I9J0K1L2')">
-                                <td class="px-6 py-4" onclick="event.stopPropagation()">
-                                    <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="I9J0K1L2">
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#I9J0K1L2</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div class="flex items-center">
-                                        <img src="../images/default-avatar.svg" alt="Charlie Brown" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
-                                        <span class="text-gray-900">Charlie Brown</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">17/32</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    <div class="font-semibold text-gray-900">₱516.70</div>
-                                    <div class="text-xs text-gray-500">GCash</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center space-x-1">
-                                        <div class="w-10 h-1 rounded" style="background-color: #1E88E5;"></div>
-                                        <div class="w-10 h-1 rounded" style="background-color: #00BCD4;"></div>
-                                        <div class="w-10 h-1 rounded" style="background-color: #4CAF50;"></div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: #E8F5E9; color: #4CAF50;">Ready for Delivery</span>
-                                </td>
-                            </tr>
+                            <?php if (empty($orders)): ?>
+                                <tr>
+                                    <td colspan="7" class="px-6 py-10 text-center text-gray-500">No orders found.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($orders as $order): ?>
+                                    <?php $statusInfo = getStatusInfo($order['status']); ?>
+                                    <tr class="hover:bg-gray-50 cursor-pointer transition-colors" onclick="viewDetails('<?php echo htmlspecialchars($order['id']); ?>')">
+                                        <td class="px-6 py-4" onclick="event.stopPropagation()">
+                                            <input type="checkbox" class="order-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" data-order-id="<?php echo htmlspecialchars($order['id']); ?>">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#<?php echo substr(htmlspecialchars($order['id']), 0, 8); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <img src="../images/default-avatar.svg" alt="<?php echo htmlspecialchars($order['customer_name']); ?>" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
+                                                <span class="text-gray-900"><?php echo htmlspecialchars($order['customer_name']); ?></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><?php echo htmlspecialchars($order['product_name'] ?? 'N/A'); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            <div class="font-semibold text-gray-900">₱<?php echo number_format($order['total_amount'], 2); ?></div>
+                                            <div class="text-xs text-gray-500"><?php echo htmlspecialchars(ucfirst($order['payment_method'])); ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-1">
+                                                <div class="w-10 h-1 rounded <?php echo $statusInfo['progress'] >= 1 ? 'bg-blue-500' : 'bg-gray-200'; ?>"></div>
+                                                <div class="w-10 h-1 rounded <?php echo $statusInfo['progress'] >= 2 ? 'bg-cyan-500' : 'bg-gray-200'; ?>"></div>
+                                                <div class="w-10 h-1 rounded <?php echo $statusInfo['progress'] >= 3 ? 'bg-green-500' : 'bg-gray-200'; ?>"></div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" style="background-color: <?php echo $statusInfo['bg']; ?>; color: <?php echo $statusInfo['color']; ?>;">
+                                                <?php echo htmlspecialchars($statusInfo['text']); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                     <div id="no-orders-message" class="p-6 text-center text-gray-500 hidden">No orders found.</div>
@@ -550,6 +605,12 @@ try {
                         <option value="Late Delivery">Late Delivery</option>
                         <option value="Completed">Completed</option>
                         <option value="Cancelled">Cancelled</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
                 
@@ -777,59 +838,7 @@ try {
     // Store current order data for modals
     let currentOrderId = null;
     
-    // Sample order data (in production, this would come from database)
-    const orderData = {
-        'A1B2C3D4': {
-            id: '#A1B2C3D4',
-            customer: 'Alice Johnson',
-            date: '12/7/2025',
-            status: 'Picking in Progress',
-            progress: 1, // 0-3 (representing progress stages)
-            items: [
-                { name: 'Fresh Apples', quantity: '2 kg', price: '₱150.00', subtotal: '₱300.00' },
-                { name: 'Organic Tomatoes', quantity: '1 kg', price: '₱65.00', subtotal: '₱65.00' }
-            ],
-            address: '123 Main Street, Barangay Sample, Manila City',
-            phone: '+63 912 345 6789',
-            notes: 'Please deliver before 5 PM',
-            subtotal: '₱365.00',
-            deliveryFee: '₱50.98',
-            total: '₱415.98'
-        },
-        'E5F6G7H8': {
-            id: '#E5F6G7H8',
-            customer: 'Bob Williams',
-            date: '12/6/2025',
-            status: 'Packing Issue',
-            progress: 2,
-            items: [
-                { name: 'Fresh Milk', quantity: '2 liters', price: '₱120.00', subtotal: '₱240.00' },
-                { name: 'Organic Eggs', quantity: '1 dozen', price: '₱180.00', subtotal: '₱180.00' }
-            ],
-            address: '456 Oak Avenue, Quezon City',
-            phone: '+63 917 888 9999',
-            notes: 'Leave at gate if nobody home',
-            subtotal: '₱420.00',
-            deliveryFee: '₱205.00',
-            total: '₱625.00'
-        },
-        'I9J0K1L2': {
-            id: '#I9J0K1L2',
-            customer: 'Charlie Brown',
-            date: '12/5/2025',
-            status: 'Ready for Delivery',
-            progress: 3,
-            items: [
-                { name: 'Fresh Mangoes', quantity: '3 kg', price: '₱103.50', subtotal: '₱310.50' }
-            ],
-            address: '789 Pine Street, Makati City',
-            phone: '+63 920 111 2222',
-            notes: 'No special instructions',
-            subtotal: '₱310.50',
-            deliveryFee: '₱0.00',
-            total: '₱310.50'
-        }
-    };
+    const orderData = <?php echo json_encode($jsOrderData); ?>;
 
     function viewDetails(orderId) {
         currentOrderId = orderId;
@@ -852,17 +861,12 @@ try {
         
         // Map statuses to colors based on the color guide
         const statusColors = {
-            'In Queue': { bg: '#E0F2F1', color: '#00897B' },                    // Light Gray/Blue
-            'Pending Fulfillment': { bg: '#FFF9C4', color: '#F57C00' },        // Amber/Yellow
-            'Picking in Progress': { bg: '#E3F2FD', color: '#1E88E5' },        // Blue
-            'Packing in Progress': { bg: '#E1F5FE', color: '#00BCD4' },        // Cyan/Light Blue
-            'Picking Issue': { bg: '#FFEBEE', color: '#EF5350' },              // Red/Pink
-            'Packing Issue': { bg: '#FFCDD2', color: '#D32F2F' },              // Darker Red
-            'Ready for Delivery': { bg: '#E8F5E9', color: '#4CAF50' },         // Green
-            'Shipping / In Transit': { bg: '#E0F2F1', color: '#00897B' },      // Teal
-            'Late Delivery': { bg: '#FFE0B2', color: '#FF9800' },              // Orange
-            'Completed': { bg: '#E8F5E9', color: '#388E3C' },                  // Dark Green
-            'Cancelled': { bg: '#EEEEEE', color: '#757575' }                   // Dark Gray
+            'Pending': { bg: '#FFF9C4', color: '#F57C00' },
+            'Confirmed': { bg: '#E3F2FD', color: '#1E88E5' },
+            'Processing': { bg: '#E1F5FE', color: '#00BCD4' },
+            'Shipped': { bg: '#E0F2F1', color: '#00897B' },
+            'Delivered': { bg: '#E8F5E9', color: '#388E3C' },
+            'Cancelled': { bg: '#EEEEEE', color: '#757575' }
         };
         
         const colors = statusColors[order.status] || { bg: '#EEEEEE', color: '#757575' };

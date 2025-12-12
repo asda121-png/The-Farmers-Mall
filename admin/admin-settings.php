@@ -164,9 +164,10 @@ $user_settings = [
     <div class="pt-6">
         <!-- Profile Tab -->
         <div id="tab-profile" class="tab-content active">
-            <div class="bg-white p-6 rounded-xl card-shadow">                
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-3 text-center">
+            <div class="bg-white p-8 rounded-xl card-shadow max-w-3xl mx-auto">
+                <!-- Profile Header -->
+                <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-gray-200">
+                    <div class="flex-shrink-0">
                         <div class="relative w-32 h-32 rounded-full mx-auto border-4 border-gray-100 overflow-hidden bg-gray-200 group">
                             <img src="https://randomuser.me/api/portraits/men/40.jpg" class="w-full h-full object-cover" alt="Profile" id="profile-image">
                             <label for="profileUpload" class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
@@ -174,37 +175,68 @@ $user_settings = [
                             </label>
                             <input type="file" id="profileUpload" class="hidden">
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mt-4"><?php echo $user_settings['name']; ?></h3>
-                        <p class="text-sm text-gray-500"><?php echo $user_settings['role']; ?></p>
                     </div>
-                    <div class="lg:col-span-9">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold text-gray-900">Personal Information</h3>
-                            <div id="profile-actions" class="flex gap-2">
-                                <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
-                                <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
-                            </div>
+                    <div class="flex-1 text-center sm:text-left">
+                        <h3 class="text-2xl font-bold text-gray-900"><?php echo $user_settings['name']; ?></h3>
+                        <p class="text-gray-500"><?php echo $user_settings['role']; ?></p>
+                        <div id="profile-actions" class="mt-4 flex gap-2 justify-center sm:justify-start">
+                            <button id="edit-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">Edit Profile</button>
+                            <button id="save-profile-btn" class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors hidden">Save Changes</button>
                         </div>
-                        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" value="<?php echo $user_settings['name']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                            <input type="text" value="<?php echo $user_settings['role']; ?>" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" value="<?php echo $user_settings['email']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input type="text" value="<?php echo $user_settings['phone']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
-                        </div>
-                        </form>
                     </div>
                 </div>
+
+                <!-- Profile Form -->
+                <form id="profile-form" class="pt-6 space-y-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Personal Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" value="<?php echo $user_settings['name']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" value="<?php echo $user_settings['email']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <input type="text" value="<?php echo $user_settings['phone']; ?>" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <input type="text" value="Mati, Davao Oriental" class="profile-input w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Access & Permissions</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
+                                <span class="text-gray-600">Dashboard Access</span>
+                                <span class="font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Full Access</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
+                                <span class="text-gray-600">User Management</span>
+                                <span class="font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Full Access</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
+                                <span class="text-gray-600">Financial Reports</span>
+                                <span class="font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">Read-Only</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
+                            <input type="text" value="January 2024" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Login</label>
+                            <input type="text" value="Today, 10:30 AM" class="w-full p-2 border bg-gray-100 border-gray-300 rounded-lg text-sm" readonly>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
 
