@@ -258,8 +258,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         
         /* Password toggle button */
         .password-toggle-btn {
-          opacity: 0;
-          pointer-events: none;
           position: absolute;
           right: 0.75rem;
           top: 50%;
@@ -267,12 +265,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
           background: none;
           border: none;
           cursor: pointer;
-          padding: 0;
-          transition: opacity 0.2s;
-        }
-        input:not(:placeholder-shown) + .password-toggle-btn {
-          opacity: 1;
-          pointer-events: auto;
         }
         
         .password-field-container {
@@ -1247,6 +1239,49 @@ include '../includes/header.php';
       } else {
         event.preventDefault();
         showErrorBanner('Please complete all steps before submitting.');
+      }
+    });
+  </script>
+
+  <?php
+  // Include the login modal HTML. This should come before the script that handles it.
+  include '../auth/login.php';
+  ?>
+
+  <!-- Use the centralized modal handler script -->
+  <script src="../assets/js/modal-handler.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const registrationChoice = document.getElementById('registration-choice');
+      const retailerSignupForm = document.getElementById('retailer-signup-form');
+      const loginModal = document.getElementById('loginModal');
+
+      // This function shows the inline registration form on this page.
+      function showRetailerRegistrationForm(event) {
+        if (event) event.preventDefault();
+
+        // If the login modal is open, close it first.
+        if (loginModal && !loginModal.classList.contains('hidden')) {
+          // Use the function from modal-handler.js if available
+          if (typeof closeLoginModal === 'function') {
+            closeLoginModal();
+          } else {
+            loginModal.classList.add('hidden');
+          }
+        }
+
+        // Show the registration form and scroll to it.
+        registrationChoice.classList.add('hidden');
+        retailerSignupForm.classList.remove('hidden');
+        retailerSignupForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      // Find the "Create an Account" link inside the login modal.
+      const createAccountLink = document.querySelector('#loginModal a[href*="register.php"]');
+      if (createAccountLink) {
+        // Override the default modal-handler behavior for this specific link.
+        createAccountLink.addEventListener('click', showRetailerRegistrationForm, true); // Use capture to run this first
       }
     });
   </script>

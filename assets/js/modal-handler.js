@@ -72,13 +72,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // --- END: Event Listeners for Modal Triggers ---
 
   // --- START: Modal Switching Logic ---
-  const switchToLoginLink = document.querySelector('#registerModal a[href*="login.php"]');
-  if (switchToLoginLink) {
-    switchToLoginLink.addEventListener('click', function (e) {
-      e.preventDefault();
-      closeRegisterModal();
-      setTimeout(openLoginModal, 150);
-    });
+  const switchToLoginLinks = document.querySelectorAll('#registerModal a[href*="login.php"]');
+  if (switchToLoginLinks) {
+    switchToLoginLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeRegisterModal();
+        setTimeout(openLoginModal, 150);
+      });
+    })
   }
   const switchToRegisterLink = document.querySelector('#loginModal a[href*="register.php"]');
   if (switchToRegisterLink) {
@@ -129,6 +131,22 @@ document.addEventListener('DOMContentLoaded', function () {
           loginSubmitBtn.disabled = false;
           btnText.textContent = 'Login';
         });
+    });
+  }
+
+  // --- START: Login Password Toggle ---
+  const toggleLoginPasswordBtn = document.getElementById('toggleLoginPassword');
+  if (toggleLoginPasswordBtn) {
+    toggleLoginPasswordBtn.addEventListener('click', function() {
+      const passwordInput = document.getElementById('login_password');
+      const icon = this.querySelector('i');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
     });
   }
   // --- END: Login Form AJAX ---
@@ -302,8 +320,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateButtons() {
       const isLastStep = currentStep === steps.length - 1;
-      termsContainer.classList.toggle('hidden', !isLastStep);
-      prevBtn.classList.toggle('hidden', currentStep === 0);
+      if (termsContainer) {
+        termsContainer.classList.toggle('hidden', !isLastStep);
+      }
+      if (prevBtn) {
+        // Always show the previous button, even on step 0, to go back to the choice screen.
+        prevBtn.classList.remove('hidden');
+      }
       nextBtn.classList.toggle('hidden', isLastStep);
       submitBtn.classList.toggle('hidden', !isLastStep);
       if (currentStep === 3) {
@@ -370,7 +393,13 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
     prevBtn.addEventListener('click', () => {
-      if (currentStep > 0) goToStep(currentStep - 1);
+      if (currentStep > 0) {
+        goToStep(currentStep - 1);
+      } else {
+        // If on the first step, go back to the registration choice screen.
+        const showChoiceFunc = window.showRegistrationChoice;
+        if (typeof showChoiceFunc === 'function') showChoiceFunc();
+      }
     });
 
     registerForm.addEventListener('submit', function (e) {

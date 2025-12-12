@@ -34,6 +34,7 @@ include '../auth/register.php';
    /* START: Login Modal Styles */
    .login-modal {
      transition: opacity 0.5s ease, visibility 0.5s ease, backdrop-filter 0.5s ease;
+     z-index: 100; /* Ensure modal is on top of the header */
      backdrop-filter: blur(0px);
    }
    .login-modal.hidden {
@@ -84,6 +85,7 @@ include '../auth/register.php';
    /* START: Register Modal Styles */
    .register-modal {
      transition: opacity 0.5s ease, visibility 0.5s ease, backdrop-filter 0.5s ease;
+     z-index: 100; /* Ensure modal is on top of the header */
      backdrop-filter: blur(0px);
    }
    .register-modal.hidden {
