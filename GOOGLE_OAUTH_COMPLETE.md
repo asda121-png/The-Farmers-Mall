@@ -146,13 +146,16 @@ Your Google OAuth login and signup functionality has been fully implemented and 
 
 ## 📋 Pre-filled Credentials
 
-Your .env file already has:
+Your .env file has placeholders for shared credentials:
 ```
-GOOGLE_CLIENT_ID=889315395056-dgvq75hafjmgep6hpiogdm699qu99gf1.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=YOUR_SHARED_CLIENT_ID_HERE
+GOOGLE_CLIENT_SECRET=YOUR_SHARED_CLIENT_SECRET_HERE
 ```
 
-**These work immediately for local development!**
+**To make it work:**
+1. Contact your team lead for the shared credentials
+2. Replace the placeholders with the actual values
+3. Save and restart your server
 
 ---
 

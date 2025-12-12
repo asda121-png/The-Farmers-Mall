@@ -26,10 +26,10 @@ Test-Path "GOOGLE_OAUTH_IMPLEMENTATION.md"
 ```
 
 ### Step 2: Verify .env Configuration
-Check that your `.env` file has:
+Check that your `.env` file has the shared credentials:
 ```
-GOOGLE_CLIENT_ID=889315395056-dgvq75hafjmgep6hpiogdm699qu99gf1.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=[Ask your team lead]
+GOOGLE_CLIENT_SECRET=[Ask your team lead]
 ```
 
 ### Step 3: Check PHP Configuration
@@ -170,9 +170,9 @@ Before deploying to production:
 
 ### Local Development:
 ```
-GOOGLE_CLIENT_ID=889315395056-dgvq75hafjmgep6hpiogdm699qu99gf1.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
-Authorized Redirect URI: http://localhost/The-Farmers-Mall/auth/google-callback.php
+GOOGLE_CLIENT_ID=[From your team lead - shared credentials]
+GOOGLE_CLIENT_SECRET=[From your team lead - shared credentials]
+Authorized Redirect URI: http://localhost:8080/The-Farmers-Mall/auth/google-callback.php
 ```
 
 ### Staging/Testing:

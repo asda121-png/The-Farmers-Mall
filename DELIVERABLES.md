@@ -78,12 +78,13 @@
   - All registration fields
 
 #### 3. **config/.env**
-- **Changes:** Added Google OAuth credentials
-- **Additions:**
+- **Changes:** Added Google OAuth configuration
+- **Additions:** Placeholders for shared team credentials
   ```
-  GOOGLE_CLIENT_ID=889315395056-dgvq75hafjmgep6hpiogdm699qu99gf1.apps.googleusercontent.com
-  GOOGLE_CLIENT_SECRET=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
+  GOOGLE_CLIENT_ID=YOUR_SHARED_CLIENT_ID_HERE
+  GOOGLE_CLIENT_SECRET=YOUR_SHARED_CLIENT_SECRET_HERE
   ```
+- **Note:** Ask your team lead for the actual shared credentials to add locally
 
 #### 4. **config/.env.example**
 - **Changes:** Added Google OAuth setup section
