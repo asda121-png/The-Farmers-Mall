@@ -101,7 +101,6 @@ try {
         $_SESSION['address'] = $user['address'] ?? '';
         $_SESSION['role'] = $user['user_type'];
         $_SESSION['user_type'] = $user['user_type'];
-        $_SESSION['google_auth'] = true;
         
         // Redirect based on user type
         $baseUrl = getBaseUrl();
@@ -143,8 +142,7 @@ try {
             'user_type' => 'customer',
             'status' => 'active',
             'phone' => '',
-            'address' => '',
-            'google_auth' => true
+            'address' => ''
         ];
         
         // Insert new user
@@ -166,7 +164,6 @@ try {
         $_SESSION['address'] = '';
         $_SESSION['role'] = 'customer';
         $_SESSION['user_type'] = 'customer';
-        $_SESSION['google_auth'] = true;
         
         // Log new Google user creation
         error_log("New user created via Google OAuth: {$newUser['email']} (ID: {$newUser['id']})");
