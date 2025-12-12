@@ -780,7 +780,10 @@ if ($user_id) {
           const name = link.dataset.name;
           const price = link.dataset.price;
           const img = link.dataset.img;
-          window.location.href = `productdetails.php?name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}`;
+          const id = link.dataset.id;
+          const description = link.dataset.description || '';
+          const category = link.dataset.category || '';
+          window.location.href = `productdetails.php?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}&description=${encodeURIComponent(description)}&category=${encodeURIComponent(category)}`;
         });
       });
 
@@ -916,6 +919,9 @@ if ($user_id) {
 
       // Update cart icon on page load
       updateCartIcon();
+      
+      // Refresh cart icon every 3 seconds to stay in sync
+      setInterval(updateCartIcon, 3000);
 
       // Listen for profile updates from other tabs
       window.addEventListener('storage', (e) => {

@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Get URL parameters
   const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id') || null;
   const productName = params.get('name') || 'Fresh Organic Vegetable Bundle';
   const productPrice = (params.get('price') || '24.99').replace(/[^\d.]/g, ''); // Remove non-numeric characters except dot
   const productImg = params.get('img') || '../images/products/Fresh Vegetable Box.png';
   const productDescription = params.get('description') || 'A fresh assortment of seasonal vegetables including carrots, spinach, and broccoli, perfect for healthy meals.';
+  const productCategory = params.get('category') || 'vegetables';
 
   // Update page elements
   const productNameEl = document.getElementById('product-name');
@@ -79,11 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
     addToCartBtn.addEventListener('click', () => {
       const quantity = parseInt(quantityInput.value) || 1;
       const product = {
+        id: productId,
         name: productName,
         price: parseFloat(productPrice),
         image: productImg,
         quantity: quantity,
-        description: productDescription
+        description: productDescription,
+        category: productCategory
       };
 
       addToCart(product);
@@ -110,37 +114,93 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Cart functions
-  function addToCart(product) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    
-    const existingIndex = cart.findIndex(item => item.name === product.name);
-    
-    if (existingIndex > -1) {
-      cart[existingIndex].quantity += product.quantity;
-    } else {
-      cart.push(product);
+  async function addToCart(product) {
+    try {
+      // Show loading state
+      const addToCartBtn = document.querySelector('.add-to-cart-btn');
+      if (addToCartBtn) {
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding...';
+      }
+
+      // Prepare payload for API
+      const payload = {
+        quantity: product.quantity || 1
+      };
+
+      // If product has ID, use it; otherwise send product details
+      if (product.id) {
+        payload.product_id = product.id;
+      } else {
+        payload.product_name = product.name;
+        payload.price = product.price;
+        payload.description = product.description;
+        payload.image = product.image;
+        payload.category = product.category;
+      }
+
+      // Call API to add to cart
+      const response = await fetch('../api/cart.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update cart icon count
+        await updateCartIcon();
+        showNotification(`${product.quantity}x ${product.name} added to cart!`, 'success');
+      } else {
+        showNotification(data.message || 'Failed to add to cart', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showNotification('Error adding to cart. Please try again.', 'error');
+    } finally {
+      // Restore button state
+      const addToCartBtn = document.querySelector('.add-to-cart-btn');
+      if (addToCartBtn) {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Add to Cart';
+      }
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartIcon();
-    showNotification(`${product.quantity}x ${product.name} added to cart!`);
   }
 
-  function updateCartIcon() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartIcon = document.querySelector('a[href="cart.php"]');
-    if (!cartIcon) return;
+  async function updateCartIcon() {
+    try {
+      // Fetch cart count from database
+      const response = await fetch('../api/cart.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'count' })
+      });
 
-    let badge = cartIcon.querySelector('.cart-badge');
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
-      cartIcon.classList.add('relative', 'inline-block');
-      cartIcon.appendChild(badge);
+      const data = await response.json();
+      
+      if (data.success) {
+        const cartIcon = document.querySelector('a[href="cart.php"]');
+        if (!cartIcon) return;
+
+        let badge = cartIcon.querySelector('.cart-badge');
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
+          cartIcon.classList.add('relative', 'inline-block');
+          cartIcon.appendChild(badge);
+        }
+        const totalItems = data.count || 0;
+        badge.textContent = totalItems;
+        badge.style.display = totalItems > 0 ? 'block' : 'none';
+      }
+    } catch (error) {
+      console.error('Error updating cart icon:', error);
     }
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    badge.textContent = totalItems;
-    badge.style.display = totalItems > 0 ? 'block' : 'none';
   }
 
   function showNotification(message, type = 'success') {

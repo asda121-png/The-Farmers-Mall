@@ -319,34 +319,46 @@ if ($user_id) {
 
   <script src="../assets/js/productdetails.js"></script>
   <script>
-    // Update cart icon with item count
-    function updateCartIcon() {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const cartIcon = document.querySelector('a[href*="cart"]');
-      if (!cartIcon) return;
-      // Create or update a badge for the count
-      let badge = cartIcon.querySelector('.cart-badge');
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
-        cartIcon.classList.add('relative');
-        cartIcon.appendChild(badge);
+    // Update cart icon with item count from database
+    async function updateCartIconFromDB() {
+      try {
+        // Fetch cart count from database
+        const response = await fetch('../api/cart.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ action: 'count' })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          const cartIcon = document.querySelector('a[href*="cart"]');
+          if (!cartIcon) return;
+
+          let badge = cartIcon.querySelector('.cart-badge');
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center';
+            cartIcon.classList.add('relative');
+            cartIcon.appendChild(badge);
+          }
+          const totalItems = data.count || 0;
+          badge.textContent = totalItems;
+          badge.style.display = totalItems > 0 ? 'block' : 'none';
+        }
+      } catch (error) {
+        console.error('Error updating cart icon:', error);
       }
-      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      badge.textContent = totalItems;
-      badge.style.display = totalItems > 0 ? 'block' : 'none';
     }
 
     // Update cart icon on page load
     document.addEventListener('DOMContentLoaded', function() {
-      updateCartIcon();
-
-      // Listen for cart updates from other tabs
-      window.addEventListener('storage', (e) => {
-        if (e.key === 'cart') {
-          updateCartIcon();
-        }
-      });
+      updateCartIconFromDB();
+      
+      // Refresh cart icon every 3 seconds to stay in sync
+      setInterval(updateCartIconFromDB, 3000);
     });
   </script>
   <script src="../assets/js/profile-sync.js"></script>
