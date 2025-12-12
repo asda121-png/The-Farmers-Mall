@@ -320,6 +320,9 @@ function getProductImage($product) {
         if (data.success) {
           showToast('Product added to cart successfully!', 'success');
           updateCartBadge();
+          // Trigger event for other components
+          window.dispatchEvent(new Event('cartUpdated'));
+          localStorage.setItem('cartUpdated', Date.now());
         } else {
           showToast(data.message || 'Failed to add product to cart', 'error');
         }
@@ -331,7 +334,11 @@ function getProductImage($product) {
     }
 
     // Initialize cart badge on page load
-    document.addEventListener('DOMContentLoaded', updateCartBadge);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Clear old localStorage cart data
+      localStorage.removeItem('cart');
+      updateCartBadge();
+    });
   </script>
 
 </body>
