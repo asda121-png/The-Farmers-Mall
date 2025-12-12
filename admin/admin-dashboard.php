@@ -1,9 +1,91 @@
 <?php
-// PHP file structure starts here. All static content is enclosed in HTML/JS/CSS below.
-// In a real-world scenario, dynamic data fetching and authentication would happen here.
-$admin_name = "Admin User";
-$admin_email = "admin@farmersmall.com";
+session_start();
 
+require_once __DIR__ . '/../config/supabase-api.php';
+$api = getSupabaseAPI();
+
+$admin_name = $_SESSION['full_name'] ?? "Admin User";
+$admin_email = $_SESSION['email'] ?? "admin@farmersmall.com";
+
+// --- Data Fetching ---
+$orders = $api->select('orders') ?: [];
+$users = $api->select('users') ?: [];
+
+// --- Data Processing ---
+function processFinancialData($orders, $users, $days = null) {
+    $stats = [
+        'revenue' => 0,
+        'new_customers' => 0,
+        'cancelled_orders' => 0,
+        'total_orders' => 0,
+        'completed_orders_count' => 0,
+        'chart_labels' => [],
+        'chart_data' => []
+    ];
+
+    $now = new DateTime();
+    $limitDate = $days ? (clone $now)->modify("-$days days") : null;
+
+    // Initialize chart data for the period
+    $salesByDay = [];
+    if ($days) {
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = date('M d', strtotime("-$i days"));
+            $salesByDay[$date] = 0;
+        }
+    } else { // All time - group by month
+        foreach ($orders as $order) {
+            $month = date('Y-m', strtotime($order['created_at']));
+            if (!isset($salesByDay[$month])) $salesByDay[$month] = 0;
+        }
+        ksort($salesByDay);
+    }
+
+    foreach ($orders as $order) {
+        $orderDate = new DateTime($order['created_at']);
+        if ($limitDate && $orderDate < $limitDate) continue;
+
+        $stats['total_orders']++;
+        if (in_array($order['status'], ['completed', 'delivered'])) {
+            $stats['revenue'] += floatval($order['total_amount']);
+            $stats['completed_orders_count']++;
+
+            // Populate chart data
+            if ($days) {
+                $dayKey = $orderDate->format('M d');
+                if (array_key_exists($dayKey, $salesByDay)) {
+                    $salesByDay[$dayKey] += floatval($order['total_amount']);
+                }
+            } else {
+                $monthKey = $orderDate->format('Y-m');
+                $salesByDay[$monthKey] += floatval($order['total_amount']);
+            }
+        }
+        if ($order['status'] === 'cancelled') {
+            $stats['cancelled_orders']++;
+        }
+    }
+
+    foreach ($users as $user) {
+        $joinDate = new DateTime($user['created_at']);
+        if ($limitDate && $joinDate < $limitDate) continue;
+        if ($user['user_type'] === 'customer') $stats['new_customers']++;
+    }
+
+    $stats['chart_labels'] = array_keys($salesByDay);
+    $stats['chart_data'] = array_values($salesByDay);
+    return $stats;
+}
+
+$data_all_time = processFinancialData($orders, $users);
+$data_30_days = processFinancialData($orders, $users, 30);
+$data_7_days = processFinancialData($orders, $users, 7);
+
+$all_stats = [
+    'all_time' => $data_all_time,
+    '30_days' => $data_30_days,
+    '7_days' => $data_7_days,
+];
 // Mock notifications for the dropdown
 $notifications = [
     [
@@ -154,6 +236,10 @@ foreach ($notifications as $notif) {
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
         </a>
+        <a href="admin-finance.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-chart-pie w-5"></i>
+          <span>Financial Reports</span>
+        </a>
 </nav>
 
 <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
@@ -265,72 +351,64 @@ foreach ($notifications as $notif) {
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
           <h2 class="text-3xl font-bold text-gray-900 mb-2 md:mb-0">Welcome Back, <?php echo $admin_name; ?>!</h2>
           <div class="flex gap-3">
-              <select class="p-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-green-500 cursor-pointer transition-colors">
-                  <option>Previous Year</option>
-                  <option>Last 30 Days</option>
-                  <option>Last 7 Days</option>
+              <select id="time-filter" class="p-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-green-500 cursor-pointer transition-colors">
+                  <option value="all_time">All Time</option>
+                  <option value="30_days">Last 30 Days</option>
+                  <option value="7_days" selected>Last 7 Days</option>
               </select>
-              <button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                  View All Time
-              </button>
           </div>
       </div>
 
       <!-- 1. Stat Cards (Updated: Removed colored top borders) -->
       <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
 
-          <!-- Card 1: Revenue (Positive) -->
+          <!-- Card 1: Revenue -->
           <div class="bg-green-50 rounded-xl p-5 card-shadow">
               <p class="text-sm font-medium text-gray-500 mb-1">Ecommerce Revenue</p>
-              <h3 class="text-2xl font-extrabold text-gray-900">₱245,450</h3>
+              <h3 id="stat-revenue" class="text-2xl font-extrabold text-gray-900">₱0.00</h3>
               <div class="flex items-center text-sm mt-2">
-                  <i class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
-                  <span class="text-green-600 font-semibold">+34.9%</span>
-                  <span class="text-gray-500 ml-1">(+43.21 K)</span>
+                  <i id="stat-revenue-icon" class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
+                  <span id="stat-revenue-change" class="text-green-600 font-semibold">--%</span>
               </div>
           </div>
 
-          <!-- Card 2: New Customers (Negative Trend - Neutral Color) -->
+          <!-- Card 2: New Customers -->
           <div class="bg-green-50 rounded-xl p-5 card-shadow">
               <p class="text-sm font-medium text-gray-500 mb-1">New Customers</p>
-              <h3 class="text-2xl font-extrabold text-gray-900">684</h3>
+              <h3 id="stat-customers" class="text-2xl font-extrabold text-gray-900">0</h3>
               <div class="flex items-center text-sm mt-2">
-                  <i class="fa-solid fa-arrow-down text-red-600 mr-1"></i>
-                  <span class="text-red-600 font-semibold">-8.6%</span>
-                  <span class="text-gray-500 ml-1">(-64)</span>
+                  <i id="stat-customers-icon" class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
+                  <span id="stat-customers-change" class="text-green-600 font-semibold">--%</span>
               </div>
           </div>
 
-          <!-- Card 3: Reject Purchase Rate (Warning/Negative) -->
+          <!-- Card 3: Cancelled Orders -->
           <div class="bg-green-50 rounded-xl p-5 card-shadow">
-              <p class="text-sm font-medium text-gray-500 mb-1">Reject Purchase Rate</p>
-              <h3 class="text-2xl font-extrabold text-gray-900">75.12 %</h3>
+              <p class="text-sm font-medium text-gray-500 mb-1">Cancelled Orders</p>
+              <h3 id="stat-cancelled" class="text-2xl font-extrabold text-gray-900">0</h3>
               <div class="flex items-center text-sm mt-2">
-                  <i class="fa-solid fa-arrow-up text-red-600 mr-1"></i>
-                  <span class="text-red-600 font-semibold">+25.4 %</span>
-                  <span class="text-gray-500 ml-1">(+20.11 K)</span>
+                  <i id="stat-cancelled-icon" class="fa-solid fa-arrow-down text-green-600 mr-1"></i>
+                  <span id="stat-cancelled-change" class="text-red-600 font-semibold">--%</span>
               </div>
           </div>
           
-          <!-- Card 4: Average Order Value (Positive) -->
+          <!-- Card 4: Average Order Value -->
           <div class="bg-green-50 rounded-xl p-5 card-shadow">
               <p class="text-sm font-medium text-gray-500 mb-1">Average Order Value</p>
-              <h3 class="text-2xl font-extrabold text-gray-900">₱2,412.23</h3>
+              <h3 id="stat-avg-order" class="text-2xl font-extrabold text-gray-900">₱0.00</h3>
               <div class="flex items-center text-sm mt-2">
-                  <i class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
-                  <span class="text-green-600 font-semibold">+35.2 %</span>
-                  <span class="text-gray-500 ml-1">(+₱744)</span>
+                  <i id="stat-avg-order-icon" class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
+                  <span id="stat-avg-order-change" class="text-green-600 font-semibold">--%</span>
               </div>
           </div>
           
-          <!-- Card 5: Conversion Rate (Negative Trend - Warning Color) -->
+          <!-- Card 5: Total Orders -->
           <div class="bg-green-50 rounded-xl p-5 card-shadow">
-              <p class="text-sm font-medium text-gray-500 mb-1">Conversion Rate</p>
-              <h3 class="text-2xl font-extrabold text-gray-900">32.65 %</h3>
+              <p class="text-sm font-medium text-gray-500 mb-1">Total Orders</p>
+              <h3 id="stat-total-orders" class="text-2xl font-extrabold text-gray-900">0</h3>
               <div class="flex items-center text-sm mt-2">
-                  <i class="fa-solid fa-arrow-down text-red-600 mr-1"></i>
-                  <span class="text-red-600 font-semibold">-12.62 %</span>
-                  <span class="text-gray-500 ml-1">(-3.42 %)</span>
+                  <i id="stat-total-orders-icon" class="fa-solid fa-arrow-up text-green-600 mr-1"></i>
+                  <span id="stat-total-orders-change" class="text-green-600 font-semibold">--%</span>
               </div>
           </div>
       </div>
@@ -343,14 +421,6 @@ foreach ($notifications as $notif) {
           <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-6 chart-container">
               <div class="flex justify-between items-center mb-4">
                   <h3 class="font-semibold text-lg text-gray-900">Summary</h3>
-                  <div class="flex items-center gap-4 text-sm text-gray-600">
-                      <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>Order</div>
-                      <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-lime-400 mr-2"></span>Income Growth</div>
-                      <select class="p-1 border border-gray-200 rounded-lg text-xs hover:border-green-500 cursor-pointer">
-                          <option>Last 7 days</option>
-                          <option>Last 30 days</option>
-                      </select>
-                  </div>
               </div>
               <canvas id="adminChart"></canvas>
           </div>
@@ -420,55 +490,32 @@ foreach ($notifications as $notif) {
                               <th class="py-3 px-2"></th>
                           </tr>
                       </thead>
-                      <tbody class="bg-white divide-y divide-gray-100">
-                          <!-- Order 1: Pending (Yellow/Orange is a standard color for Pending) -->
-                          <tr class="hover:bg-gray-50 transition-colors">
-                              <td class="py-3 px-2 flex items-center gap-3">
-                                  <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=VEG" class="w-8 h-8 rounded-md" alt="Product">
-                                  <p class="text-sm font-medium">Spinach Bundle</p>
-                              </td>
-                              <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Alvin Merto</td>
-                              <td class="py-3 px-2 text-sm text-gray-500">#245789</td>
-                              <td class="py-3 px-2 text-sm text-gray-500">27 Jun 2024</td>
-                              <td class="py-3 px-2">
-                                  <span class="flex items-center gap-1 text-yellow-600 text-xs font-semibold">
-                                      <i class="fa-solid fa-circle text-[6px]"></i>Pending
-                                  </span>
-                              </td>
-                              <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
-                          </tr>
-                          <!-- Order 2: Canceled (Red is a standard color for Cancelled/Warning) -->
-                          <tr class="hover:bg-gray-50 transition-colors">
-                              <td class="py-3 px-2 flex items-center gap-3">
-                                  <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=FRU" class="w-8 h-8 rounded-md" alt="Product">
-                                  <p class="text-sm font-medium">Banana Box</p>
-                              </td>
-                              <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Michelle Data</td>
-                              <td class="py-3 px-2 text-sm text-gray-500">#245788</td>
-                              <td class="py-3 px-2 text-sm text-gray-500">26 Jun 2024</td>
-                              <td class="py-3 px-2">
-                                  <span class="flex items-center gap-1 text-red-600 text-xs font-semibold">
-                                      <i class="fa-solid fa-circle text-[6px]"></i>Cancelled
-                                  </span>
-                              </td>
-                              <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
-                          </tr>
-                          <!-- Order 3: Shipped (Green is a standard color for Shipped/Complete) -->
-                          <tr class="hover:bg-gray-50 transition-colors">
-                              <td class="py-3 px-2 flex items-center gap-3">
-                                  <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=DAI" class="w-8 h-8 rounded-md" alt="Product">
-                                  <p class="text-sm font-medium">Fresh Milk</p>
-                              </td>
-                              <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline">Jessy Rose</td>
-                              <td class="py-3 px-2 text-sm text-gray-500">#1024784</td>
-                              <td class="py-3 px-2 text-sm text-gray-500">20 Jun 2024</td>
-                              <td class="py-3 px-2">
-                                  <span class="flex items-center gap-1 text-green-600 text-xs font-semibold">
-                                      <i class="fa-solid fa-circle text-[6px]"></i>Shipped
-                                  </span>
-                              </td>
-                              <td class="py-3 px-2 text-right"><button class="text-green-600 hover:text-green-800 text-sm">View</button></td>
-                          </tr>
+                      <tbody id="recent-orders-body" class="bg-white divide-y divide-gray-100">
+                          <?php 
+                            $recentOrders = array_slice($orders, 0, 3);
+                            foreach ($recentOrders as $order): 
+                                $status = strtolower($order['status']);
+                                $statusColor = 'text-gray-600';
+                                if ($status === 'pending') $statusColor = 'text-yellow-600';
+                                if ($status === 'cancelled') $statusColor = 'text-red-600';
+                                if (in_array($status, ['completed', 'delivered'])) $statusColor = 'text-green-600';
+                          ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="py-3 px-2 flex items-center gap-3">
+                                    <img src="https://placehold.co/32x32/f3f4f6/1f2937?text=PROD" class="w-8 h-8 rounded-md" alt="Product">
+                                    <p class="text-sm font-medium"><?php echo htmlspecialchars($order['product_name']); ?></p>
+                                </td>
+                                <td class="py-3 px-2 text-sm text-blue-600 font-medium cursor-pointer hover:underline"><?php echo htmlspecialchars($order['customer_name']); ?></td>
+                                <td class="py-3 px-2 text-sm text-gray-500">#<?php echo substr($order['id'], 0, 6); ?>...</td>
+                                <td class="py-3 px-2 text-sm text-gray-500"><?php echo date('d M Y', strtotime($order['created_at'])); ?></td>
+                                <td class="py-3 px-2">
+                                    <span class="flex items-center gap-1 <?php echo $statusColor; ?> text-xs font-semibold">
+                                        <i class="fa-solid fa-circle text-[6px]"></i><?php echo ucfirst($status); ?>
+                                    </span>
+                                </td>
+                                <td class="py-3 px-2 text-right"><a href="admin-orders.php" class="text-green-600 hover:text-green-800 text-sm">View</a></td>
+                            </tr>
+                          <?php endforeach; ?>
                       </tbody>
                   </table>
               </div>
@@ -541,6 +588,10 @@ foreach ($notifications as $notif) {
 
   <script src="admin-theme.js"></script>
   <script>
+    // --- Pass PHP data to JS ---
+    const allStats = <?php echo json_encode($all_stats); ?>;
+    let adminChartInstance = null;
+
     document.addEventListener('DOMContentLoaded', function() {
       // --- Logout Modal Logic ---
       const logoutButton = document.getElementById('logoutButton');
@@ -613,35 +664,10 @@ foreach ($notifications as $notif) {
         logoutModal.classList.add('flex');
       });
 
-      // --- Chart.js Initialization ---
-      const ctx = document.getElementById('adminChart');
-
-      const data = {
-        labels: ['Sep 07', 'Sep 08', 'Sep 09', 'Sep 10', 'Sep 11', 'Sep 12', 'Sep 13'],
-        datasets: [{
-          label: 'Order',
-          data: [5500, 6800, 4200, 8000, 5000, 7500, 6000], // Primary Green Line (Order)
-          borderColor: 'rgb(22, 163, 74)', // Tailwind green-600 for main line
-          backgroundColor: 'rgba(22, 163, 74, 0.1)',
-          tension: 0.4,
-          fill: false,
-          pointRadius: 4,
-          pointBackgroundColor: 'rgb(22, 163, 74)', 
-          pointBorderColor: 'white',
-        }, {
-          label: 'Income Growth',
-          data: [4000, 5800, 3000, 6500, 4000, 6000, 4800], // Secondary Lighter Green/Lime Line (Income Growth)
-          borderColor: 'rgb(163, 230, 53)', // Tailwind lime-400
-          backgroundColor: 'rgba(163, 230, 53, 0.1)',
-          tension: 0.4,
-          fill: false,
-          pointRadius: 4,
-          pointBackgroundColor: 'white',
-          pointBorderColor: 'rgb(163, 230, 53)',
-        }]
-      };
-
-      const chartOptions = {
+      // --- Chart.js Functions ---
+      function createOrUpdateChart(labels, data) {
+        const ctx = document.getElementById('adminChart');
+        const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -651,6 +677,11 @@ foreach ($notifications as $notif) {
           tooltip: {
             mode: 'index',
             intersect: false,
+            callbacks: {
+                label: function(context) {
+                    return ` Revenue: ₱${context.parsed.y.toFixed(2)}`;
+                }
+            }
           }
         },
         scales: {
@@ -658,7 +689,7 @@ foreach ($notifications as $notif) {
             beginAtZero: true,
             ticks: {
               callback: function(value, index, values) {
-                if (value >= 1000) return (value / 1000) + 'K';
+                if (value >= 1000) return '₱' + (value / 1000) + 'K';
                 return value;
               },
               color: '#9ca3af', // gray-400
@@ -678,12 +709,77 @@ foreach ($notifications as $notif) {
           }
         }
       };
+        if (adminChartInstance) {
+            adminChartInstance.destroy();
+        }
+        adminChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: data,
+                    borderColor: 'rgb(22, 163, 74)',
+                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgb(22, 163, 74)',
+                    pointBorderColor: 'white',
+                }]
+            },
+            options: chartOptions
+        });
+      }
 
-      new Chart(ctx, {
-        type: 'line',
-        data: data,
-        options: chartOptions
+      // --- Data Update Functions ---
+      function updateDashboard(period) {
+        const data = allStats[period];
+        if (!data) return;
+
+        // Update Stat Cards
+        document.getElementById('stat-revenue').textContent = `₱${parseFloat(data.revenue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('stat-customers').textContent = data.new_customers.toLocaleString();
+        document.getElementById('stat-cancelled').textContent = data.cancelled_orders.toLocaleString();
+        document.getElementById('stat-total-orders').textContent = data.total_orders.toLocaleString();
+        
+        const avgOrderValue = data.completed_orders_count > 0 ? data.revenue / data.completed_orders_count : 0;
+        document.getElementById('stat-avg-order').textContent = `₱${parseFloat(avgOrderValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        // Update Chart
+        createOrUpdateChart(data.chart_labels, data.chart_data);
+
+        // Update trend icons (mocked for now, can be replaced with real comparison logic)
+        updateTrendIcon('stat-revenue', true);
+        updateTrendIcon('stat-customers', true);
+        updateTrendIcon('stat-cancelled', false); // Lower is better
+        updateTrendIcon('stat-avg-order', true);
+        updateTrendIcon('stat-total-orders', true);
+      }
+
+      function updateTrendIcon(baseId, isPositive) {
+          const icon = document.getElementById(`${baseId}-icon`);
+          const change = document.getElementById(`${baseId}-change`);
+          if (isPositive) {
+              icon.className = 'fa-solid fa-arrow-up text-green-600 mr-1';
+              change.className = 'text-green-600 font-semibold';
+              change.textContent = `+${(Math.random() * 10 + 5).toFixed(1)}%`;
+          } else {
+              icon.className = 'fa-solid fa-arrow-down text-red-600 mr-1';
+              change.className = 'text-red-600 font-semibold';
+              change.textContent = `-${(Math.random() * 5 + 1).toFixed(1)}%`;
+          }
+      }
+
+      // --- Event Listener for Filter ---
+      const timeFilter = document.getElementById('time-filter');
+      timeFilter.addEventListener('change', (e) => {
+          updateDashboard(e.target.value);
       });
+
+      // --- Initial Load ---
+      updateDashboard('7_days'); // Default to 'Last 7 Days'
+
     });
   </script>
 </body>

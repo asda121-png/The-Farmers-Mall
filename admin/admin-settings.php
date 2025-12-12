@@ -113,6 +113,10 @@ $user_settings = [
           <i class="fa-solid fa-user-gear w-5"></i>
           <span>Manage Users</span>
         </a>
+        <a href="admin-finance.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-chart-pie w-5"></i>
+          <span>Financial Reports</span>
+        </a>
       </nav>
 
       <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->

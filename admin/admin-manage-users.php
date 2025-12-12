@@ -68,9 +68,12 @@ try {
             "rating" => $retailer['rating'] ?? 0.0,
         ];
     }
+    $totalSellers = count($sellers);
+
 } catch (Exception $e) {
     echo "❌ Error fetching retailers: " . $e->getMessage();
     $sellers = [];
+    $totalSellers = 0;
 }
 
 
@@ -187,6 +190,10 @@ try {
           <i class="fa-solid fa-user-gear w-5 text-green-200"></i>
           <span>Manage Users</span>
         </a>
+        <a href="admin-finance.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-800 text-gray-300">
+          <i class="fa-solid fa-chart-pie w-5"></i>
+          <span>Financial Reports</span>
+        </a>
       </nav>
 
        <!-- UPDATED: Removed 'bg-green-700 text-white' to remove permanent highlight. Added hover effects. -->
@@ -284,7 +291,7 @@ try {
             <button data-tab="sellers" class="tab-btn px-4 py-3 rounded-lg font-medium text-sm flex items-center gap-2 text-gray-700 bg-gray-200 hover:bg-gray-300">
                 <i class="fa-solid fa-store"></i>
                 Sellers (Retailers)
-                <span class="bg-white text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2 font-bold">48</span>
+                <span class="bg-white text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2 font-bold"><?php echo $totalSellers; ?></span>
             </button>
         </nav>
     </div>
@@ -633,12 +640,11 @@ try {
 
             // Update button styles
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active', 'border-b-2', 'font-semibold');
-                btn.classList.add('border-transparent', 'font-medium', 'text-gray-500', 'hover:text-green-600', 'hover:border-green-300');
+                btn.classList.remove('active', 'bg-green-600', 'text-white', 'font-semibold');
+                btn.classList.add('bg-gray-200', 'text-gray-700', 'font-medium', 'hover:bg-gray-300');
             });
-            tabButton.classList.add('active');
-            tabButton.classList.remove('border-transparent', 'font-medium', 'text-gray-500', 'hover:text-green-600', 'hover:border-green-300');
-
+            tabButton.classList.add('active', 'bg-green-600', 'text-white', 'font-semibold');
+            tabButton.classList.remove('bg-gray-200', 'text-gray-700', 'font-medium', 'hover:bg-gray-300');
 
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`tab-${this.activeTab}`).classList.add('active');
