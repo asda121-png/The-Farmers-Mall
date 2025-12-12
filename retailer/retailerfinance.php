@@ -88,16 +88,20 @@ try {
         footer {
             margin-top: auto;
         }
-        /* Force sidebar to be full height with logout at bottom */
+        /* Sticky sidebar - fixed position */
         #sidebar {
-            min-height: 100vh !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
             display: flex !important;
             flex-direction: column !important;
+            z-index: 40 !important;
         }
-        #sidebar > *:last-child {
-            margin-top: auto !important;
-            padding-top: 1rem !important;
-            border-top: 1px solid #e5e7eb !important;
+        /* Add left margin to main content to account for fixed sidebar */
+        #app {
+            margin-left: 16rem !important;
         }
         /* Mobile menu toggle */
         #mobileMenuBtn {
@@ -107,22 +111,14 @@ try {
             #mobileMenuBtn {
                 display: flex;
             }
+            #app {
+                margin-left: 0 !important;
+            }
             #sidebar {
-                position: fixed;
                 left: -100%;
-                top: 0;
-                height: 100vh;
                 z-index: 50;
                 transition: left 0.3s ease;
             }
-        #sidebar {
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        #sidebar > div:last-child {
-            margin-top: auto !important;
-        }
             #sidebar.active {
                 left: 0;
             }
@@ -147,9 +143,7 @@ try {
     
     <!-- Mobile Menu Button -->
     <button id="mobileMenuBtn" class="fixed top-4 left-4 z-50 bg-green-600 text-white p-3 rounded-lg shadow-lg md:hidden" onclick="toggleMobileMenu()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+        <i class="fas fa-bars text-xl"></i>
     </button>
     
     <div id="app" class="flex flex-1">
@@ -163,29 +157,29 @@ try {
                 <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
             </div>
             <a href="retailer-dashboard2.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-tachometer-alt text-lg mr-3"></i>
                 Dashboard
             </a>
             <a href="retailerinventory.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2m-4-2h1m-1 0h-2m2 0v2m-2-2h-1m-1 0H5m-2 4h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-boxes text-lg mr-3"></i>
                 Products & Inventory
             </a>
             <a href="retailerfulfillment.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5h6"></path></svg>
+                <i class="fas fa-clipboard-list text-lg mr-3"></i>
                 Order Fulfillment
             </a>
             <a href="retailerfinance.php" class="nav-item flex items-center p-3 rounded-xl text-white bg-green-600 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4m-4-8h4m-5-8h6a2 2 0 012 2v10a2 2 0 01-2 2h-6a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
+                <i class="fas fa-chart-line text-lg mr-3"></i>
                 Financial Reports
             </a>
             <a href="retailerreviews.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.193a2.003 2.003 0 013.902 0l1.018 2.062 2.277.33a2.003 2.003 0 011.11 3.407l-1.652 1.61.39 2.269a2.003 2.003 0 01-2.906 2.108L12 15.698l-2.035 1.071a2.003 2.003 0 01-2.906-2.108l.39-2.269-1.652-1.61a2.003 2.003 0 011.11-3.407l2.277-.33 1.018-2.062z"></path></svg>
+                <i class="fas fa-star text-lg mr-3"></i>
                 Reviews & Customers
             </a>
         </nav>
 
         <div class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm">
+            <header class="bg-white shadow-sm sticky top-0 z-30">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house text-xl"></i></a>
@@ -226,17 +220,33 @@ try {
                                     </div>
                                 <?php endif; ?>
                             </button>
-                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                <!-- Profile Header -->
+                                <div class="p-4 border-b border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
+                                            <img src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                        <?php else: ?>
+                                            <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
+                                                <i class="fas fa-user text-white text-lg"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($userFullName); ?></p>
+                                            <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($userEmail); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Menu Items -->
                                 <div class="py-2">
-                                    <a href="retailerprofile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                                        <i class="fas fa-user mr-2 text-gray-400"></i> My Account
+                                    <a href="retailerprofile.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-user-circle text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Profile & Settings</span>
                                     </a>
-                                    <a href="retailerprofile.php#settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                                        <i class="fas fa-cog mr-2 text-gray-400"></i> Settings
-                                    </a>
-                                    <div class="border-t border-gray-100 my-1"></div>
-                                    <a href="../auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    <a href="../auth/logout.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-sign-out-alt text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Logout</span>
                                     </a>
                                 </div>
                             </div>
@@ -246,24 +256,45 @@ try {
             </header>
         
             <main id="content" class="p-8 transition-all duration-300 flex-1">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8">Payouts & Financial Reporting</h2>
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Financial Reporting</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Next Payout Schedule</h3>
-                        <p class="text-3xl font-bold text-gray-800">₱1,540.20</p>
-                        <p class="text-gray-500 mt-2">Scheduled for: <?php echo date('l, M d, Y', strtotime('+7 days')); ?></p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Reports & Exports</h3>
-                        <div class="space-y-3">
-                            <button onclick="downloadSalesReport()" class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
-                                <i class="fas fa-download mr-2"></i> Download Total Sales Report (CSV)
-                            </button>
-                            <button onclick="downloadTaxReport()" class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150">
-                                <i class="fas fa-download mr-2"></i> Download Tax & Commission Report (CSV)
-                            </button>
+                <!-- Total Revenue Card -->
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Total Revenue</h3>
+                    <p class="text-3xl font-bold text-gray-800">₱12,540.50</p>
+                    <div class="grid grid-cols-3 gap-4 mt-4">
+                        <div>
+                            <p class="text-xs text-gray-500">This Week</p>
+                            <p class="text-lg font-semibold text-gray-800">₱2,890.00</p>
                         </div>
+                        <div>
+                            <p class="text-xs text-gray-500">This Month</p>
+                            <p class="text-lg font-semibold text-gray-800">₱8,450.50</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Total Sales</p>
+                            <p class="text-lg font-semibold text-gray-800">156</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Reports & Exports</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onclick="downloadSalesReport()" class="text-left p-4 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150 flex items-center">
+                            <i class="fas fa-download mr-3 text-xl"></i>
+                            <div>
+                                <div class="font-semibold">Sales Report</div>
+                                <div class="text-sm text-gray-600">Download complete sales history (CSV)</div>
+                            </div>
+                        </button>
+                        <button onclick="downloadTaxReport()" class="text-left p-4 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition duration-150 flex items-center">
+                            <i class="fas fa-file-invoice mr-3 text-xl"></i>
+                            <div>
+                                <div class="font-semibold">Tax & Commission Report</div>
+                                <div class="text-sm text-gray-600">Download tax calculations (CSV)</div>
+                            </div>
+                        </button>
                     </div>
                 </div>
 
@@ -273,19 +304,19 @@ try {
                         <ul class="space-y-3">
                             <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8291', 'Sale', 'Apples, Bread', 21.50, '2024-12-10', 'completed')">
                                 <span class="text-sm font-medium">Sale #8291 (Apples, Bread)</span>
-                                <span class="text-sm text-green-600 font-semibold">+ ₱21.50</span>
-                            </li>
-                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('P001-2024', 'Payout', 'Monthly payout to bank account', -890.00, '2024-12-09', 'completed')">
-                                <span class="text-sm font-medium">Payout ID P001-2024</span>
-                                <span class="text-sm text-red-600 font-semibold">- ₱890.00</span>
+                                <span class="text-sm text-green-600 font-semibold">₱21.50</span>
                             </li>
                             <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8290', 'Sale', 'Potatoes', 12.00, '2024-12-09', 'completed')">
                                 <span class="text-sm font-medium">Sale #8290 (Potatoes)</span>
-                                <span class="text-sm text-green-600 font-semibold">+ ₱12.00</span>
+                                <span class="text-sm text-green-600 font-semibold">₱12.00</span>
                             </li>
                             <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8289', 'Sale', 'Tomatoes, Lettuce', 35.75, '2024-12-08', 'completed')">
                                 <span class="text-sm font-medium">Sale #8289 (Tomatoes, Lettuce)</span>
-                                <span class="text-sm text-green-600 font-semibold">+ ₱35.75</span>
+                                <span class="text-sm text-green-600 font-semibold">₱35.75</span>
+                            </li>
+                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8288', 'Sale', 'Carrots, Onions', 28.30, '2024-12-07', 'completed')">
+                                <span class="text-sm font-medium">Sale #8288 (Carrots, Onions)</span>
+                                <span class="text-sm text-green-600 font-semibold">₱28.30</span>
                             </li>
                         </ul>
                     </div>
@@ -435,12 +466,12 @@ try {
     function downloadSalesReport() {
         // Sample sales data
         const salesData = [
-            ['Order ID', 'Customer', 'Products', 'Amount', 'Date', 'Status'],
-            ['8291', 'John Doe', 'Apples, Bread', '₱21.50', '2024-12-10', 'Completed'],
-            ['8290', 'Jane Smith', 'Potatoes', '₱12.00', '2024-12-09', 'Completed'],
-            ['8289', 'Bob Johnson', 'Tomatoes, Lettuce', '₱35.75', '2024-12-08', 'Completed'],
-            ['8288', 'Alice Brown', 'Carrots, Onions', '₱28.30', '2024-12-07', 'Completed'],
-            ['8287', 'Charlie Wilson', 'Cabbage, Peppers', '₱45.60', '2024-12-06', 'Completed']
+            ['Order ID', 'Customer', 'Products', 'Amount', 'Payment Method', 'Date', 'Status'],
+            ['8291', 'John Doe', 'Apples, Bread', '₱21.50', 'COD', '2024-12-10', 'Completed'],
+            ['8290', 'Jane Smith', 'Potatoes', '₱12.00', 'GCash', '2024-12-09', 'Completed'],
+            ['8289', 'Bob Johnson', 'Tomatoes, Lettuce', '₱35.75', 'COD', '2024-12-08', 'Completed'],
+            ['8288', 'Alice Brown', 'Carrots, Onions', '₱28.30', 'GCash', '2024-12-07', 'Completed'],
+            ['8287', 'Charlie Wilson', 'Cabbage, Peppers', '₱45.60', 'COD', '2024-12-06', 'Completed']
         ];
         
         // Convert to CSV
@@ -469,7 +500,7 @@ try {
             ['8290', 'Sale', '₱12.00', '₱1.20', '₱1.44', '₱9.36', '2024-12-09'],
             ['8289', 'Sale', '₱35.75', '₱3.58', '₱4.29', '₱27.88', '2024-12-08'],
             ['8288', 'Sale', '₱28.30', '₱2.83', '₱3.40', '₱22.07', '2024-12-07'],
-            ['P001-2024', 'Payout', '-₱890.00', '₱0.00', '₱0.00', '-₱890.00', '2024-12-09']
+            ['8287', 'Sale', '₱45.60', '₱4.56', '₱5.47', '₱35.57', '2024-12-06']
         ];
         
         // Convert to CSV

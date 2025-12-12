@@ -688,7 +688,6 @@ include '../includes/header.php';
     <div class="max-w-7xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-4">SUPPORT WHEN YOU NEED IT</h2>
       <p class="mb-6 text-gray-600">We’re committed to your success. Our Farmer’s Market platform provides a wealth of resources to help you every step of the way. From onboarding and setting up your shop to managing orders and marketing your products, we’ve got you covered. Access our comprehensive <a href="#" class="text-green-700">Seller Center</a>, browse the FAQ, join educational webinars, or reach out to our friendly <a href="#" class="text-green-700">Customer Service team</a>. We’re here to help you thrive.</p>
-      <a href="#" class="bg-green-700 text-white px-6 py-3 rounded hover:bg-green-800">Explore Seller Center</a>
     </div>
   </section>
 

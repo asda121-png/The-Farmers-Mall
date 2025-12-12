@@ -54,6 +54,7 @@ try {
     }
     
     // Prepare product data (matching database schema)
+    // Only include fields that exist in the products table
     $productData = [
         'name' => $productName,
         'description' => $description,
@@ -66,19 +67,36 @@ try {
         'updated_at' => date('Y-m-d H:i:s')
     ];
     
+    // Only update image if a new one was uploaded
     if ($imagePath) {
         $productData['image_url'] = $imagePath;
     }
     
     if ($productId) {
-        // Update existing product
-        $result = $api->update('products', ['id' => $productId], $productData);
-        echo json_encode(['success' => true, 'message' => 'Product updated successfully', 'product_id' => $productId]);
+        // Update existing product - correct parameter order: table, data, filters
+        $result = $api->update('products', $productData, ['id' => $productId]);
+        
+        // Log the update attempt for debugging
+        error_log("Updating product ID: " . $productId);
+        error_log("Product data: " . json_encode($productData));
+        
+        // Verify update was successful
+        if ($result !== false && $result !== null) {
+            echo json_encode(['success' => true, 'message' => 'Product updated successfully', 'product_id' => $productId]);
+        } else {
+            error_log("Update failed for product: " . $productId);
+            echo json_encode(['success' => false, 'message' => 'Failed to update product']);
+        }
     } else {
         // Insert new product
         $productData['created_at'] = date('Y-m-d H:i:s');
         $result = $api->insert('products', $productData);
-        echo json_encode(['success' => true, 'message' => 'Product created successfully', 'product_id' => $result[0]['id'] ?? null]);
+        
+        if ($result && !empty($result[0]['id'])) {
+            echo json_encode(['success' => true, 'message' => 'Product created successfully', 'product_id' => $result[0]['id']]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to create product']);
+        }
     }
     
 } catch (Exception $e) {

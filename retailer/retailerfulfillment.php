@@ -164,16 +164,20 @@ foreach ($orders as $order) {
         footer {
             margin-top: auto;
         }
-        /* Force sidebar to be full height with logout at bottom */
+        /* Sticky sidebar - fixed position */
         #sidebar {
-            min-height: 100vh !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
             display: flex !important;
             flex-direction: column !important;
+            z-index: 40 !important;
         }
-        #sidebar > *:last-child {
-            margin-top: auto !important;
-            padding-top: 1rem !important;
-            border-top: 1px solid #e5e7eb !important;
+        /* Add left margin to main content to account for fixed sidebar */
+        #app {
+            margin-left: 16rem !important;
         }
         /* Mobile menu toggle */
         #mobileMenuBtn {
@@ -183,22 +187,14 @@ foreach ($orders as $order) {
             #mobileMenuBtn {
                 display: flex;
             }
+            #app {
+                margin-left: 0 !important;
+            }
             #sidebar {
-                position: fixed;
                 left: -100%;
-                top: 0;
-                height: 100vh;
                 z-index: 50;
                 transition: left 0.3s ease;
             }
-        #sidebar {
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        #sidebar > div:last-child {
-            margin-top: auto !important;
-        }
             #sidebar.active {
                 left: 0;
             }
@@ -239,29 +235,29 @@ foreach ($orders as $order) {
                 <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
             </div>
             <a href="retailer-dashboard2.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-tachometer-alt text-lg mr-3"></i>
                 Dashboard
             </a>
             <a href="retailerinventory.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2m-4-2h1m-1 0h-2m2 0v2m-2-2h-1m-1 0H5m-2 4h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-boxes text-lg mr-3"></i>
                 Products & Inventory
             </a>
             <a href="retailerfulfillment.php" class="nav-item flex items-center p-3 rounded-xl text-white bg-green-600 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5h6"></path></svg>
+                <i class="fas fa-clipboard-list text-lg mr-3"></i>
                 Order Fulfillment
             </a>
             <a href="retailerfinance.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4m-4-8h4m-5-8h6a2 2 0 012 2v10a2 2 0 01-2 2h-6a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
+                <i class="fas fa-chart-line text-lg mr-3"></i>
                 Financial Reports
             </a>
             <a href="retailerreviews.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.193a2.003 2.003 0 013.902 0l1.018 2.062 2.277.33a2.003 2.003 0 011.11 3.407l-1.652 1.61.39 2.269a2.003 2.003 0 01-2.906 2.108L12 15.698l-2.035 1.071a2.003 2.003 0 01-2.906-2.108l.39-2.269-1.652-1.61a2.003 2.003 0 011.11-3.407l2.277-.33 1.018-2.062z"></path></svg>
+                <i class="fas fa-star text-lg mr-3"></i>
                 Reviews & Customers
             </a>
         </nav>
 
         <div class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm">
+            <header class="bg-white shadow-sm sticky top-0 z-30">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house text-xl"></i></a>
@@ -303,17 +299,33 @@ foreach ($orders as $order) {
                                     </div>
                                 <?php endif; ?>
                             </button>
-                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                <!-- Profile Header -->
+                                <div class="p-4 border-b border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
+                                            <img src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                        <?php else: ?>
+                                            <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
+                                                <i class="fas fa-user text-white text-lg"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($userFullName); ?></p>
+                                            <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($userEmail); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Menu Items -->
                                 <div class="py-2">
-                                    <a href="retailerprofile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                                        <i class="fas fa-user mr-2 text-gray-400"></i> My Account
+                                    <a href="retailerprofile.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-user-circle text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Profile & Settings</span>
                                     </a>
-                                    <a href="retailerprofile.php#settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                                        <i class="fas fa-cog mr-2 text-gray-400"></i> Settings
-                                    </a>
-                                    <div class="border-t border-gray-100 my-1"></div>
-                                    <a href="../auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    <a href="../auth/logout.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-sign-out-alt text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Logout</span>
                                     </a>
                                 </div>
                             </div>
@@ -330,66 +342,30 @@ foreach ($orders as $order) {
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <!-- Total New Orders -->
-                    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Total New Orders</p>
-                                <h3 class="text-3xl font-bold text-gray-900">594</h3>
-                                <p class="text-xs text-green-600 mt-2 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                                    </svg>
-                                    +19%
-                                </p>
-                            </div>
-                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
+                            <p class="text-xs font-medium text-gray-500">Total New Orders</p>
+                            <i class="fas fa-file-alt text-2xl text-green-400"></i>
                         </div>
+                        <p class="text-2xl font-extrabold text-gray-800">594</p>
                     </div>
 
                     <!-- Total Order Pending -->
-                    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Total Order Pending</p>
-                                <h3 class="text-3xl font-bold text-gray-900">257,361</h3>
-                                <p class="text-xs text-red-600 mt-2 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                                    </svg>
-                                    -15%
-                                </p>
-                            </div>
-                            <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
+                            <p class="text-xs font-medium text-gray-500">Total Order Pending</p>
+                            <i class="fas fa-clock text-2xl text-green-400"></i>
                         </div>
+                        <p class="text-2xl font-extrabold text-gray-800">257,361</p>
                     </div>
 
                     <!-- Total Products Sales -->
-                    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Total Products Sales</p>
-                                <h3 class="text-3xl font-bold text-gray-900">8,594</h3>
-                                <p class="text-xs text-green-600 mt-2 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                                    </svg>
-                                    +61%
-                                </p>
-                            </div>
-                            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                </svg>
-                            </div>
+                            <p class="text-xs font-medium text-gray-500">Total Products Sales</p>
+                            <i class="fas fa-chart-line text-2xl text-green-400"></i>
                         </div>
+                        <p class="text-2xl font-extrabold text-gray-800">8,594</p>
                     </div>
                 </div>
 
@@ -1208,6 +1184,28 @@ foreach ($orders as $order) {
                 toggleMobileMenu();
             }
         });
+    });
+
+    // Check for URL parameters on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const filter = urlParams.get('filter');
+        
+        if (filter) {
+            const statusFilter = document.getElementById('order-status-filter');
+            if (statusFilter) {
+                // Map filter parameter to actual status values
+                if (filter === 'new') {
+                    statusFilter.value = 'Pending';
+                } else if (filter === 'processing') {
+                    statusFilter.value = 'Processing';
+                } else if (filter === 'completed') {
+                    statusFilter.value = 'Delivered';
+                }
+                // Trigger filter
+                filterOrders();
+            }
+        }
     });
 
 </script>

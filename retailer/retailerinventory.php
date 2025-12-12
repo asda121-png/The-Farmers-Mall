@@ -70,16 +70,20 @@ try {
         footer {
             margin-top: auto;
         }
-        /* Force sidebar to be full height with logout at bottom */
+        /* Sticky sidebar - fixed position */
         #sidebar {
-            min-height: 100vh !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
             display: flex !important;
             flex-direction: column !important;
+            z-index: 40 !important;
         }
-        #sidebar > *:last-child {
-            margin-top: auto !important;
-            padding-top: 1rem !important;
-            border-top: 1px solid #e5e7eb !important;
+        /* Add left margin to main content to account for fixed sidebar */
+        #app {
+            margin-left: 16rem !important;
         }
         /* Mobile menu toggle */
         #mobileMenuBtn {
@@ -189,22 +193,14 @@ try {
             #mobileMenuBtn {
                 display: flex;
             }
+            #app {
+                margin-left: 0 !important;
+            }
             #sidebar {
-                position: fixed;
                 left: -100%;
-                top: 0;
-                height: 100vh;
                 z-index: 50;
                 transition: left 0.3s ease;
             }
-        #sidebar {
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        #sidebar > div:last-child {
-            margin-top: auto !important;
-        }
             #sidebar.active {
                 left: 0;
             }
@@ -229,9 +225,7 @@ try {
     
     <!-- Mobile Menu Button -->
     <button id="mobileMenuBtn" class="fixed top-4 left-4 z-50 bg-green-600 text-white p-3 rounded-lg shadow-lg md:hidden" onclick="toggleMobileMenu()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+        <i class="fas fa-bars text-xl"></i>
     </button>
     
     <div id="app" class="flex flex-1">
@@ -245,29 +239,29 @@ try {
                 <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
             </div>
             <a href="retailer-dashboard2.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-tachometer-alt text-lg mr-3"></i>
                 Dashboard
             </a>
             <a href="retailerinventory.php" class="nav-item flex items-center p-3 rounded-xl text-white bg-green-600 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2m-4-2h1m-1 0h-2m2 0v2m-2-2h-1m-1 0H5m-2 4h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-boxes text-lg mr-3"></i>
                 Products & Inventory
             </a>
             <a href="retailerfulfillment.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5h6"></path></svg>
+                <i class="fas fa-clipboard-list text-lg mr-3"></i>
                 Order Fulfillment
             </a>
             <a href="retailerfinance.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4m-4-8h4m-5-8h6a2 2 0 012 2v10a2 2 0 01-2 2h-6a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
+                <i class="fas fa-chart-line text-lg mr-3"></i>
                 Financial Reports
             </a>
             <a href="retailerreviews.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.193a2.003 2.003 0 013.902 0l1.018 2.062 2.277.33a2.003 2.003 0 011.11 3.407l-1.652 1.61.39 2.269a2.003 2.003 0 01-2.906 2.108L12 15.698l-2.035 1.071a2.003 2.003 0 01-2.906-2.108l.39-2.269-1.652-1.61a2.003 2.003 0 011.11-3.407l2.277-.33 1.018-2.062z"></path></svg>
+                <i class="fas fa-star text-lg mr-3"></i>
                 Reviews & Customers
             </a>
         </nav>
 
         <div class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm">
+            <header class="bg-white shadow-sm sticky top-0 z-30">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house text-xl"></i></a>
@@ -301,12 +295,43 @@ try {
 
                         <div class="relative inline-block text-left">
                             <button id="profileDropdownBtn" class="flex items-center" title="<?php echo htmlspecialchars($userFullName); ?>">
-                                <img id="headerProfilePic" src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
+                                    <img id="headerProfilePic" src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                <?php else: ?>
+                                    <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                <?php endif; ?>
                             </button>
-                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                                <a href="retailerprofile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                                <a href="retailerprofile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                                <a href="../auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                <!-- Profile Header -->
+                                <div class="p-4 border-b border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
+                                            <img src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                        <?php else: ?>
+                                            <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
+                                                <i class="fas fa-user text-white text-lg"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($userFullName); ?></p>
+                                            <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($userEmail); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Menu Items -->
+                                <div class="py-2">
+                                    <a href="retailerprofile.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-user-circle text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Profile & Settings</span>
+                                    </a>
+                                    <a href="../auth/logout.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-sign-out-alt text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Logout</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -325,9 +350,7 @@ try {
                                 <option value="edit">Edit</option>
                                 <option value="delete">Move to Trash</option>
                             </select>
-                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                            <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
                         
                         <div class="relative min-w-[160px]">
@@ -340,9 +363,7 @@ try {
                                 <option value="seafood">Seafood</option>
                                 <option value="bakery">Bakery</option>
                             </select>
-                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                            <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
                         
                         <div class="relative min-w-[180px]">
@@ -352,9 +373,7 @@ try {
                                 <option value="variable">Variable product</option>
                                 <option value="grouped">Grouped product</option>
                             </select>
-                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                            <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
                         
                         <div class="relative min-w-[180px]">
@@ -364,9 +383,7 @@ try {
                                 <option value="outofstock">Out of stock</option>
                                 <option value="onbackorder">On backorder</option>
                             </select>
-                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                            <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
                     </div>
                 </div>
@@ -399,7 +416,7 @@ try {
                 <!-- Action Buttons Below Table -->
                 <div class="flex flex-col sm:flex-row justify-start items-stretch sm:items-center gap-3 mt-6">
                     <a href="retaileraddnewproduct.php" class="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-150 font-medium">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <i class="fas fa-plus text-lg mr-2"></i>
                         Add New Product
                     </a>
                     <button onclick="openBulkPriceModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow-sm hover:bg-gray-300 transition duration-150 text-sm">
@@ -698,8 +715,31 @@ try {
         loadRetailerNotificationPreview();
     });
 
-    // Load products on page load
-    window.addEventListener('DOMContentLoaded', () => loadProducts());
+    // Load products on page load with URL parameter support
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const filter = urlParams.get('filter');
+        const updated = urlParams.get('updated');
+        
+        // Show success message if coming back from edit
+        if (updated) {
+            showToast('Product list refreshed with latest changes', 'success');
+            // Clean URL
+            window.history.replaceState({}, document.title, 'retailerinventory.php');
+        }
+        
+        if (filter === 'lowstock') {
+            // Set the stock status filter dropdown to show low stock or out of stock
+            const stockStatusFilter = document.getElementById('stockStatusFilter');
+            if (stockStatusFilter) {
+                stockStatusFilter.value = 'outofstock'; // This will also show low stock items
+            }
+            // Load products with low stock filter
+            loadProducts({ stock_status: 'outofstock' });
+        } else {
+            loadProducts();
+        }
+    });
     
     // Load products function with filters
     async function loadProducts(filters = {}) {

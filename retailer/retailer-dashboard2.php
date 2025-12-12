@@ -127,16 +127,20 @@ try {
         footer {
             margin-top: auto;
         }
-        /* Force sidebar to be full height with logout at bottom */
+        /* Sticky sidebar - fixed position */
         #sidebar {
-            min-height: 100vh !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
             display: flex !important;
             flex-direction: column !important;
+            z-index: 40 !important;
         }
-        #sidebar > *:last-child {
-            margin-top: auto !important;
-            padding-top: 1rem !important;
-            border-top: 1px solid #e5e7eb !important;
+        /* Add left margin to main content to account for fixed sidebar */
+        #app {
+            margin-left: 16rem !important;
         }
         /* Mobile menu toggle */
         #mobileMenuBtn {
@@ -146,22 +150,14 @@ try {
             #mobileMenuBtn {
                 display: flex;
             }
+            #app {
+                margin-left: 0 !important;
+            }
             #sidebar {
-                position: fixed;
                 left: -100%;
-                top: 0;
-                height: 100vh;
                 z-index: 50;
                 transition: left 0.3s ease;
             }
-        #sidebar {
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        #sidebar > div:last-child {
-            margin-top: auto !important;
-        }
             #sidebar.active {
                 left: 0;
             }
@@ -203,29 +199,29 @@ try {
                 <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
             </div>
             <a href="retailer-dashboard2.php" class="nav-item flex items-center p-3 rounded-xl text-white bg-green-600 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-tachometer-alt text-lg mr-3"></i>
                 Dashboard
             </a>
             <a href="retailerinventory.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2m-4-2h1m-1 0h-2m2 0v2m-2-2h-1m-1 0H5m-2 4h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-boxes text-lg mr-3"></i>
                 Products & Inventory
             </a>
             <a href="retailerfulfillment.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5h6"></path></svg>
+                <i class="fas fa-clipboard-list text-lg mr-3"></i>
                 Order Fulfillment
             </a>
             <a href="retailerfinance.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4m-4-8h4m-5-8h6a2 2 0 012 2v10a2 2 0 01-2 2h-6a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
+                <i class="fas fa-chart-line text-lg mr-3"></i>
                 Financial Reports
             </a>
             <a href="retailerreviews.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.193a2.003 2.003 0 013.902 0l1.018 2.062 2.277.33a2.003 2.003 0 011.11 3.407l-1.652 1.61.39 2.269a2.003 2.003 0 01-2.906 2.108L12 15.698l-2.035 1.071a2.003 2.003 0 01-2.906-2.108l.39-2.269-1.652-1.61a2.003 2.003 0 011.11-3.407l2.277-.33 1.018-2.062z"></path></svg>
+                <i class="fas fa-star text-lg mr-3"></i>
                 Reviews & Customers
             </a>
         </nav>
 
         <div class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm">
+            <header class="bg-white shadow-sm sticky top-0 z-30">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600 transition" title="Home"><i class="fa-solid fa-house text-xl"></i></a>
@@ -259,12 +255,43 @@ try {
 
                         <div class="relative inline-block text-left">
                             <button id="profileDropdownBtn" class="flex items-center" title="<?php echo htmlspecialchars($userFullName); ?>">
-                                <img id="headerProfilePic" src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
+                                    <img id="headerProfilePic" src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                <?php else: ?>
+                                    <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                <?php endif; ?>
                             </button>
-                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-40 bg-white rounded-md shadow-lg border z-50">
-                                <a href="retailerprofile.php" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                                <a href="retailerprofile.php#settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                                <a href="../auth/logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                <!-- Profile Header -->
+                                <div class="p-4 border-b border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
+                                            <img src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                                        <?php else: ?>
+                                            <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
+                                                <i class="fas fa-user text-white text-lg"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($userFullName); ?></p>
+                                            <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($userEmail); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Menu Items -->
+                                <div class="py-2">
+                                    <a href="retailerprofile.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-user-circle text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Profile & Settings</span>
+                                    </a>
+                                    <a href="../auth/logout.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-sign-out-alt text-gray-400 text-lg w-5"></i>
+                                        <span class="ml-3 text-sm">Logout</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -277,31 +304,31 @@ try {
                 
                 <!-- KPI Cards -->
                 <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div onclick="window.location.href='retailerfinance.php'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">Total Revenue</p>
-                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4"></path></svg>
+                            <i class="fas fa-dollar-sign text-2xl text-green-400"></i>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">₱12,450.00</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div onclick="window.location.href='retailerfulfillment.php?filter=new'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">New Orders</p>
-                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
+                            <i class="fas fa-clipboard-list text-2xl text-green-400"></i>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">8</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div onclick="window.location.href='retailerinventory.php?filter=lowstock'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">Low Inventory Items</p>
-                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <i class="fas fa-exclamation-circle text-2xl text-green-400"></i>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">3</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div onclick="window.location.href='retailerfinance.php'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-medium text-gray-500">Active Products</p>
-                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2"></path></svg>
+                            <p class="text-xs font-medium text-gray-500">Top Products</p>
+                            <i class="fas fa-star text-2xl text-green-400"></i>
                         </div>
                         <p class="text-2xl font-extrabold text-gray-800">24</p>
                     </div>
@@ -337,60 +364,201 @@ try {
                     </div>
                     <div id="dashboard-inventory-alerts" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Inventory Alerts (Low Stock)</h3>
-                        <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-lg mb-2">
+                        <div class="p-3 bg-red-50 rounded-lg mb-2">
                             <p class="text-sm text-red-700 font-medium">Organic Tomatoes</p>
                             <span class="text-xs text-red-600 font-bold">8 kg left</span>
                         </div>
-                        <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-lg mb-2">
+                        <div class="p-3 bg-red-50 rounded-lg mb-2">
                             <p class="text-sm text-red-700 font-medium">Fresh Milk</p>
                             <span class="text-xs text-red-600 font-bold">5 liters left</span>
                         </div>
-                        <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                        <div class="p-3 bg-red-50 rounded-lg mb-4">
                             <p class="text-sm text-red-700 font-medium">Sourdough Bread</p>
                             <span class="text-xs text-red-600 font-bold">3 loaves left</span>
+                        </div>
+                        <button onclick="window.location.href='retailerinventory.php?filter=lowstock'" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
+                            <i class="fas fa-boxes"></i>
+                            Manage Inventory
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Products Sold & Top Products -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                    <!-- Products Sold -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Products Sold</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-apple-alt text-green-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Organic Tomatoes</p>
+                                        <p class="text-xs text-gray-500">45 units sold</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">₱2,250</p>
+                                    <p class="text-xs text-green-600">+15%</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-carrot text-orange-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Fresh Carrots</p>
+                                        <p class="text-xs text-gray-500">38 units sold</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">₱1,520</p>
+                                    <p class="text-xs text-green-600">+8%</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-lemon text-yellow-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Fresh Mangoes</p>
+                                        <p class="text-xs text-gray-500">32 units sold</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">₱1,920</p>
+                                    <p class="text-xs text-green-600">+12%</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-seedling text-purple-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Mixed Vegetables</p>
+                                        <p class="text-xs text-gray-500">28 units sold</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">₱1,400</p>
+                                    <p class="text-xs text-green-600">+5%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Top Performing Products</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3 flex-1">
+                                    <div class="bg-yellow-400 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">1</div>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-gray-800">Organic Tomatoes</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                                <div class="bg-green-600 h-2 rounded-full" style="width: 90%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-600">90%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-lg font-bold text-green-600">₱2,250</p>
+                                    <p class="text-xs text-gray-500">45 sold</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3 flex-1">
+                                    <div class="bg-gray-400 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">2</div>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-gray-800">Fresh Mangoes</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                                <div class="bg-green-600 h-2 rounded-full" style="width: 75%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-600">75%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-lg font-bold text-green-600">₱1,920</p>
+                                    <p class="text-xs text-gray-500">32 sold</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3 flex-1">
+                                    <div class="bg-orange-400 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">3</div>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-gray-800">Fresh Carrots</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                                <div class="bg-green-600 h-2 rounded-full" style="width: 68%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-600">68%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-lg font-bold text-green-600">₱1,520</p>
+                                    <p class="text-xs text-gray-500">38 sold</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3 flex-1">
+                                    <div class="bg-gray-300 text-gray-700 font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">4</div>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-gray-800">Mixed Vegetables</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                                <div class="bg-green-600 h-2 rounded-full" style="width: 56%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-600">56%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-lg font-bold text-green-600">₱1,400</p>
+                                    <p class="text-xs text-gray-500">28 sold</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Recent Activity Feed -->
-                <div class="mt-8 bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Recent Activity Feed</h3>
-                    <ul id="recent-activity-feed" class="space-y-3">
-                        <li class="flex items-center space-x-3 text-sm text-gray-600 border-b pb-2">
-                            <span class="text-green-500 font-medium">New Order</span>
-                            <span>#A1B2C3</span>
-                            <span class="text-gray-500">•</span>
-                            <span>₱415.98</span>
-                            <span class="text-gray-500">•</span>
-                            <span>Alice Johnson</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-sm text-gray-600 border-b pb-2">
-                            <span class="text-green-500 font-medium">New Order</span>
-                            <span>#D4E5F6</span>
-                            <span class="text-gray-500">•</span>
-                            <span>₱625.00</span>
-                            <span class="text-gray-500">•</span>
-                            <span>Bob Williams</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-sm text-gray-600 border-b pb-2">
-                            <span class="text-blue-500 font-medium">Order Completed</span>
-                            <span>#G7H8I9</span>
-                            <span class="text-gray-500">•</span>
-                            <span>₱310.50</span>
-                            <span class="text-gray-500">•</span>
-                            <span>Charlie Brown</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-sm text-gray-600 border-b pb-2">
-                            <span class="text-yellow-500 font-medium">Low Stock Alert</span>
-                            <span class="text-gray-500">•</span>
-                            <span>Organic Tomatoes (8 kg remaining)</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-sm text-gray-600">
-                            <span class="text-green-500 font-medium">Product Added</span>
-                            <span class="text-gray-500">•</span>
-                            <span>Fresh Strawberries added to inventory</span>
-                        </li>
-                    </ul>
+                <div class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-green-50 to-white">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-green-100 p-2 rounded-lg">
+                                    <i class="fas fa-stream text-green-600 text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800">Recent Activity Feed</h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span id="activity-count" class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">0 activities</span>
+                                <button onclick="loadRecentActivities()" class="text-gray-400 hover:text-green-600 transition p-2 rounded-lg hover:bg-green-50" title="Refresh">
+                                    <i class="fas fa-sync-alt text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="recent-activity-feed" class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+                        <!-- Loading state -->
+                        <div class="p-8 text-center text-gray-400">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                            <p class="text-sm">Loading activities...</p>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -1637,6 +1805,189 @@ try {
                     toggleMobileMenu();
                 }
             });
+        });
+
+        // Recent Activity Feed functionality
+        function loadRecentActivities() {
+            const activityFeed = document.getElementById('recent-activity-feed');
+            const activityCount = document.getElementById('activity-count');
+            
+            if (!activityFeed) return;
+            
+            // Show loading state
+            activityFeed.innerHTML = `
+                <div class="p-8 text-center text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                    <p class="text-sm">Loading activities...</p>
+                </div>
+            `;
+            
+            fetch('../api/get-recent-activities.php?limit=15')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.activities && data.activities.length > 0) {
+                        // Update activity count
+                        if (activityCount) {
+                            activityCount.textContent = `${data.count} ${data.count === 1 ? 'activity' : 'activities'}`;
+                        }
+                        
+                        // Render activities
+                        activityFeed.innerHTML = data.activities.map(activity => {
+                            return renderActivity(activity);
+                        }).join('');
+                    } else {
+                        activityFeed.innerHTML = `
+                            <div class="p-12 text-center text-gray-400">
+                                <div class="inline-block p-4 bg-gray-100 rounded-full mb-4">
+                                    <i class="fas fa-inbox text-4xl text-gray-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-600">No recent activities</p>
+                                <p class="text-xs text-gray-400 mt-1">Your shop activity will appear here</p>
+                            </div>
+                        `;
+                        if (activityCount) {
+                            activityCount.textContent = '0 activities';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading activities:', error);
+                    activityFeed.innerHTML = `
+                        <div class="p-8 text-center text-red-400">
+                            <i class="fas fa-exclamation-circle text-3xl mb-3"></i>
+                            <p class="text-sm">Failed to load activities</p>
+                            <button onclick="loadRecentActivities()" class="mt-3 text-xs text-green-600 hover:text-green-700 font-medium">
+                                Try Again
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+        
+        function renderActivity(activity) {
+            const colorClasses = {
+                'green': { bg: 'bg-green-50', text: 'text-green-700', icon: 'text-green-600', border: 'border-green-200' },
+                'blue': { bg: 'bg-blue-50', text: 'text-blue-700', icon: 'text-blue-600', border: 'border-blue-200' },
+                'yellow': { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: 'text-yellow-600', border: 'border-yellow-200' },
+                'red': { bg: 'bg-red-50', text: 'text-red-700', icon: 'text-red-600', border: 'border-red-200' },
+                'gray': { bg: 'bg-gray-50', text: 'text-gray-700', icon: 'text-gray-600', border: 'border-gray-200' }
+            };
+            
+            const colors = colorClasses[activity.color] || colorClasses['gray'];
+            const timeAgo = getTimeAgo(new Date(activity.timestamp));
+            
+            let content = '';
+            
+            if (activity.type === 'order') {
+                content = `
+                    <div class="flex items-start space-x-3 p-4 hover:bg-gray-50 transition group">
+                        <div class="${colors.bg} ${colors.icon} p-2.5 rounded-lg flex-shrink-0 group-hover:scale-110 transition">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="${colors.text} font-semibold text-sm">${escapeHtml(activity.activity_type)}</span>
+                                <span class="text-xs text-gray-400">${timeAgo}</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Order <span class="font-mono font-medium text-gray-800">#${escapeHtml(activity.order_number)}</span>
+                                <span class="text-gray-400 mx-1">•</span>
+                                <span class="font-semibold text-gray-800">₱${activity.amount.toFixed(2)}</span>
+                                <span class="text-gray-400 mx-1">•</span>
+                                ${escapeHtml(activity.customer_name)}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (activity.type === 'stock') {
+                const stockText = activity.stock > 0 
+                    ? `${activity.stock} ${activity.unit} remaining` 
+                    : 'Out of stock';
+                content = `
+                    <div class="flex items-start space-x-3 p-4 hover:bg-gray-50 transition group">
+                        <div class="${colors.bg} ${colors.icon} p-2.5 rounded-lg flex-shrink-0 group-hover:scale-110 transition">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="${colors.text} font-semibold text-sm">${escapeHtml(activity.activity_type)}</span>
+                                <span class="text-xs text-gray-400">${timeAgo}</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                <span class="font-medium text-gray-800">${escapeHtml(activity.product_name)}</span>
+                                <span class="text-gray-400 mx-1">•</span>
+                                <span class="${colors.text} font-medium">${stockText}</span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (activity.type === 'product') {
+                content = `
+                    <div class="flex items-start space-x-3 p-4 hover:bg-gray-50 transition group">
+                        <div class="${colors.bg} ${colors.icon} p-2.5 rounded-lg flex-shrink-0 group-hover:scale-110 transition">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="${colors.text} font-semibold text-sm">${escapeHtml(activity.activity_type)}</span>
+                                <span class="text-xs text-gray-400">${timeAgo}</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                <span class="font-medium text-gray-800">${escapeHtml(activity.product_name)}</span>
+                                ${activity.activity_type === 'Product Added' ? ' added to inventory' : ' was updated'}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (activity.type === 'review') {
+                const stars = '⭐'.repeat(activity.rating);
+                content = `
+                    <div class="flex items-start space-x-3 p-4 hover:bg-gray-50 transition group">
+                        <div class="${colors.bg} ${colors.icon} p-2.5 rounded-lg flex-shrink-0 group-hover:scale-110 transition">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="${colors.text} font-semibold text-sm">${escapeHtml(activity.activity_type)}</span>
+                                <span class="text-xs text-gray-400">${timeAgo}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-1">
+                                ${stars} by <span class="font-medium text-gray-800">${escapeHtml(activity.customer_name)}</span>
+                            </p>
+                            ${activity.comment ? `<p class="text-xs text-gray-500 italic">"${escapeHtml(activity.comment.substring(0, 80))}${activity.comment.length > 80 ? '...' : ''}"</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (activity.type === 'message') {
+                content = `
+                    <div class="flex items-start space-x-3 p-4 hover:bg-gray-50 transition group">
+                        <div class="${colors.bg} ${colors.icon} p-2.5 rounded-lg flex-shrink-0 group-hover:scale-110 transition">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="${colors.text} font-semibold text-sm">${escapeHtml(activity.activity_type)}</span>
+                                <span class="text-xs text-gray-400">${timeAgo}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 italic">
+                                "${escapeHtml(activity.message_preview)}${activity.message_preview.length >= 50 ? '...' : ''}"
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return content;
+        }
+
+        // Load activities on page load
+        loadRecentActivities();
+        
+        // Reload when page becomes visible (user returns to tab)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadRecentActivities();
+            }
         });
 
         // Notification functionality

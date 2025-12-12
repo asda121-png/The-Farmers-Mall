@@ -43,9 +43,11 @@ try {
                 $stock = intval($product['stock_quantity'] ?? 0);
                 switch ($stockStatus) {
                     case 'instock':
-                        return $stock > 0;
+                        return $stock > 10; // More than 10 is considered in stock
+                    case 'lowstock':
+                        return $stock > 0 && $stock <= 10; // Low stock threshold
                     case 'outofstock':
-                        return $stock <= 0;
+                        return $stock <= 10; // Include both low stock and out of stock
                     case 'onbackorder':
                         // For now, treat as out of stock or low stock
                         return $stock <= 5 && $stock > 0;
