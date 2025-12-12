@@ -712,6 +712,47 @@ try {
             }
         });
     });
+    
+    // Filter Dropdown and Reviews Filter Functions
+    function toggleFilterDropdown() {
+        const filterDropdown = document.getElementById('filterDropdown');
+        filterDropdown.classList.toggle('hidden');
+    }
+    
+    function filterReviews(rating) {
+        const reviewsContainer = document.getElementById('reviewsContainer');
+        const reviewItems = reviewsContainer.querySelectorAll('.review-item');
+        
+        // Close the filter dropdown
+        document.getElementById('filterDropdown').classList.add('hidden');
+        
+        if (rating === 'all') {
+            // Show all reviews
+            reviewItems.forEach(item => {
+                item.style.display = 'block';
+            });
+        } else {
+            // Filter by rating
+            reviewItems.forEach(item => {
+                const itemRating = parseInt(item.getAttribute('data-rating'));
+                if (itemRating === rating) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    }
+    
+    // Close filter dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const filterBtn = document.getElementById('filterBtn');
+        const filterDropdown = document.getElementById('filterDropdown');
+        
+        if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+            filterDropdown.classList.add('hidden');
+        }
+    });
 </script>
 </body>
 </html>
