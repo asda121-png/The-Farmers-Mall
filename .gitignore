@@ -5,8 +5,8 @@
 nbproject/
 
 # Environment and sensitive files
-.env
-config/.env
+.env.local
+.env.production
 
 # Ignore uploads and user-generated content
 uploads/*
