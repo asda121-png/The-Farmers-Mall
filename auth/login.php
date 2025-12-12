@@ -35,17 +35,6 @@ function send_json_response($status, $message, $redirect_url = '') {
         if (empty($input_identifier) || empty($password)) {
             send_json_response('error', 'Please enter both email/username and password.');
         } else {
-            // Check for hardcoded admin credentials first
-            if ($input_identifier === 'Admin1234@gmail.com' && $password === 'Admin123') {
-                $_SESSION['loggedin'] = true;
-                $_SESSION['role'] = 'admin';
-                $_SESSION['username'] = 'Administrator';
-                $_SESSION['user_id'] = 'admin';
-                $_SESSION['email'] = 'Admin1234@gmail.com';
-                $_SESSION['full_name'] = 'Administrator';
-                
-                send_json_response('success', 'Admin login successful! Redirecting...', '../admin/admin-dashboard.php');
-            } else {
                 // Query Supabase for user by email or username
                 $user = null;
                 
@@ -97,7 +86,6 @@ function send_json_response($status, $message, $redirect_url = '') {
                 } else {
                     send_json_response('error', 'Invalid email/username or password.');
                 }
-            }
         }
     } catch (Exception $e) {
         error_log("Login Error: " . $e->getMessage());
