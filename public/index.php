@@ -1,7 +1,13 @@
 <?php
+// Use output buffering to prevent any HTML output from includes before page loads
+ob_start();
+
 // Include modal logic at the top to handle sessions and form posts before any HTML is sent.
 include '../auth/login.php';
 include '../auth/register.php';
+
+// Capture the modal HTML
+$modals = ob_get_clean();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +23,23 @@ include '../auth/register.php';
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
  <style>
+   /* Prevent flash of unstyled content */
+   html {
+     background-color: #1fa02d;
+   }
+   
+   body {
+     opacity: 0;
+     background-color: #ffffff;
+     animation: fadeIn 0.5s ease-in forwards;
+   }
+   
+   @keyframes fadeIn {
+     to {
+       opacity: 1;
+     }
+   }
+   
    html {
      scroll-behavior: smooth;
      scroll-padding-top: 100px; /* Prevents header overlap */
@@ -405,6 +428,11 @@ include '../includes/header.php';
   </section>
 
   <?php include '../includes/footer.php'; ?>
+
+  <?php 
+  // Output the captured modals (login and register)
+  echo $modals; 
+  ?>
 
   <script src="../assets/js/modal-handler.js"></script>
 
