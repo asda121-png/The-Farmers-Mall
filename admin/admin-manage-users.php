@@ -128,9 +128,12 @@ try {
     }
     
     .tab-btn.active {
-        background-color: #15803d; /* green-700 */
+        background-color: #16a34a; /* green-600 */
         color: white;
-        border-color: #15803d;
+    }
+    
+    .tab-btn {
+        transition: all 0.2s ease;
     }
     
     /* Pagination Styles */
@@ -271,17 +274,17 @@ try {
         </div>
     </div>
 
-    <div class="border-b border-gray-200">
-        <nav id="tabs" class="-mb-px flex space-x-6">
-            <button data-tab="customers" class="tab-btn active whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm flex items-center gap-2">
+    <div class="flex gap-4 mb-6">
+        <nav id="tabs" class="flex gap-4">
+            <button data-tab="customers" class="tab-btn active px-4 py-3 rounded-lg font-semibold text-sm flex items-center gap-2 bg-green-600 text-white">
                 <i class="fa-solid fa-user"></i>
                 Customers (Buyers)
-                <span class="bg-green-100 text-green-800 py-0.5 px-2.5 rounded-full text-xs ml-2"><?php echo "$totalCustomers"; ?></span>
+                <span class="bg-white text-green-600 py-0.5 px-2.5 rounded-full text-xs ml-2 font-bold"><?php echo "$totalCustomers"; ?></span>
             </button>
-            <button data-tab="sellers" class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm flex items-center gap-2 text-gray-500 hover:text-green-600 hover:border-green-300">
+            <button data-tab="sellers" class="tab-btn px-4 py-3 rounded-lg font-medium text-sm flex items-center gap-2 text-gray-700 bg-gray-200 hover:bg-gray-300">
                 <i class="fa-solid fa-store"></i>
                 Sellers (Retailers)
-                <span class="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2">48</span>
+                <span class="bg-white text-gray-600 py-0.5 px-2.5 rounded-full text-xs ml-2 font-bold">48</span>
             </button>
         </nav>
     </div>
@@ -352,6 +355,10 @@ try {
                 </table>
                 <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                     <nav class="pagination flex gap-2" id="customers-pagination"></nav>
+                </div>
+                <div id="no-customers-message" class="p-12 text-center text-gray-500 hidden">
+                    <i class="fa-solid fa-user-slash text-4xl text-gray-300 mb-4"></i>
+                    <p class="font-medium">No customers found matching your criteria.</p>
                 </div>
             </div>
         </div>
@@ -428,6 +435,10 @@ try {
                 </table>
                 <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                     <nav class="pagination flex gap-2" id="sellers-pagination"></nav>
+                </div>
+                <div id="no-sellers-message" class="p-12 text-center text-gray-500 hidden">
+                    <i class="fa-solid fa-store-slash text-4xl text-gray-300 mb-4"></i>
+                    <p class="font-medium">No sellers found matching your criteria.</p>
                 </div>
             </div>
         </div>
@@ -576,6 +587,8 @@ try {
                 notificationDropdown: document.getElementById('notification-dropdown'),
                 notificationPulse: document.getElementById('notification-pulse'),
                 notificationList: document.getElementById('notification-list'),
+                noCustomersMessage: document.getElementById('no-customers-message'),
+                noSellersMessage: document.getElementById('no-sellers-message'),
             };
         },
 
@@ -665,6 +678,10 @@ try {
         renderPage(type) {
             const tableBody = type === 'customers' ? this.elements.customersTableBody : this.elements.sellersTableBody;
             const rows = Array.from(tableBody.querySelectorAll('tr'));
+            const table = tableBody.closest('table');
+            const noResultsMessage = type === 'customers' ? this.elements.noCustomersMessage : this.elements.noSellersMessage;
+            const paginationContainer = type === 'customers' ? this.elements.customersPagination.parentElement : this.elements.sellersPagination.parentElement;
+
             const matchedRows = rows.filter(r => r.classList.contains('filter-match'));
             
             const totalItems = matchedRows.length;
@@ -680,6 +697,16 @@ try {
             // Show slice
             matchedRows.slice(startIndex, endIndex).forEach(r => r.style.display = '');
             
+            // Show/hide no results message
+            if (totalItems === 0) {
+                table.classList.add('hidden');
+                paginationContainer.classList.add('hidden');
+                noResultsMessage.classList.remove('hidden');
+            } else {
+                table.classList.remove('hidden');
+                paginationContainer.classList.remove('hidden');
+                noResultsMessage.classList.add('hidden');
+            }
             this.updatePaginationControls(type, totalPages);
         },
         
