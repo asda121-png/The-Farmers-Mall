@@ -343,6 +343,11 @@ try {
     .notification-header { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
     .notification-clear-btn { font-size: 12px; color: #2E7D32; cursor: pointer; background: none; border: none; }
     .notification-clear-btn:hover { color: #1B5E20; }
+
+    /* FAQ Accordion Styles from support.php */
+    .faq-item .faq-answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-out; }
+    .faq-item.active .faq-answer { grid-template-rows: 1fr; }
+    .faq-item.active .faq-toggle .fa-chevron-down { transform: rotate(180deg); }
   </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -788,32 +793,83 @@ try {
       <!-- Help & Support Section -->
       <section id="help-support" class="content-section bg-white rounded-lg shadow p-6 hidden">
         <h2 class="text-xl font-semibold text-gray-800 mb-6">Help & Support</h2>
-        <div class="space-y-3" id="faqAccordion">
-          <div class="border rounded-lg">
-            <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
+        <div class="space-y-4" id="faqAccordion">
+          <div class="faq-item border rounded-lg overflow-hidden">
+            <button class="faq-toggle w-full text-left p-4 flex justify-between items-center font-medium hover:bg-gray-50">
               <span>How do I track my order?</span>
-              <i class="fas fa-chevron-down transition-transform"></i>
+              <i class="fas fa-chevron-down transition-transform duration-200"></i>
             </button>
-            <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
-              You can track your order from the "Order History" section. Click on "Track Order" for any item that is in transit.
+            <div class="faq-answer">
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-sm text-gray-600">
+                  You can track your order from the "Order History" section. Click on "View Details" for any order, and if it has shipped, a "Track Order" link will be available.
+                </div>
+              </div>
             </div>
           </div>
-          <div class="border rounded-lg">
-            <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
+          <div class="faq-item border rounded-lg overflow-hidden">
+            <button class="faq-toggle w-full text-left p-4 flex justify-between items-center font-medium hover:bg-gray-50">
               <span>What is your return policy?</span>
-              <i class="fas fa-chevron-down transition-transform"></i>
+              <i class="fas fa-chevron-down transition-transform duration-200"></i>
             </button>
-            <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
-              Due to the nature of fresh produce, we only accept returns for damaged or incorrect items reported within 24 hours of delivery. Please contact our support team with a photo of the issue.
+            <div class="faq-answer">
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-sm text-gray-600">
+                  Due to the nature of fresh produce, we only accept returns for damaged or incorrect items reported within 24 hours of delivery. Please contact our support team with a photo of the issue.
+                </div>
+              </div>
             </div>
           </div>
-          <div class="border rounded-lg">
-            <button class="faq-question w-full text-left p-4 flex justify-between items-center font-medium">
+          <div class="faq-item border rounded-lg overflow-hidden">
+            <button class="faq-toggle w-full text-left p-4 flex justify-between items-center font-medium hover:bg-gray-50">
               <span>How do I change my delivery address?</span>
-              <i class="fas fa-chevron-down transition-transform"></i>
+              <i class="fas fa-chevron-down transition-transform duration-200"></i>
             </button>
-            <div class="faq-answer hidden p-4 border-t text-sm text-gray-600">
-              You can manage your delivery locations in the "Saved Addresses" section. You can add, edit, or delete addresses there.
+            <div class="faq-answer">
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-sm text-gray-600">
+                  You can update your primary address in the "My Profile" section by clicking "Edit Profile". For managing multiple delivery addresses, please visit the "My Address" section.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="faq-item border rounded-lg overflow-hidden">
+            <button class="faq-toggle w-full text-left p-4 flex justify-between items-center font-medium hover:bg-gray-50">
+              <span>What payment methods are accepted?</span>
+              <i class="fas fa-chevron-down transition-transform duration-200"></i>
+            </button>
+            <div class="faq-answer">
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-sm text-gray-600">
+                  We accept all major credit cards, GCash, and Cash on Delivery (COD). You can manage your saved payment methods in the "Payment Methods" section.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="faq-item border rounded-lg overflow-hidden">
+            <button class="faq-toggle w-full text-left p-4 flex justify-between items-center font-medium hover:bg-gray-50">
+              <span>What should I do if an item is missing or damaged?</span>
+              <i class="fas fa-chevron-down transition-transform duration-200"></i>
+            </button>
+            <div class="faq-answer">
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-sm text-gray-600">
+                  We're sorry for the inconvenience! Please contact our support team within 24 hours of delivery with your order number and a photo of the damaged item. We will arrange for a refund or a replacement.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="faq-item border rounded-lg overflow-hidden">
+            <button class="faq-toggle w-full text-left p-4 flex justify-between items-center font-medium hover:bg-gray-50">
+              <span>Which areas do you deliver to?</span>
+              <i class="fas fa-chevron-down transition-transform duration-200"></i>
+            </button>
+            <div class="faq-answer">
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-sm text-gray-600">
+                  We currently deliver to most areas within the City of Mati. For a detailed list of covered barangays, please visit our main <a href="../public/support.php" class="text-green-600 hover:underline">Support Page</a>. We are always expanding our delivery zones!
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1456,6 +1512,19 @@ try {
         });
 
       });
+
+      // --- FAQ Accordion Logic ---
+      const faqItems = document.querySelectorAll('.faq-item');
+      if (faqItems) {
+        faqItems.forEach(item => {
+          const toggle = item.querySelector('.faq-toggle');
+          if (toggle) {
+            toggle.addEventListener('click', () => {
+              item.classList.toggle('active');
+            });
+          }
+        });
+      }
 
       // --- Order History Logic ---
 
