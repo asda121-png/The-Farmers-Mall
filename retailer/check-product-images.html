@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Upload Status Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h1 class="text-3xl font-bold mb-2 text-green-600">
+          🔍 Image Upload Status Checker
+        </h1>
+        <p class="text-gray-600 mb-6">
+          This tool shows which of your products have images and which don't.
+        </p>
+
+        <button
+          onclick="checkProducts()"
+          class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 font-semibold"
+        >
+          Check My Products
+        </button>
+      </div>
+
+      <div id="results" class="hidden">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="text-gray-500 text-sm font-medium">Total Products</div>
+            <div id="totalCount" class="text-3xl font-bold text-gray-800">
+              0
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="text-gray-500 text-sm font-medium">With Images ✅</div>
+            <div id="withImages" class="text-3xl font-bold text-green-600">
+              0
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="text-gray-500 text-sm font-medium">
+              Missing Images ❌
+            </div>
+            <div id="missingImages" class="text-3xl font-bold text-red-600">
+              0
+            </div>
+          </div>
+        </div>
+
+        <!-- Products with Images -->
+        <div id="productsWithImages" class="mb-6"></div>
+
+        <!-- Products without Images -->
+        <div id="productsWithoutImages" class="mb-6"></div>
+      </div>
+
+      <div id="loading" class="hidden text-center py-12">
+        <div
+          class="animate-spin rounded-full h-16 w-16 border-b-2 border-green-500 mx-auto"
+        ></div>
+        <p class="mt-4 text-gray-600">Loading products...</p>
+      </div>
+
+      <div
+        id="error"
+        class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded"
+      >
+        <p class="text-red-700 font-medium">Error loading products</p>
+        <p id="errorMessage" class="text-red-600 text-sm mt-1"></p>
+      </div>
+    </div>
+
+    <script>
+      async function checkProducts() {
+        const resultsDiv = document.getElementById("results");
+        const loadingDiv = document.getElementById("loading");
+        const errorDiv = document.getElementById("error");
+
+        resultsDiv.classList.add("hidden");
+        errorDiv.classList.add("hidden");
+        loadingDiv.classList.remove("hidden");
+
+        try {
+          const response = await fetch("../api/get-products.php");
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.message || "Failed to load products");
+          }
+
+          const products = data.products || [];
+          const withImages = products.filter(
+            (p) => p.image_url && p.image_url.trim() !== ""
+          );
+          const withoutImages = products.filter(
+            (p) => !p.image_url || p.image_url.trim() === ""
+          );
+
+          // Update summary
+          document.getElementById("totalCount").textContent = products.length;
+          document.getElementById("withImages").textContent = withImages.length;
+          document.getElementById("missingImages").textContent =
+            withoutImages.length;
+
+          // Display products with images
+          const withImagesDiv = document.getElementById("productsWithImages");
+          if (withImages.length > 0) {
+            withImagesDiv.innerHTML = `
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-xl font-bold text-green-600 mb-4">✅ Products with Images (${
+                              withImages.length
+                            })</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${withImages
+                                  .map(
+                                    (p) => `
+                                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                                        <img src="../${p.image_url}" alt="${p.name}" 
+                                             class="w-16 h-16 object-cover rounded-lg border-2 border-green-500"
+                                             onerror="this.src='https://placehold.co/64x64/22c55e/fff?text=❌'">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-medium text-gray-800 truncate">${p.name}</div>
+                                            <div class="text-xs text-gray-500 truncate">ID: ${p.id}</div>
+                                            <div class="text-xs text-gray-400 truncate mt-1">${p.image_url}</div>
+                                        </div>
+                                        <div class="text-2xl">✅</div>
+                                    </div>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                        </div>
+                    `;
+          } else {
+            withImagesDiv.innerHTML = "";
+          }
+
+          // Display products without images
+          const withoutImagesDiv = document.getElementById(
+            "productsWithoutImages"
+          );
+          if (withoutImages.length > 0) {
+            withoutImagesDiv.innerHTML = `
+                        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                            <h2 class="text-xl font-bold text-red-600 mb-4">❌ Products Missing Images (${
+                              withoutImages.length
+                            })</h2>
+                            <p class="text-gray-600 mb-4">These products don't have images. They will show letter placeholders.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${withoutImages
+                                  .map(
+                                    (p) => `
+                                    <div class="flex items-center gap-4 p-4 border border-red-200 rounded-lg bg-red-50">
+                                        <div class="w-16 h-16 bg-green-500 text-white rounded-lg flex items-center justify-center text-2xl font-bold">
+                                            ${p.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-medium text-gray-800 truncate">${
+                                              p.name
+                                            }</div>
+                                            <div class="text-xs text-gray-500">ID: ${
+                                              p.id
+                                            }</div>
+                                            <div class="text-xs text-red-600 mt-1">⚠️ No image uploaded</div>
+                                        </div>
+                                        <a href="retaileraddnewproduct.php?edit=${
+                                          p.id
+                                        }" 
+                                           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            Edit
+                                        </a>
+                                    </div>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                        </div>
+                    `;
+          } else {
+            withoutImagesDiv.innerHTML = `
+                        <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded">
+                            <p class="text-green-700 font-medium">🎉 All your products have images!</p>
+                        </div>
+                    `;
+          }
+
+          loadingDiv.classList.add("hidden");
+          resultsDiv.classList.remove("hidden");
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("errorMessage").textContent = error.message;
+          loadingDiv.classList.add("hidden");
+          errorDiv.classList.remove("hidden");
+        }
+      }
+
+      // Auto-load on page load
+      window.addEventListener("DOMContentLoaded", checkProducts);
+    </script>
+  </body>
+</html>
