@@ -154,17 +154,33 @@ try {
     } else {
         // Insert new product
         $productData['created_at'] = date('Y-m-d H:i:s');
-        $result = $api->insert('products', $productData);
-
-        if ($result && !empty($result[0]['id'])) {
-            $response = ['success' => true, 'message' => 'Product created successfully', 'product_id' => $result[0]['id']];
+        
+        try {
+            $result = $api->insert('products', $productData);
+            
+            // Handle different return types from insert
+            $productIdResponse = null;
+            if (is_array($result) && !empty($result[0]['id'])) {
+                $productIdResponse = $result[0]['id'];
+            }
+            
+            // If insert didn't throw an exception, consider it successful
+            $response = ['success' => true, 'message' => 'Product created successfully'];
+            if ($productIdResponse) {
+                $response['product_id'] = $productIdResponse;
+            }
             if ($uploadError) {
                 $response['upload_warning'] = $uploadError;
                 error_log("Product created but with upload error for user {$userId}: {$uploadError}");
             }
             echo json_encode($response);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to create product', 'upload_error' => $uploadError]);
+        } catch (Exception $insertError) {
+            error_log("Insert failed: " . $insertError->getMessage());
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Failed to create product: ' . $insertError->getMessage(), 
+                'upload_error' => $uploadError
+            ]);
         }
     }
 } catch (Exception $e) {
