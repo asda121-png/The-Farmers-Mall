@@ -181,27 +181,16 @@ if ($user_id) {
         transform: rotate(90deg) scale(0.9);
     }
 
-    /* Shop card hover effects */
+    /* Shop card styles (hover effect aligned with product cards) */
     .shop-card {
-        transition: all 0.4s ease;
-        overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 0.5rem; /* Tailwind's rounded-lg */
+      transition: all 0.3s ease;
+      overflow: hidden; /* Keep this to contain the image */
     }
 
     .shop-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 40px rgba(46, 125, 50, 0.2);
-    }
-
-    .shop-card img {
-        transition: all 0.5s ease;
-    }
-
-    .shop-card:hover img {
-        transform: scale(1.2) rotate(2deg);
-    }
-
-    .shop-card:hover h3 {
-        color: #2E7D32;
+      border-color: #2E7D32;
     }
 
     /* Footer links hover effect */
@@ -450,7 +439,7 @@ if ($user_id) {
 
 
   <section class="hero-slider relative">
-    <div class="hero-slide active" style="background-image: url('../images/img.png');">
+    <div class="hero-slide active" style="background-image: url('../images/img01.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
           <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Fresh Harvest Sale</h2>
@@ -462,7 +451,7 @@ if ($user_id) {
       </div>
     </div>
 
-    <div class="hero-slide" style="background-image: url('../images/img1.png');">
+    <div class="hero-slide" style="background-image: url('../images/img02.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
           <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Farm Fresh Daily</h2>
@@ -474,7 +463,7 @@ if ($user_id) {
       </div>
     </div>
 
-    <div class="hero-slide" style="background-image: url('../images/img2.png');">
+    <div class="hero-slide" style="background-image: url('../images/img03.png');">
       <div class="bg-black bg-opacity-40">
         <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
           <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Premium Quality</h2>

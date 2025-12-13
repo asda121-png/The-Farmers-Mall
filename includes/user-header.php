@@ -18,6 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // Get user data
 $user_id = $_SESSION['user_id'] ?? null;
 $profile_picture = '';
+$email = $_SESSION['email'] ?? 'user@email.com';
 $full_name = $_SESSION['full_name'] ?? 'User';
 
 // Fetch profile picture from database
@@ -140,34 +141,41 @@ if (in_array($current_dir, $subdirectories)) {
           </div>
         </div>
 
-        <!-- Profile Dropdown (Hover to Open) -->
+        <!-- Profile Dropdown (Click to Open) -->
         <div class="relative" id="profileDropdownContainer">
           <button class="flex items-center focus:outline-none" id="profileDropdownBtn">
             <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
               <img src="<?php echo htmlspecialchars($base . $profile_picture); ?>" 
                    alt="Profile" 
-                   class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200">
+                   class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-green-500">
             <?php else: ?>
-              <div class="w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center">
+              <div class="w-9 h-9 rounded-full cursor-pointer bg-green-600 flex items-center justify-center border-2 border-green-500">
                 <i class="fas fa-user text-white text-sm"></i>
               </div>
             <?php endif; ?>
           </button>
 
           <!-- Profile Dropdown Menu -->
-          <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-            <div class="py-2">
-              <a href="<?php echo $base; ?>user/profile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                <i class="fas fa-user mr-2 text-gray-400"></i> My Account
+          <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 z-50">
+            <div class="p-3 border-b">
+                <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($full_name); ?></p>
+                <p class="text-xs text-gray-500"><?php echo htmlspecialchars($email); ?></p>
+            </div>
+            <nav class="p-2">
+              <a href="<?php echo $base; ?>user/profile.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                <i class="fa-solid fa-user-cog w-5 text-gray-500"></i>
+                <span>Profile & Settings</span>
               </a>
-              <a href="<?php echo $base; ?>user/my-purchases.php" class="block px-4 py-2 text-green-600 hover:bg-gray-100 transition font-medium">
-                <i class="fas fa-shopping-bag mr-2"></i> My Purchases
+              <a href="<?php echo $base; ?>user/my-purchases.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                <i class="fas fa-shopping-bag w-5 text-gray-500"></i>
+                <span>My Purchases</span>
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a href="<?php echo $base; ?>public/index.php" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition">
-                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              <a href="<?php echo $base; ?>auth/logout.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
+                <i class="fas fa-sign-out-alt w-5 text-gray-500"></i>
+                <span>Logout</span>
               </a>
-            </div>
+            </nav>
           </div>
         </div>
 
@@ -499,12 +507,11 @@ if (in_array($current_dir, $subdirectories)) {
       });
     }
     
-    // Profile dropdown hover handlers
+    // Profile dropdown hover handlers (changed from click to hover)
     const profileContainer = document.getElementById('profileDropdownContainer');
     const profileDropdown = document.getElementById('profileDropdown');
-    const profileBtn = document.getElementById('profileDropdownBtn');
     
-    if (profileContainer && profileDropdown && profileBtn) {
+    if (profileContainer && profileDropdown) {
       // Show dropdown on hover
       profileContainer.addEventListener('mouseenter', function() {
         clearTimeout(profileDropdownTimeout);
@@ -523,12 +530,13 @@ if (in_array($current_dir, $subdirectories)) {
         clearTimeout(profileDropdownTimeout);
       });
       
+      // Hide dropdown when mouse leaves the dropdown itself
       profileDropdown.addEventListener('mouseleave', function() {
         profileDropdownTimeout = setTimeout(function() {
           profileDropdown.classList.add('hidden');
         }, HOVER_DELAY);
       });
-    }
+        }
     
     // Cart preview hover handlers
     const cartContainer = document.getElementById('cartPreviewContainer');
@@ -639,4 +647,3 @@ if (in_array($current_dir, $subdirectories)) {
   }
 }
 </style>
-
