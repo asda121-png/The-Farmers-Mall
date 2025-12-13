@@ -93,6 +93,21 @@ try {
         footer {
             margin-top: auto;
         }
+        /* Sticky sidebar - fixed position */
+        #sidebar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            z-index: 40 !important;
+        }
+        /* Add left margin to main content to account for fixed sidebar */
+        #app {
+            margin-left: 16rem !important;
+        }
 
         /* Custom scrollbar for chat messages */
     .scrollbar-thin {
@@ -112,17 +127,6 @@ try {
     .scrollbar-thin::-webkit-scrollbar-track {
       background-color: #e5e7eb;
     }
-    /* Force sidebar to be full height with logout at bottom */
-    #sidebar {
-        min-height: 100vh !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    #sidebar > *:last-child {
-        margin-top: auto !important;
-        padding-top: 1rem !important;
-        border-top: 1px solid #e5e7eb !important;
-    }
     /* Mobile menu toggle */
     #mobileMenuBtn {
         display: none;
@@ -131,21 +135,13 @@ try {
         #mobileMenuBtn {
             display: flex;
         }
+        #app {
+            margin-left: 0 !important;
+        }
         #sidebar {
-            position: fixed;
             left: -100%;
-            top: 0;
-            height: 100vh;
             z-index: 50;
             transition: left 0.3s ease;
-        }
-        #sidebar {
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        #sidebar > div:last-child {
-            margin-top: auto !important;
         }
         #sidebar.active {
             left: 0;
@@ -171,9 +167,7 @@ try {
     
     <!-- Mobile Menu Button -->
     <button id="mobileMenuBtn" class="fixed top-4 left-4 z-50 bg-green-600 text-white p-3 rounded-lg shadow-lg md:hidden" onclick="toggleMobileMenu()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+        <i class="fas fa-bars text-xl"></i>
     </button>
     
     <!-- Main Application Container -->
@@ -188,41 +182,30 @@ try {
                 <h1 class="text-2xl font-bold text-green-700">Farmers Mall</h1>
             </div>
             <a href="retailer-dashboard2.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-tachometer-alt text-lg mr-3"></i>
                 Dashboard
             </a>
             <a href="retailerinventory.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0V9m0 2v2m-4-2h1m-1 0h-2m2 0v2m-2-2h-1m-1 0H5m-2 4h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <i class="fas fa-boxes text-lg mr-3"></i>
                 Products & Inventory
             </a>
             <a href="retailerfulfillment.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5h6"></path></svg>
+                <i class="fas fa-clipboard-list text-lg mr-3"></i>
                 Order Fulfillment
             </a>
             <a href="retailerfinance.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2M9 14h6m-5 4h4m-4-8h4m-5-8h6a2 2 0 012 2v10a2 2 0 01-2 2h-6a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
+                <i class="fas fa-chart-line text-lg mr-3"></i>
                 Financial Reports
             </a>
-            <!-- Vouchers & Coupons -->
-            <a href="retailercoupons.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11l4-4-4-4m0 16l4-4-4-4m-1-5a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Vouchers & Coupons
-            </a>
+
             <a href="retailerreviews.php" class="nav-item flex items-center p-3 rounded-xl text-gray-700 hover:bg-green-100 transition duration-150">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.193a2.003 2.003 0 013.902 0l1.018 2.062 2.277.33a2.003 2.003 0 011.11 3.407l-1.652 1.61.39 2.269a2.003 2.003 0 01-2.906 2.108L12 15.698l-2.035 1.071a2.003 2.003 0 01-2.906-2.108l.39-2.269-1.652-1.61a2.003 2.003 0 011.11-3.407l2.277-.33 1.018-2.062z"></path></svg>
+                <i class="fas fa-star text-lg mr-3"></i>
                 Reviews & Customers
             </a>
-
-            <div class="mt-auto pt-4 border-t border-gray-100">
-                <a href="../auth/logout.php" class="w-full flex items-center justify-center p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition duration-150 font-medium">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                    Logout
-                </a>
-            </div>
         </nav>
 
         <div class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm">
+            <header class="bg-white shadow-sm sticky top-0 z-30">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-end">
                     <div class="flex items-center space-x-6">
                         <a href="retailer-dashboard2.php" class="text-gray-600 hover:text-green-600"><i class="fa-solid fa-house"></i></a>

@@ -10,6 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 require_once __DIR__ . '/../config/supabase-api.php';
+require_once __DIR__ . '/../config/notifications-helper.php';
 
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
@@ -85,6 +86,25 @@ try {
     $result = $api->update('orders', $update_data, ['id' => $order_id]);
     
     if ($result) {
+        // If order is cancelled, notify retailers
+        if ($new_status === 'cancelled') {
+            $orderItems = $api->select('order_items', ['order_id' => $order_id]);
+            $notifiedRetailers = [];
+            
+            foreach ($orderItems as $item) {
+                $product = $api->select('products', ['id' => $item['product_id']]);
+                if (!empty($product)) {
+                    $retailer_id = $product[0]['retailer_id'];
+                    // Only notify each retailer once per order
+                    if (!in_array($retailer_id, $notifiedRetailers)) {
+                        $customer_name = $order['customer_name'] ?? 'Customer';
+                        notifyRetailerOrderCancelled($retailer_id, $order_id, $customer_name, 'Customer cancelled the order');
+                        $notifiedRetailers[] = $retailer_id;
+                    }
+                }
+            }
+        }
+        
         echo json_encode([
             'success' => true,
             'message' => 'Order status updated successfully',
