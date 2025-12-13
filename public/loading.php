@@ -127,14 +127,8 @@
         link.href = redirectTo || 'index.php';
         document.head.appendChild(link);
 
-        // Fade out the loading screen before redirect
-        document.body.classList.add('fade-out');
-        
-        // Wait for fade animation to complete before redirecting
-        setTimeout(() => {
-          // Redirect to the final destination, or fallback to index.php
-          window.location.replace(redirectTo || "index.php");
-        }, 500);
+        // Redirect immediately to the final destination, or fallback to index.php
+        window.location.replace(redirectTo || "index.php");
       }
     }, 30);
   </script>

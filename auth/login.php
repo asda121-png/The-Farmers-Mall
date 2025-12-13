@@ -56,7 +56,7 @@ function send_json_response($status, $message, $redirect_url = '') {
                 $_SESSION['email'] = 'Admin1234@gmail.com';
                 $_SESSION['full_name'] = 'Administrator';
                 
-                send_json_response('success', 'Admin login successful! Redirecting...', '../admin/admin-dashboard.php');
+                send_json_response('success', 'Admin login successful! Redirecting...', '../public/loading.php?redirect_to=../admin/admin-dashboard.php');
             } else {
                 // Query Supabase for user by email or username
                 $user = null;
@@ -95,12 +95,12 @@ function send_json_response($status, $message, $redirect_url = '') {
                             
                             // Redirect based on user type
                             if ($user['user_type'] === 'admin') {
-                                send_json_response('success', 'Admin login successful! Redirecting...', '../admin/admin-dashboard.php');
+                                send_json_response('success', 'Admin login successful! Redirecting...', '../public/loading.php?redirect_to=../admin/admin-dashboard.php');
                             } elseif ($user['user_type'] === 'retailer') {
-                                send_json_response('success', 'Retailer login successful! Redirecting...', '../retailer/retailer-dashboard2.php');
+                                send_json_response('success', 'Retailer login successful! Redirecting...', '../public/loading.php?redirect_to=../retailer/retailer-dashboard2.php');
                             } else {
                                 // Default to customer
-                                send_json_response('success', 'Login successful! Redirecting...', '../user/user-homepage.php');
+                                send_json_response('success', 'Login successful! Redirecting...', '../public/loading.php?redirect_to=../user/user-homepage.php');
                             }
                         }
                     } else {
