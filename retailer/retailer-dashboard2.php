@@ -309,28 +309,28 @@ try {
                             <p class="text-xs font-medium text-gray-500">Total Revenue</p>
                             <i class="fas fa-dollar-sign text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">₱12,450.00</p>
+                        <p id="kpi-revenue" class="text-2xl font-extrabold text-gray-800">₱0.00</p>
                     </div>
                     <div onclick="window.location.href='retailerfulfillment.php?filter=new'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
                             <p class="text-xs font-medium text-gray-500">New Orders</p>
                             <i class="fas fa-clipboard-list text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">8</p>
+                        <p id="kpi-orders" class="text-2xl font-extrabold text-gray-800">0</p>
                     </div>
-                    <div onclick="window.location.href='retailerinventory.php?filter=lowstock'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
+                    <div onclick="window.location.href='retailerinventory.php?filter=outofstock'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-medium text-gray-500">Low Inventory Items</p>
+                            <p class="text-xs font-medium text-gray-500">Out of Stock Items</p>
                             <i class="fas fa-exclamation-circle text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">3</p>
+                        <p id="kpi-outofstock" class="text-2xl font-extrabold text-gray-800">0</p>
                     </div>
-                    <div onclick="window.location.href='retailerfinance.php'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
+                    <div onclick="window.location.href='retailerinventory.php'" class="bg-white p-4 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer hover:scale-105 transform transition-transform">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-medium text-gray-500">Top Products</p>
+                            <p class="text-xs font-medium text-gray-500">Total Products</p>
                             <i class="fas fa-star text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">24</p>
+                        <p id="kpi-products" class="text-2xl font-extrabold text-gray-800">0</p>
                     </div>
                 </div>
                 
@@ -362,21 +362,12 @@ try {
                             <canvas id="salesTrendChart"></canvas>
                         </div>
                     </div>
-                    <div id="dashboard-inventory-alerts" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Inventory Alerts (Low Stock)</h3>
-                        <div class="p-3 bg-red-50 rounded-lg mb-2">
-                            <p class="text-sm text-red-700 font-medium">Organic Tomatoes</p>
-                            <span class="text-xs text-red-600 font-bold">8 kg left</span>
+                    <div id="dashboard-inventory-alerts" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Out of Stock Alerts</h3>
+                        <div id="low-stock-list" class="flex-1 overflow-y-auto" style="max-height: 300px;">
+                            <!-- Content will be loaded dynamically -->
                         </div>
-                        <div class="p-3 bg-red-50 rounded-lg mb-2">
-                            <p class="text-sm text-red-700 font-medium">Fresh Milk</p>
-                            <span class="text-xs text-red-600 font-bold">5 liters left</span>
-                        </div>
-                        <div class="p-3 bg-red-50 rounded-lg mb-4">
-                            <p class="text-sm text-red-700 font-medium">Sourdough Bread</p>
-                            <span class="text-xs text-red-600 font-bold">3 loaves left</span>
-                        </div>
-                        <button onclick="window.location.href='retailerinventory.php?filter=lowstock'" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
+                        <button onclick="window.location.href='retailerinventory.php?filter=outofstock'" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 mt-4">
                             <i class="fas fa-boxes"></i>
                             Manage Inventory
                         </button>
@@ -388,146 +379,16 @@ try {
                     <!-- Products Sold -->
                     <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Products Sold</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-apple-alt text-green-600 text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800">Organic Tomatoes</p>
-                                        <p class="text-xs text-gray-500">45 units sold</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-gray-800">₱2,250</p>
-                                    <p class="text-xs text-green-600">+15%</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-carrot text-orange-600 text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800">Fresh Carrots</p>
-                                        <p class="text-xs text-gray-500">38 units sold</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-gray-800">₱1,520</p>
-                                    <p class="text-xs text-green-600">+8%</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-lemon text-yellow-600 text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800">Fresh Mangoes</p>
-                                        <p class="text-xs text-gray-500">32 units sold</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-gray-800">₱1,920</p>
-                                    <p class="text-xs text-green-600">+12%</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-seedling text-purple-600 text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800">Mixed Vegetables</p>
-                                        <p class="text-xs text-gray-500">28 units sold</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-gray-800">₱1,400</p>
-                                    <p class="text-xs text-green-600">+5%</p>
-                                </div>
-                            </div>
+                        <div id="products-sold-list" class="space-y-4">
+                            <!-- Content will be loaded dynamically -->
                         </div>
                     </div>
 
                     <!-- Top Products -->
                     <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Top Performing Products</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3 flex-1">
-                                    <div class="bg-yellow-400 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">1</div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-800">Organic Tomatoes</p>
-                                        <div class="flex items-center mt-1">
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                                                <div class="bg-green-600 h-2 rounded-full" style="width: 90%"></div>
-                                            </div>
-                                            <span class="text-xs text-gray-600">90%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-lg font-bold text-green-600">₱2,250</p>
-                                    <p class="text-xs text-gray-500">45 sold</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3 flex-1">
-                                    <div class="bg-gray-400 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">2</div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-800">Fresh Mangoes</p>
-                                        <div class="flex items-center mt-1">
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                                                <div class="bg-green-600 h-2 rounded-full" style="width: 75%"></div>
-                                            </div>
-                                            <span class="text-xs text-gray-600">75%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-lg font-bold text-green-600">₱1,920</p>
-                                    <p class="text-xs text-gray-500">32 sold</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3 flex-1">
-                                    <div class="bg-orange-400 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">3</div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-800">Fresh Carrots</p>
-                                        <div class="flex items-center mt-1">
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                                                <div class="bg-green-600 h-2 rounded-full" style="width: 68%"></div>
-                                            </div>
-                                            <span class="text-xs text-gray-600">68%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-lg font-bold text-green-600">₱1,520</p>
-                                    <p class="text-xs text-gray-500">38 sold</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3 flex-1">
-                                    <div class="bg-gray-300 text-gray-700 font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">4</div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-800">Mixed Vegetables</p>
-                                        <div class="flex items-center mt-1">
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                                                <div class="bg-green-600 h-2 rounded-full" style="width: 56%"></div>
-                                            </div>
-                                            <span class="text-xs text-gray-600">56%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-lg font-bold text-green-600">₱1,400</p>
-                                    <p class="text-xs text-gray-500">28 sold</p>
-                                </div>
-                            </div>
+                        <div id="top-products-list" class="space-y-4">
+                            <!-- Content will be loaded dynamically -->
                         </div>
                     </div>
                 </div>
@@ -553,11 +414,7 @@ try {
                         </div>
                     </div>
                     <div id="recent-activity-feed" class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
-                        <!-- Loading state -->
-                        <div class="p-8 text-center text-gray-400">
-                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
-                            <p class="text-sm">Loading activities...</p>
-                        </div>
+                        <!-- Content will be loaded automatically -->
                     </div>
                 </div>
             </main>
@@ -1814,14 +1671,6 @@ try {
             
             if (!activityFeed) return;
             
-            // Show loading state
-            activityFeed.innerHTML = `
-                <div class="p-8 text-center text-gray-400">
-                    <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
-                    <p class="text-sm">Loading activities...</p>
-                </div>
-            `;
-            
             fetch('../api/get-recent-activities.php?limit=15')
                 .then(response => response.json())
                 .then(data => {
@@ -2103,9 +1952,19 @@ try {
             return div.innerHTML;
         }
         
-        // Load notifications on page load
-        loadRetailerNotificationBadge();
-        loadRetailerNotificationPreview();
+        // Load notifications immediately on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRetailerNotificationBadge();
+            loadRetailerNotificationPreview();
+        });
+        // Also call immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            // DOM is still loading, wait for DOMContentLoaded
+        } else {
+            // DOM is already loaded, execute immediately
+            loadRetailerNotificationBadge();
+            loadRetailerNotificationPreview();
+        }
         setInterval(loadRetailerNotificationBadge, 5000);
         
         // Listen for notification updates from other pages (e.g., retailernotifications.php)
@@ -2121,6 +1980,195 @@ try {
             loadRetailerNotificationBadge();
             loadRetailerNotificationPreview();
         });
+        
+        // Load recent activities on page load
+        loadRecentActivities();
+        
+        // Load dashboard products data
+        loadDashboardData();
+        
+        // Function to load all dashboard data
+        function loadDashboardData() {
+            fetch('../api/get-retailer-dashboard-stats.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update KPI cards
+                        updateDashboardKPIs(data.dashboardStats);
+                        
+                        // Update inventory alerts
+                        renderOutOfStockAlerts(data.outOfStockProducts);
+                        
+                        // Update product sections
+                        if (data.topProducts) {
+                            renderProductsSold(data.topProducts.slice(0, 4));
+                            renderTopPerformingProducts(data.topProducts.slice(0, 4));
+                        }
+                    } else {
+                        console.error('Failed to load dashboard data:', data.message);
+                        showEmptyState();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading dashboard data:', error);
+                    showEmptyState();
+                });
+        }
+        
+        function updateDashboardKPIs(stats) {
+            // Update Total Revenue
+            const revenueEl = document.getElementById('kpi-revenue');
+            if (revenueEl) {
+                revenueEl.textContent = '₱' + (stats.totalRevenue || 0).toFixed(2);
+            }
+            
+            // Update New Orders
+            const ordersEl = document.getElementById('kpi-orders');
+            if (ordersEl) {
+                ordersEl.textContent = stats.newOrders || 0;
+            }
+            
+            // Update Out of Stock Count
+            const outOfStockEl = document.getElementById('kpi-outofstock');
+            if (outOfStockEl) {
+                outOfStockEl.textContent = stats.outOfStockCount || 0;
+            }
+            
+            // Update Total Products
+            const productsEl = document.getElementById('kpi-products');
+            if (productsEl) {
+                productsEl.textContent = stats.activeProducts || 0;
+            }
+        }
+        
+        function renderOutOfStockAlerts(products) {
+            const container = document.getElementById('low-stock-list');
+            if (!container) return;
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class=\"text-center py-6 text-gray-400\">
+                        <i class=\"fas fa-check-circle text-4xl mb-2 text-green-400\"></i>
+                        <p class=\"text-sm\">All products in stock!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = products.slice(0, 5).map(product => {
+                return `
+                    <div class=\"p-3 bg-red-50 rounded-lg mb-2\">
+                        <p class=\"text-sm text-red-700 font-medium\">${escapeHtml(product.name)}</p>
+                        <span class=\"text-xs text-red-600 font-bold\">Out of Stock</span>
+                    </div>
+                `;
+            }).join('') + (products.length > 5 ? `
+                <p class=\"text-xs text-gray-500 text-center mt-2\">+${products.length - 5} more items</p>
+            ` : '');
+        }
+        
+        function renderProductsSold(products) {
+            const container = document.getElementById('products-sold-list');
+            if (!container) return;
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-box-open text-4xl mb-2"></i>
+                        <p class="text-sm">No products sold yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const colors = ['green', 'orange', 'yellow', 'purple', 'blue', 'red'];
+            const icons = ['fa-apple-alt', 'fa-carrot', 'fa-lemon', 'fa-seedling', 'fa-leaf', 'fa-pepper-hot'];
+            
+            container.innerHTML = products.map((product, index) => {
+                const color = colors[index % colors.length];
+                const icon = icons[index % icons.length];
+                
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-${color}-100 rounded-lg flex items-center justify-center">
+                                <i class="fas ${icon} text-${color}-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">${escapeHtml(product.product_name)}</p>
+                                <p class="text-xs text-gray-500">${product.quantity} units sold</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-gray-800">₱${product.revenue.toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderTopPerformingProducts(products) {
+            const container = document.getElementById('top-products-list');
+            if (!container) return;
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-chart-line text-4xl mb-2"></i>
+                        <p class="text-sm">No sales data available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const badgeColors = [
+                'bg-yellow-400 text-white',
+                'bg-gray-400 text-white',
+                'bg-orange-400 text-white',
+                'bg-gray-300 text-gray-700'
+            ];
+            
+            container.innerHTML = products.map((product, index) => {
+                const badgeClass = badgeColors[index] || 'bg-gray-200 text-gray-600';
+                const percentage = product.percentage || 0;
+                
+                return `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3 flex-1">
+                            <div class="${badgeClass} font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">${index + 1}</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">${escapeHtml(product.product_name)}</p>
+                                <div class="flex items-center mt-1">
+                                    <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-green-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-600">${percentage}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right ml-4">
+                            <p class="text-lg font-bold text-green-600">₱${product.revenue.toFixed(2)}</p>
+                            <p class="text-xs text-gray-500">${product.quantity} sold</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function showEmptyState() {
+            const productsSoldContainer = document.getElementById('products-sold-list');
+            const topProductsContainer = document.getElementById('top-products-list');
+            
+            const emptyMessage = `
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-box-open text-4xl mb-2"></i>
+                    <p class="text-sm">No sales data available</p>
+                </div>
+            `;
+            
+            if (productsSoldContainer) productsSoldContainer.innerHTML = emptyMessage;
+            if (topProductsContainer) topProductsContainer.innerHTML = emptyMessage;
+        }
       </script>
 </body>
 </html>

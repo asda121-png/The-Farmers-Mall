@@ -766,7 +766,17 @@ try {
                 }
             }).catch(error => console.error('Error marking notification as read:', error));
         }
-        loadRetailerNotificationBadge();
+        // Load notifications immediately on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRetailerNotificationBadge();
+        });
+        // Also call immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            // DOM is still loading, wait for DOMContentLoaded
+        } else {
+            // DOM is already loaded, execute immediately
+            loadRetailerNotificationBadge();
+        }
         setInterval(loadRetailerNotificationBadge, 5000);
 
         // Listen for notification updates from other pages (e.g., retailernotifications.php)
@@ -835,6 +845,42 @@ try {
         // Product image preview
         const productImageInput = document.getElementById('productImage');
         const productImagePreview = document.getElementById('productImagePreview');
+
+        // Make preview div clickable
+        productImagePreview.addEventListener('click', () => {
+            productImageInput.click();
+        });
+
+        // Add drag and drop functionality
+        productImagePreview.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            productImagePreview.classList.add('border-green-500', 'bg-green-50');
+        });
+
+        productImagePreview.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            productImagePreview.classList.remove('border-green-500', 'bg-green-50');
+        });
+
+        productImagePreview.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            productImagePreview.classList.remove('border-green-500', 'bg-green-50');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Create a new FileList-like object and assign to input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(files[0]);
+                productImageInput.files = dataTransfer.files;
+                
+                // Trigger change event manually
+                const event = new Event('change', { bubbles: true });
+                productImageInput.dispatchEvent(event);
+            }
+        });
 
         productImageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];

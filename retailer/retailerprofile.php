@@ -381,13 +381,33 @@ try {
               </div>
             <?php endif; ?>
           </button>
-          <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+          <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+            <!-- Profile Header -->
+            <div class="p-4 border-b border-gray-200">
+              <div class="flex items-center space-x-3">
+                <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                  <img src="<?php echo htmlspecialchars('../' . $profile_picture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($shop_name); ?>" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
+                <?php else: ?>
+                  <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
+                    <i class="fas fa-user text-white text-lg"></i>
+                  </div>
+                <?php endif; ?>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($shop_name); ?></p>
+                  <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($email); ?></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Menu Items -->
             <div class="py-2">
-              <a href="retailerprofile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                <i class="fas fa-user mr-2 text-gray-400"></i> My Account
+              <a href="retailerprofile.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                <i class="fas fa-user-circle text-gray-400 text-lg w-5"></i>
+                <span class="ml-3 text-sm">Profile & Settings</span>
               </a>
-              <a href="retailerprofile.php#settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                <i class="fas fa-cog mr-2 text-gray-400"></i> Settings
+              <a href="../auth/logout.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition">
+                <i class="fas fa-sign-out-alt text-gray-400 text-lg w-5"></i>
+                <span class="ml-3 text-sm">Logout</span>
               </a>
             </div>
           </div>
@@ -845,7 +865,18 @@ try {
         function getTimeAgo(date) { const s = Math.floor((new Date() - date) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return `${Math.floor(s / 60)}m ago`; if (s < 86400) return `${Math.floor(s / 3600)}h ago`; if (s < 604800) return `${Math.floor(s / 86400)}d ago`; return date.toLocaleDateString(); }
         function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         function markNotificationAsRead(event, notificationId) { fetch('../api/mark-retailer-notification-read.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notification_id: notificationId }) }).then(response => response.json()).then(data => { if (data.success) { setTimeout(() => { loadRetailerNotificationBadge(); }, 100); } }).catch(error => console.error('Error marking notification as read:', error)); }
-        loadRetailerNotificationBadge(); setInterval(loadRetailerNotificationBadge, 5000);
+        // Load notifications immediately on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRetailerNotificationBadge();
+        });
+        // Also call immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            // DOM is still loading, wait for DOMContentLoaded
+        } else {
+            // DOM is already loaded, execute immediately
+            loadRetailerNotificationBadge();
+        }
+        setInterval(loadRetailerNotificationBadge, 5000);
 
         // Listen for notification updates from other pages (e.g., retailernotifications.php)
         window.addEventListener('storage', (e) => {

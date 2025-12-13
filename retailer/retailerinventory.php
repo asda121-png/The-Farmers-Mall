@@ -322,7 +322,7 @@ try {
                                 </div>
                             </div>
 
-                            <div class="relative inline-block text-left">
+                            <div class="relative inline-block text-left" id="profileDropdownContainer">
                                 <button id="profileDropdownBtn" class="flex items-center" title="<?php echo htmlspecialchars($userFullName); ?>">
                                     <?php if (!empty($profilePicture) && $profilePicture !== '../images/default-avatar.svg' && file_exists(__DIR__ . '/' . $profilePicture)): ?>
                                         <img id="headerProfilePic" src="<?php echo htmlspecialchars($profilePicture); ?>?v=<?php echo time(); ?>" alt="<?php echo htmlspecialchars($userFullName); ?>" class="w-8 h-8 rounded-full cursor-pointer object-cover border-2 border-gray-200" onerror="this.src='../images/default-avatar.svg'">
@@ -738,8 +738,19 @@ try {
                 .catch(error => console.error('Error marking notification as read:', error));
         }
 
-        loadRetailerNotificationBadge();
-        loadRetailerNotificationPreview();
+        // Load notifications immediately on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRetailerNotificationBadge();
+            loadRetailerNotificationPreview();
+        });
+        // Also call immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            // DOM is still loading, wait for DOMContentLoaded
+        } else {
+            // DOM is already loaded, execute immediately
+            loadRetailerNotificationBadge();
+            loadRetailerNotificationPreview();
+        }
         setInterval(loadRetailerNotificationBadge, 5000);
 
         // Listen for notification updates from other pages (e.g., retailernotifications.php)

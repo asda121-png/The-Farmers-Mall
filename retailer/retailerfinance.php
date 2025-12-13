@@ -702,7 +702,17 @@ try {
         .catch(error => console.error('Error marking notification as read:', error));
     }
     
-    loadRetailerNotificationBadge();
+    // Load notifications immediately on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadRetailerNotificationBadge();
+    });
+    // Also call immediately in case DOM is already loaded
+    if (document.readyState === 'loading') {
+        // DOM is still loading, wait for DOMContentLoaded
+    } else {
+        // DOM is already loaded, execute immediately
+        loadRetailerNotificationBadge();
+    }
     setInterval(loadRetailerNotificationBadge, 5000);
 
     // Listen for notification updates from other pages (e.g., retailernotifications.php)

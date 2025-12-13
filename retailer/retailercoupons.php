@@ -555,7 +555,18 @@ try {
     function getTimeAgo(date) { const s = Math.floor((new Date() - date) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return `${Math.floor(s / 60)}m ago`; if (s < 86400) return `${Math.floor(s / 3600)}h ago`; if (s < 604800) return `${Math.floor(s / 86400)}d ago`; return date.toLocaleDateString(); }
     function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
     function markNotificationAsRead(event, notificationId) { fetch('../api/mark-retailer-notification-read.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notification_id: notificationId }) }).then(response => response.json()).then(data => { if (data.success) { setTimeout(() => { loadRetailerNotificationBadge(); }, 100); } }).catch(error => console.error('Error marking notification as read:', error)); }
-    loadRetailerNotificationBadge(); setInterval(loadRetailerNotificationBadge, 5000);
+    // Load notifications immediately on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadRetailerNotificationBadge();
+    });
+    // Also call immediately in case DOM is already loaded
+    if (document.readyState === 'loading') {
+        // DOM is still loading, wait for DOMContentLoaded
+    } else {
+        // DOM is already loaded, execute immediately
+        loadRetailerNotificationBadge();
+    }
+    setInterval(loadRetailerNotificationBadge, 5000);
 
     // Listen for notification updates from other pages (e.g., retailernotifications.php)
     window.addEventListener('storage', (e) => {
