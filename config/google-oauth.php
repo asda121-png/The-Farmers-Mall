@@ -36,20 +36,9 @@ class GoogleOAuth {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
         $host = $_SERVER['HTTP_HOST'];
         
-        // Build the correct base path to The-Farmers-Mall directory
-        // This ensures the redirect URI is always correct regardless of where the script is called from
-        $scriptPath = $_SERVER['SCRIPT_NAME'];
-        
-        // Get the application root (The-Farmers-Mall directory)
-        // We need to find where /The-Farmers-Mall/ starts in the path
-        if (strpos($scriptPath, '/The-Farmers-Mall/') !== false) {
-            $basePath = '/The-Farmers-Mall';
-        } elseif (strpos($scriptPath, '\\The-Farmers-Mall\\') !== false) {
-            $basePath = '/The-Farmers-Mall';
-        } else {
-            // Fallback: calculate from script directory
-            $basePath = rtrim(dirname($scriptPath), '/\\');
-        }
+        // ALWAYS return /The-Farmers-Mall as the base path
+        // This ensures consistency regardless of which script is calling this function
+        $basePath = '/The-Farmers-Mall';
         
         return $protocol . $host . $basePath;
     }

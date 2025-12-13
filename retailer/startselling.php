@@ -2,6 +2,18 @@
 // PHP SCRIPT START - RETAILER REGISTRATION WITH SUPABASE
 session_start();
 
+// Load Google OAuth configuration
+require_once __DIR__ . '/../config/google-oauth.php';
+$googleAuthUrl = '';
+try {
+    $oauth = new GoogleOAuth();
+    $baseAuthUrl = $oauth->getAuthorizationUrl();
+    // Add user_type parameter for retailer signup
+    $googleAuthUrl = $baseAuthUrl . '&state=retailer';
+} catch (Exception $e) {
+    error_log("Google OAuth initialization error: " . $e->getMessage());
+}
+
 // Load Supabase API
 require_once __DIR__ . '/../config/supabase-api.php';
 
@@ -50,6 +62,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
         if (empty($shopAddress)) $errors[] = "Shop address is required.";
         if (empty($verificationCode)) $errors[] = "Verification code is required.";
+        
+        // Verify the email verification code
+        if (empty($errors) && !empty($verificationCode)) {
+            // Check if code exists in session and matches
+            if (!isset($_SESSION['retailer_verification_code']) || !isset($_SESSION['retailer_code_email']) || !isset($_SESSION['retailer_code_expires'])) {
+                $errors[] = "No verification code found. Please send a new code.";
+            } else if ($_SESSION['retailer_code_email'] !== $email) {
+                $errors[] = "Verification code does not match the email address.";
+            } else if (time() > $_SESSION['retailer_code_expires']) {
+                $errors[] = "Verification code has expired. Please send a new code.";
+                unset($_SESSION['retailer_verification_code']);
+                unset($_SESSION['retailer_code_email']);
+                unset($_SESSION['retailer_code_expires']);
+            } else if ($_SESSION['retailer_verification_code'] !== $verificationCode) {
+                $errors[] = "Verification code is incorrect.";
+            } else {
+                // Code is valid - clear the session variables
+                unset($_SESSION['retailer_verification_code']);
+                unset($_SESSION['retailer_code_email']);
+                unset($_SESSION['retailer_code_expires']);
+            }
+        }
+        
         if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', $password)) $errors[] = "Password must be at least 8 characters with uppercase, lowercase, and number.";
         if ($password !== $confirmPassword) $errors[] = "Passwords do not match.";
         if (!$terms) $errors[] = "You must agree to the Terms and Conditions.";
@@ -745,10 +780,13 @@ include '../includes/header.php';
   <script>
     // ====== REGISTRATION METHOD CHOICE ======
     function continueWithGoogle() {
-      // TODO: Implement Google OAuth
-      alert('Google Sign-In will be implemented soon!');
-      // For now, you can redirect to Google OAuth or show a message
-      // window.location.href = '/auth/google';
+      // Redirect to Google OAuth
+      const googleAuthUrl = '<?php echo $googleAuthUrl; ?>';
+      if (googleAuthUrl) {
+        window.location.href = googleAuthUrl;
+      } else {
+        alert('Google authentication is not configured. Please try email sign-up instead.');
+      }
     }
 
     function continueWithEmail() {
@@ -1220,6 +1258,81 @@ include '../includes/header.php';
         toggle.classList.remove('fa-eye-slash');
         toggle.classList.add('fa-eye');
       }
+    }
+
+    // ====== EMAIL VERIFICATION HANDLER ======
+    let sentVerificationCode = null; // Stores the OTP for client-side validation (dev only)
+    let verificationCodeSent = false; // Flag to indicate if code was sent
+    
+    const sendVerificationBtn = document.querySelector('button[type="button"]');
+    const emailInput = document.getElementById('email');
+    const verificationCodeInput = document.getElementById('verification_code');
+    const verificationMessage = document.createElement('div');
+    verificationMessage.id = 'verification_message';
+    verificationMessage.className = 'text-sm text-center hidden mt-2';
+    
+    // Insert the message div after the send button
+    if (sendVerificationBtn) {
+      sendVerificationBtn.parentNode.insertBefore(verificationMessage, sendVerificationBtn.nextSibling);
+    }
+    
+    // Find the actual Send Verification Code button by checking text content
+    let sendCodeBtn = null;
+    const allButtons = document.querySelectorAll('button[type="button"]');
+    allButtons.forEach(btn => {
+      if (btn.textContent.includes('Send Verification Code')) {
+        sendCodeBtn = btn;
+      }
+    });
+    
+    if (sendCodeBtn && emailInput) {
+      sendCodeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          verificationMessage.innerHTML = '<span class="text-red-600">Please enter a valid email address.</span>';
+          verificationMessage.classList.remove('hidden');
+          return;
+        }
+        
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.textContent = 'Sending...';
+        verificationMessage.classList.add('hidden');
+        
+        fetch('./verify-email.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            sentVerificationCode = data.code || null;
+            verificationMessage.innerHTML = '<span class="text-green-600">✅ ' + data.message + '</span>';
+            verificationMessage.classList.remove('hidden');
+            sendCodeBtn.textContent = 'Code Sent!';
+            sendCodeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            verificationCodeSent = true;
+            verificationCodeInput.focus();
+          } else {
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.textContent = 'Send Verification Code';
+            verificationMessage.innerHTML = '<span class="text-red-600">❌ ' + data.message + '</span>';
+            verificationMessage.classList.remove('hidden');
+          }
+        })
+        .catch(error => {
+          sendCodeBtn.disabled = false;
+          sendCodeBtn.textContent = 'Send Verification Code';
+          verificationMessage.innerHTML = '<span class="text-red-600">❌ Error: ' + error.message + '</span>';
+          verificationMessage.classList.remove('hidden');
+        });
+      });
     }
 
     // Final form submission handler

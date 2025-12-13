@@ -133,13 +133,19 @@ try {
         $tempPassword = bin2hex(random_bytes(16));
         $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
         
+        // Determine user type (from state parameter or default to customer)
+        $userType = 'customer';
+        if (isset($_GET['state']) && $_GET['state'] === 'retailer') {
+            $userType = 'retailer';
+        }
+        
         // Prepare new user data
         $newUserData = [
             'email' => $email,
             'username' => $username,
             'full_name' => $fullName,
             'password_hash' => $hashedPassword,
-            'user_type' => 'customer',
+            'user_type' => $userType,
             'status' => 'active',
             'phone' => '',
             'address' => ''
@@ -162,15 +168,19 @@ try {
         $_SESSION['full_name'] = $newUser['full_name'];
         $_SESSION['phone'] = '';
         $_SESSION['address'] = '';
-        $_SESSION['role'] = 'customer';
-        $_SESSION['user_type'] = 'customer';
+        $_SESSION['role'] = $userType;
+        $_SESSION['user_type'] = $userType;
         
         // Log new Google user creation
-        error_log("New user created via Google OAuth: {$newUser['email']} (ID: {$newUser['id']})");
+        error_log("New user created via Google OAuth: {$newUser['email']} (ID: {$newUser['id']}, Type: {$userType})");
         
-        // Redirect to user homepage
+        // Redirect based on user type
         $baseUrl = getBaseUrl();
-        sendJsonResponse('success', 'Account created and logged in! Redirecting...', $baseUrl . '/user/user-homepage.php');
+        if ($userType === 'retailer') {
+            sendJsonResponse('success', 'Retailer account created! Redirecting...', $baseUrl . '/retailer/retailer-dashboard2.php');
+        } else {
+            sendJsonResponse('success', 'Account created and logged in! Redirecting...', $baseUrl . '/user/user-homepage.php');
+        }
     }
     
 } catch (Exception $e) {
