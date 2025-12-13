@@ -372,11 +372,11 @@ try {
 
 
   <!-- Main Layout with Modern Design -->
-  <main class="max-w-7xl mx-auto px-6 py-8 flex gap-6 mb-32">
+  <main class="max-w-7xl mx-auto px-6 py-8 flex gap-6 mb-32 min-h-screen">
 
     <!-- Sidebar -->
 
-    <aside class="w-72 bg-white rounded-lg shadow p-6">
+    <aside class="w-72 bg-white rounded-lg shadow p-6 h-fit sticky top-24">
 
       <!-- Profile Info -->
 
@@ -894,7 +894,7 @@ try {
 
   <!-- Footer -->
 
-  <footer class="text-white py-12 mt-20" style="background-color: #1B5E20;">
+  <footer class="text-white py-12 mt-40" style="background-color: #1B5E20;">
 
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
 
