@@ -344,10 +344,26 @@ try {
     .notification-clear-btn { font-size: 12px; color: #2E7D32; cursor: pointer; background: none; border: none; }
     .notification-clear-btn:hover { color: #1B5E20; }
 
+    /* Ensure select dropdown doesn't overflow modal */
+    select { 
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    
     /* FAQ Accordion Styles from support.php */
     .faq-item .faq-answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-out; }
     .faq-item.active .faq-answer { grid-template-rows: 1fr; }
     .faq-item.active .faq-toggle .fa-chevron-down { transform: rotate(180deg); }
+
+    /* Custom style for a focused select element to act as a scrollable dropdown */
+    #address-barangay[size] {
+      position: absolute;
+      z-index: 99;
+      height: 240px; /* Adjust height as needed */
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      border-color: #22c55e; /* focus:ring-green-500 */
+      border-width: 2px;
+    }
   </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -358,7 +374,7 @@ try {
 
 
   <!-- Main Layout with Modern Design -->
-  <main class="max-w-7xl mx-auto px-6 py-8 flex gap-6 mb-20">
+  <main class="max-w-7xl mx-auto px-6 py-8 flex gap-6 mb-32">
 
     <!-- Sidebar -->
 
@@ -402,7 +418,7 @@ try {
 
         <a href="#order-history" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
 
-          <i class="fas fa-box"></i> Order History
+          <i class="fas fa-box"></i> My Purchases
 
         </a>
 
@@ -707,19 +723,35 @@ try {
 
 
       <section id="order-history" class="content-section bg-white rounded-lg shadow p-6 hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold text-gray-800">Order History</h2>
-          <div class="flex items-center gap-3">
-            <select class="border rounded-lg px-3 py-2 text-sm">
-              <option>Last 3 months</option>
-              <option>Last 6 months</option>
-              <option>Last year</option>
-            </select>
-            <button class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-              <i class="fas fa-download"></i> Export
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">My Purchases</h2>
+          
+          <!-- Filter Tabs -->
+          <div class="flex gap-4 overflow-x-auto border-b">
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="all">
+              All
+            </button>
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="to-pay">
+              To Pay
+            </button>
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="to-ship">
+              To Ship
+            </button>
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="to-receive">
+              To Receive
+            </button>
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="completed">
+              Completed
+            </button>
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="cancelled">
+              Cancelled
+            </button>
+            <button class="order-filter-btn pb-3 px-4 font-medium text-gray-600 border-b-2 border-transparent hover:border-green-600 whitespace-nowrap transition" data-filter="return-refund">
+              Return Refund
             </button>
           </div>
         </div>
+
         <div id="orderList" class="space-y-4">
           <div id="noOrdersPlaceholder" class="text-center text-gray-500 py-10 border-2 border-dashed rounded-lg">
             <i class="fas fa-receipt text-3xl mb-3"></i>
@@ -736,8 +768,8 @@ try {
       <section id="my-address" class="content-section bg-white rounded-lg shadow p-6 hidden">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-semibold text-gray-800">My Delivery Address</h2>
-          <button id="editAddressBtn" class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-            <i class="fas fa-pen mr-1"></i> Edit
+          <button id="editAddressBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+            <i class="fas fa-plus mr-1"></i> Add New Address
           </button>
         </div>
         <div id="addressDisplay" class="text-gray-600 leading-relaxed">
@@ -886,7 +918,7 @@ try {
 
   <!-- Footer -->
 
-  <footer class="text-white py-12" style="background-color: #1B5E20;">
+  <footer class="text-white py-12 mt-20" style="background-color: #1B5E20;">
 
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
 
@@ -988,44 +1020,96 @@ try {
 
   <!-- Add Address Modal -->
 
-  <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
 
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
 
-      <h3 class="font-semibold text-lg mb-4">Add New Address</h3>
+      <h3 class="font-semibold text-lg p-6 pb-4 border-b">New Address</h3>
+      
+      <!-- The form itself should not scroll, but its content should. -->
+      <form id="addressForm" class="flex flex-col flex-1">
+        <div class="p-6 space-y-4 overflow-y-auto">
 
-      <form id="addressForm" class="space-y-4">
-
-        <div>
-
-          <label class="block text-sm font-medium text-gray-700">Full Name</label>
-
-          <input type="text" id="address-name" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-
-        </div>
-
-        <div>
-
-          <label class="block text-sm font-medium text-gray-700">Street Address</label>
-
-          <input type="text" id="address-street" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-
-        </div>
-
+        <!-- Full Name and Phone Number Row -->
         <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="address-name" required placeholder="Full Name" class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+            <input type="tel" id="address-phone" required placeholder="Phone Number" class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+        </div>
 
-          <div><label class="block text-sm font-medium text-gray-700">City</label><input type="text" id="address-city" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+        <!-- Region, Province, City, Barangay -->
+        <div class="space-y-3">
+          <div class="grid grid-cols-4 gap-3">
+            <!-- Region Static Display -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+              <div class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700 text-sm">
+                Davao
+              </div>
+              <input type="hidden" id="address-region" value="REGION_XI">
+            </div>
 
-          <div><label class="block text-sm font-medium text-gray-700">Province</label><input type="text" id="address-province" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
+            <!-- Province Static Display -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+              <div class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700 text-sm">
+                Davao Oriental
+              </div>
+              <input type="hidden" id="address-province" value="Davao Oriental">
+            </div>
+
+            <!-- City Static Display -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <div class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700 text-sm">
+                Mati
+              </div>
+              <input type="hidden" id="address-city" value="Mati">
+            </div>
+
+            <!-- Barangay Dropdown -->
+            <div class="relative z-20">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
+              <select id="address-barangay" class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none text-sm bg-white">
+                <option value="">Barangay</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Postal Code Static Display -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+          <div class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700 text-sm">
+            8200
+          </div>
+          <input type="hidden" id="address-postal" value="8200">
+        </div>
+
+        <!-- Street Address with Add Location -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Street Name, Building, House No.</label>
+          <input type="text" id="address-street" required placeholder="Street Name, Building, House No." class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none mb-2">
+          <div id="locationStatus" class="text-xs text-gray-500 mb-2"></div>
+          <div class="flex justify-center">
+            <button type="button" id="addLocationBtn" class="px-4 py-2 border-2 border-dashed border-gray-300 text-gray-600 rounded-md text-sm hover:border-blue-500 hover:text-blue-600 flex items-center gap-2">
+              <i class="fas fa-plus"></i> Add Location
+            </button>
+          </div>
+        </div>
 
         </div>
 
-        <div class="mt-6 flex justify-end gap-3">
-
-          <button type="button" class="modal-close px-4 py-2 border rounded-md text-sm">Cancel</button>
-
-          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Address</button>
-
+        <!-- Buttons -->
+        <div class="p-6 pt-4 border-t bg-gray-50 flex justify-end gap-3">
+          <button type="button" class="modal-close px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700">Submit</button>
         </div>
 
       </form>
@@ -1435,7 +1519,7 @@ try {
       const addressModal = document.getElementById('addressModal');
       const editAddressBtn = document.getElementById('editAddressBtn');
       const addressDisplay = document.getElementById('addressDisplay');
-      const addressEdit = document.getElementById('addressEdit');
+      const addressForm = document.getElementById('addressForm');
 
       const closeModalBtns = document.querySelectorAll('.modal-close');
 
@@ -1445,9 +1529,9 @@ try {
 
       const closeModal = (modal) => modal.classList.add('hidden');
       
+      // Open address modal when Add New Address button is clicked
       editAddressBtn.addEventListener('click', () => {
-        addressDisplay.classList.add('hidden');
-        addressEdit.classList.remove('hidden');
+        openModal(addressModal);
       });
 
       closeModalBtns.forEach(btn => {
@@ -1458,6 +1542,375 @@ try {
         });
 
       });
+
+      // --- Address Form Submission ---
+      let userAddresses = JSON.parse(localStorage.getItem('userAddresses')) || [];
+
+      // Comprehensive region, province, city mapping
+      const regionData = {
+        'NCR': {
+          name: 'Metro Manila',
+          provinces: {
+            'Metro Manila': ['Manila', 'Quezon City', 'Caloocan', 'Las Piñas', 'Makati', 'Marikina', 'Muntinlupa', 'Navotas', 'Pasay', 'Pasig', 'Pateros', 'San Juan', 'Taguig', 'Valenzuela', 'Malabon']
+          }
+        },
+        'REGION_I': {
+          name: 'North Luzon',
+          provinces: {
+            'Ilocos Norte': ['Laoag', 'Batac', 'Paoay', 'Pagudpud'],
+            'Ilocos Sur': ['Vigan', 'Candon', 'Santa Cruz'],
+            'La Union': ['San Fernando', 'Dagupan', 'Agoo', 'Bauang']
+          }
+        },
+        'REGION_II': {
+          name: 'Cagayan Valley',
+          provinces: {
+            'Cagayan': ['Tuguegarao', 'Ilagan', 'Cabanatuan', 'Sanchez Mira'],
+            'Isabela': ['Isabela City', 'Cabagan', 'Cauayan']
+          }
+        },
+        'REGION_III': {
+          name: 'Central Luzon',
+          provinces: {
+            'Bulacan': ['Malolos', 'San Fernando', 'Meycauayan', 'Valenzuela'],
+            'Nueva Ecija': ['Cabanatuan', 'San Fernando', 'Palayan'],
+            'Pampanga': ['Angeles City', 'San Fernando', 'Mabalacat', 'Porac'],
+            'Quezon': ['Lucena', 'Pagbilao', 'Tayabas']
+          }
+        },
+        'CALABARZON': {
+          name: 'Calabarzon',
+          provinces: {
+            'Batangas': ['Batangas City', 'Lipa City', 'Nasugbu', 'Tagaytay'],
+            'Cavite': ['Dasmariñas', 'Kawit', 'Bacoor', 'Imus'],
+            'Laguna': ['Biñan', 'Santa Rosa', 'Calamba', 'Laguna'],
+            'Quezon': ['Lucena', 'Pagbilao', 'Tayabas'],
+            'Rizal': ['Rizal Province', 'Antipolo', 'Cainta']
+          }
+        },
+        'MIMAROPA': {
+          name: 'MIMAROPA',
+          provinces: {
+            'Marinduque': ['Boac', 'Mogpog'],
+            'Mindoro Occidental': ['Mamburao', 'San Jose'],
+            'Mindoro Oriental': ['Calapan', 'Pola'],
+            'Palawan': ['Puerto Princesa', 'Coron', 'Naic']
+          }
+        },
+        'REGION_VI': {
+          name: 'Western Visayas',
+          provinces: {
+            'Aklan': ['Kalibo', 'Boracay'],
+            'Antique': ['San Jose de Buenavista'],
+            'Capiz': ['Roxas', 'Panay'],
+            'Iloilo': ['Iloilo City', 'Dungarvan', 'Molo'],
+            'Negros Occidental': ['Bacolod', 'Talisay', 'Victorias']
+          }
+        },
+        'REGION_VII': {
+          name: 'Central Visayas',
+          provinces: {
+            'Bohol': ['Tagbilaran', 'Panglao', 'Loon'],
+            'Cebu': ['Cebu City', 'Lapu-Lapu', 'Mandaue', 'Talisay', 'Bais'],
+            'Negros Oriental': ['Dumaguete', 'Sibulan', 'Mabinay'],
+            'Siquijor': ['Larena', 'Lazi']
+          }
+        },
+        'REGION_VIII': {
+          name: 'Eastern Visayas',
+          provinces: {
+            'Biliran': ['Naval', 'Almeria'],
+            'Eastern Samar': ['Borongan', 'Guiuan'],
+            'Leyte': ['Tacloban', 'Ormoc', 'Albuera'],
+            'Northern Samar': ['Catarman', 'San Jose'],
+            'Southern Leyte': ['Maasin', 'San Ricardo']
+          }
+        },
+        'REGION_IX': {
+          name: 'Zamboanga Peninsula',
+          provinces: {
+            'Zamboanga del Norte': ['Dipolog', 'Dapitan'],
+            'Zamboanga del Sur': ['Pagadian', 'Zamboanga City'],
+            'Zamboanga Sibugay': ['Ipil', 'Malangas']
+          }
+        },
+        'REGION_X': {
+          name: 'Northern Mindanao',
+          provinces: {
+            'Bukidnon': ['Butuan', 'Valencia'],
+            'Camiguin': ['Mambajao', 'Catarman'],
+            'Lanao del Norte': ['Iligan', 'Marawi'],
+            'Misamis Occidental': ['Oroquieta', 'Ozamis City'],
+            'Misamis Oriental': ['Cagayan de Oro', 'Gingoog', 'Surigao City']
+          }
+        },
+        'REGION_XI': {
+          name: 'Davao',
+          provinces: {
+            'Davao del Norte': ['Davao City', 'Tagum', 'Panabo'],
+            'Davao del Sur': ['Digos', 'Matanao'],
+            'Davao Oriental': ['Mati', 'Manay'],
+            'Davao Occidental': ['Malita', 'Don Marcelino']
+          }
+        },
+        'REGION_XII': {
+          name: 'Soccsksargen',
+          provinces: {
+            'Cotabato': ['Kidapawan', 'Matalam', 'Arakan'],
+            'Sarangani': ['Alabel', 'Malungon'],
+            'South Cotabato': ['Koronadal', 'General Santos', 'Tupi'],
+            'Sultan Kudarat': ['Isulan', 'Tacurong']
+          }
+        },
+        'CARAGA': {
+          name: 'Caraga',
+          provinces: {
+            'Agusan del Norte': ['Butuan', 'Cabadbaran'],
+            'Agusan del Sur': ['Proserpina', 'San Luis'],
+            'Surigao del Norte': ['Surigao City', 'Tandag'],
+            'Surigao del Sur': ['Bislig', 'Tandag']
+          }
+        },
+        'BARMM': {
+          name: 'Bangsamoro',
+          provinces: {
+            'Basilan': ['Isabela City', 'Lamitan'],
+            'Lanao del Sur': ['Marawi', 'Koronadal'],
+            'Maguindanao': ['Cotabato City', 'Parang'],
+            'Sulu': ['Jolo', 'Zamboanga']
+          }
+        }
+      };
+
+      // Element references
+      const regionSelect = document.getElementById('address-region');
+      const provinceSelect = document.getElementById('address-province');
+      const citySelect = document.getElementById('address-city');
+      const barangaySelect = document.getElementById('address-barangay');
+
+      // All barangays in Mati city
+      const matiBarangays = [
+        'Badas', 'Bobon', 'Buso', 'Cabuaya', 'Central', 'Culian', 'Dahican', 'Danao', 'Dawan',
+        'Don Enrique Lopez', 'Don Martin Marundan', 'Don Salvador Lopez, Sr.', 'Langka', 'Lawigan',
+        'Libudon', 'Luban', 'Macambol', 'Mamali', 'Matiao', 'Mayo', 'Sainz', 'Sanghay',
+        'Tagabakid', 'Tagbinonga', 'Taguibo', 'Tamisan'
+      ];
+
+      // Populate barangay dropdown on page load
+      function populateBarangays() {
+        barangaySelect.innerHTML = ''; // Remove the repeating "Barangay" placeholder
+        matiBarangays.forEach(barangay => {
+          const option = document.createElement('option');
+          option.value = barangay;
+          option.textContent = barangay;
+          barangaySelect.appendChild(option);
+        });
+      }
+
+      // Call on page load
+      populateBarangays();
+
+      // --- Custom Dropdown Behavior for Barangay ---
+      // This keeps the dropdown inside the scrolling modal.
+      if (barangaySelect) {
+        barangaySelect.addEventListener('focus', () => {
+          // When the select box is focused, give it a size to expand it.
+          barangaySelect.setAttribute('size', '12'); 
+        });
+
+        barangaySelect.addEventListener('blur', () => {
+          // When it loses focus, remove the size to collapse it.
+          barangaySelect.removeAttribute('size');
+        });
+
+        // Automatically submit the form when a barangay is selected
+        barangaySelect.addEventListener('change', () => {
+          // A brief delay can improve UX, ensuring the user sees their selection.
+          setTimeout(() => {
+            addressForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          }, 200);
+        });
+      }
+
+
+      function displayAddresses() {
+        const noAddressPlaceholder = document.getElementById('noAddressPlaceholder');
+        
+        if (userAddresses.length === 0) {
+          addressDisplay.innerHTML = '';
+          addressDisplay.appendChild(noAddressPlaceholder);
+        } else {
+          addressDisplay.innerHTML = '';
+          userAddresses.forEach((address, index) => {
+            const addressDiv = document.createElement('div');
+            addressDiv.className = 'border rounded-lg p-4 mb-4 flex justify-between items-start';
+            addressDiv.innerHTML = `
+              <div>
+                <h3 class="font-semibold text-gray-800">${address.name}</h3>
+                <p class="text-sm text-gray-600">Phone: ${address.phone}</p>
+                <p class="text-sm text-gray-600">${address.street}</p>
+                <p class="text-sm text-gray-600">${address.city}, ${address.province}</p>
+                ${address.postal ? `<p class="text-sm text-gray-600">Postal: ${address.postal}</p>` : ''}
+              </div>
+              <button onclick="deleteAddress(${index})" class="text-red-600 hover:text-red-700 text-sm">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            `;
+            addressDisplay.appendChild(addressDiv);
+          });
+        }
+      }
+
+      window.deleteAddress = function(index) {
+        userAddresses.splice(index, 1);
+        localStorage.setItem('userAddresses', JSON.stringify(userAddresses));
+        displayAddresses();
+      };
+
+      // --- Add Location (Geolocation) Handler ---
+      const addLocationBtn = document.getElementById('addLocationBtn');
+      const locationStatus = document.getElementById('locationStatus');
+
+      if (addLocationBtn) {
+        addLocationBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          locationStatus.textContent = 'Getting your location...';
+          addLocationBtn.disabled = true;
+          addLocationBtn.style.opacity = '0.5';
+
+          if (!navigator.geolocation) {
+            locationStatus.textContent = 'Geolocation is not supported by your browser';
+            addLocationBtn.disabled = false;
+            addLocationBtn.style.opacity = '1';
+            return;
+          }
+
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const { latitude, longitude } = position.coords;
+              
+              // Store coordinates
+              const coordinatesText = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+              document.getElementById('address-street').value = coordinatesText;
+              locationStatus.textContent = `✓ Location captured (${coordinatesText})`;
+              
+              addLocationBtn.disabled = false;
+              addLocationBtn.style.opacity = '1';
+
+              // Try to reverse geocode using OpenStreetMap Nominatim (free, no API key needed)
+              try {
+                const response = await fetch(
+                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+                );
+                
+                if (response.ok) {
+                  const data = await response.json();
+                  const address = data.address;
+                  
+                  // Try to populate city and province from the reverse geocode data
+                  if (address) {
+                    // Prepend the street/road info to the coordinates
+                    const street = address.road || address.street || coordinatesText;
+                    document.getElementById('address-street').value = street;
+                    
+                    // Try to match province and city from reverse geocode
+                    const state = address.state || address.region || '';
+                    const city = address.city || address.town || address.village || '';
+                    
+                    // Try to match region first (for Philippines structure)
+                    const regionSelect = document.getElementById('address-region');
+                    const provinceSelect = document.getElementById('address-province');
+                    const citySelect = document.getElementById('address-city');
+                    
+                    // Find matching region based on common patterns
+                    let matchedRegion = null;
+                    for (let [regionCode, regionInfo] of Object.entries(regionData)) {
+                      for (let province of Object.keys(regionInfo.provinces)) {
+                        if (province.toLowerCase().includes(state.toLowerCase()) || 
+                            state.toLowerCase().includes(province.toLowerCase())) {
+                          matchedRegion = regionCode;
+                          // Set province value
+                          provinceSelect.value = province;
+                          
+                          // Trigger province change to populate cities
+                          regionSelect.value = regionCode;
+                          regionSelect.dispatchEvent(new Event('change'));
+                          provinceSelect.dispatchEvent(new Event('change'));
+                          
+                          // Try to match city
+                          if (city) {
+                            const cityOptions = citySelect.querySelectorAll('option');
+                            for (let option of cityOptions) {
+                              if (option.value && option.value.toLowerCase().includes(city.toLowerCase())) {
+                                citySelect.value = option.value;
+                                break;
+                              }
+                            }
+                          }
+                          break;
+                        }
+                      }
+                      if (matchedRegion) break;
+                    }
+                    
+                    locationStatus.textContent = `✓ Location: ${street}`;
+                  }
+                }
+              } catch (error) {
+                console.log('Reverse geocode not available, using coordinates only');
+                locationStatus.textContent = `✓ Location captured (coordinates only)`;
+              }
+            },
+            (error) => {
+              let errorMsg = 'Unable to get location';
+              if (error.code === error.PERMISSION_DENIED) {
+                errorMsg = 'Location permission denied. Please enable it in your browser settings.';
+              } else if (error.code === error.POSITION_UNAVAILABLE) {
+                errorMsg = 'Location information is unavailable.';
+              } else if (error.code === error.TIMEOUT) {
+                errorMsg = 'Location request timed out.';
+              }
+              
+              locationStatus.textContent = errorMsg;
+              addLocationBtn.disabled = false;
+              addLocationBtn.style.opacity = '1';
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            }
+          );
+        });
+      }
+
+      if (addressForm) {
+        addressForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          
+          const newAddress = {
+            name: document.getElementById('address-name').value,
+            phone: document.getElementById('address-phone').value,
+            street: document.getElementById('address-street').value,
+            postal: document.getElementById('address-postal').value,
+            region: document.getElementById('address-region').value,
+            province: document.getElementById('address-province').value,
+            city: document.getElementById('address-city').value,
+            barangay: document.getElementById('address-barangay').value
+          };
+
+          userAddresses.push(newAddress);
+          localStorage.setItem('userAddresses', JSON.stringify(userAddresses));
+          
+          displayAddresses();
+          closeModal(addressModal);
+          addressForm.reset();
+        });
+      }
+
+      // Display addresses on load
+      displayAddresses();
 
       // --- Logout Modal Logic ---
       const logoutLink = document.getElementById('logoutLink');
@@ -1534,6 +1987,8 @@ try {
 
       let userOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
 
+      let currentFilter = 'all';
+
 
 
       function getStatusInfo(status) {
@@ -1554,11 +2009,43 @@ try {
 
 
 
+      function getOrderStatus(order) {
+
+        if (order.status === 'Delivered') return 'completed';
+
+        if (order.status === 'Cancelled') return 'cancelled';
+
+        if (order.status === 'Shipped') return 'to-receive';
+
+        if (order.payment_status === 'pending') return 'to-pay';
+
+        if (order.status === 'Processing') return 'to-ship';
+
+        return 'all';
+
+      }
+
+
+
+      function filterOrders(filter) {
+
+        if (filter === 'all') return userOrders;
+
+        return userOrders.filter(order => getOrderStatus(order) === filter);
+
+      }
+
+
+
       function renderOrders() {
 
         orderList.innerHTML = '';
 
-        if (userOrders.length === 0) {
+        const filteredOrders = filterOrders(currentFilter);
+
+        
+
+        if (filteredOrders.length === 0) {
 
           orderList.appendChild(noOrdersPlaceholder);
 
@@ -1570,11 +2057,11 @@ try {
 
           // Sort by most recent first
 
-          userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          filteredOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
           
 
-          userOrders.forEach(order => {
+          filteredOrders.forEach(order => {
 
             const statusInfo = getStatusInfo(order.status);
 
@@ -1635,6 +2122,50 @@ try {
         }
 
       }
+
+
+
+      // --- Filter Button Handlers ---
+
+      document.querySelectorAll('.order-filter-btn').forEach(btn => {
+
+        btn.addEventListener('click', () => {
+
+          // Remove active class from all buttons
+
+          document.querySelectorAll('.order-filter-btn').forEach(b => {
+
+            b.classList.remove('text-green-600', 'border-green-600');
+
+            b.classList.add('text-gray-600', 'border-transparent');
+
+          });
+
+          // Add active class to clicked button
+
+          btn.classList.remove('text-gray-600', 'border-transparent');
+
+          btn.classList.add('text-green-600', 'border-green-600');
+
+          
+
+          // Update filter and render
+
+          currentFilter = btn.dataset.filter;
+
+          renderOrders();
+
+        });
+
+      });
+
+      
+
+      // Set "All" as active by default
+
+      document.querySelector('[data-filter="all"]').classList.add('text-green-600', 'border-green-600');
+
+      document.querySelector('[data-filter="all"]').classList.remove('text-gray-600', 'border-transparent');
 
 
 
