@@ -359,9 +359,7 @@ try {
     #address-barangay[size] {
       position: absolute;
       z-index: 99;
-      height: 240px; /* Adjust height as needed */
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      border-color: #22c55e; /* focus:ring-green-500 */
+      height: 400px; /* Adjust height as needed */
       border-width: 2px;
     }
   </style>
@@ -425,12 +423,6 @@ try {
         <a href="#my-address" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
 
           <i class="fas fa-map-marker-alt"></i> My Address
-
-        </a>
-
-        <a href="#payment-methods" class="sidebar-link flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100">
-
-          <i class="fas fa-credit-card"></i> Payment Methods
 
         </a>
 
@@ -780,22 +772,6 @@ try {
         </div>
       </section>
 
-      <!-- Payment Methods Section -->
-      <section id="payment-methods" class="content-section bg-white rounded-lg shadow p-6 hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold text-gray-800">Payment Methods</h2>
-          <button id="addPaymentBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-            <i class="fas fa-plus mr-1"></i> Add New Card
-          </button>
-        </div>
-        <div id="paymentList" class="space-y-4">
-          <div id="noPaymentPlaceholder" class="text-center text-gray-500 py-10">
-            <i class="fas fa-credit-card text-3xl mb-3"></i>
-            <p>No payment methods saved.</p>
-          </div>
-        </div>
-      </section>
-
       <!-- Settings Section -->
       <section id="settings" class="content-section bg-white rounded-lg shadow p-6 hidden">
         <h2 class="text-xl font-semibold text-gray-800 mb-6">Settings</h2>
@@ -1095,13 +1071,7 @@ try {
         <!-- Street Address with Add Location -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Street Name, Building, House No.</label>
-          <input type="text" id="address-street" required placeholder="Street Name, Building, House No." class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none mb-2">
-          <div id="locationStatus" class="text-xs text-gray-500 mb-2"></div>
-          <div class="flex justify-center">
-            <button type="button" id="addLocationBtn" class="px-4 py-2 border-2 border-dashed border-gray-300 text-gray-600 rounded-md text-sm hover:border-blue-500 hover:text-blue-600 flex items-center gap-2">
-              <i class="fas fa-plus"></i> Add Location
-            </button>
-          </div>
+          <input type="text" id="address-street" required placeholder="Street Name, Building, House No." class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
 
         </div>
@@ -1117,58 +1087,6 @@ try {
     </div>
 
   </div>
-
-
-
-  <!-- Add Payment Modal -->
-
-  <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-
-      <h3 class="font-semibold text-lg mb-4">Add New Card</h3>
-
-      <form id="paymentForm" class="space-y-4">
-
-        <div>
-
-          <label class="block text-sm font-medium text-gray-700">Card Number</label>
-
-          <input type="text" id="card-number" placeholder="€¢€¢€¢€¢ €¢€¢€¢€¢ €¢€¢€¢€¢ €¢€¢€¢€¢" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-
-        </div>
-
-        <div>
-
-          <label class="block text-sm font-medium text-gray-700">Cardholder Name</label>
-
-          <input type="text" id="card-name" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
-
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-
-          <div><label class="block text-sm font-medium text-gray-700">Expiry (MM/YY)</label><input type="text" id="card-expiry" placeholder="MM/YY" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
-
-          <div><label class="block text-sm font-medium text-gray-700">CVV</label><input type="text" id="card-cvv" placeholder="€¢€¢€¢" required class="mt-1 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"></div>
-
-        </div>
-
-        <div class="mt-6 flex justify-end gap-3">
-
-          <button type="button" class="modal-close px-4 py-2 border rounded-md text-sm">Cancel</button>
-
-          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">Save Card</button>
-
-        </div>
-
-      </form>
-
-    </div>
-
-  </div>
-
-
 
   <!-- Success Notification Modal -->
 
@@ -1523,14 +1441,23 @@ try {
 
       const closeModalBtns = document.querySelectorAll('.modal-close');
 
-
-
-      const openModal = (modal) => modal.classList.remove('hidden');
+      const openModal = (modal, callback) => {
+        modal.classList.remove('hidden');
+      };
 
       const closeModal = (modal) => modal.classList.add('hidden');
       
       // Open address modal when Add New Address button is clicked
       editAddressBtn.addEventListener('click', () => {
+        // Reset to "New Address" mode
+        document.querySelector('#addressModal h3').textContent = 'New Address';
+        const existingIndexInput = document.getElementById('editingAddressIndex');
+        if (existingIndexInput) {
+          existingIndexInput.remove();
+        }
+        addressForm.reset();
+        populateBarangays(); // Repopulate and set default
+
         openModal(addressModal);
       });
 
@@ -1539,6 +1466,11 @@ try {
         btn.addEventListener('click', () => {
 
           closeModal(addressModal);
+          addressForm.reset();
+          const existingIndexInput = document.getElementById('editingAddressIndex');
+          if (existingIndexInput) {
+            existingIndexInput.remove();
+          }
         });
 
       });
@@ -1710,12 +1642,13 @@ try {
       // Call on page load
       populateBarangays();
 
+
       // --- Custom Dropdown Behavior for Barangay ---
       // This keeps the dropdown inside the scrolling modal.
       if (barangaySelect) {
         barangaySelect.addEventListener('focus', () => {
           // When the select box is focused, give it a size to expand it.
-          barangaySelect.setAttribute('size', '12'); 
+          barangaySelect.setAttribute('size', '20'); 
         });
 
         barangaySelect.addEventListener('blur', () => {
@@ -1723,12 +1656,9 @@ try {
           barangaySelect.removeAttribute('size');
         });
 
-        // Automatically submit the form when a barangay is selected
         barangaySelect.addEventListener('change', () => {
-          // A brief delay can improve UX, ensuring the user sees their selection.
-          setTimeout(() => {
-            addressForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-          }, 200);
+          // When an option is selected, manually trigger the blur to collapse it.
+          barangaySelect.blur();
         });
       }
 
@@ -1746,15 +1676,20 @@ try {
             addressDiv.className = 'border rounded-lg p-4 mb-4 flex justify-between items-start';
             addressDiv.innerHTML = `
               <div>
-                <h3 class="font-semibold text-gray-800">${address.name}</h3>
-                <p class="text-sm text-gray-600">Phone: ${address.phone}</p>
-                <p class="text-sm text-gray-600">${address.street}</p>
-                <p class="text-sm text-gray-600">${address.city}, ${address.province}</p>
+                <h3 class="font-semibold text-gray-800">${address.name || ''}</h3>
+                <p class="text-sm text-gray-600">Phone: ${address.phone || ''}</p>
+                <p class="text-sm text-gray-600">${address.street || ''}</p>
+                <p class="text-sm text-gray-600">${address.barangay || ''}, ${address.city || ''}, ${address.province || ''}</p>
                 ${address.postal ? `<p class="text-sm text-gray-600">Postal: ${address.postal}</p>` : ''}
               </div>
-              <button onclick="deleteAddress(${index})" class="text-red-600 hover:text-red-700 text-sm">
-                <i class="fas fa-trash"></i> Delete
-              </button>
+              <div class="flex gap-3">
+                <button onclick="editAddress(${index})" class="text-green-600 hover:text-green-700 text-sm">
+                  <i class="fas fa-pen"></i> Edit
+                </button>
+                <button onclick="deleteAddress(${index})" class="text-red-600 hover:text-red-700 text-sm">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
             `;
             addressDisplay.appendChild(addressDiv);
           });
@@ -1767,123 +1702,32 @@ try {
         displayAddresses();
       };
 
-      // --- Add Location (Geolocation) Handler ---
-      const addLocationBtn = document.getElementById('addLocationBtn');
-      const locationStatus = document.getElementById('locationStatus');
+      window.editAddress = function(index) {
+        const address = userAddresses[index];
+        if (!address) return;
 
-      if (addLocationBtn) {
-        addLocationBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          
-          locationStatus.textContent = 'Getting your location...';
-          addLocationBtn.disabled = true;
-          addLocationBtn.style.opacity = '0.5';
+        // Populate the modal form
+        document.querySelector('#addressModal h3').textContent = 'Edit Address';
+        const existingIndexInput = document.getElementById('editingAddressIndex');
+        if (existingIndexInput) {
+          existingIndexInput.remove();
+        }
+        addressForm.reset();
 
-          if (!navigator.geolocation) {
-            locationStatus.textContent = 'Geolocation is not supported by your browser';
-            addLocationBtn.disabled = false;
-            addLocationBtn.style.opacity = '1';
-            return;
-          }
+        document.getElementById('address-name').value = address.name || '';
+        document.getElementById('address-phone').value = address.phone || '';
+        document.getElementById('address-street').value = address.street || '';
+        document.getElementById('address-barangay').value = address.barangay || '';
+        
+        // Add a hidden input to store the index of the address being edited
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.id = 'editingAddressIndex';
+        hiddenInput.value = index;
+        addressForm.appendChild(hiddenInput);
 
-          navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              const { latitude, longitude } = position.coords;
-              
-              // Store coordinates
-              const coordinatesText = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-              document.getElementById('address-street').value = coordinatesText;
-              locationStatus.textContent = `✓ Location captured (${coordinatesText})`;
-              
-              addLocationBtn.disabled = false;
-              addLocationBtn.style.opacity = '1';
-
-              // Try to reverse geocode using OpenStreetMap Nominatim (free, no API key needed)
-              try {
-                const response = await fetch(
-                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-                );
-                
-                if (response.ok) {
-                  const data = await response.json();
-                  const address = data.address;
-                  
-                  // Try to populate city and province from the reverse geocode data
-                  if (address) {
-                    // Prepend the street/road info to the coordinates
-                    const street = address.road || address.street || coordinatesText;
-                    document.getElementById('address-street').value = street;
-                    
-                    // Try to match province and city from reverse geocode
-                    const state = address.state || address.region || '';
-                    const city = address.city || address.town || address.village || '';
-                    
-                    // Try to match region first (for Philippines structure)
-                    const regionSelect = document.getElementById('address-region');
-                    const provinceSelect = document.getElementById('address-province');
-                    const citySelect = document.getElementById('address-city');
-                    
-                    // Find matching region based on common patterns
-                    let matchedRegion = null;
-                    for (let [regionCode, regionInfo] of Object.entries(regionData)) {
-                      for (let province of Object.keys(regionInfo.provinces)) {
-                        if (province.toLowerCase().includes(state.toLowerCase()) || 
-                            state.toLowerCase().includes(province.toLowerCase())) {
-                          matchedRegion = regionCode;
-                          // Set province value
-                          provinceSelect.value = province;
-                          
-                          // Trigger province change to populate cities
-                          regionSelect.value = regionCode;
-                          regionSelect.dispatchEvent(new Event('change'));
-                          provinceSelect.dispatchEvent(new Event('change'));
-                          
-                          // Try to match city
-                          if (city) {
-                            const cityOptions = citySelect.querySelectorAll('option');
-                            for (let option of cityOptions) {
-                              if (option.value && option.value.toLowerCase().includes(city.toLowerCase())) {
-                                citySelect.value = option.value;
-                                break;
-                              }
-                            }
-                          }
-                          break;
-                        }
-                      }
-                      if (matchedRegion) break;
-                    }
-                    
-                    locationStatus.textContent = `✓ Location: ${street}`;
-                  }
-                }
-              } catch (error) {
-                console.log('Reverse geocode not available, using coordinates only');
-                locationStatus.textContent = `✓ Location captured (coordinates only)`;
-              }
-            },
-            (error) => {
-              let errorMsg = 'Unable to get location';
-              if (error.code === error.PERMISSION_DENIED) {
-                errorMsg = 'Location permission denied. Please enable it in your browser settings.';
-              } else if (error.code === error.POSITION_UNAVAILABLE) {
-                errorMsg = 'Location information is unavailable.';
-              } else if (error.code === error.TIMEOUT) {
-                errorMsg = 'Location request timed out.';
-              }
-              
-              locationStatus.textContent = errorMsg;
-              addLocationBtn.disabled = false;
-              addLocationBtn.style.opacity = '1';
-            },
-            {
-              enableHighAccuracy: true,
-              timeout: 10000,
-              maximumAge: 0
-            }
-          );
-        });
-      }
+        openModal(addressModal);
+      };
 
       if (addressForm) {
         addressForm.addEventListener('submit', (e) => {
@@ -1899,13 +1743,37 @@ try {
             city: document.getElementById('address-city').value,
             barangay: document.getElementById('address-barangay').value
           };
+          
+          const editingIndexInput = document.getElementById('editingAddressIndex');
+          if (editingIndexInput) {
+            // We are editing an existing address
+            const index = parseInt(editingIndexInput.value, 10);
+            userAddresses[index] = newAddress;
+            editingIndexInput.remove(); // Clean up the hidden input
+          } else {
+            // We are adding a new address
+            userAddresses.push(newAddress);
+          }
 
-          userAddresses.push(newAddress);
           localStorage.setItem('userAddresses', JSON.stringify(userAddresses));
           
           displayAddresses();
           closeModal(addressModal);
           addressForm.reset();
+        });
+      }
+
+      // Reset form when address modal is closed
+      if (addressModal) {
+        closeModalBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            addressForm.reset();
+            const existingIndexInput = document.getElementById('editingAddressIndex');
+            if (existingIndexInput) {
+              existingIndexInput.remove();
+            }
+            document.querySelector('#addressModal h3').textContent = 'New Address';
+          });
         });
       }
 
@@ -2847,6 +2715,15 @@ try {
       // Listen for cart updates within the same page
 
       window.addEventListener('cartUpdated', updateCartIcon);
+
+      // Listen for storage events to sync orders across tabs
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'userOrders') {
+          console.log('Order history updated from another tab. Refreshing...');
+          userOrders = JSON.parse(e.newValue) || [];
+          renderOrders();
+        }
+      });
 
     });
 
