@@ -15,12 +15,7 @@ GOOGLE_CLIENT_ID=YOUR_SHARED_CLIENT_ID_HERE
 GOOGLE_CLIENT_SECRET=YOUR_SHARED_CLIENT_SECRET_HERE
 ```
 
-**Replace them with these values:**
-
-```
-GOOGLE_CLIENT_ID=341033795740-rmd194gkanbnv9crp2kdi6us1rs80e4d.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
-```
+**Contact your team lead to get the actual shared credentials** and add them to your local `config/.env.local` file (which is not committed to Git).
 
 ---
 
