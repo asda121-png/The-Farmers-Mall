@@ -3,8 +3,8 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header('Location: ../auth/login.php');
-    exit();
+  header('Location: ../auth/login.php');
+  exit();
 }
 
 // Get user data from session
@@ -16,27 +16,28 @@ $user_id = $_SESSION['user_id'] ?? null;
 $profile_picture = '';
 $full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
-    require_once __DIR__ . '/../config/supabase-api.php';
-    require_once __DIR__ . '/../config/uuid-helper.php';
-    $api = getSupabaseAPI();
-    $user = safeGetUser($user_id, $api);
-    if ($user) {
-        $profile_picture = $user['profile_picture'] ?? '';
-    }
+  require_once __DIR__ . '/../config/supabase-api.php';
+  require_once __DIR__ . '/../config/uuid-helper.php';
+  $api = getSupabaseAPI();
+  $user = safeGetUser($user_id, $api);
+  if ($user) {
+    $profile_picture = $user['profile_picture'] ?? '';
+  }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Farmers Mall - Home</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-  <style>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Farmers Mall - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
     /* New Class for Fresh Vegetable Bundle Font Style - UPDATED to sans-serif */
     .fresh-font {
         font-family: sans-serif;
@@ -44,7 +45,8 @@ if ($user_id) {
     }
 
     .category-text {
-        margin-top: 0.5rem; /* Adjusts spacing to the upper */
+        margin-top: 0.5rem;
+        /* Adjusts spacing to the upper */
     }
 
     /* Smooth transitions for all elements */
@@ -100,20 +102,20 @@ if ($user_id) {
 
     /* Category hover effects - subtle */
     .category-item {
-      transition: all 0.3s ease;
+        transition: all 0.3s ease;
     }
 
     .category-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
     }
 
     .category-item:hover i {
-      color: #1B5E20;
+        color: #1B5E20;
     }
 
     .category-item:hover p {
-      color: #1B5E20;
+        color: #1B5E20;
     }
 
     /* Product card static (no hover effects) */
@@ -123,41 +125,43 @@ if ($user_id) {
 
     /* Make product cards vertical rectangles: taller image and card height */
     .product-card {
-      display: flex;
-      flex-direction: column;
-      min-height: 22rem; /* Slightly increased for category text */
-      border: 2px solid transparent;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-      position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 22rem;
+        /* Slightly increased for category text */
+        border: 2px solid transparent;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        position: relative;
     }
 
     .product-card:hover {
-      border-color: #2E7D32;
+        border-color: #2E7D32;
     }
 
-    .product-card > img {
-      height: 12rem;
-      width: 100%;
-      object-fit: cover;
-      flex-shrink: 0;
+    .product-card>img {
+        height: 12rem;
+        width: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
     }
 
-    .product-card > div {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 1rem;
+    .product-card>div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1rem;
     }
 
     /* Container for the bottom elements */
     .product-card-bottom {
-      display: flex;
-      align-items: flex-end; /* Aligns content to the bottom baseline */
-      justify-content: space-between;
-      width: 100%;
-      margin-top: auto;
+        display: flex;
+        align-items: flex-end;
+        /* Aligns content to the bottom baseline */
+        justify-content: space-between;
+        width: 100%;
+        margin-top: auto;
     }
 
     .product-card h3,
@@ -183,14 +187,16 @@ if ($user_id) {
 
     /* Shop card styles (hover effect aligned with product cards) */
     .shop-card {
-      border: 2px solid transparent;
-      border-radius: 0.5rem; /* Tailwind's rounded-lg */
-      transition: all 0.3s ease;
-      overflow: hidden; /* Keep this to contain the image */
+        border: 2px solid transparent;
+        border-radius: 0.5rem;
+        /* Tailwind's rounded-lg */
+        transition: all 0.3s ease;
+        overflow: hidden;
+        /* Keep this to contain the image */
     }
 
     .shop-card:hover {
-      border-color: #2E7D32;
+        border-color: #2E7D32;
     }
 
     /* Footer links hover effect */
@@ -240,10 +246,13 @@ if ($user_id) {
 
     /* Pulse animation for new badges */
     @keyframes pulse {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: scale(1);
             opacity: 1;
         }
+
         50% {
             transform: scale(1.05);
             opacity: 0.8;
@@ -255,6 +264,7 @@ if ($user_id) {
         0% {
             background-position: -1000px 0;
         }
+
         100% {
             background-position: 1000px 0;
         }
@@ -267,12 +277,10 @@ if ($user_id) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.3),
-            transparent
-        );
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent);
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite;
         pointer-events: none;
@@ -430,168 +438,191 @@ if ($user_id) {
     .notification-clear-btn:hover {
         color: #4CAF50;
     }
-  
-  </style>
+    </style>
 </head>
+
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<?php include __DIR__ . '/../includes/user-header.php'; ?>
+    <?php include __DIR__ . '/../includes/user-header.php'; ?>
 
 
-  <section class="hero-slider relative">
-    <div class="hero-slide active" style="background-image: url('../images/img01.png');">
-      <div class="bg-black bg-opacity-40">
-        <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Fresh Harvest Sale</h2>
-          <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
-          <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
-            Shop Now
-          </a>
+    <section class="hero-slider relative">
+        <div class="hero-slide active" style="background-image: url('../images/img01.png');">
+            <div class="bg-black bg-opacity-40">
+                <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
+                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Fresh Harvest Sale</h2>
+                    <p class="text-lg md:text-xl mb-6">Up to 30% off on organic produce</p>
+                    <a href="products.php"
+                        class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+                        Shop Now
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="hero-slide" style="background-image: url('../images/img02.png');">
-      <div class="bg-black bg-opacity-40">
-        <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Farm Fresh Daily</h2>
-          <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
-          <a href="../user/products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
-            Shop Now
-          </a>
+        <div class="hero-slide" style="background-image: url('../images/img02.png');">
+            <div class="bg-black bg-opacity-40">
+                <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
+                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Farm Fresh Daily</h2>
+                    <p class="text-lg md:text-xl mb-6">Organic vegetables & herbs from local farms</p>
+                    <a href="../user/products.php"
+                        class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+                        Shop Now
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="hero-slide" style="background-image: url('../images/img03.png');">
-      <div class="bg-black bg-opacity-40">
-        <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Premium Quality</h2>
-          <p class="text-lg md:text-xl mb-6">Fresh ingredients delivered to your door</p>
-          <a href="products.php" class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
-            Shop Now
-          </a>
+        <div class="hero-slide" style="background-image: url('../images/img03.png');">
+            <div class="bg-black bg-opacity-40">
+                <div class="hero-content max-w-7xl mx-auto px-6 py-32 text-left text-white">
+                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4 fresh-font">Premium Quality</h2>
+                    <p class="text-lg md:text-xl mb-6">Fresh ingredients delivered to your door</p>
+                    <a href="products.php"
+                        class="hero-btn inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+                        Shop Now
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="slider-dots">
-      <span class="slider-dot active" data-slide="0"></span>
-      <span class="slider-dot" data-slide="1"></span>
-      <span class="slider-dot" data-slide="2"></span>
-    </div>
-  </section>
-
-  <section class="w-full mx-auto px-0 py-10 bg-[#FFFFFF] mb-10">
-    <div class="flex justify-center mb-8">
-      <h2 class="section-heading text-2xl font-bold fresh-font">Shop by Category</h2>
-    </div>
-    <div class="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto px-6">
-      <a href="products.php?category=vegetables" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-        <i class="fa-solid fa-carrot text-green-600 text-2xl"></i>
-        <p class="text-gray-700 mt-2 text-xs category-text">Vegetables</p>
-      </a>
-      <a href="products.php?category=fruits" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-        <i class="fa-solid fa-apple-whole text-green-600 text-2xl"></i>
-        <p class="mt-2 text-xs category-text">Fruits</p>
-      </a>
-      <a href="products.php?category=meat" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-        <i class="fa-solid fa-drumstick-bite text-green-600 text-2xl"></i>
-        <p class="mt-2 text-xs category-text">Meat</p>
-      </a>
-      <a href="products.php?category=seafood" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-        <i class="fa-solid fa-fish text-green-600 text-2xl"></i>
-        <p class="mt-2 text-xs category-text">Seafood</p>
-      </a>
-      <a href="products.php?category=dairy" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-        <i class="fa-solid fa-cheese text-green-600 text-2xl"></i>
-        <p class="mt-2 text-xs category-text">Dairy</p>
-      </a>
-      <a href="products.php?category=bakery" class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
-        <i class="fa-solid fa-bread-slice text-green-600 text-2xl"></i>
-        <p class="mt-2 text-xs category-text">Bakery</p>
-      </a>
-    </div>
-  </section>
-
-  <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
-    <h2 class="section-heading text-2xl font-bold mb-6 fresh-font">Explore Other Shops</h2>
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <a href="shop-products.php?shop=Mesa Farm" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="../images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Mesa Farm</h3>
-          <p class="text-sm text-gray-600">Organic vegetables & herbs</p>
-          <p class="text-green-600 mt-2">★ 4.8</p>
+        <div class="slider-dots">
+            <span class="slider-dot active" data-slide="0"></span>
+            <span class="slider-dot" data-slide="1"></span>
+            <span class="slider-dot" data-slide="2"></span>
         </div>
-      </a>
+    </section>
 
-      <a href="shop-products.php?shop=Taco Bell" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="../images/img3.png" alt="Taco Bell" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Taco Bell</h3>
-          <p class="text-sm text-gray-600">Fresh Mexican ingredients</p>
-          <p class="text-green-600 mt-2">★ 4.5</p>
+    <section class="w-full mx-auto px-0 py-10 bg-[#FFFFFF] mb-10">
+        <div class="flex justify-center mb-8">
+            <h2 class="section-heading text-2xl font-bold fresh-font">Shop by Category</h2>
         </div>
-      </a>
+        <div class="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto px-6">
+            <a href="products.php?category=vegetables"
+                class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+                <i class="fa-solid fa-carrot text-green-600 text-2xl"></i>
+                <p class="text-gray-700 mt-2 text-xs category-text">Vegetables</p>
+            </a>
+            <a href="products.php?category=fruits"
+                class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+                <i class="fa-solid fa-apple-whole text-green-600 text-2xl"></i>
+                <p class="mt-2 text-xs category-text">Fruits</p>
+            </a>
+            <a href="products.php?category=meat"
+                class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+                <i class="fa-solid fa-drumstick-bite text-green-600 text-2xl"></i>
+                <p class="mt-2 text-xs category-text">Meat</p>
+            </a>
+            <a href="products.php?category=seafood"
+                class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+                <i class="fa-solid fa-fish text-green-600 text-2xl"></i>
+                <p class="mt-2 text-xs category-text">Seafood</p>
+            </a>
+            <a href="products.php?category=dairy"
+                class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+                <i class="fa-solid fa-cheese text-green-600 text-2xl"></i>
+                <p class="mt-2 text-xs category-text">Dairy</p>
+            </a>
+            <a href="products.php?category=bakery"
+                class="category-item flex flex-col items-center justify-center bg-white w-24 h-24 rounded-full shadow-md hover:shadow-lg cursor-pointer transition">
+                <i class="fa-solid fa-bread-slice text-green-600 text-2xl"></i>
+                <p class="mt-2 text-xs category-text">Bakery</p>
+            </a>
+        </div>
+    </section>
 
-      <a href="shop-products.php?shop=Jay's Artisan" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="../images/img2.png" alt="Jay's Artisan" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Jay's Artisan</h3>
-          <p class="text-sm text-gray-600">Coffees and bread</p>
-          <p class="text-green-600 mt-2">★ 4.9</p>
-        </div>
-      </a>
+    <section class="max-w-7xl mx-auto px-6 pt-20 pb-8">
+        <h2 class="section-heading text-2xl font-bold mb-6 fresh-font">Explore Other Shops</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <a href="shop-products.php?shop=Mesa Farm"
+                class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                <img src="../images/img1.png" alt="Mesa Farm" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold">Mesa Farm</h3>
+                    <p class="text-sm text-gray-600">Organic vegetables & herbs</p>
+                    <p class="text-green-600 mt-2">★ 4.8</p>
+                </div>
+            </a>
 
-      <a href="shop-products.php?shop=Ocean Fresh" class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
-        <img src="../images/img4.png" alt="Ocean Fresh" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold">Ocean Fresh</h3>
-          <p class="text-sm text-gray-600">Daily catch seafood</p>
-          <p class="text-green-600 mt-2">★ 4.7</p>
+            <a href="shop-products.php?shop=Taco Bell"
+                class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                <img src="../images/img3.png" alt="Taco Bell" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold">Taco Bell</h3>
+                    <p class="text-sm text-gray-600">Fresh Mexican ingredients</p>
+                    <p class="text-green-600 mt-2">★ 4.5</p>
+                </div>
+            </a>
+
+            <a href="shop-products.php?shop=Jay's Artisan"
+                class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                <img src="../images/img2.png" alt="Jay's Artisan" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold">Jay's Artisan</h3>
+                    <p class="text-sm text-gray-600">Coffees and bread</p>
+                    <p class="text-green-600 mt-2">★ 4.9</p>
+                </div>
+            </a>
+
+            <a href="shop-products.php?shop=Ocean Fresh"
+                class="shop-card bg-white rounded-lg shadow overflow-hidden hover:shadow-md cursor-pointer">
+                <img src="../images/img4.png" alt="Ocean Fresh" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold">Ocean Fresh</h3>
+                    <p class="text-sm text-gray-600">Daily catch seafood</p>
+                    <p class="text-green-600 mt-2">★ 4.7</p>
+                </div>
+            </a>
         </div>
-      </a>
-    </div>
-  </section>
-  <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold fresh-font">Top Products</h2>
-    </div>
-    <?php
+
+        <!-- View More Button -->
+        <div class="flex justify-center mt-12">
+            <a href="shop-products.php"
+                class="inline-block px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                View More
+            </a>
+        </div>
+    </section>
+    <section class="max-w-7xl mx-auto px-6 pt-2 pb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="section-heading text-2xl font-bold fresh-font">Top Products</h2>
+        </div>
+        <?php
     // Fetch products from Supabase
     require_once __DIR__ . '/../config/supabase-api.php';
     $api = getSupabaseAPI();
     $products = $api->select('products') ?: [];
 
-    function resolveImagePath($img) {
-        if (empty($img)) return '../images/products/placeholder.png';
-        if (preg_match('#^https?://#i', $img)) return $img;
-        if (strpos($img, '../') === 0) return $img;
-        if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
-        if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
-        return $img;
+    function resolveImagePath($img)
+    {
+      if (empty($img)) return '../images/products/placeholder.png';
+      if (preg_match('#^https?://#i', $img)) return $img;
+      if (strpos($img, '../') === 0) return $img;
+      if (file_exists(__DIR__ . '/../' . $img)) return '../' . $img;
+      if (file_exists(__DIR__ . '/../images/products/' . $img)) return '../images/products/' . $img;
+      return $img;
     }
 
-    function formatPriceValue($p) {
-        if (is_null($p) || $p === '') return '0.00';
-        if (is_numeric($p)) return number_format((float)$p, 2, '.', '');
-        $clean = preg_replace('/[^0-9\.]/', '', $p);
-        return $clean === '' ? '0.00' : number_format((float)$clean, 2, '.', '');
+    function formatPriceValue($p)
+    {
+      if (is_null($p) || $p === '') return '0.00';
+      if (is_numeric($p)) return number_format((float)$p, 2, '.', '');
+      $clean = preg_replace('/[^0-9\.]/', '', $p);
+      return $clean === '' ? '0.00' : number_format((float)$clean, 2, '.', '');
     }
 
     // Sort by units_sold (or times_ordered) to get top products
-    usort($products, function($a, $b) {
-        $aSold = (int)($a['units_sold'] ?? $a['times_ordered'] ?? $a['qty_sold'] ?? 0);
-        $bSold = (int)($b['units_sold'] ?? $b['times_ordered'] ?? $b['qty_sold'] ?? 0);
-        return $bSold <=> $aSold;
+    usort($products, function ($a, $b) {
+      $aSold = (int)($a['units_sold'] ?? $a['times_ordered'] ?? $a['qty_sold'] ?? 0);
+      $bSold = (int)($b['units_sold'] ?? $b['times_ordered'] ?? $b['qty_sold'] ?? 0);
+      return $bSold <=> $aSold;
     });
 
     // Top 5 most sold products
     $topProducts = array_slice($products, 0, 5);
-    
+
     // Pagination for All Products
-    $itemsPerPage = 24;
+    $itemsPerPage = 25;
     $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
     $allProducts = array_slice($products, 5); // All products except top 5
     $totalProducts = count($allProducts);
@@ -600,8 +631,8 @@ if ($user_id) {
     $otherProducts = array_slice($allProducts, $offset, $itemsPerPage);
     ?>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <?php foreach ($topProducts as $prod):
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <?php foreach ($topProducts as $prod):
         $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
         $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
         $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
@@ -611,37 +642,45 @@ if ($user_id) {
         // Sold Count Logic
         $sold = $prod['units_sold'] ?? $prod['times_ordered'] ?? $prod['qty_sold'] ?? 0;
       ?>
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
-        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
-        <div>
-          <div class="w-full">
-            <h3 class="mt-2 font-bold text-sm truncate"><?php echo $name; ?></h3>
-            <p class="text-xs text-gray-500 mb-1 truncate"><?php echo ucfirst($category); ?></p>
-          </div>
-          
-          <div class="product-card-bottom">
-            <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?></p>
-            
-            <div class="flex flex-col items-end">
-                <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
-            </div>
-          </div>
+            <a href="#"
+                class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden"
+                data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>"
+                data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>"
+                data-id="<?php echo $id; ?>">
+                <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover"
+                    loading="lazy">
+                <div>
+                    <div class="w-full">
+                        <h3 class="mt-2 font-bold text-sm truncate"><?php echo $name; ?></h3>
+                        <p class="text-xs text-gray-500 mb-1 truncate"><?php echo ucfirst($category); ?></p>
+                    </div>
+
+                    <div class="product-card-bottom">
+                        <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?>
+                        </p>
+
+                        <div class="flex flex-col items-end">
+                            <button aria-label="add"
+                                class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0"
+                                title="Add to cart">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <?php endforeach; ?>
         </div>
-      </a>
-      <?php endforeach; ?>
-    </div>
-  </section>
+    </section>
 
-  <section id="all-products" class="max-w-7xl mx-auto px-6 py-8 scroll-mt-20">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="section-heading text-2xl font-bold fresh-font">All Products</h2>
-    </div>
+    <section id="all-products" class="max-w-7xl mx-auto px-6 py-8 scroll-mt-20">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="section-heading text-2xl font-bold fresh-font">All Products</h2>
+        </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-      <?php foreach ($otherProducts as $prod):
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <?php foreach ($otherProducts as $prod):
         $name = htmlspecialchars($prod['name'] ?? $prod['product_name'] ?? 'Product');
         $priceVal = formatPriceValue($prod['price'] ?? $prod['amount'] ?? $prod['price_value'] ?? '0');
         $img = htmlspecialchars(resolveImagePath($prod['image'] ?? $prod['image_url'] ?? $prod['product_image'] ?? $prod['image_path'] ?? ''));
@@ -651,375 +690,393 @@ if ($user_id) {
         // Sold Count Logic
         $sold = $prod['units_sold'] ?? $prod['times_ordered'] ?? $prod['qty_sold'] ?? 0;
       ?>
-      <a href="#" class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden" data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>" data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>" data-id="<?php echo $id; ?>">
-        <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover" loading="lazy">
-        <div>
-          <div class="w-full">
-            <h3 class="mt-2 font-bold text-sm truncate"><?php echo $name; ?></h3>
-            <p class="text-xs text-gray-500 mb-1 truncate"><?php echo ucfirst($category); ?></p>
-          </div>
-          
-          <div class="product-card-bottom">
-            <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?></p>
-            
-            <div class="flex flex-col items-end">
-                <button aria-label="add" class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0" title="Add to cart">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
-            </div>
-          </div>
+            <a href="#"
+                class="product-card product-link bg-white rounded-lg shadow hover:shadow-lg transition relative block overflow-hidden"
+                data-name="<?php echo $name; ?>" data-price="<?php echo $priceVal; ?>" data-img="<?php echo $img; ?>"
+                data-description="<?php echo $desc; ?>" data-category="<?php echo $category; ?>"
+                data-id="<?php echo $id; ?>">
+                <img src="<?php echo $img; ?>" alt="<?php echo $name; ?>" class="w-full h-32 object-cover"
+                    loading="lazy">
+                <div>
+                    <div class="w-full">
+                        <h3 class="mt-2 font-bold text-sm truncate"><?php echo $name; ?></h3>
+                        <p class="text-xs text-gray-500 mb-1 truncate"><?php echo ucfirst($category); ?></p>
+                    </div>
+
+                    <div class="product-card-bottom">
+                        <p class="text-green-600 font-bold text-lg">₱<?php echo number_format((float)$priceVal, 2); ?>
+                        </p>
+
+                        <div class="flex flex-col items-end">
+                            <button aria-label="add"
+                                class="add-btn bg-transparent border border-green-600 text-green-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white shadow transition flex-shrink-0"
+                                title="Add to cart">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <p class="text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo $sold; ?> sold</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <?php endforeach; ?>
         </div>
-      </a>
-      <?php endforeach; ?>
-    </div>
 
-    <!-- Pagination -->
-    <?php if ($totalPages > 1): ?>
-    <div class="flex justify-center items-center gap-2 mt-8">
-      <!-- Previous Button -->
-      <?php if ($currentPage > 1): ?>
-        <a href="?page=<?php echo $currentPage - 1; ?>#all-products" 
-           class="w-10 h-10 flex items-center justify-center rounded-full border border-green-600 text-green-600 hover:bg-green-50 transition-all">
-          <i class="fa-solid fa-chevron-left text-sm"></i>
-        </a>
-      <?php else: ?>
-        <span class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-300 cursor-not-allowed">
-          <i class="fa-solid fa-chevron-left text-sm"></i>
-        </span>
-      <?php endif; ?>
-      
-      <?php
-      // Pagination logic: show first 4, ..., current range, ..., last pages
-      $range = 2; // Show 2 pages before and after current
-      $showPages = [];
-      
-      // Always show first page
-      $showPages[] = 1;
-      
-      // Show pages around current page
-      for ($i = max(2, $currentPage - $range); $i <= min($totalPages - 1, $currentPage + $range); $i++) {
-        $showPages[] = $i;
-      }
-      
-      // Always show last page
-      if ($totalPages > 1) {
-        $showPages[] = $totalPages;
-      }
-      
-      // Remove duplicates and sort
-      $showPages = array_unique($showPages);
-      sort($showPages);
-      
-      // Display pagination numbers
-      $prevPage = 0;
-      foreach ($showPages as $page):
-        // Add ellipsis if there's a gap
-        if ($page - $prevPage > 1): ?>
-          <span class="w-10 h-10 flex items-center justify-center text-gray-400 font-semibold">...</span>
-        <?php endif;
-        
-        if ($page == $currentPage): ?>
-          <span class="w-10 h-10 flex items-center justify-center rounded-full bg-green-600 text-white font-semibold shadow-md">
-            <?php echo $page; ?>
-          </span>
-        <?php else: ?>
-          <a href="?page=<?php echo $page; ?>#all-products" 
-             class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600 hover:bg-green-50 transition-all font-medium">
-            <?php echo $page; ?>
-          </a>
-        <?php endif;
-        
-        $prevPage = $page;
-      endforeach; ?>
-      
-      <!-- Next Button -->
-      <?php if ($currentPage < $totalPages): ?>
-        <a href="?page=<?php echo $currentPage + 1; ?>#all-products" 
-           class="w-10 h-10 flex items-center justify-center rounded-full border border-green-600 text-green-600 hover:bg-green-50 transition-all">
-          <i class="fa-solid fa-chevron-right text-sm"></i>
-        </a>
-      <?php else: ?>
-        <span class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-300 cursor-not-allowed">
-          <i class="fa-solid fa-chevron-right text-sm"></i>
-        </span>
-      <?php endif; ?>
-    </div>
-    <?php endif; ?>
-  </section>
-  
-  <footer class="text-white py-12" style="background-color: #1B5E20;">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-      
-      <div>
-        <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
-        <p class="text-gray-300 text-sm">
-          Fresh, organic produce delivered straight to your home from local farmers.
-        </p>
-      </div>
-      
-      <div>
-        <h3 class="font-bold text-lg mb-3">Quick Links</h3>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="#" class="hover:underline">About Us</a></li>
-          <li><a href="#" class="hover:underline">Contact</a></li>
-          <li><a href="#" class="hover:underline">FAQ</a></li>
-          <li><a href="#" class="hover:underline">Support</a></li>
-        </ul>
-      </div>
+        <!-- Pagination -->
+        <?php if ($totalPages > 1): ?>
+        <div class="flex justify-center items-center gap-2 mt-8">
+            <!-- Previous Button -->
+            <?php if ($currentPage > 1): ?>
+            <a href="?page=<?php echo $currentPage - 1; ?>#all-products"
+                class="w-10 h-10 flex items-center justify-center rounded-full border border-green-600 text-green-600 hover:bg-green-50 transition-all">
+                <i class="fa-solid fa-chevron-left text-sm"></i>
+            </a>
+            <?php else: ?>
+            <span
+                class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-300 cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left text-sm"></i>
+            </span>
+            <?php endif; ?>
 
-      <div>
-        <h3 class="font-bold text-lg mb-3">Categories</h3>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="#" class="hover:underline">Vegetables</a></li>
-          <li><a href="#" class="hover:underline">Fruits</a></li>
-          <li><a href="#" class="hover:underline">Dairy</a></li>
-          <li><a href="#" class="hover:underline">Meat</a></li>
-        </ul>
-      </div>
+            <?php
+        // Pagination logic: show first 4, ..., current range, ..., last pages
+        $range = 2; // Show 2 pages before and after current
+        $showPages = [];
 
-      <div>
-        <h3 class="font-bold text-lg mb-3">Follow Us</h3>
-        <div class="flex space-x-4 text-xl">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-        </div>
-      </div>
-    </div>
+        // Always show first page
+        $showPages[] = 1;
 
-    <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
-      © 2025 Farmers Mall. All rights reserved.
-    </div>
-  </footer>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Hero Slider
-      const slides = document.querySelectorAll('.hero-slide');
-      const dots = document.querySelectorAll('.slider-dot');
-      let currentSlide = 0;
-      const slideInterval = 5000; // 5 seconds
-
-      function showSlide(index) {
-        slides.forEach((slide, i) => {
-          slide.classList.remove('active');
-          dots[i].classList.remove('active');
-        });
-        
-        currentSlide = (index + slides.length) % slides.length;
-        slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
-      }
-
-      function nextSlide() {
-        showSlide(currentSlide + 1);
-      }
-
-      // Auto advance slides
-      let sliderTimer = setInterval(nextSlide, slideInterval);
-
-      // Dot click handlers
-      dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-          showSlide(index);
-          clearInterval(sliderTimer);
-          sliderTimer = setInterval(nextSlide, slideInterval);
-        });
-      });
-
-      // Pause on hover
-      const heroSlider = document.querySelector('.hero-slider');
-      heroSlider.addEventListener('mouseenter', () => {
-        clearInterval(sliderTimer);
-      });
-
-      heroSlider.addEventListener('mouseleave', () => {
-        sliderTimer = setInterval(nextSlide, slideInterval);
-      });
-
-      // Product links
-      document.querySelectorAll('.product-link').forEach(link => {
-        link.addEventListener('click', (event) => {
-          event.preventDefault();
-          const name = link.dataset.name;
-          const price = link.dataset.price;
-          const img = link.dataset.img;
-          const id = link.dataset.id;
-          const description = link.dataset.description || '';
-          const category = link.dataset.category || '';
-          window.location.href = `productdetails.php?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}&description=${encodeURIComponent(description)}&category=${encodeURIComponent(category)}`;
-        });
-      });
-
-      // Add to cart functionality
-      async function addToCart(product) {
-        try {
-          // Prepare the payload
-          const payload = {
-            quantity: 1
-          };
-
-          // If product has an ID, use it
-          if (product.id) {
-            payload.product_id = product.id;
-          } else {
-            // Otherwise send product details to create/find product
-            payload.product_name = product.name;
-            payload.price = parseFloat(product.price);
-            payload.description = product.description || '';
-            payload.image = product.image || '';
-            payload.category = product.category || 'other';
-          }
-
-          const response = await fetch('../api/cart.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-          });
-          
-          const data = await response.json();
-          if (data.success) {
-            updateCartIcon();
-            showNotification(`${product.name} added to cart!`);
-            // Trigger event for other components
-            window.dispatchEvent(new Event('cartUpdated'));
-            localStorage.setItem('cartUpdated', Date.now());
-          } else {
-            showNotification(data.message || 'Failed to add to cart', 'error');
-          }
-        } catch (error) {
-          console.error('Error adding to cart:', error);
-          showNotification('Error adding to cart', 'error');
+        // Show pages around current page
+        for ($i = max(2, $currentPage - $range); $i <= min($totalPages - 1, $currentPage + $range); $i++) {
+          $showPages[] = $i;
         }
-      }
 
-      // Show toast notification
-      function showNotification(message, type = 'success') {
-        // Remove existing notification if any
-        const existing = document.querySelector('.toast-notification');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.className = `toast-notification fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
-        toast.innerHTML = `
+        // Always show last page
+        if ($totalPages > 1) {
+          $showPages[] = $totalPages;
+        }
+
+        // Remove duplicates and sort
+        $showPages = array_unique($showPages);
+        sort($showPages);
+
+        // Display pagination numbers
+        $prevPage = 0;
+        foreach ($showPages as $page):
+          // Add ellipsis if there's a gap
+          if ($page - $prevPage > 1): ?>
+            <span class="w-10 h-10 flex items-center justify-center text-gray-400 font-semibold">...</span>
+            <?php endif;
+
+          if ($page == $currentPage): ?>
+            <span
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-green-600 text-white font-semibold shadow-md">
+                <?php echo $page; ?>
+            </span>
+            <?php else: ?>
+            <a href="?page=<?php echo $page; ?>#all-products"
+                class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600 hover:bg-green-50 transition-all font-medium">
+                <?php echo $page; ?>
+            </a>
+            <?php endif;
+
+          $prevPage = $page;
+        endforeach; ?>
+
+            <!-- Next Button -->
+            <?php if ($currentPage < $totalPages): ?>
+            <a href="?page=<?php echo $currentPage + 1; ?>#all-products"
+                class="w-10 h-10 flex items-center justify-center rounded-full border border-green-600 text-green-600 hover:bg-green-50 transition-all">
+                <i class="fa-solid fa-chevron-right text-sm"></i>
+            </a>
+            <?php else: ?>
+            <span
+                class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-300 cursor-not-allowed">
+                <i class="fa-solid fa-chevron-right text-sm"></i>
+            </span>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    </section>
+
+    <footer class="text-white py-12" style="background-color: #1B5E20;">
+        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+
+            <div>
+                <h3 class="font-bold text-lg mb-3">Farmers Mall</h3>
+                <p class="text-gray-300 text-sm">
+                    Fresh, organic produce delivered straight to your home from local farmers.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-lg mb-3">Quick Links</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="#" class="hover:underline">About Us</a></li>
+                    <li><a href="#" class="hover:underline">Contact</a></li>
+                    <li><a href="#" class="hover:underline">FAQ</a></li>
+                    <li><a href="#" class="hover:underline">Support</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-lg mb-3">Categories</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="#" class="hover:underline">Vegetables</a></li>
+                    <li><a href="#" class="hover:underline">Fruits</a></li>
+                    <li><a href="#" class="hover:underline">Dairy</a></li>
+                    <li><a href="#" class="hover:underline">Meat</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-lg mb-3">Follow Us</h3>
+                <div class="flex space-x-4 text-xl">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-green-800 text-center text-gray-400 text-sm mt-10 pt-6">
+            © 2025 Farmers Mall. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Hero Slider
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        let currentSlide = 0;
+        const slideInterval = 5000; // 5 seconds
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                dots[i].classList.remove('active');
+            });
+
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        // Auto advance slides
+        let sliderTimer = setInterval(nextSlide, slideInterval);
+
+        // Dot click handlers
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                clearInterval(sliderTimer);
+                sliderTimer = setInterval(nextSlide, slideInterval);
+            });
+        });
+
+        // Pause on hover
+        const heroSlider = document.querySelector('.hero-slider');
+        heroSlider.addEventListener('mouseenter', () => {
+            clearInterval(sliderTimer);
+        });
+
+        heroSlider.addEventListener('mouseleave', () => {
+            sliderTimer = setInterval(nextSlide, slideInterval);
+        });
+
+        // Product links
+        document.querySelectorAll('.product-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const name = link.dataset.name;
+                const price = link.dataset.price;
+                const img = link.dataset.img;
+                const id = link.dataset.id;
+                const description = link.dataset.description || '';
+                const category = link.dataset.category || '';
+                window.location.href =
+                    `productdetails.php?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}&img=${encodeURIComponent(img)}&description=${encodeURIComponent(description)}&category=${encodeURIComponent(category)}`;
+            });
+        });
+
+        // Add to cart functionality
+        async function addToCart(product) {
+            try {
+                // Prepare the payload
+                const payload = {
+                    quantity: 1
+                };
+
+                // If product has an ID, use it
+                if (product.id) {
+                    payload.product_id = product.id;
+                } else {
+                    // Otherwise send product details to create/find product
+                    payload.product_name = product.name;
+                    payload.price = parseFloat(product.price);
+                    payload.description = product.description || '';
+                    payload.image = product.image || '';
+                    payload.category = product.category || 'other';
+                }
+
+                const response = await fetch('../api/cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    updateCartIcon();
+                    showNotification(`${product.name} added to cart!`);
+                    // Trigger event for other components
+                    window.dispatchEvent(new Event('cartUpdated'));
+                    localStorage.setItem('cartUpdated', Date.now());
+                } else {
+                    showNotification(data.message || 'Failed to add to cart', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showNotification('Error adding to cart', 'error');
+            }
+        }
+
+        // Show toast notification
+        function showNotification(message, type = 'success') {
+            // Remove existing notification if any
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className =
+                `toast-notification fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+            toast.innerHTML = `
           <div class="flex items-center gap-3">
             <i class="fas fa-check-circle text-xl"></i>
             <span class="font-medium">${message}</span>
           </div>
         `;
-        document.body.appendChild(toast);
-        // Animate in
-        setTimeout(() => toast.classList.remove('translate-x-full'), 10);
-        // Animate out and remove
-        setTimeout(() => {
-          toast.classList.add('translate-x-full');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-      }
+            document.body.appendChild(toast);
+            // Animate in
+            setTimeout(() => toast.classList.remove('translate-x-full'), 10);
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-      // Update cart icon with item count
-      async function updateCartIcon() {
-        const badge = document.getElementById('cartBadge');
-        if (!badge) return;
-        
-        try {
-          // Fetch from database
-          const response = await fetch('../api/cart.php');
-          const data = await response.json();
-          
-          if (data.success && data.items) {
-            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        // Update cart icon with item count
+        async function updateCartIcon() {
+            const badge = document.getElementById('cartBadge');
+            if (!badge) return;
+
+            try {
+                // Fetch from database
+                const response = await fetch('../api/cart.php');
+                const data = await response.json();
+
+                if (data.success && data.items) {
+                    const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                    badge.textContent = totalItems;
+                    badge.classList.toggle('hidden', totalItems === 0);
+                    return;
+                }
+            } catch (error) {
+                console.log('Error loading cart count:', error);
+            }
+
+            // Fallback to localStorage
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
             badge.textContent = totalItems;
             badge.classList.toggle('hidden', totalItems === 0);
-            return;
-          }
-        } catch (error) {
-          console.log('Error loading cart count:', error);
         }
-        
-        // Fallback to localStorage
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-        badge.textContent = totalItems;
-        badge.classList.toggle('hidden', totalItems === 0);
-      }
 
-      document.querySelectorAll('.add-btn').forEach(button => {
-        button.addEventListener('click', (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          const link = button.closest('.product-link');
-          if (link) {
-            const product = {
-              name: link.dataset.name,
-              price: parseFloat(link.dataset.price.replace('₱', '')),
-              image: link.dataset.img,
-              description: link.dataset.description || '',
-              category: link.dataset.category || 'other'
-            };
-            addToCart(product);
-          }
+        document.querySelectorAll('.add-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const link = button.closest('.product-link');
+                if (link) {
+                    const product = {
+                        name: link.dataset.name,
+                        price: parseFloat(link.dataset.price.replace('₱', '')),
+                        image: link.dataset.img,
+                        description: link.dataset.description || '',
+                        category: link.dataset.category || 'other'
+                    };
+                    addToCart(product);
+                }
+            });
         });
-      });
 
-      // --- Load User Profile Data ---
-      function loadUserProfile() {
-        const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-        const headerProfilePic = document.getElementById('headerProfilePic');
-        
-        if (headerProfilePic) {
-          if (userProfile && userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
-            // Has uploaded image
-            headerProfilePic.innerHTML = `<img src="${userProfile.profilePic}" alt="User" class="w-full h-full rounded-full object-cover">`;
-            headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer';
-          } else {
-            // Show icon
-            headerProfilePic.innerHTML = '<i class="fas fa-user text-white text-sm"></i>';
-            headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center';
-          }
+        // --- Load User Profile Data ---
+        function loadUserProfile() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            const headerProfilePic = document.getElementById('headerProfilePic');
+
+            if (headerProfilePic) {
+                if (userProfile && userProfile.profilePic && userProfile.profilePic.startsWith('data:image')) {
+                    // Has uploaded image
+                    headerProfilePic.innerHTML =
+                        `<img src="${userProfile.profilePic}" alt="User" class="w-full h-full rounded-full object-cover">`;
+                    headerProfilePic.className = 'w-8 h-8 rounded-full cursor-pointer';
+                } else {
+                    // Show icon
+                    headerProfilePic.innerHTML = '<i class="fas fa-user text-white text-sm"></i>';
+                    headerProfilePic.className =
+                        'w-8 h-8 rounded-full cursor-pointer bg-green-600 flex items-center justify-center';
+                }
+            }
         }
-      }
 
-      // Load profile on page load
-      loadUserProfile();
-
-      // Clear old localStorage cart data
-      localStorage.removeItem('cart');
-      
-      // Update cart icon on page load
-      updateCartIcon();
-      
-      // Refresh cart icon every 3 seconds to stay in sync
-      setInterval(updateCartIcon, 3000);
-
-      // Listen for profile updates from other tabs
-      window.addEventListener('storage', (e) => {
-        if (e.key === 'userProfile') {
-          loadUserProfile();
-        }
-      });
-
-      // Listen for profile updates in same tab
-      window.addEventListener('profileUpdated', () => {
+        // Load profile on page load
         loadUserProfile();
-      });
-    });
-  </script>
-  <script src="../assets/js/profile-sync.js"></script>
 
-  <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
-      <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
-      <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
-      <div class="flex justify-center gap-4">
-        <button id="cancelLogout" class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
-        <a href="../auth/login.php" id="confirmLogout" class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
-      </div>
+        // Clear old localStorage cart data
+        localStorage.removeItem('cart');
+
+        // Update cart icon on page load
+        updateCartIcon();
+
+        // Refresh cart icon every 3 seconds to stay in sync
+        setInterval(updateCartIcon, 3000);
+
+        // Listen for profile updates from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'userProfile') {
+                loadUserProfile();
+            }
+        });
+
+        // Listen for profile updates in same tab
+        window.addEventListener('profileUpdated', () => {
+            loadUserProfile();
+        });
+    });
+    </script>
+    <script src="../assets/js/profile-sync.js"></script>
+
+    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+            <div class="text-red-500 text-4xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="font-semibold text-lg mb-2">Confirm Logout</h3>
+            <p class="text-gray-600 text-sm mb-6">Are you sure you want to log out?</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancelLogout"
+                    class="px-6 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</button>
+                <a href="../auth/login.php" id="confirmLogout"
+                    class="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">Logout</a>
+            </div>
+        </div>
     </div>
-  </div>
 
 </body>
+
 </html>
