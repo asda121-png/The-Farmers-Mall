@@ -1,4 +1,4 @@
--- Migration: Add product_name column to orders table for easy tracking
+\-- Migration: Add product_name column to orders table for easy tracking
 -- Date: 2025-12-08
 -- Purpose: Add product name directly to orders table for quick reference and tracking
 -- Note: For orders with multiple items, this will show the first/primary product
