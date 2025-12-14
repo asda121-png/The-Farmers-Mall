@@ -136,13 +136,8 @@ function handleRetailerProfileUpdate()
         if (!empty(trim($_POST['full_name'] ?? ''))) {
             $updateData['full_name'] = trim($_POST['full_name']);
         }
-        if (!empty(trim($_POST['phone'] ?? ''))) {
-            $updateData['phone'] = trim($_POST['phone']);
-        }
-        // Contact number maps to phone in users table
-        if (!empty(trim($_POST['contact_number'] ?? ''))) {
-            $updateData['phone'] = trim($_POST['contact_number']);
-        }
+       
+        
         if (!empty(trim($_POST['email'] ?? ''))) {
             $updateData['email'] = trim($_POST['email']);
         }
@@ -156,7 +151,7 @@ function handleRetailerProfileUpdate()
         if (!empty(trim($_POST['business_address'] ?? ''))) {
             $retailerData['business_address'] = trim($_POST['business_address']);
         }
-        // Note: contact_number is stored in users.phone, not in retailers table
+      
 
         // Handle profile picture upload
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -295,7 +290,7 @@ try {
 // Set default values
 $email = $userData['email'] ?? $_SESSION['email'] ?? 'retailer@email.com';
 $full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest Retailer';
-$phone = $userData['phone'] ?? '';
+
 $profile_picture = $userData['profile_picture'] ?? $_SESSION['profile_picture'] ?? '';
 $created_at = $userData['created_at'] ?? '';
 
@@ -303,8 +298,7 @@ $created_at = $userData['created_at'] ?? '';
 $shop_name = $retailerData['shop_name'] ?? 'My Shop';
 $business_address = $retailerData['business_address'] ?? '';
 $business_permit = $retailerData['business_permit'] ?? '';
-// Contact number is actually stored in users.phone
-$contact_number = $phone;
+
 $permit_status = !empty($business_permit) ? 'Verified' : 'Not Uploaded';
 
 // Get shop statistics
@@ -497,13 +491,8 @@ try {
           <!-- Personal & Business Information Grid -->
           <div class="grid md:grid-cols-2 gap-6">
             <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-              <p id="displayPhone" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Contact Number</label>
-              <p id="displayContactNumber" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($contact_number ?: 'Not provided'); ?></p>
-            </div>
+            
+            
             <div class="bg-gray-50 p-4 rounded-lg">
               <label class="text-xs text-gray-500 uppercase tracking-wide">Business Location</label>
               <p id="displayBusinessAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
@@ -588,14 +577,8 @@ try {
               <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
               <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-              <input type="tel" id="editPhone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-              <input type="tel" id="editContactNumber" name="contact_number" value="<?php echo htmlspecialchars($contact_number); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX">
-            </div>
+        
+           
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Business Location</label>
               <input type="text" id="editBusinessAddress" name="business_address" value="<?php echo htmlspecialchars($business_address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Shop address">
@@ -626,10 +609,7 @@ try {
             <label class="text-xs text-gray-500 uppercase tracking-wide">Business Address</label>
             <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <label class="text-xs text-gray-500 uppercase tracking-wide">Contact Number</label>
-            <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($contact_number ?: 'Not provided'); ?></p>
-          </div>
+          
         </div>
       </section>
 
@@ -1128,10 +1108,10 @@ try {
         const formData = new FormData();
         formData.append('action', 'update_profile');
         formData.append('email', document.getElementById('editEmail').value);
-        formData.append('phone', document.getElementById('editPhone').value);
+        
         formData.append('shop_name', document.getElementById('editShopName').value);
         formData.append('business_address', document.getElementById('editBusinessAddress').value);
-        formData.append('contact_number', document.getElementById('editContactNumber').value);
+       
         
         const profilePicFile = profilePicInput.files[0];
         if (profilePicFile) {
@@ -1179,7 +1159,7 @@ try {
                 if (fullNameEl) fullNameEl.textContent = data.full_name;
               }
               document.getElementById('displayEmail').textContent = data.email;
-              document.getElementById('displayPhone').textContent = data.phone || 'Not provided';
+             
               document.getElementById('displayBusinessAddress').textContent = data.business_address || 'Not provided';
               document.getElementById('displayContactNumber').textContent = data.contact_number || 'Not provided';
               
