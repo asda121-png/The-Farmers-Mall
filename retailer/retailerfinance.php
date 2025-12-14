@@ -66,7 +66,7 @@ try {
         sidebar.classList.toggle('active');
         overlay.classList.toggle('active');
     }
-    
+
     document.querySelectorAll('#sidebar a').forEach(link => {
         link.addEventListener('click', () => {
             if (window.innerWidth < 768) {
@@ -74,6 +74,104 @@ try {
             }
         });
     });
+
+    // Load finance data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFinanceData();
+        loadTransactionHistory();
+    });
+
+    function loadFinanceData() {
+        fetch('../api/get-retailer-finance.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.financeData) {
+                    const finance = data.financeData;
+
+                    // Update revenue displays
+                    document.getElementById('totalRevenue').textContent = '₱' + Number(finance.totalRevenue).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    document.getElementById('thisWeekRevenue').textContent = '₱' + Number(finance.thisWeekRevenue).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    document.getElementById('thisMonthRevenue').textContent = '₱' + Number(finance.thisMonthRevenue).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    document.getElementById('totalSales').textContent = finance.totalSales;
+                } else {
+                    console.error('Error loading finance data:', data.message);
+                    // Show error state
+                    document.getElementById('totalRevenue').textContent = 'Error loading data';
+                    document.getElementById('thisWeekRevenue').textContent = 'Error loading data';
+                    document.getElementById('thisMonthRevenue').textContent = 'Error loading data';
+                    document.getElementById('totalSales').textContent = 'Error loading data';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching finance data:', error);
+                // Show error state
+                document.getElementById('totalRevenue').textContent = 'Error loading data';
+                document.getElementById('thisWeekRevenue').textContent = 'Error loading data';
+                document.getElementById('thisMonthRevenue').textContent = 'Error loading data';
+                document.getElementById('totalSales').textContent = 'Error loading data';
+            });
+    }
+
+    function loadTransactionHistory() {
+        const container = document.getElementById('transactionHistoryContainer');
+
+        fetch('../api/get-retailer-finance.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.transactions) {
+                    const transactions = data.transactions;
+
+                    if (transactions.length === 0) {
+                        container.innerHTML = `
+                            <div class="text-center py-8">
+                                <i class="fas fa-receipt text-4xl text-gray-300 mb-2"></i>
+                                <p class="text-gray-500">No transactions found</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    const transactionList = transactions.map(transaction => {
+                        const orderId = transaction.id;
+                        const shortId = orderId.substring(0, 8);
+                        const description = transaction.description;
+                        const amount = Number(transaction.amount);
+                        const date = new Date(transaction.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        const status = transaction.status;
+
+                        return `
+                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition"
+                                onclick="showTransactionDetails('${orderId}', '${transaction.type}', '${description.replace(/'/g, "\\'")}', ${amount}, '${transaction.date}', '${status}')">
+                                <span class="text-sm font-medium">${transaction.type} #${shortId} (${description})</span>
+                                <span class="text-sm text-green-600 font-semibold">₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </li>
+                        `;
+                    }).join('');
+
+                    container.innerHTML = `<ul class="space-y-3">${transactionList}</ul>`;
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-2"></i>
+                            <p class="text-red-500">Error loading transactions</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching transaction history:', error);
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-2"></i>
+                        <p class="text-red-500">Error loading transactions</p>
+                    </div>
+                `;
+            });
+    }
 </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -261,19 +359,19 @@ try {
                 <!-- Total Revenue Card -->
                 <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-8">
                     <h3 class="text-xl font-semibold text-gray-700 mb-4">Total Revenue</h3>
-                    <p class="text-3xl font-bold text-gray-800">₱12,540.50</p>
+                    <p class="text-3xl font-bold text-gray-800" id="totalRevenue">₱0.00</p>
                     <div class="grid grid-cols-3 gap-4 mt-4">
                         <div>
                             <p class="text-xs text-gray-500">This Week</p>
-                            <p class="text-lg font-semibold text-gray-800">₱2,890.00</p>
+                            <p class="text-lg font-semibold text-gray-800" id="thisWeekRevenue">₱0.00</p>
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">This Month</p>
-                            <p class="text-lg font-semibold text-gray-800">₱8,450.50</p>
+                            <p class="text-lg font-semibold text-gray-800" id="thisMonthRevenue">₱0.00</p>
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Total Sales</p>
-                            <p class="text-lg font-semibold text-gray-800">156</p>
+                            <p class="text-lg font-semibold text-gray-800" id="totalSales">0</p>
                         </div>
                     </div>
                 </div>
@@ -300,25 +398,11 @@ try {
 
                 <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                     <h3 class="px-6 py-4 text-xl font-semibold text-gray-700 border-b">Transaction History</h3>
-                    <div class="p-6 text-gray-500">
-                        <ul class="space-y-3">
-                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8291', 'Sale', 'Apples, Bread', 21.50, '2024-12-10', 'completed')">
-                                <span class="text-sm font-medium">Sale #8291 (Apples, Bread)</span>
-                                <span class="text-sm text-green-600 font-semibold">₱21.50</span>
-                            </li>
-                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8290', 'Sale', 'Potatoes', 12.00, '2024-12-09', 'completed')">
-                                <span class="text-sm font-medium">Sale #8290 (Potatoes)</span>
-                                <span class="text-sm text-green-600 font-semibold">₱12.00</span>
-                            </li>
-                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8289', 'Sale', 'Tomatoes, Lettuce', 35.75, '2024-12-08', 'completed')">
-                                <span class="text-sm font-medium">Sale #8289 (Tomatoes, Lettuce)</span>
-                                <span class="text-sm text-green-600 font-semibold">₱35.75</span>
-                            </li>
-                            <li class="flex justify-between items-center border-b pb-2 hover:bg-gray-50 cursor-pointer rounded-lg p-2 transition" onclick="showTransactionDetails('8288', 'Sale', 'Carrots, Onions', 28.30, '2024-12-07', 'completed')">
-                                <span class="text-sm font-medium">Sale #8288 (Carrots, Onions)</span>
-                                <span class="text-sm text-green-600 font-semibold">₱28.30</span>
-                            </li>
-                        </ul>
+                    <div class="p-6 text-gray-500" id="transactionHistoryContainer">
+                        <div class="text-center py-8">
+                            <i class="fas fa-receipt text-4xl text-gray-300 mb-2"></i>
+                            <p>No transactions found</p>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -463,62 +547,130 @@ try {
     }
     
     // Download Reports Functions
-    function downloadSalesReport() {
-        // Sample sales data
-        const salesData = [
-            ['Order ID', 'Customer', 'Products', 'Amount', 'Payment Method', 'Date', 'Status'],
-            ['8291', 'John Doe', 'Apples, Bread', '₱21.50', 'COD', '2024-12-10', 'Completed'],
-            ['8290', 'Jane Smith', 'Potatoes', '₱12.00', 'GCash', '2024-12-09', 'Completed'],
-            ['8289', 'Bob Johnson', 'Tomatoes, Lettuce', '₱35.75', 'COD', '2024-12-08', 'Completed'],
-            ['8288', 'Alice Brown', 'Carrots, Onions', '₱28.30', 'GCash', '2024-12-07', 'Completed'],
-            ['8287', 'Charlie Wilson', 'Cabbage, Peppers', '₱45.60', 'COD', '2024-12-06', 'Completed']
-        ];
-        
-        // Convert to CSV
-        const csv = salesData.map(row => row.join(',')).join('\n');
-        
-        // Create download
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        
-        // Show success message
-        alert('Sales report downloaded successfully!');
+    async function downloadSalesReport() {
+        try {
+            const response = await fetch('../api/get-retailer-finance.php');
+            const data = await response.json();
+
+            if (!data.success) {
+                alert('Error loading sales data: ' + (data.message || 'Unknown error'));
+                return;
+            }
+
+            // Prepare sales data from API response
+            const salesData = [
+                ['Order ID', 'Customer', 'Products', 'Amount', 'Payment Method', 'Date', 'Status']
+            ];
+
+            // Add transaction data
+            if (data.transactions && data.transactions.length > 0) {
+                data.transactions.forEach(transaction => {
+                    const orderId = transaction.id;
+                    const customerName = transaction.customer_name || 'Customer';
+                    const products = transaction.description || 'Products';
+                    const amount = Number(transaction.amount);
+                    const paymentMethod = 'COD'; // Default, could be enhanced later
+                    const date = new Date(transaction.date).toLocaleDateString('en-US');
+                    const status = transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1);
+
+                    salesData.push([
+                        orderId,
+                        customerName,
+                        products,
+                        '₱' + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                        paymentMethod,
+                        date,
+                        status
+                    ]);
+                });
+            } else {
+                // Add sample data if no transactions
+                salesData.push(['No sales data available', '', '', '', '', '', '']);
+            }
+
+            // Convert to CSV
+            const csv = salesData.map(row => row.join(',')).join('\n');
+
+            // Create download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            // Show success message
+            alert('Sales report downloaded successfully!');
+        } catch (error) {
+            console.error('Error downloading sales report:', error);
+            alert('Error downloading sales report. Please try again.');
+        }
     }
     
-    function downloadTaxReport() {
-        // Sample tax and commission data
-        const taxData = [
-            ['Transaction ID', 'Type', 'Gross Amount', 'Commission (10%)', 'Tax (12%)', 'Net Amount', 'Date'],
-            ['8291', 'Sale', '₱21.50', '₱2.15', '₱2.58', '₱16.77', '2024-12-10'],
-            ['8290', 'Sale', '₱12.00', '₱1.20', '₱1.44', '₱9.36', '2024-12-09'],
-            ['8289', 'Sale', '₱35.75', '₱3.58', '₱4.29', '₱27.88', '2024-12-08'],
-            ['8288', 'Sale', '₱28.30', '₱2.83', '₱3.40', '₱22.07', '2024-12-07'],
-            ['8287', 'Sale', '₱45.60', '₱4.56', '₱5.47', '₱35.57', '2024-12-06']
-        ];
-        
-        // Convert to CSV
-        const csv = taxData.map(row => row.join(',')).join('\n');
-        
-        // Create download
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `tax_commission_report_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        
-        // Show success message
-        alert('Tax & Commission report downloaded successfully!');
+    async function downloadTaxReport() {
+        try {
+            const response = await fetch('../api/get-retailer-finance.php');
+            const data = await response.json();
+
+            if (!data.success) {
+                alert('Error loading tax data: ' + (data.message || 'Unknown error'));
+                return;
+            }
+
+            // Prepare tax and commission data from API response
+            const taxData = [
+                ['Transaction ID', 'Type', 'Gross Amount', 'Commission (10%)', 'Tax (12%)', 'Net Amount', 'Date']
+            ];
+
+            // Add transaction data with tax calculations
+            if (data.transactions && data.transactions.length > 0) {
+                data.transactions.forEach(transaction => {
+                    const transactionId = transaction.id;
+                    const type = transaction.type;
+                    const grossAmount = Number(transaction.amount);
+                    const commission = grossAmount * 0.10; // 10% commission
+                    const tax = grossAmount * 0.12; // 12% tax
+                    const netAmount = grossAmount - commission - tax;
+                    const date = new Date(transaction.date).toLocaleDateString('en-US');
+
+                    taxData.push([
+                        transactionId,
+                        type,
+                        '₱' + grossAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                        '₱' + commission.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                        '₱' + tax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                        '₱' + netAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                        date
+                    ]);
+                });
+            } else {
+                // Add sample data if no transactions
+                taxData.push(['No tax data available', '', '', '', '', '', '']);
+            }
+
+            // Convert to CSV
+            const csv = taxData.map(row => row.join(',')).join('\n');
+
+            // Create download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tax_commission_report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            // Show success message
+            alert('Tax & Commission report downloaded successfully!');
+        } catch (error) {
+            console.error('Error downloading tax report:', error);
+            alert('Error downloading tax report. Please try again.');
+        }
     }
     
     // Profile dropdown hover handlers (matching user header style)

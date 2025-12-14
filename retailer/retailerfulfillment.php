@@ -101,11 +101,42 @@ function getStatusInfo($status) {
     return $statusMap[$status] ?? ['color' => '#757575', 'bg' => '#EEEEEE', 'text' => ucfirst($status), 'progress' => 0];
 }
 
+// Calculate real-time statistics
+$totalNewOrders = 0;
+$totalPendingOrders = 0;
+$totalProductsSales = 0;
+
+foreach ($orders as $order) {
+    $status = strtolower($order['status'] ?? '');
+
+    // Total New Orders: pending, confirmed, processing
+    if (in_array($status, ['pending', 'confirmed', 'processing'])) {
+        $totalNewOrders++;
+    }
+
+    // Total Order Pending: specifically pending status
+    if ($status === 'pending') {
+        $totalPendingOrders++;
+    }
+
+    // Total Products Sales: sum of quantities from completed/delivered orders
+    if (in_array($status, ['completed', 'delivered'])) {
+        try {
+            $orderItems = $api->select('order_items', ['order_id' => $order['id'], 'retailer_id' => $retailerId]);
+            foreach ($orderItems as $item) {
+                $totalProductsSales += intval($item['quantity'] ?? 0);
+            }
+        } catch (Exception $e) {
+            // Ignore errors for stats calculation
+        }
+    }
+}
+
 // Prepare data for JavaScript modal
 $jsOrderData = [];
 foreach ($orders as $order) {
     $items = [];
-    
+
     // Try to fetch actual order items
     try {
         $orderItems = $api->select('order_items', ['order_id' => $order['id'], 'retailer_id' => $retailerId]);
@@ -142,6 +173,35 @@ foreach ($orders as $order) {
         'deliveryFee' => '₱0.00', // Not in orders table
         'total' => '₱' . number_format($order['total_amount'], 2)
     ];
+}
+
+// Fetch customer profile pictures
+$customerProfiles = [];
+$uniqueCustomerNames = array_unique(array_column($orders, 'customer_name'));
+
+foreach ($uniqueCustomerNames as $customerName) {
+    if (empty($customerName)) continue;
+
+    try {
+        $users = $api->select('users', ['full_name' => $customerName]);
+        if (!empty($users)) {
+            $profilePic = $users[0]['profile_picture'] ?? '../images/default-avatar.svg';
+            if (!empty($profilePic)) {
+                $profilePath = '../' . ltrim($profilePic, '/');
+                if (file_exists(__DIR__ . '/' . $profilePath)) {
+                    $customerProfiles[$customerName] = $profilePath;
+                } else {
+                    $customerProfiles[$customerName] = '../images/default-avatar.svg';
+                }
+            } else {
+                $customerProfiles[$customerName] = '../images/default-avatar.svg';
+            }
+        } else {
+            $customerProfiles[$customerName] = '../images/default-avatar.svg';
+        }
+    } catch (Exception $e) {
+        $customerProfiles[$customerName] = '../images/default-avatar.svg';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -347,7 +407,7 @@ foreach ($orders as $order) {
                             <p class="text-xs font-medium text-gray-500">Total New Orders</p>
                             <i class="fas fa-file-alt text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">594</p>
+                        <p class="text-2xl font-extrabold text-gray-800"><?php echo number_format($totalNewOrders); ?></p>
                     </div>
 
                     <!-- Total Order Pending -->
@@ -356,7 +416,7 @@ foreach ($orders as $order) {
                             <p class="text-xs font-medium text-gray-500">Total Order Pending</p>
                             <i class="fas fa-clock text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">257,361</p>
+                        <p class="text-2xl font-extrabold text-gray-800"><?php echo number_format($totalPendingOrders); ?></p>
                     </div>
 
                     <!-- Total Products Sales -->
@@ -365,7 +425,7 @@ foreach ($orders as $order) {
                             <p class="text-xs font-medium text-gray-500">Total Products Sales</p>
                             <i class="fas fa-chart-line text-2xl text-green-400"></i>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-800">8,594</p>
+                        <p class="text-2xl font-extrabold text-gray-800"><?php echo number_format($totalProductsSales); ?></p>
                     </div>
                 </div>
 
@@ -448,7 +508,8 @@ foreach ($orders as $order) {
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#<?php echo substr(htmlspecialchars($order['id']), 0, 8); ?></td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <div class="flex items-center">
-                                                <img src="../images/default-avatar.svg" alt="<?php echo htmlspecialchars($order['customer_name']); ?>" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
+                                                <?php $profilePic = $customerProfiles[$order['customer_name']] ?? '../images/default-avatar.svg'; ?>
+                                                <img src="<?php echo htmlspecialchars($profilePic); ?>" alt="<?php echo htmlspecialchars($order['customer_name']); ?>" class="w-8 h-8 rounded-full border-2 border-gray-200 mr-2 object-cover" onerror="this.src='../images/default-avatar.svg'">
                                                 <span class="text-gray-900"><?php echo htmlspecialchars($order['customer_name']); ?></span>
                                             </div>
                                         </td>

@@ -262,52 +262,26 @@ try {
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 h-fit">
                         <h3 class="text-xl font-semibold text-gray-700 mb-4">Rating Summary</h3>
-                        <div class="text-center">
-                            <p class="text-5xl font-bold text-green-700">4.7</p>
-                            <div class="flex justify-center items-center mt-2 text-yellow-500 text-xl">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star-half-stroke"></i>
+                        <div id="ratingSummaryContent" class="text-center">
+                            <div class="animate-pulse">
+                                <div class="h-12 bg-gray-200 rounded mb-2"></div>
+                                <div class="flex justify-center space-x-1 mb-2">
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                </div>
+                                <div class="h-4 bg-gray-200 rounded"></div>
                             </div>
-                            <p class="text-gray-600 mt-2 text-sm">Based on 342 reviews</p>
                         </div>
-                        <div class="space-y-2 mt-4">
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-600 w-12">5★</span>
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 80%"></div>
-                                </div>
-                                <span class="text-xs text-gray-500 w-10 text-right">274</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-600 w-12">4★</span>
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 12%"></div>
-                                </div>
-                                <span class="text-xs text-gray-500 w-10 text-right">41</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-600 w-12">3★</span>
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                                    <div class="bg-yellow-300 h-2 rounded-full" style="width: 5%"></div>
-                                </div>
-                                <span class="text-xs text-gray-500 w-10 text-right">17</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-600 w-12">2★</span>
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                                    <div class="bg-orange-400 h-2 rounded-full" style="width: 2%"></div>
-                                </div>
-                                <span class="text-xs text-gray-500 w-10 text-right">7</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-600 w-12">1★</span>
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                                    <div class="bg-red-500 h-2 rounded-full" style="width: 1%"></div>
-                                </div>
-                                <span class="text-xs text-gray-500 w-10 text-right">3</span>
+                        <div id="ratingDistribution" class="space-y-2 mt-4">
+                            <div class="animate-pulse space-y-2">
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded"></div>
                             </div>
                         </div>
                     </div>
@@ -807,11 +781,217 @@ try {
     document.addEventListener('click', (e) => {
         const filterBtn = document.getElementById('filterBtn');
         const filterDropdown = document.getElementById('filterDropdown');
-        
+
         if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
             filterDropdown.classList.add('hidden');
         }
     });
+
+    // Load reviews data from API
+    async function loadReviewsData() {
+        try {
+            const response = await fetch('../api/get-retailer-reviews.php');
+            const data = await response.json();
+
+            if (data.success) {
+                updateRatingSummary(data.ratingSummary);
+                updateRatingDistribution(data.ratingSummary);
+                updateRecentReviews(data.recentReviews);
+                updateFilterDropdown(data.ratingSummary);
+            } else {
+                console.error('Failed to load reviews data:', data.message);
+                showNoReviewsState();
+            }
+        } catch (error) {
+            console.error('Error loading reviews data:', error);
+            showNoReviewsState();
+        }
+    }
+
+    function updateRatingSummary(summary) {
+        const container = document.getElementById('ratingSummaryContent');
+        const averageRating = summary.averageRating;
+        const totalReviews = summary.totalReviews;
+
+        // Generate star display
+        const fullStars = Math.floor(averageRating);
+        const hasHalfStar = averageRating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+        let starsHtml = '';
+        for (let i = 0; i < fullStars; i++) {
+            starsHtml += '<i class="fa-solid fa-star"></i>';
+        }
+        if (hasHalfStar) {
+            starsHtml += '<i class="fa-solid fa-star-half-stroke"></i>';
+        }
+        for (let i = 0; i < emptyStars; i++) {
+            starsHtml += '<i class="fa-regular fa-star"></i>';
+        }
+
+        container.innerHTML = `
+            <p class="text-5xl font-bold text-green-700">${averageRating.toFixed(1)}</p>
+            <div class="flex justify-center items-center mt-2 text-yellow-500 text-xl">
+                ${starsHtml}
+            </div>
+            <p class="text-gray-600 mt-2 text-sm">Based on ${totalReviews} review${totalReviews !== 1 ? 's' : ''}</p>
+        `;
+    }
+
+    function updateRatingDistribution(summary) {
+        const container = document.getElementById('ratingDistribution');
+        const distribution = summary.ratingDistribution;
+        const totalReviews = summary.totalReviews;
+
+        let html = '';
+        for (let rating = 5; rating >= 1; rating--) {
+            const count = distribution[rating] || 0;
+            const percentage = totalReviews > 0 ? (count / totalReviews * 100).toFixed(1) : 0;
+
+            let colorClass = '';
+            if (rating === 5) colorClass = 'bg-yellow-500';
+            else if (rating === 4) colorClass = 'bg-yellow-400';
+            else if (rating === 3) colorClass = 'bg-yellow-300';
+            else if (rating === 2) colorClass = 'bg-orange-400';
+            else colorClass = 'bg-red-500';
+
+            html += `
+                <div class="flex items-center">
+                    <span class="text-sm text-gray-600 w-12">${rating}★</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
+                        <div class="${colorClass} h-2 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                    <span class="text-xs text-gray-500 w-10 text-right">${count}</span>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    }
+
+    function updateRecentReviews(reviews) {
+        const container = document.getElementById('reviewsContainer');
+
+        if (reviews.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-star text-4xl mb-2 text-gray-300"></i>
+                    <p class="text-sm">No reviews yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        reviews.forEach((review, index) => {
+            const customerName = review.customer ? review.customer.full_name : 'Anonymous Customer';
+            const productName = review.product ? review.product.name : 'Unknown Product';
+            const rating = review.rating;
+            const comment = review.comment || '';
+            const createdAt = new Date(review.created_at);
+            const timeAgo = getTimeAgo(createdAt);
+
+            // Generate star display
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    starsHtml += '<i class="fa-solid fa-star"></i>';
+                } else {
+                    starsHtml += '<i class="fa-regular fa-star"></i>';
+                }
+            }
+
+            html += `
+                <div class="border-b pb-4 review-item" data-rating="${rating}">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <p class="font-semibold text-gray-800">${escapeHtml(customerName)}</p>
+                            <p class="text-xs text-gray-500">Product: <span class="text-green-600 font-medium">${escapeHtml(productName)}</span></p>
+                            <div class="flex items-center text-yellow-500 text-sm mt-1">
+                                ${starsHtml}
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-500">${timeAgo}</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">${escapeHtml(comment)}</p>
+                    <div id="reply-box-${review.id}" class="hidden mb-2">
+                        <textarea id="reply-text-${review.id}" class="w-full p-2 border border-gray-300 rounded-lg text-sm mb-2" rows="2" placeholder="Write your response..."></textarea>
+                        <div class="flex space-x-2">
+                            <button onclick="submitReviewResponse('${review.id}')" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs font-medium">Send Reply</button>
+                            <button onclick="toggleReplyBox('${review.id}')" class="px-4 py-1.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-xs font-medium">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="toggleReplyBox('${review.id}')" class="text-xs text-blue-600 hover:underline">Reply</button>
+                        <button onclick="markHelpful('${review.id}')" class="text-xs text-gray-500 hover:underline">Mark as helpful</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function updateFilterDropdown(summary) {
+        const select = document.getElementById('rating-filter');
+        const distribution = summary.ratingDistribution;
+
+        // Update option texts with real counts
+        const options = select.querySelectorAll('option');
+        options.forEach(option => {
+            const rating = option.value;
+            if (rating !== 'all') {
+                const count = distribution[rating] || 0;
+                option.textContent = `${rating} Stars (${count})`;
+            }
+        });
+    }
+
+    function showNoReviewsState() {
+        const summaryContainer = document.getElementById('ratingSummaryContent');
+        const distributionContainer = document.getElementById('ratingDistribution');
+        const reviewsContainer = document.getElementById('reviewsContainer');
+
+        summaryContainer.innerHTML = `
+            <p class="text-5xl font-bold text-green-700">0.0</p>
+            <div class="flex justify-center items-center mt-2 text-yellow-500 text-xl">
+                <i class="fa-regular fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+            </div>
+            <p class="text-gray-600 mt-2 text-sm">Based on 0 reviews</p>
+        `;
+
+        distributionContainer.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p class="text-sm">No reviews yet</p>
+            </div>
+        `;
+
+        reviewsContainer.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-star text-4xl mb-2 text-gray-300"></i>
+                <p class="text-sm">No reviews yet</p>
+            </div>
+        `;
+    }
+
+    // Load reviews data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadReviewsData();
+        loadRetailerNotificationBadge();
+    });
+
+    // Also load immediately if DOM is already loaded
+    if (document.readyState === 'loading') {
+        // DOM is still loading, wait for DOMContentLoaded
+    } else {
+        // DOM is already loaded, execute immediately
+        loadReviewsData();
+        loadRetailerNotificationBadge();
+    }
 </script>
 </body>
 </html>
