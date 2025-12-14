@@ -395,15 +395,7 @@ try {
                                 <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
 
-                            <div class="relative min-w-[180px]">
-                                <select id="productTypeFilter" onchange="applyFilters()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
-                                    <option value="">Filter by product type</option>
-                                    <option value="simple">Simple product</option>
-                                    <option value="variable">Variable product</option>
-                                    <option value="grouped">Grouped product</option>
-                                </select>
-                                <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            </div>
+
 
                             <div class="relative min-w-[180px]">
                                 <select id="stockStatusFilter" onchange="applyFilters()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white appearance-none pr-10">
@@ -767,33 +759,31 @@ try {
             loadRetailerNotificationPreview();
         });
 
-        // Load products on page load with URL parameter support
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const filter = urlParams.get('filter');
-            const updated = urlParams.get('updated');
+        // Load products immediately on page load with URL parameter support
+        const urlParams = new URLSearchParams(window.location.search);
+        const filter = urlParams.get('filter');
+        const updated = urlParams.get('updated');
 
-            // Show success message if coming back from edit
-            if (updated) {
-                showToast('Product list refreshed with latest changes', 'success');
-                // Clean URL
-                window.history.replaceState({}, document.title, 'retailerinventory.php');
-            }
+        // Show success message if coming back from edit
+        if (updated) {
+            showToast('Product list refreshed with latest changes', 'success');
+            // Clean URL
+            window.history.replaceState({}, document.title, 'retailerinventory.php');
+        }
 
-            if (filter === 'lowstock') {
-                // Set the stock status filter dropdown to show low stock or out of stock
-                const stockStatusFilter = document.getElementById('stockStatusFilter');
-                if (stockStatusFilter) {
-                    stockStatusFilter.value = 'outofstock'; // This will also show low stock items
-                }
-                // Load products with low stock filter
-                loadProducts({
-                    stock_status: 'outofstock'
-                });
-            } else {
-                loadProducts();
+        if (filter === 'lowstock') {
+            // Set the stock status filter dropdown to show low stock or out of stock
+            const stockStatusFilter = document.getElementById('stockStatusFilter');
+            if (stockStatusFilter) {
+                stockStatusFilter.value = 'outofstock'; // This will also show low stock items
             }
-        });
+            // Load products with low stock filter
+            loadProducts({
+                stock_status: 'outofstock'
+            });
+        } else {
+            loadProducts();
+        }
 
         // Load products function with filters
         async function loadProducts(filters = {}) {
@@ -1353,6 +1343,10 @@ try {
         });
     </script>
 
+    <?php
+    // Include the messaging widget for retailer
+    include __DIR__ . '/../includes/retailer-message-widget.php';
+    ?>
 </body>
 
 </html>

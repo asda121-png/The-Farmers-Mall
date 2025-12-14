@@ -10,40 +10,40 @@ session_start();
 
 // Handle AJAX requests BEFORE any output
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    error_log("=== AJAX REQUEST DETECTED ===");
-    error_log("Action: " . $_POST['action']);
-    error_log("POST data: " . print_r($_POST, true));
-    error_log("FILES data: " . print_r($_FILES, true));
-    
-    // Clean any existing output
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    
-    // Load database connection for AJAX
-    require_once __DIR__ . '/../config/supabase-api.php';
-    
-    // Route to appropriate handler
-    if ($_POST['action'] === 'update_profile') {
-        error_log("Calling handleRetailerProfileUpdate()");
-        handleRetailerProfileUpdate();
-        exit;
-    } elseif ($_POST['action'] === 'remove_profile_picture') {
-        error_log("Calling handleRemoveProfilePicture()");
-        handleRemoveProfilePicture();
-        exit;
-    }
-    
-    // If we get here, unknown action
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Unknown action: ' . $_POST['action']]);
+  error_log("=== AJAX REQUEST DETECTED ===");
+  error_log("Action: " . $_POST['action']);
+  error_log("POST data: " . print_r($_POST, true));
+  error_log("FILES data: " . print_r($_FILES, true));
+
+  // Clean any existing output
+  while (ob_get_level()) {
+    ob_end_clean();
+  }
+
+  // Load database connection for AJAX
+  require_once __DIR__ . '/../config/supabase-api.php';
+
+  // Route to appropriate handler
+  if ($_POST['action'] === 'update_profile') {
+    error_log("Calling handleRetailerProfileUpdate()");
+    handleRetailerProfileUpdate();
     exit;
+  } elseif ($_POST['action'] === 'remove_profile_picture') {
+    error_log("Calling handleRemoveProfilePicture()");
+    handleRemoveProfilePicture();
+    exit;
+  }
+
+  // If we get here, unknown action
+  header('Content-Type: application/json');
+  echo json_encode(['status' => 'error', 'message' => 'Unknown action: ' . $_POST['action']]);
+  exit;
 }
 
 // Check if user is logged in (only for page display)
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header('Location: ../auth/login.php');
-    exit;
+  header('Location: ../auth/login.php');
+  exit;
 }
 
 // Start output buffering for page display
@@ -59,54 +59,54 @@ require_once __DIR__ . '/../config/supabase-api.php';
  */
 function handleRetailerProfilePictureUpload(array $file, string $userId, string $oldProfilePicture): ?string
 {
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        return null;
-    }
+  if ($file['error'] !== UPLOAD_ERR_OK) {
+    return null;
+  }
 
-    // Validate file size (5MB limit)
-    if ($file['size'] > 5 * 1024 * 1024) {
-        throw new Exception('File size must be less than 5MB');
-    }
+  // Validate file size (5MB limit)
+  if ($file['size'] > 5 * 1024 * 1024) {
+    throw new Exception('File size must be less than 5MB');
+  }
 
-    // Validate MIME type
-    $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    
-    if (function_exists('mime_content_type')) {
-        $mime_type = mime_content_type($file['tmp_name']);
-    } elseif (function_exists('finfo_open')) {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime_type = finfo_file($finfo, $file['tmp_name']);
-    } else {
-        $mime_type = $file['type'];
-    }
-    
-    if (!in_array($mime_type, $allowed_mime_types)) {
-        throw new Exception('Invalid file type. Only JPG, PNG, GIF, and WEBP are allowed.');
-    }
+  // Validate MIME type
+  $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-    // Create uploads directory
-    $upload_dir = __DIR__ . '/../assets/profiles/';
-    if (!is_dir($upload_dir)) {
-        if (!mkdir($upload_dir, 0755, true)) {
-            throw new Exception('Failed to create upload directory.');
-        }
-    }
+  if (function_exists('mime_content_type')) {
+    $mime_type = mime_content_type($file['tmp_name']);
+  } elseif (function_exists('finfo_open')) {
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime_type = finfo_file($finfo, $file['tmp_name']);
+  } else {
+    $mime_type = $file['type'];
+  }
 
-    // Generate unique filename
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = 'profile_' . $userId . '_' . time() . '.' . $extension;
-    $filepath = $upload_dir . $filename;
+  if (!in_array($mime_type, $allowed_mime_types)) {
+    throw new Exception('Invalid file type. Only JPG, PNG, GIF, and WEBP are allowed.');
+  }
 
-    // Move uploaded file
-    if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        // Delete old profile picture if it exists
-        if (!empty($oldProfilePicture) && file_exists(__DIR__ . '/../' . $oldProfilePicture)) {
-            @unlink(__DIR__ . '/../' . $oldProfilePicture);
-        }
-        return 'assets/profiles/' . $filename;
-    } else {
-        throw new Exception('Failed to move uploaded file.');
+  // Create uploads directory
+  $upload_dir = __DIR__ . '/../assets/profiles/';
+  if (!is_dir($upload_dir)) {
+    if (!mkdir($upload_dir, 0755, true)) {
+      throw new Exception('Failed to create upload directory.');
     }
+  }
+
+  // Generate unique filename
+  $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+  $filename = 'profile_' . $userId . '_' . time() . '.' . $extension;
+  $filepath = $upload_dir . $filename;
+
+  // Move uploaded file
+  if (move_uploaded_file($file['tmp_name'], $filepath)) {
+    // Delete old profile picture if it exists
+    if (!empty($oldProfilePicture) && file_exists(__DIR__ . '/../' . $oldProfilePicture)) {
+      @unlink(__DIR__ . '/../' . $oldProfilePicture);
+    }
+    return 'assets/profiles/' . $filename;
+  } else {
+    throw new Exception('Failed to move uploaded file.');
+  }
 }
 
 /**
@@ -114,122 +114,117 @@ function handleRetailerProfilePictureUpload(array $file, string $userId, string 
  */
 function handleRetailerProfileUpdate()
 {
-    header('Content-Type: application/json');
-    
-    try {
-        $api = getSupabaseAPI();
-        $user_id = $_SESSION['user_id'] ?? null;
+  header('Content-Type: application/json');
 
-        error_log("=== RETAILER PROFILE UPDATE DEBUG ===");
-        error_log("User ID: " . $user_id);
-        error_log("FILES received: " . print_r($_FILES, true));
-        error_log("POST data: " . print_r($_POST, true));
+  try {
+    $api = getSupabaseAPI();
+    $user_id = $_SESSION['user_id'] ?? null;
 
-        if (!$user_id) {
-            echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
-            exit();
-        }
-        
-        // User data updates
-        $updateData = [];
-        
-        if (!empty(trim($_POST['full_name'] ?? ''))) {
-            $updateData['full_name'] = trim($_POST['full_name']);
-        }
-        if (!empty(trim($_POST['phone'] ?? ''))) {
-            $updateData['phone'] = trim($_POST['phone']);
-        }
-        // Contact number maps to phone in users table
-        if (!empty(trim($_POST['contact_number'] ?? ''))) {
-            $updateData['phone'] = trim($_POST['contact_number']);
-        }
-        if (!empty(trim($_POST['email'] ?? ''))) {
-            $updateData['email'] = trim($_POST['email']);
-        }
+    error_log("=== RETAILER PROFILE UPDATE DEBUG ===");
+    error_log("User ID: " . $user_id);
+    error_log("FILES received: " . print_r($_FILES, true));
+    error_log("POST data: " . print_r($_POST, true));
 
-        // Retailer-specific data
-        $retailerData = [];
-        
-        if (!empty(trim($_POST['shop_name'] ?? ''))) {
-            $retailerData['shop_name'] = trim($_POST['shop_name']);
-        }
-        if (!empty(trim($_POST['business_address'] ?? ''))) {
-            $retailerData['business_address'] = trim($_POST['business_address']);
-        }
-        // Note: contact_number is stored in users.phone, not in retailers table
-
-        // Handle profile picture upload
-        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-            error_log("Profile picture file detected: " . $_FILES['profile_picture']['name']);
-            $oldProfilePicture = ($_SESSION['profile_picture'] ?? '');
-            $newProfilePicPath = handleRetailerProfilePictureUpload($_FILES['profile_picture'], $user_id, $oldProfilePicture);
-            if ($newProfilePicPath) {
-                error_log("New profile picture saved to: " . $newProfilePicPath);
-                $updateData['profile_picture'] = $newProfilePicPath;
-            }
-        }
-        
-        if (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
-            $updateData['profile_picture'] = null;
-            if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/../' . $_SESSION['profile_picture'])) {
-                @unlink(__DIR__ . '/../' . $_SESSION['profile_picture']);
-            }
-        }
-
-        // Update user database (only if there's data to update)
-        if (!empty($updateData)) {
-            error_log("Updating users table with: " . print_r($updateData, true));
-            $result = $api->update('users', $updateData, ['id' => $user_id]);
-            error_log("User update result: " . print_r($result, true));
-        }
-
-        // Update session with new values
-        if (isset($updateData['full_name'])) {
-            $_SESSION['full_name'] = $updateData['full_name'];
-            $_SESSION['username'] = $updateData['full_name'];
-        }
-        if (isset($updateData['profile_picture'])) {
-            $_SESSION['profile_picture'] = $updateData['profile_picture'];
-        }
-
-        // Update retailer table
-        $retailers = $api->select('retailers', ['user_id' => $user_id]);
-        if (!empty($retailers)) {
-            if (!empty($retailerData)) {
-                error_log("Updating retailers table with: " . print_r($retailerData, true));
-                $result = $api->update('retailers', $retailerData, ['user_id' => $user_id]);
-                error_log("Retailer update result: " . print_r($result, true));
-            }
-        } else {
-            if (!empty($retailerData)) {
-                $retailerData['user_id'] = $user_id;
-                error_log("Inserting into retailers table: " . print_r($retailerData, true));
-                $api->insert('retailers', $retailerData);
-            }
-        }
-
-        // Fetch updated data
-        $updatedUser = $api->select('users', ['id' => $user_id]);
-        $updatedRetailer = $api->select('retailers', ['user_id' => $user_id]);
-        
-        $responseData = !empty($updatedUser) ? $updatedUser[0] : [];
-        if (!empty($updatedRetailer)) {
-            $responseData = array_merge($responseData, $updatedRetailer[0]);
-        }
-
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Profile updated successfully!',
-            'data' => $responseData
-        ]);
-    } catch (Exception $e) {
-        error_log("EXCEPTION during profile update: " . $e->getMessage());
-        error_log("Stack trace: " . $e->getTraceAsString());
-        
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
+    if (!$user_id) {
+      echo json_encode(['status' => 'error', 'message' => 'User session expired. Please log in again.']);
+      exit();
     }
-    exit();
+
+    // User data updates
+    $updateData = [];
+
+    if (!empty(trim($_POST['full_name'] ?? ''))) {
+      $updateData['full_name'] = trim($_POST['full_name']);
+    }
+
+
+    if (!empty(trim($_POST['email'] ?? ''))) {
+      $updateData['email'] = trim($_POST['email']);
+    }
+
+    // Retailer-specific data
+    $retailerData = [];
+
+    if (!empty(trim($_POST['shop_name'] ?? ''))) {
+      $retailerData['shop_name'] = trim($_POST['shop_name']);
+    }
+    if (!empty(trim($_POST['business_address'] ?? ''))) {
+      $retailerData['business_address'] = trim($_POST['business_address']);
+    }
+
+
+    // Handle profile picture upload
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+      error_log("Profile picture file detected: " . $_FILES['profile_picture']['name']);
+      $oldProfilePicture = ($_SESSION['profile_picture'] ?? '');
+      $newProfilePicPath = handleRetailerProfilePictureUpload($_FILES['profile_picture'], $user_id, $oldProfilePicture);
+      if ($newProfilePicPath) {
+        error_log("New profile picture saved to: " . $newProfilePicPath);
+        $updateData['profile_picture'] = $newProfilePicPath;
+      }
+    }
+
+    if (isset($_POST['profile_picture']) && $_POST['profile_picture'] === 'remove') {
+      $updateData['profile_picture'] = null;
+      if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/../' . $_SESSION['profile_picture'])) {
+        @unlink(__DIR__ . '/../' . $_SESSION['profile_picture']);
+      }
+    }
+
+    // Update user database (only if there's data to update)
+    if (!empty($updateData)) {
+      error_log("Updating users table with: " . print_r($updateData, true));
+      $result = $api->update('users', $updateData, ['id' => $user_id]);
+      error_log("User update result: " . print_r($result, true));
+    }
+
+    // Update session with new values
+    if (isset($updateData['full_name'])) {
+      $_SESSION['full_name'] = $updateData['full_name'];
+      $_SESSION['username'] = $updateData['full_name'];
+    }
+    if (isset($updateData['profile_picture'])) {
+      $_SESSION['profile_picture'] = $updateData['profile_picture'];
+    }
+
+    // Update retailer table
+    $retailers = $api->select('retailers', ['user_id' => $user_id]);
+    if (!empty($retailers)) {
+      if (!empty($retailerData)) {
+        error_log("Updating retailers table with: " . print_r($retailerData, true));
+        $result = $api->update('retailers', $retailerData, ['user_id' => $user_id]);
+        error_log("Retailer update result: " . print_r($result, true));
+      }
+    } else {
+      if (!empty($retailerData)) {
+        $retailerData['user_id'] = $user_id;
+        error_log("Inserting into retailers table: " . print_r($retailerData, true));
+        $api->insert('retailers', $retailerData);
+      }
+    }
+
+    // Fetch updated data
+    $updatedUser = $api->select('users', ['id' => $user_id]);
+    $updatedRetailer = $api->select('retailers', ['user_id' => $user_id]);
+
+    $responseData = !empty($updatedUser) ? $updatedUser[0] : [];
+    if (!empty($updatedRetailer)) {
+      $responseData = array_merge($responseData, $updatedRetailer[0]);
+    }
+
+    echo json_encode([
+      'status' => 'success',
+      'message' => 'Profile updated successfully!',
+      'data' => $responseData
+    ]);
+  } catch (Exception $e) {
+    error_log("EXCEPTION during profile update: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()]);
+  }
+  exit();
 }
 
 /**
@@ -237,39 +232,39 @@ function handleRetailerProfileUpdate()
  */
 function handleRemoveProfilePicture()
 {
-    header('Content-Type: application/json');
-    try {
-        $user_id = $_SESSION['user_id'] ?? null;
-        if ($user_id) {
-            $api = getSupabaseAPI();
-            $users = $api->select('users', ['id' => $user_id]);
-            if (!empty($users)) {
-                $currentPic = $users[0]['profile_picture'] ?? '';
-                $full_name = $users[0]['full_name'] ?? 'User';
-                
-                if (!empty($currentPic) && file_exists(__DIR__ . '/../' . $currentPic)) {
-                    @unlink(__DIR__ . '/../' . $currentPic);
-                }
-            } else {
-                $full_name = 'User';
-            }
-            
-            $api->update('users', ['profile_picture' => ''], ['id' => $user_id]);
-            $_SESSION['profile_picture'] = '';
-            $initials = strtoupper(substr($full_name, 0, 1));
-            
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Profile picture removed successfully!',
-                'data' => ['initials' => $initials]
-            ]);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'User not found']);
+  header('Content-Type: application/json');
+  try {
+    $user_id = $_SESSION['user_id'] ?? null;
+    if ($user_id) {
+      $api = getSupabaseAPI();
+      $users = $api->select('users', ['id' => $user_id]);
+      if (!empty($users)) {
+        $currentPic = $users[0]['profile_picture'] ?? '';
+        $full_name = $users[0]['full_name'] ?? 'User';
+
+        if (!empty($currentPic) && file_exists(__DIR__ . '/../' . $currentPic)) {
+          @unlink(__DIR__ . '/../' . $currentPic);
         }
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to remove picture: ' . $e->getMessage()]);
+      } else {
+        $full_name = 'User';
+      }
+
+      $api->update('users', ['profile_picture' => ''], ['id' => $user_id]);
+      $_SESSION['profile_picture'] = '';
+      $initials = strtoupper(substr($full_name, 0, 1));
+
+      echo json_encode([
+        'status' => 'success',
+        'message' => 'Profile picture removed successfully!',
+        'data' => ['initials' => $initials]
+      ]);
+    } else {
+      echo json_encode(['status' => 'error', 'message' => 'User not found']);
     }
-    exit();
+  } catch (Exception $e) {
+    echo json_encode(['status' => 'error', 'message' => 'Failed to remove picture: ' . $e->getMessage()]);
+  }
+  exit();
 }
 
 // Get user and retailer data
@@ -279,23 +274,23 @@ $userData = [];
 $retailerData = [];
 
 try {
-    $users = $api->select('users', ['id' => $user_id]);
-    if (!empty($users)) {
-        $userData = $users[0];
-    }
-    
-    $retailers = $api->select('retailers', ['user_id' => $user_id]);
-    if (!empty($retailers)) {
-        $retailerData = $retailers[0];
-    }
+  $users = $api->select('users', ['id' => $user_id]);
+  if (!empty($users)) {
+    $userData = $users[0];
+  }
+
+  $retailers = $api->select('retailers', ['user_id' => $user_id]);
+  if (!empty($retailers)) {
+    $retailerData = $retailers[0];
+  }
 } catch (Exception $e) {
-    error_log("Error fetching data: " . $e->getMessage());
+  error_log("Error fetching data: " . $e->getMessage());
 }
 
 // Set default values
 $email = $userData['email'] ?? $_SESSION['email'] ?? 'retailer@email.com';
 $full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest Retailer';
-$phone = $userData['phone'] ?? '';
+
 $profile_picture = $userData['profile_picture'] ?? $_SESSION['profile_picture'] ?? '';
 $created_at = $userData['created_at'] ?? '';
 
@@ -303,8 +298,7 @@ $created_at = $userData['created_at'] ?? '';
 $shop_name = $retailerData['shop_name'] ?? 'My Shop';
 $business_address = $retailerData['business_address'] ?? '';
 $business_permit = $retailerData['business_permit'] ?? '';
-// Contact number is actually stored in users.phone
-$contact_number = $phone;
+
 $permit_status = !empty($business_permit) ? 'Verified' : 'Not Uploaded';
 
 // Get shop statistics
@@ -313,22 +307,23 @@ $total_orders = 0;
 $total_revenue = 0;
 
 try {
-    // Count products
-    $products = $api->select('products', ['retailer_id' => $user_id]);
-    $total_products = count($products);
-    
-    // Count orders and calculate revenue
-    $orders = $api->select('orders', ['retailer_id' => $user_id]);
-    $total_orders = count($orders);
-    foreach ($orders as $order) {
-        $total_revenue += floatval($order['total_amount'] ?? 0);
-    }
+  // Count products
+  $products = $api->select('products', ['retailer_id' => $user_id]);
+  $total_products = count($products);
+
+  // Count orders and calculate revenue
+  $orders = $api->select('orders', ['retailer_id' => $user_id]);
+  $total_orders = count($orders);
+  foreach ($orders as $order) {
+    $total_revenue += floatval($order['total_amount'] ?? 0);
+  }
 } catch (Exception $e) {
-    // Silent fail
+  // Silent fail
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -337,12 +332,14 @@ try {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f7fbf8;
     }
   </style>
 </head>
+
 <body class="bg-gray-50 font-sans">
 
   <!-- Header -->
@@ -364,8 +361,14 @@ try {
             <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
           </a>
           <div id="notificationPreview" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-            <div class="p-4 border-b border-gray-100"><h3 class="font-semibold text-gray-800">Notifications</h3></div>
-            <div id="notificationPreviewItems" class="max-h-96 overflow-y-auto"><div class="p-8 text-center text-gray-500"><i class="fas fa-bell text-4xl mb-2 text-gray-300"></i><p class="text-sm">No notifications</p></div></div>
+            <div class="p-4 border-b border-gray-100">
+              <h3 class="font-semibold text-gray-800">Notifications</h3>
+            </div>
+            <div id="notificationPreviewItems" class="max-h-96 overflow-y-auto">
+              <div class="p-8 text-center text-gray-500"><i class="fas fa-bell text-4xl mb-2 text-gray-300"></i>
+                <p class="text-sm">No notifications</p>
+              </div>
+            </div>
             <div class="p-4 border-t border-gray-100 bg-gray-50"><a href="retailernotifications.php" class="block w-full bg-green-600 text-white text-center py-2 rounded-lg hover:bg-green-700 transition font-medium">View All Notifications</a></div>
           </div>
         </div>
@@ -459,7 +462,7 @@ try {
 
     <!-- Main Content -->
     <div class="flex-1">
-      
+
       <!-- My Profile Section -->
       <section id="my-profile" class="content-section bg-white rounded-lg shadow p-6">
         <div class="flex justify-between items-center mb-6">
@@ -486,10 +489,10 @@ try {
               <h3 id="displayShopName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($shop_name); ?></h3>
               <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
               <?php if (!empty($full_name)): ?>
-              <p class="text-gray-600 text-sm">
-                <i class="fas fa-store text-green-600 mr-1"></i>
-                <span id="displayShopName"><?php echo htmlspecialchars($shop_name); ?></span>
-              </p>
+                <p class="text-gray-600 text-sm">
+                  <i class="fas fa-store text-green-600 mr-1"></i>
+                  <span id="displayShopName"><?php echo htmlspecialchars($shop_name); ?></span>
+                </p>
               <?php endif; ?>
             </div>
           </div>
@@ -497,121 +500,110 @@ try {
           <!-- Personal & Business Information Grid -->
           <div class="grid md:grid-cols-2 gap-6">
             <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-              <p id="displayPhone" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Contact Number</label>
-              <p id="displayContactNumber" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($contact_number ?: 'Not provided'); ?></p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Business Location</label>
-              <p id="displayBusinessAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
-              <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
-                <?php 
+
+
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Business Location</label>
+                <p id="displayBusinessAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
+                <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
+                  <?php
                   if (!empty($created_at)) {
                     echo date('F Y', strtotime($created_at));
                   } else {
                     echo 'Recently';
                   }
-                ?>
-              </p>
+                  ?>
+                </p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Business Permit Status</label>
+                <p id="displayPermitStatus" class="text-gray-800 font-medium mt-1">
+                  <?php if ($permit_status === 'Verified'): ?>
+                    <span class="text-green-600"><i class="fas fa-check-circle mr-1"></i>Verified</span>
+                  <?php else: ?>
+                    <span class="text-orange-500"><i class="fas fa-exclamation-circle mr-1"></i>Not Uploaded</span>
+                  <?php endif; ?>
+                </p>
+              </div>
             </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <label class="text-xs text-gray-500 uppercase tracking-wide">Business Permit Status</label>
-              <p id="displayPermitStatus" class="text-gray-800 font-medium mt-1">
-                <?php if ($permit_status === 'Verified'): ?>
-                  <span class="text-green-600"><i class="fas fa-check-circle mr-1"></i>Verified</span>
-                <?php else: ?>
-                  <span class="text-orange-500"><i class="fas fa-exclamation-circle mr-1"></i>Not Uploaded</span>
-                <?php endif; ?>
-              </p>
-            </div>
-          </div>
 
-          <!-- Shop Statistics -->
-          <div class="pt-6 border-t">
-            <h4 class="font-semibold mb-4 text-gray-700">Shop Statistics</h4>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center p-4 bg-green-50 rounded-lg">
-                <p class="text-2xl font-bold text-green-600"><?php echo $total_products; ?></p>
-                <p class="text-sm text-gray-600 mt-1">Total Products</p>
-              </div>
-              <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <p class="text-2xl font-bold text-blue-600"><?php echo $total_orders; ?></p>
-                <p class="text-sm text-gray-600 mt-1">Total Orders</p>
-              </div>
-              <div class="text-center p-4 bg-purple-50 rounded-lg">
-                <p class="text-2xl font-bold text-purple-600">₱<?php echo number_format($total_revenue, 2); ?></p>
-                <p class="text-sm text-gray-600 mt-1">Total Revenue</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Profile Edit Mode (Hidden by default) -->
-        <form id="profileEditForm" class="space-y-6 hidden">
-          <!-- Profile Picture Upload -->
-          <div class="flex items-start gap-6 pb-6 border-b">
-            <div class="relative">
-              <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-                <img id="editProfilePicPreview" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">
-              <?php else: ?>
-                <div id="editProfilePicPreview" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
-                  <i class="fas fa-user text-white text-5xl"></i>
+            <!-- Shop Statistics -->
+            <div class="pt-6 border-t">
+              <h4 class="font-semibold mb-4 text-gray-700">Shop Statistics</h4>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                  <p class="text-2xl font-bold text-green-600"><?php echo $total_products; ?></p>
+                  <p class="text-sm text-gray-600 mt-1">Total Products</p>
                 </div>
-              <?php endif; ?>
-              <label for="profilePicInput" class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white cursor-pointer hover:bg-green-700 transition">
-                <i class="fas fa-camera text-sm"></i>
-              </label>
-              <input type="file" id="profilePicInput" accept="image/*" class="hidden">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                  <p class="text-2xl font-bold text-blue-600"><?php echo $total_orders; ?></p>
+                  <p class="text-sm text-gray-600 mt-1">Total Orders</p>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                  <p class="text-2xl font-bold text-purple-600">₱<?php echo number_format($total_revenue, 2); ?></p>
+                  <p class="text-sm text-gray-600 mt-1">Total Revenue</p>
+                </div>
+              </div>
             </div>
-            <div class="flex-1">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
-              <p class="text-sm text-gray-500 mb-2">Click the camera icon to upload a new profile picture</p>
-              <button type="button" id="removeProfilePic" class="text-sm text-red-600 hover:text-red-700 <?php echo empty($profile_picture) ? 'hidden' : ''; ?>">
-                <i class="fas fa-trash-alt mr-1"></i> Remove Picture
+          </div>
+
+          <!-- Profile Edit Mode (Hidden by default) -->
+          <form id="profileEditForm" class="space-y-6 hidden">
+            <!-- Profile Picture Upload -->
+            <div class="flex items-start gap-6 pb-6 border-b">
+              <div class="relative">
+                <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
+                  <img id="editProfilePicPreview" src="<?php echo htmlspecialchars('../' . $profile_picture); ?>" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">
+                <?php else: ?>
+                  <div id="editProfilePicPreview" class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
+                    <i class="fas fa-user text-white text-5xl"></i>
+                  </div>
+                <?php endif; ?>
+                <label for="profilePicInput" class="absolute bottom-0 right-0 w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white border-4 border-white cursor-pointer hover:bg-green-700 transition">
+                  <i class="fas fa-camera text-sm"></i>
+                </label>
+                <input type="file" id="profilePicInput" accept="image/*" class="hidden">
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                <p class="text-sm text-gray-500 mb-2">Click the camera icon to upload a new profile picture</p>
+                <button type="button" id="removeProfilePic" class="text-sm text-red-600 hover:text-red-700 <?php echo empty($profile_picture) ? 'hidden' : ''; ?>">
+                  <i class="fas fa-trash-alt mr-1"></i> Remove Picture
+                </button>
+              </div>
+            </div>
+
+            <!-- Personal & Business Information -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
+                <input type="text" id="editShopName" name="shop_name" value="<?php echo htmlspecialchars($shop_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
+              </div>
+
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Business Location</label>
+                <input type="text" id="editBusinessAddress" name="business_address" value="<?php echo htmlspecialchars($business_address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Shop address">
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t">
+              <button type="button" id="cancelEditProfile" class="px-6 py-2 border rounded-lg text-sm font-medium hover:bg-gray-50">
+                Cancel
+              </button>
+              <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
+                <i class="fas fa-save mr-1"></i> Save Changes
               </button>
             </div>
-          </div>
-
-          <!-- Personal & Business Information -->
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
-              <input type="text" id="editShopName" name="shop_name" value="<?php echo htmlspecialchars($shop_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-              <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-              <input type="tel" id="editPhone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-              <input type="tel" id="editContactNumber" name="contact_number" value="<?php echo htmlspecialchars($contact_number); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="09XXXXXXXXX">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Business Location</label>
-              <input type="text" id="editBusinessAddress" name="business_address" value="<?php echo htmlspecialchars($business_address); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Shop address">
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex justify-end gap-3 pt-4 border-t">
-            <button type="button" id="cancelEditProfile" class="px-6 py-2 border rounded-lg text-sm font-medium hover:bg-gray-50">
-              Cancel
-            </button>
-            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
-              <i class="fas fa-save mr-1"></i> Save Changes
-            </button>
-          </div>
-        </form>
+          </form>
       </section>
 
       <!-- Shop Details Section -->
@@ -626,10 +618,7 @@ try {
             <label class="text-xs text-gray-500 uppercase tracking-wide">Business Address</label>
             <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <label class="text-xs text-gray-500 uppercase tracking-wide">Contact Number</label>
-            <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($contact_number ?: 'Not provided'); ?></p>
-          </div>
+
         </div>
       </section>
 
@@ -809,43 +798,43 @@ try {
     </div>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       // Profile dropdown hover handlers (matching user header style)
       let profileDropdownTimeout = null;
       let notificationPreviewTimeout = null;
       const HOVER_DELAY = 200;
-      
+
       const profileContainer = document.getElementById('profileDropdownContainer');
       const profileDropdown = document.getElementById('profileDropdown');
       const profileDropdownBtn = document.getElementById('profileDropdownBtn');
-      
+
       if (profileContainer && profileDropdown && profileDropdownBtn) {
         profileContainer.addEventListener('mouseenter', function() {
           clearTimeout(profileDropdownTimeout);
           profileDropdown.classList.remove('hidden');
         });
-        
+
         profileContainer.addEventListener('mouseleave', function() {
           profileDropdownTimeout = setTimeout(function() {
             profileDropdown.classList.add('hidden');
           }, HOVER_DELAY);
         });
-        
+
         profileDropdown.addEventListener('mouseenter', function() {
           clearTimeout(profileDropdownTimeout);
         });
-        
+
         profileDropdown.addEventListener('mouseleave', function() {
           profileDropdownTimeout = setTimeout(function() {
             profileDropdown.classList.add('hidden');
           }, HOVER_DELAY);
         });
-        
+
         profileDropdownBtn.addEventListener('click', function(e) {
           e.stopPropagation();
           profileDropdown.classList.toggle('hidden');
         });
-        
+
         document.addEventListener('click', function() {
           if (!profileDropdown.classList.contains('hidden')) {
             profileDropdown.classList.add('hidden');
@@ -855,41 +844,128 @@ try {
         const notificationContainer = document.getElementById('notificationPreviewContainer');
         const notificationPreview = document.getElementById('notificationPreview');
         if (notificationContainer && notificationPreview) {
-          notificationContainer.addEventListener('mouseenter', function() { clearTimeout(notificationPreviewTimeout); loadRetailerNotificationPreview(); notificationPreview.classList.remove('hidden'); });
-          notificationContainer.addEventListener('mouseleave', function() { notificationPreviewTimeout = setTimeout(() => notificationPreview.classList.add('hidden'), HOVER_DELAY); });
+          notificationContainer.addEventListener('mouseenter', function() {
+            clearTimeout(notificationPreviewTimeout);
+            loadRetailerNotificationPreview();
+            notificationPreview.classList.remove('hidden');
+          });
+          notificationContainer.addEventListener('mouseleave', function() {
+            notificationPreviewTimeout = setTimeout(() => notificationPreview.classList.add('hidden'), HOVER_DELAY);
+          });
           notificationPreview.addEventListener('mouseenter', () => clearTimeout(notificationPreviewTimeout));
-          notificationPreview.addEventListener('mouseleave', () => { notificationPreviewTimeout = setTimeout(() => notificationPreview.classList.add('hidden'), HOVER_DELAY); });
+          notificationPreview.addEventListener('mouseleave', () => {
+            notificationPreviewTimeout = setTimeout(() => notificationPreview.classList.add('hidden'), HOVER_DELAY);
+          });
         }
-        function loadRetailerNotificationBadge() { const badge = document.getElementById('notificationBadge'); if (!badge) return; fetch('../api/get-retailer-notifications.php').then(r => r.json()).then(d => { if (d.success && d.notifications) { const c = d.unreadCount || 0; if (c > 0) { badge.textContent = c; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }}}).catch(e => console.error(e)); }
-        function loadRetailerNotificationPreview() { const items = document.getElementById('notificationPreviewItems'); if (!items) return; fetch('../api/get-retailer-notifications.php').then(r => r.json()).then(d => { if (d.success && d.notifications && d.notifications.length > 0) { items.innerHTML = d.notifications.slice(0, 5).map(n => { const unread = !n.read ? 'bg-green-50 border-l-4 border-green-500' : ''; const time = getTimeAgo(new Date(n.timestamp)); let icon = 'fa-info-circle', bg = 'bg-blue-100', tc = 'text-blue-700'; if (n.type === 'order') { icon = 'fa-box'; bg = 'bg-green-100'; tc = 'text-green-700'; } else if (n.type === 'stock') { icon = 'fa-exclamation-triangle'; bg = 'bg-yellow-100'; tc = 'text-yellow-700'; } else if (n.type === 'review') { icon = 'fa-star'; bg = 'bg-yellow-100'; tc = 'text-yellow-700'; } const t = escapeHtml(n.title || 'Notification'); const m = escapeHtml(n.message || ''); const l = n.link || 'retailernotifications.php'; return `<a href="${l}" class="block p-3 border-b border-gray-100 hover:bg-gray-50 transition ${unread}" data-notification-id="${n.id}" onclick="markNotificationAsRead(event, ${n.id})"><div class="flex items-start gap-3"><div class="${bg} ${tc} p-2 rounded-full flex-shrink-0"><i class="fas ${icon} text-sm"></i></div><div class="flex-1 min-w-0"><p class="font-medium text-gray-800 text-sm truncate">${t}</p><p class="text-xs text-gray-500 mt-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${m}</p><span class="text-xs text-gray-400 block mt-1">${time}</span></div>${!n.read ? '<div class="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>' : ''}</div></a>`; }).join(''); } else { items.innerHTML = '<div class="p-8 text-center text-gray-500"><i class="fas fa-bell text-4xl mb-2 text-gray-300"></i><p class="text-sm">No notifications</p></div>'; }}).catch(e => console.error(e)); }
-        function getTimeAgo(date) { const s = Math.floor((new Date() - date) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return `${Math.floor(s / 60)}m ago`; if (s < 86400) return `${Math.floor(s / 3600)}h ago`; if (s < 604800) return `${Math.floor(s / 86400)}d ago`; return date.toLocaleDateString(); }
-        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-        function markNotificationAsRead(event, notificationId) { fetch('../api/mark-retailer-notification-read.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notification_id: notificationId }) }).then(response => response.json()).then(data => { if (data.success) { setTimeout(() => { loadRetailerNotificationBadge(); }, 100); } }).catch(error => console.error('Error marking notification as read:', error)); }
+
+        function loadRetailerNotificationBadge() {
+          const badge = document.getElementById('notificationBadge');
+          if (!badge) return;
+          fetch('../api/get-retailer-notifications.php').then(r => r.json()).then(d => {
+            if (d.success && d.notifications) {
+              const c = d.unreadCount || 0;
+              if (c > 0) {
+                badge.textContent = c;
+                badge.classList.remove('hidden');
+              } else {
+                badge.classList.add('hidden');
+              }
+            }
+          }).catch(e => console.error(e));
+        }
+
+        function loadRetailerNotificationPreview() {
+          const items = document.getElementById('notificationPreviewItems');
+          if (!items) return;
+          fetch('../api/get-retailer-notifications.php').then(r => r.json()).then(d => {
+            if (d.success && d.notifications && d.notifications.length > 0) {
+              items.innerHTML = d.notifications.slice(0, 5).map(n => {
+                const unread = !n.read ? 'bg-green-50 border-l-4 border-green-500' : '';
+                const time = getTimeAgo(new Date(n.timestamp));
+                let icon = 'fa-info-circle',
+                  bg = 'bg-blue-100',
+                  tc = 'text-blue-700';
+                if (n.type === 'order') {
+                  icon = 'fa-box';
+                  bg = 'bg-green-100';
+                  tc = 'text-green-700';
+                } else if (n.type === 'stock') {
+                  icon = 'fa-exclamation-triangle';
+                  bg = 'bg-yellow-100';
+                  tc = 'text-yellow-700';
+                } else if (n.type === 'review') {
+                  icon = 'fa-star';
+                  bg = 'bg-yellow-100';
+                  tc = 'text-yellow-700';
+                }
+                const t = escapeHtml(n.title || 'Notification');
+                const m = escapeHtml(n.message || '');
+                const l = n.link || 'retailernotifications.php';
+                return `<a href="${l}" class="block p-3 border-b border-gray-100 hover:bg-gray-50 transition ${unread}" data-notification-id="${n.id}" onclick="markNotificationAsRead(event, ${n.id})"><div class="flex items-start gap-3"><div class="${bg} ${tc} p-2 rounded-full flex-shrink-0"><i class="fas ${icon} text-sm"></i></div><div class="flex-1 min-w-0"><p class="font-medium text-gray-800 text-sm truncate">${t}</p><p class="text-xs text-gray-500 mt-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${m}</p><span class="text-xs text-gray-400 block mt-1">${time}</span></div>${!n.read ? '<div class="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>' : ''}</div></a>`;
+              }).join('');
+            } else {
+              items.innerHTML = '<div class="p-8 text-center text-gray-500"><i class="fas fa-bell text-4xl mb-2 text-gray-300"></i><p class="text-sm">No notifications</p></div>';
+            }
+          }).catch(e => console.error(e));
+        }
+
+        function getTimeAgo(date) {
+          const s = Math.floor((new Date() - date) / 1000);
+          if (s < 60) return 'Just now';
+          if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+          if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+          if (s < 604800) return `${Math.floor(s / 86400)}d ago`;
+          return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        }
+
+        function markNotificationAsRead(event, notificationId) {
+          fetch('../api/mark-retailer-notification-read.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              notification_id: notificationId
+            })
+          }).then(response => response.json()).then(data => {
+            if (data.success) {
+              setTimeout(() => {
+                loadRetailerNotificationBadge();
+              }, 100);
+            }
+          }).catch(error => console.error('Error marking notification as read:', error));
+        }
         // Load notifications immediately on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadRetailerNotificationBadge();
+          loadRetailerNotificationBadge();
         });
         // Also call immediately in case DOM is already loaded
         if (document.readyState === 'loading') {
-            // DOM is still loading, wait for DOMContentLoaded
+          // DOM is still loading, wait for DOMContentLoaded
         } else {
-            // DOM is already loaded, execute immediately
-            loadRetailerNotificationBadge();
+          // DOM is already loaded, execute immediately
+          loadRetailerNotificationBadge();
         }
         setInterval(loadRetailerNotificationBadge, 5000);
 
         // Listen for notification updates from other pages (e.g., retailernotifications.php)
         window.addEventListener('storage', (e) => {
-            if (e.key === 'notificationsUpdated') {
-                loadRetailerNotificationBadge();
-                loadRetailerNotificationPreview();
-            }
+          if (e.key === 'notificationsUpdated') {
+            loadRetailerNotificationBadge();
+            loadRetailerNotificationPreview();
+          }
         });
 
         // Listen for custom event from same page
         window.addEventListener('notificationsUpdated', () => {
-            loadRetailerNotificationBadge();
-            loadRetailerNotificationPreview();
+          loadRetailerNotificationBadge();
+          loadRetailerNotificationPreview();
         });
       }
 
@@ -946,7 +1022,7 @@ try {
 
       function updateContent(hash) {
         const targetHash = hash || '#my-profile';
-        
+
         // Hide all sections
         contentSections.forEach(section => {
           section.classList.add('hidden');
@@ -1024,10 +1100,10 @@ try {
                 newImg.src = event.target.result;
                 newImg.alt = 'Profile';
                 newImg.className = 'w-32 h-32 rounded-full border-4 border-green-100 object-cover';
-                
+
                 const oldEl = document.getElementById('editProfilePicPreview');
                 previewContainer.replaceChild(newImg, oldEl);
-                
+
                 const removeBtn = document.getElementById('removeProfilePic');
                 if (removeBtn) removeBtn.classList.remove('hidden');
               }
@@ -1094,18 +1170,18 @@ try {
 
             if (result.status === 'success') {
               showSuccessModal('Profile picture removed successfully!');
-              
+
               const defaultAvatar = `<div class="w-32 h-32 rounded-full border-4 border-green-100 bg-green-600 flex items-center justify-center">
                 <i class="fas fa-user text-white text-4xl"></i>
               </div>`;
-              
+
               const displayPic = document.getElementById('displayProfilePic');
               const sidebarPic = document.getElementById('sidebarProfilePic');
               if (displayPic) displayPic.outerHTML = defaultAvatar;
               if (sidebarPic) sidebarPic.outerHTML = defaultAvatar.replace('w-32 h-32', 'w-20 h-20');
-              
+
               if (removeProfilePic) removeProfilePic.classList.add('hidden');
-              
+
               setTimeout(() => {
                 closeSuccessModal();
               }, 1500);
@@ -1122,17 +1198,17 @@ try {
       // Save profile changes
       profileEditForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         showLoadingModal();
-        
+
         const formData = new FormData();
         formData.append('action', 'update_profile');
         formData.append('email', document.getElementById('editEmail').value);
-        formData.append('phone', document.getElementById('editPhone').value);
+
         formData.append('shop_name', document.getElementById('editShopName').value);
         formData.append('business_address', document.getElementById('editBusinessAddress').value);
-        formData.append('contact_number', document.getElementById('editContactNumber').value);
-        
+
+
         const profilePicFile = profilePicInput.files[0];
         if (profilePicFile) {
           formData.append('profile_picture', profilePicFile);
@@ -1166,10 +1242,10 @@ try {
 
           if (result.status === 'success') {
             showSuccessModal(result.message || 'Profile updated successfully!');
-            
+
             if (result.data) {
               const data = result.data;
-              
+
               // Update display mode with shop name as primary
               if (data.shop_name) {
                 document.getElementById('displayShopName').textContent = data.shop_name || 'My Shop';
@@ -1179,45 +1255,48 @@ try {
                 if (fullNameEl) fullNameEl.textContent = data.full_name;
               }
               document.getElementById('displayEmail').textContent = data.email;
-              document.getElementById('displayPhone').textContent = data.phone || 'Not provided';
+
               document.getElementById('displayBusinessAddress').textContent = data.business_address || 'Not provided';
               document.getElementById('displayContactNumber').textContent = data.contact_number || 'Not provided';
-              
+
               if (data.created_at) {
                 const createdDate = new Date(data.created_at);
-                const formattedDate = createdDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                const formattedDate = createdDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long'
+                });
                 document.getElementById('displayMemberSince').textContent = formattedDate;
               }
-              
+
               // Update profile pictures
               if (data.profile_picture) {
                 const picPath = '../' + data.profile_picture;
-                
+
                 const displayPicEl = document.getElementById('displayProfilePic');
                 if (displayPicEl) {
                   displayPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
                 }
-                
+
                 const sidebarPicEl = document.getElementById('sidebarProfilePic');
                 if (sidebarPicEl) {
                   sidebarPicEl.innerHTML = `<img src="${picPath}" alt="Profile" class="w-20 h-20 rounded-full mb-3 object-cover border-2 border-green-600">`;
                 }
-                
+
                 const editPicEl = document.getElementById('editProfilePicPreview');
                 if (editPicEl) {
                   editPicEl.outerHTML = `<img id="editProfilePicPreview" src="${picPath}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-green-100 object-cover">`;
                 }
-                
+
                 // Update header profile picture
                 const headerPicEl = document.getElementById('headerProfilePic');
                 if (headerPicEl) {
                   headerPicEl.src = picPath + '?v=' + new Date().getTime();
                 }
-                
+
                 const removeBtn = document.getElementById('removeProfilePic');
                 if (removeBtn) removeBtn.classList.remove('hidden');
               }
-              
+
               // Update sidebar with shop name
               const sidebarTitle = document.querySelector('aside h2');
               if (sidebarTitle && data.shop_name) {
@@ -1225,7 +1304,7 @@ try {
               }
               document.querySelector('aside p').textContent = data.email;
             }
-            
+
             profileDisplay.classList.remove('hidden');
             profileEditForm.classList.add('hidden');
             editProfileBtn.classList.remove('hidden');
@@ -1273,13 +1352,15 @@ try {
         question.addEventListener('click', () => {
           const answer = question.nextElementSibling;
           const icon = question.querySelector('i');
-          
+
           answer.classList.toggle('hidden');
           icon.classList.toggle('rotate-180');
         });
       });
     });
   </script>
-</body>
-</html>
-  
+
+  <?php
+  // Include the messaging widget for retailer
+  include __DIR__ . '/../includes/retailer-message-widget.php';
+  ?>

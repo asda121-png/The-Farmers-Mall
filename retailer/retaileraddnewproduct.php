@@ -875,9 +875,11 @@ try {
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(files[0]);
                 productImageInput.files = dataTransfer.files;
-                
+
                 // Trigger change event manually
-                const event = new Event('change', { bubbles: true });
+                const event = new Event('change', {
+                    bubbles: true
+                });
                 productImageInput.dispatchEvent(event);
             }
         });
@@ -1191,6 +1193,10 @@ try {
         });
     </script>
 
+    <?php
+    // Include the messaging widget for retailer
+    include __DIR__ . '/../includes/retailer-message-widget.php';
+    ?>
 </body>
 
 </html>

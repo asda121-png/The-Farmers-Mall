@@ -36,33 +36,33 @@
 </head>
 
 <body>
-<?php
-// Get profile picture from session/database if available
-$headerProfilePic = '../images/default-avatar.svg';
-$headerUserName = 'Retailer';
+  <?php
+  // Get profile picture from session/database if available
+  $headerProfilePic = '../images/default-avatar.svg';
+  $headerUserName = 'Retailer';
 
-if (isset($_SESSION['user_id'])) {
+  if (isset($_SESSION['user_id'])) {
     require_once __DIR__ . '/../config/supabase-api.php';
     try {
-        $api = getSupabaseAPI();
-        $users = $api->select('users', ['id' => $_SESSION['user_id']]);
-        if (!empty($users)) {
-            $userData = $users[0];
-            $headerUserName = $userData['full_name'] ?? 'Retailer';
-            if (!empty($userData['profile_picture'])) {
-                $profilePath = '../' . ltrim($userData['profile_picture'], '/');
-                if (file_exists(__DIR__ . '/../' . ltrim($userData['profile_picture'], '/'))) {
-                    $headerProfilePic = $profilePath;
-                }
-            }
+      $api = getSupabaseAPI();
+      $users = $api->select('users', ['id' => $_SESSION['user_id']]);
+      if (!empty($users)) {
+        $userData = $users[0];
+        $headerUserName = $userData['full_name'] ?? 'Retailer';
+        if (!empty($userData['profile_picture'])) {
+          $profilePath = '../' . ltrim($userData['profile_picture'], '/');
+          if (file_exists(__DIR__ . '/../' . ltrim($userData['profile_picture'], '/'))) {
+            $headerProfilePic = $profilePath;
+          }
         }
+      }
     } catch (Exception $e) {
-        error_log("Header profile fetch error: " . $e->getMessage());
+      error_log("Header profile fetch error: " . $e->getMessage());
     }
-}
-?>
+  }
+  ?>
   <!-- SELLER HEADER -->
- <header class="bg-white shadow-sm">
+  <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='retailerdashboard.php'"></div>
@@ -103,50 +103,55 @@ if (isset($_SESSION['user_id'])) {
     const menu = document.getElementById('profileDropdown');
 
     btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
     });
 
     document.addEventListener('click', () => {
-        if (!menu.classList.contains('hidden')) {
-            menu.classList.add('hidden');
-        }
+      if (!menu.classList.contains('hidden')) {
+        menu.classList.add('hidden');
+      }
     });
-    
+
     // Real-time profile picture update for header
     let lastHeaderProfilePic = '<?php echo htmlspecialchars($headerProfilePic); ?>';
-    
+
     async function checkHeaderProfileUpdates() {
-        try {
-            const response = await fetch('../api/get-profile.php');
-            const result = await response.json();
-            
-            if (result.success && result.data && result.data.profile_picture) {
-                const profilePicElement = document.getElementById('headerProfilePic');
-                
-                if (result.data.profile_picture !== lastHeaderProfilePic) {
-                    profilePicElement.src = result.data.profile_picture + '?t=' + new Date().getTime();
-                    lastHeaderProfilePic = result.data.profile_picture;
-                }
-            }
-        } catch (error) {
-            console.error('Error checking header profile updates:', error);
+      try {
+        const response = await fetch('../api/get-profile.php');
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.profile_picture) {
+          const profilePicElement = document.getElementById('headerProfilePic');
+
+          if (result.data.profile_picture !== lastHeaderProfilePic) {
+            profilePicElement.src = result.data.profile_picture + '?t=' + new Date().getTime();
+            lastHeaderProfilePic = result.data.profile_picture;
+          }
         }
+      } catch (error) {
+        console.error('Error checking header profile updates:', error);
+      }
     }
-    
+
     // Check every 5 seconds
     setInterval(checkHeaderProfileUpdates, 5000);
-    
+
     // Check when page becomes visible
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            checkHeaderProfileUpdates();
-        }
+      if (!document.hidden) {
+        checkHeaderProfileUpdates();
+      }
     });
-    
+
     // Listen for profile update events
     window.addEventListener('profileUpdated', checkHeaderProfileUpdates);
   </script>
+
+  <?php
+  // Include the messaging widget for all retailer pages
+  include __DIR__ . '/../includes/retailer-message-widget.php';
+  ?>
 </body>
 
 </html>

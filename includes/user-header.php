@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User Header Component - Fully Functional Header for Logged-in Users
  * 
@@ -12,7 +13,7 @@
 
 // Start session only if not already started
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
 // Get user data
@@ -23,13 +24,13 @@ $full_name = $_SESSION['full_name'] ?? 'User';
 
 // Fetch profile picture from database
 if ($user_id) {
-    require_once __DIR__ . '/../config/supabase-api.php';
-    require_once __DIR__ . '/../config/uuid-helper.php';
-    $api = getSupabaseAPI();
-    $user = safeGetUser($user_id, $api);
-    if ($user) {
-        $profile_picture = $user['profile_picture'] ?? '';
-    }
+  require_once __DIR__ . '/../config/supabase-api.php';
+  require_once __DIR__ . '/../config/uuid-helper.php';
+  $api = getSupabaseAPI();
+  $user = safeGetUser($user_id, $api);
+  if ($user) {
+    $profile_picture = $user['profile_picture'] ?? '';
+  }
 }
 
 // Determine base path
@@ -37,13 +38,13 @@ $base = '';
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
 $subdirectories = ['public', 'retailer', 'auth', 'admin', 'user', 'seller', 'rider'];
 if (in_array($current_dir, $subdirectories)) {
-    $base = '../';
+  $base = '../';
 }
 ?>
 <header class="bg-white shadow-sm sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16 md:h-20">
-      
+
       <!-- Logo (Clickable - Redirects to User Homepage) -->
       <a href="<?php echo $base; ?>user/user-homepage.php" class="flex items-center gap-2 flex-shrink-0">
         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
@@ -56,20 +57,19 @@ if (in_array($current_dir, $subdirectories)) {
       <div class="flex-1 max-w-2xl mx-4 relative">
         <form id="searchForm" action="<?php echo $base; ?>user/products.php" method="GET" class="relative">
           <div class="relative">
-            <input 
-              type="text" 
+            <input
+              type="text"
               id="searchInput"
               name="search"
               placeholder="Search for fresh produce, dairy, and more..."
               autocomplete="off"
-              class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none focus:border-green-500 transition-all"
-            />
+              class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none focus:border-green-500 transition-all" />
             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 text-white px-4 py-1 rounded-full hover:bg-green-700 transition text-sm hidden sm:block">
               Search
             </button>
           </div>
-          
+
           <!-- Autocomplete Dropdown -->
           <div id="autocompleteDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
             <div id="autocompleteResults" class="py-2">
@@ -81,7 +81,7 @@ if (in_array($current_dir, $subdirectories)) {
 
       <!-- Right Side Icons -->
       <div class="flex items-center space-x-4 md:space-x-6 flex-shrink-0">
-        
+
         <!-- Home Icon -->
         <a href="<?php echo $base; ?>user/user-homepage.php" class="text-gray-600 hover:text-green-600 transition" title="Home">
           <i class="fa-solid fa-house text-xl"></i>
@@ -93,7 +93,7 @@ if (in_array($current_dir, $subdirectories)) {
             <i class="fa-regular fa-bell text-xl"></i>
             <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
           </a>
-          
+
           <!-- Notification Preview Dropdown -->
           <div id="notificationPreview" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
             <div class="p-4 border-b border-gray-100">
@@ -120,7 +120,7 @@ if (in_array($current_dir, $subdirectories)) {
             <i class="fa-solid fa-cart-shopping text-xl"></i>
             <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 min-w-[1.125rem] h-[1.125rem] flex items-center justify-center hidden">0</span>
           </a>
-          
+
           <!-- Cart Preview Dropdown -->
           <div id="cartPreview" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
             <div class="p-4 border-b border-gray-100">
@@ -145,9 +145,9 @@ if (in_array($current_dir, $subdirectories)) {
         <div class="relative" id="profileDropdownContainer">
           <button class="flex items-center focus:outline-none" id="profileDropdownBtn">
             <?php if (!empty($profile_picture) && file_exists(__DIR__ . '/../' . $profile_picture)): ?>
-              <img src="<?php echo htmlspecialchars($base . $profile_picture); ?>" 
-                   alt="Profile" 
-                   class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-green-500">
+              <img src="<?php echo htmlspecialchars($base . $profile_picture); ?>"
+                alt="Profile"
+                class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-green-500">
             <?php else: ?>
               <div class="w-9 h-9 rounded-full cursor-pointer bg-green-600 flex items-center justify-center border-2 border-green-500">
                 <i class="fas fa-user text-white text-sm"></i>
@@ -158,8 +158,8 @@ if (in_array($current_dir, $subdirectories)) {
           <!-- Profile Dropdown Menu -->
           <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 z-50">
             <div class="p-3 border-b">
-                <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($full_name); ?></p>
-                <p class="text-xs text-gray-500"><?php echo htmlspecialchars($email); ?></p>
+              <p class="text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($full_name); ?></p>
+              <p class="text-xs text-gray-500"><?php echo htmlspecialchars($email); ?></p>
             </div>
             <nav class="p-2">
               <a href="<?php echo $base; ?>user/profile.php" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm text-gray-700">
@@ -186,74 +186,74 @@ if (in_array($current_dir, $subdirectories)) {
 
 <!-- Header JavaScript -->
 <script>
-(function() {
-  'use strict';
-  
-  // Search Autocomplete
-  const searchInput = document.getElementById('searchInput');
-  const autocompleteDropdown = document.getElementById('autocompleteDropdown');
-  const autocompleteResults = document.getElementById('autocompleteResults');
-  let searchTimeout = null;
-  
-  if (searchInput) {
-    // Handle input for autocomplete
-    searchInput.addEventListener('input', function() {
-      const query = this.value.trim();
-      
-      clearTimeout(searchTimeout);
-      
-      if (query.length < 2) {
-        autocompleteDropdown.classList.add('hidden');
-        return;
-      }
-      
-      searchTimeout = setTimeout(() => {
-        fetchSearchSuggestions(query);
-      }, 300);
-    });
-    
-    // Hide dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
-        autocompleteDropdown.classList.add('hidden');
-      }
-    });
-    
-    // Handle Enter key
-    searchInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('searchForm').submit();
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        const firstResult = autocompleteResults.querySelector('a');
-        if (firstResult) firstResult.focus();
-      }
-    });
-  }
-  
-  // Fetch search suggestions
-  function fetchSearchSuggestions(query) {
-    const basePath = '<?php echo $base; ?>';
-    fetch(`${basePath}api/search.php?q=${encodeURIComponent(query)}&limit=5`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success && data.results.length > 0) {
-          displayAutocompleteResults(data.results);
-          autocompleteDropdown.classList.remove('hidden');
-        } else {
+  (function() {
+    'use strict';
+
+    // Search Autocomplete
+    const searchInput = document.getElementById('searchInput');
+    const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+    const autocompleteResults = document.getElementById('autocompleteResults');
+    let searchTimeout = null;
+
+    if (searchInput) {
+      // Handle input for autocomplete
+      searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+
+        clearTimeout(searchTimeout);
+
+        if (query.length < 2) {
+          autocompleteDropdown.classList.add('hidden');
+          return;
+        }
+
+        searchTimeout = setTimeout(() => {
+          fetchSearchSuggestions(query);
+        }, 300);
+      });
+
+      // Hide dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
           autocompleteDropdown.classList.add('hidden');
         }
-      })
-      .catch(error => {
-        console.error('Search error:', error);
-        autocompleteDropdown.classList.add('hidden');
       });
-  }
-  
-  // Display autocomplete results
-  function displayAutocompleteResults(results) {
-    autocompleteResults.innerHTML = results.map(product => `
+
+      // Handle Enter key
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('searchForm').submit();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const firstResult = autocompleteResults.querySelector('a');
+          if (firstResult) firstResult.focus();
+        }
+      });
+    }
+
+    // Fetch search suggestions
+    function fetchSearchSuggestions(query) {
+      const basePath = '<?php echo $base; ?>';
+      fetch(`${basePath}api/search.php?q=${encodeURIComponent(query)}&limit=5`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.results.length > 0) {
+            displayAutocompleteResults(data.results);
+            autocompleteDropdown.classList.remove('hidden');
+          } else {
+            autocompleteDropdown.classList.add('hidden');
+          }
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          autocompleteDropdown.classList.add('hidden');
+        });
+    }
+
+    // Display autocomplete results
+    function displayAutocompleteResults(results) {
+      autocompleteResults.innerHTML = results.map(product => `
       <a href="<?php echo $base; ?>user/products.php?search=${encodeURIComponent(product.name)}" 
          class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer">
         <img src="${product.image_url}" 
@@ -264,50 +264,50 @@ if (in_array($current_dir, $subdirectories)) {
         </div>
       </a>
     `).join('');
-  }
-  
-  // Escape HTML
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-  
-  // Load Cart Preview
-  function loadCartPreview() {
-    const basePath = '<?php echo $base; ?>';
-    const cartPreviewItems = document.getElementById('cartPreviewItems');
-    const cartBadge = document.getElementById('cartBadge');
-    
-    fetch(`${basePath}api/cart.php`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success && data.items && data.items.length > 0) {
-          const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-          
-          // Update badge
-          if (cartBadge) {
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.remove('hidden');
-          }
-          
-          // Update preview
-          if (cartPreviewItems) {
-            cartPreviewItems.innerHTML = data.items.slice(0, 5).map(item => {
-              // Resolve image path - use image_url, image, or product_image_url
-              let imageSrc = item.image_url || item.image || item.product_image_url || '../images/products/placeholder.png';
-              
-              // Ensure proper path resolution
-              if (imageSrc && !imageSrc.startsWith('http://') && !imageSrc.startsWith('https://')) {
-                // If path doesn't start with ../, add it
-                if (!imageSrc.startsWith('../') && !imageSrc.startsWith('/')) {
-                  imageSrc = '../' + imageSrc;
-                }
-              }
-              
-              const productName = item.product_name || item.name || 'Product';
-              
-              return `
+    }
+
+    // Escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Load Cart Preview
+    function loadCartPreview() {
+      const basePath = '<?php echo $base; ?>';
+      const cartPreviewItems = document.getElementById('cartPreviewItems');
+      const cartBadge = document.getElementById('cartBadge');
+
+      fetch(`${basePath}api/cart.php`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.items && data.items.length > 0) {
+            const totalItems = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+            // Update badge
+            if (cartBadge) {
+              cartBadge.textContent = totalItems;
+              cartBadge.classList.remove('hidden');
+            }
+
+            // Update preview
+            if (cartPreviewItems) {
+              cartPreviewItems.innerHTML = data.items.slice(0, 5).map(item => {
+                  // Resolve image path - use image_url, image, or product_image_url
+                  let imageSrc = item.image_url || item.image || item.product_image_url || '../images/products/placeholder.png';
+
+                  // Ensure proper path resolution
+                  if (imageSrc && !imageSrc.startsWith('http://') && !imageSrc.startsWith('https://')) {
+                    // If path doesn't start with ../, add it
+                    if (!imageSrc.startsWith('../') && !imageSrc.startsWith('/')) {
+                      imageSrc = '../' + imageSrc;
+                    }
+                  }
+
+                  const productName = item.product_name || item.name || 'Product';
+
+                  return `
               <div class="flex items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50">
                 <img src="${imageSrc}" 
                      alt="${escapeHtml(productName)}" 
@@ -320,119 +320,119 @@ if (in_array($current_dir, $subdirectories)) {
                 </div>
               </div>
             `;
-            }).join('') + 
-            (data.items.length > 5 ? `
+                }).join('') +
+                (data.items.length > 5 ? `
               <div class="p-3 text-center text-sm text-gray-500 border-t border-gray-100">
                 +${data.items.length - 5} more item(s)
               </div>
             ` : '');
-          }
-        } else {
-          // Empty cart - no localStorage fallback
-          if (cartBadge) {
-            cartBadge.classList.add('hidden');
-          }
-          if (cartPreviewItems) {
-            cartPreviewItems.innerHTML = `
+            }
+          } else {
+            // Empty cart - no localStorage fallback
+            if (cartBadge) {
+              cartBadge.classList.add('hidden');
+            }
+            if (cartPreviewItems) {
+              cartPreviewItems.innerHTML = `
               <div class="p-8 text-center text-gray-500">
                 <i class="fas fa-shopping-cart text-4xl mb-2 text-gray-300"></i>
                 <p class="text-sm">Your cart is empty</p>
               </div>
             `;
+            }
+            // Clear old localStorage cart data
+            localStorage.removeItem('cart');
           }
+        })
+        .catch(error => {
+          console.error('Cart load error:', error);
           // Clear old localStorage cart data
           localStorage.removeItem('cart');
+          if (cartBadge) {
+            cartBadge.classList.add('hidden');
+          }
+        });
+    }
+
+    // Load notification badge
+    function loadNotificationBadge() {
+      const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+      const unreadCount = notifications.filter(n => !n.read).length;
+      const badge = document.getElementById('notificationBadge');
+      if (badge) {
+        if (unreadCount > 0) {
+          badge.textContent = unreadCount;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
         }
-      })
-      .catch(error => {
-        console.error('Cart load error:', error);
-        // Clear old localStorage cart data
-        localStorage.removeItem('cart');
-        if (cartBadge) {
-          cartBadge.classList.add('hidden');
-        }
-      });
-  }
-  
-  // Load notification badge
-  function loadNotificationBadge() {
-    const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
-    const unreadCount = notifications.filter(n => !n.read).length;
-    const badge = document.getElementById('notificationBadge');
-    if (badge) {
-      if (unreadCount > 0) {
-        badge.textContent = unreadCount;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
       }
     }
-  }
-  
-  // Load notification preview
-  function loadNotificationPreview() {
-    const notificationPreviewItems = document.getElementById('notificationPreviewItems');
-    const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
-    
-    if (!notificationPreviewItems) return;
-    
-    // Sort notifications by time (newest first)
-    const sortedNotifications = [...notifications].sort((a, b) => {
-      const timeA = new Date(a.timestamp || a.time || 0).getTime();
-      const timeB = new Date(b.timestamp || b.time || 0).getTime();
-      return timeB - timeA;
-    });
-    
-    if (sortedNotifications.length === 0) {
-      notificationPreviewItems.innerHTML = `
+
+    // Load notification preview
+    function loadNotificationPreview() {
+      const notificationPreviewItems = document.getElementById('notificationPreviewItems');
+      const notifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
+
+      if (!notificationPreviewItems) return;
+
+      // Sort notifications by time (newest first)
+      const sortedNotifications = [...notifications].sort((a, b) => {
+        const timeA = new Date(a.timestamp || a.time || 0).getTime();
+        const timeB = new Date(b.timestamp || b.time || 0).getTime();
+        return timeB - timeA;
+      });
+
+      if (sortedNotifications.length === 0) {
+        notificationPreviewItems.innerHTML = `
         <div class="p-8 text-center text-gray-500">
           <i class="fas fa-bell text-4xl mb-2 text-gray-300"></i>
           <p class="text-sm">No notifications</p>
         </div>
       `;
-      return;
-    }
-    
-    // Show only the 5 most recent notifications
-    const recentNotifications = sortedNotifications.slice(0, 5);
-    
-    notificationPreviewItems.innerHTML = recentNotifications.map(notif => {
-      const isUnread = !notif.read;
-      const unreadClass = isUnread ? 'bg-green-50 border-l-4 border-green-500' : '';
-      const time = notif.timestamp || notif.time || Date.now();
-      const timeAgo = getTimeAgo(new Date(time));
-      
-      // Get icon and color classes based on notification type
-      let iconClass = 'fa-info-circle';
-      let iconBgClass = 'bg-blue-100';
-      let iconTextClass = 'text-blue-700';
-      if (notif.type === 'order' || notif.type === 'order_placed') {
-        iconClass = 'fa-box';
-        iconBgClass = 'bg-green-100';
-        iconTextClass = 'text-green-700';
-      } else if (notif.type === 'stock') {
-        iconClass = 'fa-exclamation-triangle';
-        iconBgClass = 'bg-yellow-100';
-        iconTextClass = 'text-yellow-700';
-      } else if (notif.type === 'review') {
-        iconClass = 'fa-star';
-        iconBgClass = 'bg-yellow-100';
-        iconTextClass = 'text-yellow-700';
-      } else if (notif.type === 'message') {
-        iconClass = 'fa-comment';
-        iconBgClass = 'bg-blue-100';
-        iconTextClass = 'text-blue-700';
-      } else if (notif.type === 'payment') {
-        iconClass = 'fa-money-bill';
-        iconBgClass = 'bg-green-100';
-        iconTextClass = 'text-green-700';
+        return;
       }
-      
-      const title = escapeHtml(notif.title || 'Notification');
-      const message = escapeHtml(notif.message || '');
-      const link = notif.link || '<?php echo $base; ?>user/notification.php';
-      
-      return `
+
+      // Show only the 5 most recent notifications
+      const recentNotifications = sortedNotifications.slice(0, 5);
+
+      notificationPreviewItems.innerHTML = recentNotifications.map(notif => {
+        const isUnread = !notif.read;
+        const unreadClass = isUnread ? 'bg-green-50 border-l-4 border-green-500' : '';
+        const time = notif.timestamp || notif.time || Date.now();
+        const timeAgo = getTimeAgo(new Date(time));
+
+        // Get icon and color classes based on notification type
+        let iconClass = 'fa-info-circle';
+        let iconBgClass = 'bg-blue-100';
+        let iconTextClass = 'text-blue-700';
+        if (notif.type === 'order' || notif.type === 'order_placed') {
+          iconClass = 'fa-box';
+          iconBgClass = 'bg-green-100';
+          iconTextClass = 'text-green-700';
+        } else if (notif.type === 'stock') {
+          iconClass = 'fa-exclamation-triangle';
+          iconBgClass = 'bg-yellow-100';
+          iconTextClass = 'text-yellow-700';
+        } else if (notif.type === 'review') {
+          iconClass = 'fa-star';
+          iconBgClass = 'bg-yellow-100';
+          iconTextClass = 'text-yellow-700';
+        } else if (notif.type === 'message') {
+          iconClass = 'fa-comment';
+          iconBgClass = 'bg-blue-100';
+          iconTextClass = 'text-blue-700';
+        } else if (notif.type === 'payment') {
+          iconClass = 'fa-money-bill';
+          iconBgClass = 'bg-green-100';
+          iconTextClass = 'text-green-700';
+        }
+
+        const title = escapeHtml(notif.title || 'Notification');
+        const message = escapeHtml(notif.message || '');
+        const link = notif.link || '<?php echo $base; ?>user/notification.php';
+
+        return `
         <a href="${link}" class="block p-3 border-b border-gray-100 hover:bg-gray-50 transition ${unreadClass}">
           <div class="flex items-start gap-3">
             <div class="${iconBgClass} ${iconTextClass} p-2 rounded-full flex-shrink-0">
@@ -447,203 +447,212 @@ if (in_array($current_dir, $subdirectories)) {
           </div>
         </a>
       `;
-    }).join('');
-  }
-  
-  // Helper function to format time ago
-  function getTimeAgo(date) {
-    const seconds = Math.floor((new Date() - date) / 1000);
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return date.toLocaleDateString();
-  }
-  
-  // Hover delay management for dropdowns
-  let profileDropdownTimeout = null;
-  let cartPreviewTimeout = null;
-  let notificationPreviewTimeout = null;
-  const HOVER_DELAY = 200; // milliseconds delay before hiding
-  
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    // Clear old localStorage cart data to prevent conflicts
-    localStorage.removeItem('cart');
-    
-    loadCartPreview();
-    loadNotificationBadge();
-    loadNotificationPreview();
-    
-    // Notification preview hover handlers
-    const notificationContainer = document.getElementById('notificationPreviewContainer');
-    const notificationPreview = document.getElementById('notificationPreview');
-    const notificationIcon = document.getElementById('notificationIcon');
-    
-    if (notificationContainer && notificationPreview && notificationIcon) {
-      // Show preview on hover
-      notificationContainer.addEventListener('mouseenter', function() {
-        clearTimeout(notificationPreviewTimeout);
-        loadNotificationPreview(); // Refresh notifications when hovering
-        notificationPreview.classList.remove('hidden');
-      });
-      
-      // Hide preview with delay on mouse leave
-      notificationContainer.addEventListener('mouseleave', function() {
-        notificationPreviewTimeout = setTimeout(function() {
-          notificationPreview.classList.add('hidden');
-        }, HOVER_DELAY);
-      });
-      
-      // Keep preview visible when hovering over it
-      notificationPreview.addEventListener('mouseenter', function() {
-        clearTimeout(notificationPreviewTimeout);
-      });
-      
-      notificationPreview.addEventListener('mouseleave', function() {
-        notificationPreviewTimeout = setTimeout(function() {
-          notificationPreview.classList.add('hidden');
-        }, HOVER_DELAY);
-      });
+      }).join('');
     }
-    
-    // Profile dropdown hover handlers (changed from click to hover)
-    const profileContainer = document.getElementById('profileDropdownContainer');
-    const profileDropdown = document.getElementById('profileDropdown');
-    
-    if (profileContainer && profileDropdown) {
-      // Show dropdown on hover
-      profileContainer.addEventListener('mouseenter', function() {
-        clearTimeout(profileDropdownTimeout);
-        profileDropdown.classList.remove('hidden');
-      });
-      
-      // Hide dropdown with delay on mouse leave
-      profileContainer.addEventListener('mouseleave', function() {
-        profileDropdownTimeout = setTimeout(function() {
-          profileDropdown.classList.add('hidden');
-        }, HOVER_DELAY);
-      });
-      
-      // Keep dropdown visible when hovering over it
-      profileDropdown.addEventListener('mouseenter', function() {
-        clearTimeout(profileDropdownTimeout);
-      });
-      
-      // Hide dropdown when mouse leaves the dropdown itself
-      profileDropdown.addEventListener('mouseleave', function() {
-        profileDropdownTimeout = setTimeout(function() {
-          profileDropdown.classList.add('hidden');
-        }, HOVER_DELAY);
-      });
-        }
-    
-    // Cart preview hover handlers
-    const cartContainer = document.getElementById('cartPreviewContainer');
-    const cartPreview = document.getElementById('cartPreview');
-    const cartIcon = document.getElementById('cartIcon');
-    
-    if (cartContainer && cartPreview && cartIcon) {
-      // Show preview on hover and refresh cart data
-      cartContainer.addEventListener('mouseenter', function() {
-        clearTimeout(cartPreviewTimeout);
-        loadCartPreview(); // Refresh cart data when hovering
-        cartPreview.classList.remove('hidden');
-      });
-      
-      // Hide preview with delay on mouse leave
-      cartContainer.addEventListener('mouseleave', function() {
-        cartPreviewTimeout = setTimeout(function() {
-          cartPreview.classList.add('hidden');
-        }, HOVER_DELAY);
-      });
-      
-      // Keep preview visible when hovering over it
-      cartPreview.addEventListener('mouseenter', function() {
-        clearTimeout(cartPreviewTimeout);
-      });
-      
-      cartPreview.addEventListener('mouseleave', function() {
-        cartPreviewTimeout = setTimeout(function() {
-          cartPreview.classList.add('hidden');
-        }, HOVER_DELAY);
-      });
+
+    // Helper function to format time ago
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'Just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+      return date.toLocaleDateString();
     }
-    
-    // Refresh cart every 5 seconds for real-time updates
-    setInterval(loadCartPreview, 5000);
-  });
-  
-  // Listen for cart updates from same page or other tabs
-  window.addEventListener('cartUpdated', function() {
-    loadCartPreview();
-    // Also update badge separately for immediate feedback
-    const basePath = '<?php echo $base; ?>';
-    fetch(`${basePath}api/cart.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'count' })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const cartBadge = document.getElementById('cartBadge');
-        if (cartBadge) {
-          cartBadge.textContent = data.count || 0;
-          cartBadge.classList.toggle('hidden', data.count === 0);
-        }
-      }
-    })
-    .catch(error => console.log('Error updating badge:', error));
-  });
-  
-  window.addEventListener('storage', function(e) {
-    if (e.key === 'cart' || e.key === 'cartUpdated') {
+
+    // Hover delay management for dropdowns
+    let profileDropdownTimeout = null;
+    let cartPreviewTimeout = null;
+    let notificationPreviewTimeout = null;
+    const HOVER_DELAY = 200; // milliseconds delay before hiding
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Clear old localStorage cart data to prevent conflicts
+      localStorage.removeItem('cart');
+
       loadCartPreview();
-    }
-    if (e.key === 'userNotifications') {
       loadNotificationBadge();
       loadNotificationPreview();
-    }
-  });
-})();
+
+      // Notification preview hover handlers
+      const notificationContainer = document.getElementById('notificationPreviewContainer');
+      const notificationPreview = document.getElementById('notificationPreview');
+      const notificationIcon = document.getElementById('notificationIcon');
+
+      if (notificationContainer && notificationPreview && notificationIcon) {
+        // Show preview on hover
+        notificationContainer.addEventListener('mouseenter', function() {
+          clearTimeout(notificationPreviewTimeout);
+          loadNotificationPreview(); // Refresh notifications when hovering
+          notificationPreview.classList.remove('hidden');
+        });
+
+        // Hide preview with delay on mouse leave
+        notificationContainer.addEventListener('mouseleave', function() {
+          notificationPreviewTimeout = setTimeout(function() {
+            notificationPreview.classList.add('hidden');
+          }, HOVER_DELAY);
+        });
+
+        // Keep preview visible when hovering over it
+        notificationPreview.addEventListener('mouseenter', function() {
+          clearTimeout(notificationPreviewTimeout);
+        });
+
+        notificationPreview.addEventListener('mouseleave', function() {
+          notificationPreviewTimeout = setTimeout(function() {
+            notificationPreview.classList.add('hidden');
+          }, HOVER_DELAY);
+        });
+      }
+
+      // Profile dropdown hover handlers (changed from click to hover)
+      const profileContainer = document.getElementById('profileDropdownContainer');
+      const profileDropdown = document.getElementById('profileDropdown');
+
+      if (profileContainer && profileDropdown) {
+        // Show dropdown on hover
+        profileContainer.addEventListener('mouseenter', function() {
+          clearTimeout(profileDropdownTimeout);
+          profileDropdown.classList.remove('hidden');
+        });
+
+        // Hide dropdown with delay on mouse leave
+        profileContainer.addEventListener('mouseleave', function() {
+          profileDropdownTimeout = setTimeout(function() {
+            profileDropdown.classList.add('hidden');
+          }, HOVER_DELAY);
+        });
+
+        // Keep dropdown visible when hovering over it
+        profileDropdown.addEventListener('mouseenter', function() {
+          clearTimeout(profileDropdownTimeout);
+        });
+
+        // Hide dropdown when mouse leaves the dropdown itself
+        profileDropdown.addEventListener('mouseleave', function() {
+          profileDropdownTimeout = setTimeout(function() {
+            profileDropdown.classList.add('hidden');
+          }, HOVER_DELAY);
+        });
+      }
+
+      // Cart preview hover handlers
+      const cartContainer = document.getElementById('cartPreviewContainer');
+      const cartPreview = document.getElementById('cartPreview');
+      const cartIcon = document.getElementById('cartIcon');
+
+      if (cartContainer && cartPreview && cartIcon) {
+        // Show preview on hover and refresh cart data
+        cartContainer.addEventListener('mouseenter', function() {
+          clearTimeout(cartPreviewTimeout);
+          loadCartPreview(); // Refresh cart data when hovering
+          cartPreview.classList.remove('hidden');
+        });
+
+        // Hide preview with delay on mouse leave
+        cartContainer.addEventListener('mouseleave', function() {
+          cartPreviewTimeout = setTimeout(function() {
+            cartPreview.classList.add('hidden');
+          }, HOVER_DELAY);
+        });
+
+        // Keep preview visible when hovering over it
+        cartPreview.addEventListener('mouseenter', function() {
+          clearTimeout(cartPreviewTimeout);
+        });
+
+        cartPreview.addEventListener('mouseleave', function() {
+          cartPreviewTimeout = setTimeout(function() {
+            cartPreview.classList.add('hidden');
+          }, HOVER_DELAY);
+        });
+      }
+
+      // Refresh cart every 5 seconds for real-time updates
+      setInterval(loadCartPreview, 5000);
+    });
+
+    // Listen for cart updates from same page or other tabs
+    window.addEventListener('cartUpdated', function() {
+      loadCartPreview();
+      // Also update badge separately for immediate feedback
+      const basePath = '<?php echo $base; ?>';
+      fetch(`${basePath}api/cart.php`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: 'count'
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const cartBadge = document.getElementById('cartBadge');
+            if (cartBadge) {
+              cartBadge.textContent = data.count || 0;
+              cartBadge.classList.toggle('hidden', data.count === 0);
+            }
+          }
+        })
+        .catch(error => console.log('Error updating badge:', error));
+    });
+
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'cart' || e.key === 'cartUpdated') {
+        loadCartPreview();
+      }
+      if (e.key === 'userNotifications') {
+        loadNotificationBadge();
+        loadNotificationPreview();
+      }
+    });
+  })();
 </script>
 
+<?php
+// Include the messaging widget for all user pages
+include __DIR__ . '/user-message-widget.php';
+?>
+
 <style>
+  /* Smooth transitions */
+  #autocompleteDropdown,
+  #profileDropdown,
+  #cartPreview,
+  #notificationPreview {
+    animation: fadeIn 0.2s ease-out;
+  }
 
-/* Smooth transitions */
-#autocompleteDropdown,
-#profileDropdown,
-#cartPreview,
-#notificationPreview {
-  animation: fadeIn 0.2s ease-out;
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-/* Mobile responsive */
-@media (max-width: 640px) {
-  #searchInput {
-    font-size: 14px;
-    padding-left: 2.5rem;
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    #searchInput {
+      font-size: 14px;
+      padding-left: 2.5rem;
+    }
+
+    #autocompleteDropdown {
+      max-height: 60vh;
+    }
+
+    #cartPreview {
+      width: 90vw;
+      right: -10px;
+    }
   }
-  
-  #autocompleteDropdown {
-    max-height: 60vh;
-  }
-  
-  #cartPreview {
-    width: 90vw;
-    right: -10px;
-  }
-}
 </style>

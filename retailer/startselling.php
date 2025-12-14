@@ -44,6 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
         $city = trim($_POST['city'] ?? '');
         $province = trim($_POST['province'] ?? '');
         $shopCategory = trim($_POST['shop_category'] ?? '');
+        if ($shopCategory === 'others') {
+            $shopCategory = trim($_POST['shop_category_other'] ?? '');
+        }
         $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
         $verificationCode = trim($_POST['verification_code'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -103,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
             
             $newUser = $api->insert('users', [
                 'email' => $email,
+                'username' => $email,
                 'password_hash' => $hashedPassword,
                 'full_name' => $shopName,
                 'phone' => $phone,
@@ -117,8 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retailer_signup'])) {
                 $retailerData = [
                     'user_id' => $userId,
                     'shop_name' => $shopName,
-                    'business_address' => $shopAddress,
                     'shop_category' => $shopCategory,
+                    'business_address' => $shopAddress,
                     'verification_status' => 'pending',
                     'rating' => 0.00,
                     'total_sales' => 0.00
