@@ -7,42 +7,67 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
   exit();
 }
 
+// Include API and Helpers globally
+require_once __DIR__ . '/../config/supabase-api.php';
+require_once __DIR__ . '/../config/uuid-helper.php';
+$api = getSupabaseAPI();
+
 // Get user data from session
 $user_id = $_SESSION['user_id'] ?? null;
 $shop_name = $_GET['shop'] ?? '';
 
-// Fetch profile picture from database
+// Fetch logged-in user profile picture
 $profile_picture = '';
 $full_name = $_SESSION['full_name'] ?? 'User';
 if ($user_id) {
-  require_once __DIR__ . '/../config/supabase-api.php';
-  require_once __DIR__ . '/../config/uuid-helper.php';
-  $api = getSupabaseAPI();
+  // We can stick with safeGetUser for the current logged-in user session checks
   $user = safeGetUser($user_id, $api);
   if ($user) {
     $profile_picture = $user['profile_picture'] ?? '';
   }
 }
 
-// Fetch shop/retailer information
-$shop_info = null;
-$products = [];
-if ($shop_name) {
-  require_once __DIR__ . '/../config/supabase-api.php';
-  $api = getSupabaseAPI();
+// Helper function to get shop owner's profile image with file existence check
+function getShopProfileImage($retailer_user_id, $api) {
+    // Default fallback (placeholder)
+    $default_image = '../images/products/placeholder.png';
+    
+    if (empty($retailer_user_id)) {
+        return $default_image;
+    }
+    
+    // Explicitly fetch from the 'users' table based on the schema provided
+    $users = $api->select('users', ['id' => $retailer_user_id]);
+    
+    // Check if user exists
+    if (empty($users) || !isset($users[0])) {
+        return $default_image;
+    }
 
-  // Get retailer information by shop name
-  $retailers = $api->select('retailers', ['shop_name' => $shop_name]);
-  if (!empty($retailers)) {
-    $shop_info = $retailers[0];
-    $retailer_id = $shop_info['id'];
+    $shop_owner = $users[0];
+    $pic = $shop_owner['profile_picture'] ?? '';
+    
+    if (empty($pic)) {
+        return $default_image;
+    }
 
-    // Fetch products for this retailer
-    $products = $api->select('products', ['retailer_id' => $retailer_id, 'status' => 'active']);
-  }
+    // Clean the filename (in case DB has full path stored)
+    $filename = basename($pic);
+    
+    // Check if the file physically exists on the server
+    // Assuming structure: /root/pages/shop-products.php and /root/assets/profiles/
+    $target_dir = __DIR__ . '/../assets/profiles/';
+    $file_path = $target_dir . $filename;
+
+    if (file_exists($file_path)) {
+        return '../assets/profiles/' . $filename;
+    }
+    
+    // If file not found in assets/profiles, return default
+    return $default_image;
 }
 
-// Helper function to resolve image path
+// Helper function to resolve product image path
 function resolveImagePath($img)
 {
   if (empty($img)) return '../images/products/placeholder.png';
@@ -59,6 +84,26 @@ function getProductImage($product)
   $img = $product['image'] ?? $product['image_url'] ?? $product['product_image'] ?? $product['image_path'] ?? '';
   return resolveImagePath($img);
 }
+
+// Fetch shop/retailer information
+$shop_info = null;
+$shop_owner_image = '';
+$products = [];
+
+if ($shop_name) {
+  // Get retailer information by shop name
+  $retailers = $api->select('retailers', ['shop_name' => $shop_name]);
+  if (!empty($retailers)) {
+    $shop_info = $retailers[0];
+    $retailer_id = $shop_info['id'];
+
+    // Get the shop image from the owner's profile in the users table
+    $shop_owner_image = getShopProfileImage($shop_info['user_id'] ?? null, $api);
+
+    // Fetch products for this retailer
+    $products = $api->select('products', ['retailer_id' => $retailer_id, 'status' => 'active']);
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,7 +111,7 @@ function getProductImage($product)
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title><?php echo htmlspecialchars($shop_name); ?>Farmers Mall - Shop</title>
+  <title><?php echo htmlspecialchars($shop_name ? $shop_name . ' - ' : ''); ?>Farmers Mall</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -115,9 +160,20 @@ function getProductImage($product)
     <section class="bg-white shadow-sm py-8">
       <div class="max-w-7xl mx-auto px-6">
         <div class="flex items-center gap-6">
-          <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
-            <i class="fas fa-store text-green-600 text-3xl"></i>
+          <!-- Shop Image / Profile Picture -->
+          <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+             <?php if (!empty($shop_owner_image) && strpos($shop_owner_image, 'placeholder') === false): ?>
+                <img src="<?php echo htmlspecialchars($shop_owner_image); ?>" 
+                     alt="<?php echo htmlspecialchars($shop_info['shop_name']); ?>" 
+                     class="w-full h-full object-cover"
+                     onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($shop_info['shop_name']); ?>&background=random'">
+             <?php else: ?>
+                <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($shop_info['shop_name']); ?>&background=random" 
+                     alt="Shop Icon" 
+                     class="w-full h-full object-cover">
+             <?php endif; ?>
           </div>
+          
           <div>
             <h1 class="text-3xl font-bold text-gray-800">
               <?php echo htmlspecialchars($shop_info['shop_name']); ?></h1>
@@ -147,7 +203,7 @@ function getProductImage($product)
         <a href="shop-products.php"
           class="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium transition-colors">
           <i class="fas fa-arrow-left"></i>
-          <span>Shops</span>
+          <span>All Shops</span>
         </a>
       <?php else: ?>
         <a href="user-homepage.php"
@@ -161,8 +217,6 @@ function getProductImage($product)
     <?php if (!$shop_info): ?>
       <?php
       // Fetch all shops/retailers
-      require_once __DIR__ . '/../config/supabase-api.php';
-      $api = getSupabaseAPI();
       $all_retailers = $api->select('retailers') ?: [];
       ?>
       <div class="mb-6">
@@ -171,27 +225,27 @@ function getProductImage($product)
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <?php
-        // Map shop names to images
-        $shop_images = [
-          'Mesa Farm' => '../images/img1.png',
-          'Taco Bell' => '../images/img3.png',
-          'Jay\'s Artisan' => '../images/img2.png',
-          'Ocean Fresh' => '../images/img4.png'
-        ];
-
-        foreach ($all_retailers as $retailer):
-          $shop_image = $shop_images[$retailer['shop_name']] ?? '../images/img1.png';
+        <?php foreach ($all_retailers as $retailer): 
+            // Fetch shop image dynamically from owner's profile
+            $shop_image = getShopProfileImage($retailer['user_id'] ?? null, $api);
+            
+            // Define a robust fallback image (UI Avatars) if local file fails
+            $fallback_image = "https://ui-avatars.com/api/?name=" . urlencode($retailer['shop_name']) . "&background=random&size=200";
         ?>
           <a href="shop-products.php?shop=<?php echo urlencode($retailer['shop_name']); ?>"
-            class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-            <img src="<?php echo htmlspecialchars($shop_image); ?>"
-              alt="<?php echo htmlspecialchars($retailer['shop_name']); ?>" class="w-full h-40 object-cover">
-            <div class="p-4">
+            class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition flex flex-col h-full">
+            <div class="w-full h-40 bg-gray-100 relative">
+                 <img src="<?php echo htmlspecialchars($shop_image); ?>"
+                  alt="<?php echo htmlspecialchars($retailer['shop_name']); ?>" 
+                  class="w-full h-full object-cover"
+                  onerror="this.onerror=null; this.src='<?php echo $fallback_image; ?>';">
+            </div>
+            
+            <div class="p-4 flex-1">
               <h3 class="font-bold text-lg mb-1"><?php echo htmlspecialchars($retailer['shop_name']); ?></h3>
-              <p class="text-sm text-gray-600 mb-2">
+              <p class="text-sm text-gray-600 mb-2 line-clamp-2">
                 <?php echo htmlspecialchars($retailer['shop_description'] ?? 'Quality products'); ?></p>
-              <div class="flex items-center gap-2 text-sm text-gray-500">
+              <div class="flex items-center gap-2 text-sm text-gray-500 mt-auto">
                 <span class="text-yellow-500">
                   <i class="fas fa-star"></i>
                   <?php echo number_format($retailer['rating'] ?? 0, 1); ?>
@@ -219,7 +273,7 @@ function getProductImage($product)
       ?>
 
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Shop</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Shop Products</h2>
         <p class="text-gray-600">Browse all products from <?php echo htmlspecialchars($shop_name); ?></p>
       </div>
 

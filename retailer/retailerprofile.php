@@ -133,10 +133,13 @@ function handleRetailerProfileUpdate()
     // User data updates
     $updateData = [];
 
-    if (!empty(trim($_POST['full_name'] ?? ''))) {
-      $updateData['full_name'] = trim($_POST['full_name']);
+    // CHANGED: Replaced full_name with phone
+    if (!empty(trim($_POST['phone'] ?? ''))) {
+      $updateData['phone'] = trim($_POST['phone']);
+    } elseif (isset($_POST['phone'])) {
+       // Allow clearing the phone number
+       $updateData['phone'] = null;
     }
-
 
     if (!empty(trim($_POST['email'] ?? ''))) {
       $updateData['email'] = trim($_POST['email']);
@@ -151,7 +154,9 @@ function handleRetailerProfileUpdate()
     if (!empty(trim($_POST['business_address'] ?? ''))) {
       $retailerData['business_address'] = trim($_POST['business_address']);
     }
-
+    
+    // REMOVED: Previous contact_number handling for retailers table to avoid duplication
+    // We are now using users.phone as the primary contact number
 
     // Handle profile picture upload
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -179,10 +184,6 @@ function handleRetailerProfileUpdate()
     }
 
     // Update session with new values
-    if (isset($updateData['full_name'])) {
-      $_SESSION['full_name'] = $updateData['full_name'];
-      $_SESSION['username'] = $updateData['full_name'];
-    }
     if (isset($updateData['profile_picture'])) {
       $_SESSION['profile_picture'] = $updateData['profile_picture'];
     }
@@ -290,6 +291,8 @@ try {
 // Set default values
 $email = $userData['email'] ?? $_SESSION['email'] ?? 'retailer@email.com';
 $full_name = $userData['full_name'] ?? $_SESSION['username'] ?? 'Guest Retailer';
+// CHANGED: Get phone from users table
+$phone = $userData['phone'] ?? '';
 
 $profile_picture = $userData['profile_picture'] ?? $_SESSION['profile_picture'] ?? '';
 $created_at = $userData['created_at'] ?? '';
@@ -467,7 +470,7 @@ try {
       <section id="my-profile" class="content-section bg-white rounded-lg shadow p-6">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-semibold text-gray-800">My Profile</h2>
-          <button id="editProfileBtn" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+          <button type="button" id="editProfileBtn" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
             <i class="fas fa-pen"></i> Edit Profile
           </button>
         </div>
@@ -488,24 +491,28 @@ try {
             <div class="flex-1">
               <h3 id="displayShopName" class="text-2xl font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($shop_name); ?></h3>
               <p id="displayEmail" class="text-gray-600 mb-3"><?php echo htmlspecialchars($email); ?></p>
-              <?php if (!empty($full_name)): ?>
-                <p class="text-gray-600 text-sm">
-                  <i class="fas fa-store text-green-600 mr-1"></i>
-                  <span id="displayShopName"><?php echo htmlspecialchars($shop_name); ?></span>
-                </p>
-              <?php endif; ?>
+              <p class="text-gray-600 text-sm">
+                <!-- CHANGED: Replaced User Icon/Full Name with Phone -->
+                <i class="fas fa-phone text-green-600 mr-1"></i>
+                <span id="displayPhone"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></span>
+              </p>
             </div>
           </div>
 
           <!-- Personal & Business Information Grid -->
           <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-gray-50 p-4 rounded-lg">
-
-
+            <!-- COLUMN 1: Information Tiles (Cleaned up structure) -->
+            <div class="space-y-4">
+              
+              <!-- Tile: Business Location -->
               <div class="bg-gray-50 p-4 rounded-lg">
                 <label class="text-xs text-gray-500 uppercase tracking-wide">Business Location</label>
                 <p id="displayBusinessAddress" class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
               </div>
+              
+              <!-- Removed separate contact number tile as it's now primary info -->
+              
+              <!-- Tile: Member Since -->
               <div class="bg-gray-50 p-4 rounded-lg">
                 <label class="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
                 <p id="displayMemberSince" class="text-gray-800 font-medium mt-1">
@@ -518,6 +525,8 @@ try {
                   ?>
                 </p>
               </div>
+              
+              <!-- Tile: Business Permit Status -->
               <div class="bg-gray-50 p-4 rounded-lg">
                 <label class="text-xs text-gray-500 uppercase tracking-wide">Business Permit Status</label>
                 <p id="displayPermitStatus" class="text-gray-800 font-medium mt-1">
@@ -528,9 +537,9 @@ try {
                   <?php endif; ?>
                 </p>
               </div>
-            </div>
+            </div> <!-- End of COLUMN 1: Information Tiles -->
 
-            <!-- Shop Statistics -->
+            <!-- COLUMN 2: Shop Statistics -->
             <div class="pt-6 border-t">
               <h4 class="font-semibold mb-4 text-gray-700">Shop Statistics</h4>
               <div class="grid grid-cols-3 gap-4">
@@ -548,7 +557,8 @@ try {
                 </div>
               </div>
             </div>
-          </div>
+          </div> <!-- End of Grid -->
+        </div> <!-- End of profileDisplay -->
 
           <!-- Profile Edit Mode (Hidden by default) -->
           <form id="profileEditForm" class="space-y-6 hidden">
@@ -578,6 +588,12 @@ try {
 
             <!-- Personal & Business Information -->
             <div class="grid md:grid-cols-2 gap-4">
+              <!-- CHANGED: Full Name Input to Contact Number Input -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                <input type="text" id="editPhone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="e.g., +639123456789">
+              </div>
+              
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
                 <input type="text" id="editShopName" name="shop_name" value="<?php echo htmlspecialchars($shop_name); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
@@ -587,6 +603,7 @@ try {
                 <input type="email" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none">
               </div>
 
+              <!-- REMOVED: Extra Contact Number field added previously -->
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Business Location</label>
@@ -614,6 +631,12 @@ try {
             <label class="text-xs text-gray-500 uppercase tracking-wide">Shop Name</label>
             <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($shop_name); ?></p>
           </div>
+          <!-- CHANGED: Replaced retailer contact number with user phone -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <label class="text-xs text-gray-500 uppercase tracking-wide">Contact Number</label>
+            <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($phone ?: 'Not provided'); ?></p>
+          </div>
+          
           <div class="bg-gray-50 p-4 rounded-lg">
             <label class="text-xs text-gray-500 uppercase tracking-wide">Business Address</label>
             <p class="text-gray-800 font-medium mt-1"><?php echo htmlspecialchars($business_address ?: 'Not provided'); ?></p>
@@ -942,9 +965,7 @@ try {
           }).catch(error => console.error('Error marking notification as read:', error));
         }
         // Load notifications immediately on page load
-        document.addEventListener('DOMContentLoaded', function() {
-          loadRetailerNotificationBadge();
-        });
+        
         // Also call immediately in case DOM is already loaded
         if (document.readyState === 'loading') {
           // DOM is still loading, wait for DOMContentLoaded
@@ -1069,6 +1090,26 @@ try {
       // Switch to edit mode
       if (editProfileBtn) {
         editProfileBtn.addEventListener('click', () => {
+          // --- FIX: Synchronize display values to edit inputs ---
+          const getDisplayValue = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return '';
+            const text = el.textContent.trim();
+            // Clear "Not provided" or other placeholders before setting in input
+            return text === 'Not provided' || text === 'Recently' ? '' : text;
+          };
+
+          // Basic Info
+          // CHANGED: Get phone instead of full name
+          document.getElementById('editPhone').value = getDisplayValue('displayPhone');
+          document.getElementById('editShopName').value = getDisplayValue('displayShopName');
+          document.getElementById('editEmail').value = getDisplayValue('displayEmail');
+          
+          // Retailer Info
+          const businessAddressInput = document.getElementById('editBusinessAddress');
+          if (businessAddressInput) businessAddressInput.value = getDisplayValue('displayBusinessAddress');
+
+          // Switch views
           profileDisplay.classList.add('hidden');
           profileEditForm.classList.remove('hidden');
           editProfileBtn.classList.add('hidden');
@@ -1207,7 +1248,8 @@ try {
 
         formData.append('shop_name', document.getElementById('editShopName').value);
         formData.append('business_address', document.getElementById('editBusinessAddress').value);
-
+        // CHANGED: Append phone instead of full_name or contact_number
+        formData.append('phone', document.getElementById('editPhone').value);
 
         const profilePicFile = profilePicInput.files[0];
         if (profilePicFile) {
@@ -1250,14 +1292,20 @@ try {
               if (data.shop_name) {
                 document.getElementById('displayShopName').textContent = data.shop_name || 'My Shop';
               }
-              if (data.full_name) {
-                const fullNameEl = document.getElementById('displayFullName');
-                if (fullNameEl) fullNameEl.textContent = data.full_name;
+              // CHANGED: Update phone display
+              if (data.phone) {
+                const phoneEl = document.getElementById('displayPhone');
+                if (phoneEl) phoneEl.textContent = data.phone;
+              } else {
+                 const phoneEl = document.getElementById('displayPhone');
+                 if (phoneEl) phoneEl.textContent = 'Not provided';
               }
+
               document.getElementById('displayEmail').textContent = data.email;
 
               document.getElementById('displayBusinessAddress').textContent = data.business_address || 'Not provided';
-              document.getElementById('displayContactNumber').textContent = data.contact_number || 'Not provided';
+              
+              // Note: Removed redundant contact number update since it's now primary
 
               if (data.created_at) {
                 const createdDate = new Date(data.created_at);
@@ -1335,7 +1383,7 @@ try {
       if (closePermitModal) {
         closePermitModal.addEventListener('click', () => {
           permitModal.classList.add('hidden');
-        });
+        } );
       }
 
       if (permitModal) {

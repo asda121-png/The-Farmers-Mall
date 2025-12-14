@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const formInputs = document.querySelectorAll('#my-profile form input:not([type="file"])');
   const imageUpload = document.getElementById('imageUpload');
   const changePictureBtn = document.getElementById('changePictureBtn');
-
+const editContactNumber = document.getElementById('editContactNumber');
   // Profile Data Elements
   const profileImage = document.getElementById('profileImage');
   const sidebarProfilePic = document.getElementById('sidebarProfilePic');
