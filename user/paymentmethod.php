@@ -290,8 +290,7 @@ if ($user_id && isset($api)) {
             <span class="font-medium">GCash</span>
           </div>
           <div class="flex items-center gap-3">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/GCash_logo.svg" alt="GCash"
-              class="h-6">
+            <div class="bg-blue-600 text-white px-3 py-1 rounded font-bold text-sm">GCash</div>
           </div>
         </label>
 
@@ -399,8 +398,7 @@ if ($user_id && isset($api)) {
       <div id="gcash-button-container" class="mt-6 hidden">
         <button id="gcashPayBtn"
           class="bg-blue-600 w-full text-white py-3 rounded-md font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/GCash_logo.svg" alt="GCash"
-            class="h-5">
+          <span class="bg-white text-blue-600 px-2 py-0.5 rounded font-bold text-sm">GCash</span>
           Pay with GCash
         </button>
       </div>
