@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayPal Integration Test - Farmers Mall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- UPDATE THIS WITH YOUR ACTUAL PAYPAL CLIENT ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=Acrpz8PXXG3uTexf1Ap9c7ADDza2qxiuyRfbM8O9AVbM_qJ0dAZ7SBEFrXnNziKGCjmbIcToiNbcbQqj&currency=PHP"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8">
+      <h1 class="text-3xl font-bold text-center mb-2">
+        PayPal Integration Test
+      </h1>
+      <p class="text-gray-600 text-center mb-8">
+        Test if your PayPal credentials are working
+      </p>
+
+      <!-- Status Messages -->
+      <div id="status" class="mb-6 hidden">
+        <div id="statusContent" class="p-4 rounded-lg"></div>
+      </div>
+
+      <!-- Test Order Summary -->
+      <div class="bg-gray-50 p-6 rounded-lg mb-6">
+        <h2 class="font-semibold text-lg mb-4">Test Order</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span>Test Product</span>
+            <span>₱100.00</span>
+          </div>
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>Tax</span>
+            <span>₱12.00</span>
+          </div>
+          <div class="border-t pt-2 flex justify-between font-semibold">
+            <span>Total</span>
+            <span id="totalAmount">₱112.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <h3 class="font-semibold text-blue-800 mb-2">How to Test:</h3>
+        <ol class="list-decimal list-inside text-sm text-blue-700 space-y-1">
+          <li>Update the PayPal Client ID in the script tag above</li>
+          <li>Click the PayPal button below</li>
+          <li>Login with your PayPal sandbox buyer account</li>
+          <li>Complete the payment</li>
+          <li>Check if success message appears</li>
+        </ol>
+      </div>
+
+      <!-- PayPal Button Container -->
+      <div id="paypal-button-container" class="mb-6"></div>
+
+      <!-- Alternative: Manual API Test -->
+      <div class="border-t pt-6 mt-6">
+        <h3 class="font-semibold mb-4">Alternative: Test API Directly</h3>
+        <button
+          id="testApiBtn"
+          class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 w-full"
+        >
+          Test PayPal API Connection
+        </button>
+        <div id="apiResult" class="mt-4 hidden">
+          <pre
+            class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-xs"
+          ></pre>
+        </div>
+      </div>
+
+      <!-- Configuration Check -->
+      <div class="border-t pt-6 mt-6">
+        <h3 class="font-semibold mb-4">Configuration Status</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-2">
+            <span
+              id="sdkStatus"
+              class="w-3 h-3 rounded-full bg-gray-300"
+            ></span>
+            <span>PayPal SDK Loaded</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              id="configStatus"
+              class="w-3 h-3 rounded-full bg-gray-300"
+            ></span>
+            <span>Payment Config File</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              id="apiStatus"
+              class="w-3 h-3 rounded-full bg-gray-300"
+            ></span>
+            <span>API Handler</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Test amount
+      const testAmount = 112.0;
+
+      // Check if PayPal SDK loaded
+      window.addEventListener("load", () => {
+        if (window.paypal) {
+          document.getElementById("sdkStatus").classList.remove("bg-gray-300");
+          document.getElementById("sdkStatus").classList.add("bg-green-500");
+          initializePayPal();
+        } else {
+          document.getElementById("sdkStatus").classList.remove("bg-gray-300");
+          document.getElementById("sdkStatus").classList.add("bg-red-500");
+          showStatus(
+            "PayPal SDK failed to load. Check your Client ID in the script tag.",
+            "error"
+          );
+        }
+      });
+
+      // Initialize PayPal Button
+      function initializePayPal() {
+        paypal
+          .Buttons({
+            createOrder: async function (data, actions) {
+              showStatus("Creating PayPal order...", "info");
+
+              try {
+                // Test if API file exists
+                const response = await fetch("../api/paypal-payment.php", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "create_paypal_order",
+                    amount: testAmount,
+                    cart_items: [
+                      { name: "Test Product", quantity: 1, price: 100 },
+                    ],
+                  }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  showStatus(
+                    "✅ Order created! Redirecting to PayPal...",
+                    "success"
+                  );
+                  document
+                    .getElementById("apiStatus")
+                    .classList.remove("bg-gray-300");
+                  document
+                    .getElementById("apiStatus")
+                    .classList.add("bg-green-500");
+                  return result.order_id;
+                } else {
+                  throw new Error(result.message || "Failed to create order");
+                }
+              } catch (error) {
+                document
+                  .getElementById("apiStatus")
+                  .classList.remove("bg-gray-300");
+                document
+                  .getElementById("apiStatus")
+                  .classList.add("bg-red-500");
+                showStatus("❌ Error: " + error.message, "error");
+                throw error;
+              }
+            },
+
+            onApprove: async function (data, actions) {
+              showStatus("Payment approved! Capturing payment...", "info");
+
+              try {
+                const response = await fetch("../api/paypal-payment.php", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "capture_paypal_order",
+                    order_id: data.orderID,
+                  }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  showStatus(
+                    "🎉 SUCCESS! Payment captured successfully!<br>Capture ID: " +
+                      result.capture_id,
+                    "success"
+                  );
+                } else {
+                  showStatus("❌ Capture failed: " + result.message, "error");
+                }
+              } catch (error) {
+                showStatus("❌ Error: " + error.message, "error");
+              }
+            },
+
+            onError: function (err) {
+              showStatus("❌ PayPal Error: " + err, "error");
+              console.error("PayPal Error:", err);
+            },
+
+            onCancel: function (data) {
+              showStatus("⚠️ Payment cancelled by user", "warning");
+            },
+          })
+          .render("#paypal-button-container");
+      }
+
+      // Test API Connection Directly
+      document
+        .getElementById("testApiBtn")
+        .addEventListener("click", async () => {
+          const btn = document.getElementById("testApiBtn");
+          const resultDiv = document.getElementById("apiResult");
+          const resultPre = resultDiv.querySelector("pre");
+
+          btn.disabled = true;
+          btn.textContent = "Testing...";
+          resultDiv.classList.remove("hidden");
+
+          try {
+            const response = await fetch("../api/paypal-payment.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                action: "create_paypal_order",
+                amount: testAmount,
+                cart_items: [],
+              }),
+            });
+
+            const result = await response.json();
+            resultPre.textContent = JSON.stringify(result, null, 2);
+
+            if (result.success) {
+              document
+                .getElementById("configStatus")
+                .classList.remove("bg-gray-300");
+              document
+                .getElementById("configStatus")
+                .classList.add("bg-green-500");
+              showStatus("✅ API test successful!", "success");
+            } else {
+              document
+                .getElementById("configStatus")
+                .classList.remove("bg-gray-300");
+              document
+                .getElementById("configStatus")
+                .classList.add("bg-red-500");
+              showStatus("❌ API test failed: " + result.message, "error");
+            }
+          } catch (error) {
+            document
+              .getElementById("configStatus")
+              .classList.remove("bg-gray-300");
+            document.getElementById("configStatus").classList.add("bg-red-500");
+            resultPre.textContent = "Error: " + error.message;
+            showStatus("❌ API test failed: " + error.message, "error");
+          }
+
+          btn.disabled = false;
+          btn.textContent = "Test PayPal API Connection";
+        });
+
+      // Show status message
+      function showStatus(message, type) {
+        const statusDiv = document.getElementById("status");
+        const statusContent = document.getElementById("statusContent");
+
+        statusDiv.classList.remove("hidden");
+
+        const colors = {
+          success: "bg-green-100 border-green-500 text-green-800",
+          error: "bg-red-100 border-red-500 text-red-800",
+          warning: "bg-yellow-100 border-yellow-500 text-yellow-800",
+          info: "bg-blue-100 border-blue-500 text-blue-800",
+        };
+
+        statusContent.className =
+          "p-4 rounded-lg border-l-4 " + (colors[type] || colors.info);
+        statusContent.innerHTML = message;
+      }
+    </script>
+  </body>
+</html>
